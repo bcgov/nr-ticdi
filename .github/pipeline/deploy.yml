@@ -18,7 +18,7 @@ parameters:
     required: true
   - name: NAMESPACE
     description: Namespace to deploy to
-    value: 32d13a-dev
+    value: c57b8f-dev
   - name: DOMAIN
     value: apps.silver.devops.gov.bc.ca
   - name: CPU_REQUEST

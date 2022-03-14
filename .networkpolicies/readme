@@ -1,0 +1,3 @@
+export NAMESPACE=c57b8f-dev   
+oc create -f allow-same-namespace.yaml -n $NAMESPACE
+oc create -f allow-from-openshift-ingress.yaml -n $NAMESPACE

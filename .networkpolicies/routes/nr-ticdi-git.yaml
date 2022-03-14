@@ -1,0 +1,71 @@
+kind: Route
+apiVersion: route.openshift.io/v1
+metadata:
+  name: nr-ticdi-git
+  namespace: c57b8f-dev
+  uid: a33019c5-923e-454c-8e4c-104345266391
+  resourceVersion: '3001151232'
+  creationTimestamp: '2022-03-05T16:44:22Z'
+  labels:
+    app: nr-ticdi-git
+    app.kubernetes.io/component: nr-ticdi-git
+    app.kubernetes.io/instance: nr-ticdi-git
+    app.kubernetes.io/name: nr-ticdi-git
+    app.kubernetes.io/part-of: nr-ticdi-git-app
+    app.openshift.io/runtime: nodejs
+    app.openshift.io/runtime-version: 14-ubi7
+  annotations:
+    openshift.io/host.generated: 'true'
+  managedFields:
+    - manager: Mozilla
+      operation: Update
+      apiVersion: route.openshift.io/v1
+      time: '2022-03-05T16:44:22Z'
+      fieldsType: FieldsV1
+      fieldsV1:
+        'f:metadata':
+          'f:labels':
+            .: {}
+            'f:app': {}
+            'f:app.kubernetes.io/component': {}
+            'f:app.kubernetes.io/instance': {}
+            'f:app.kubernetes.io/name': {}
+            'f:app.kubernetes.io/part-of': {}
+            'f:app.openshift.io/runtime': {}
+            'f:app.openshift.io/runtime-version': {}
+        'f:spec':
+          'f:port':
+            .: {}
+            'f:targetPort': {}
+          'f:to':
+            'f:kind': {}
+            'f:name': {}
+            'f:weight': {}
+          'f:wildcardPolicy': {}
+    - manager: openshift-router
+      operation: Update
+      apiVersion: route.openshift.io/v1
+      time: '2022-03-05T16:44:23Z'
+      fieldsType: FieldsV1
+      fieldsV1:
+        'f:status':
+          'f:ingress': {}
+spec:
+  host: nr-ticdi-git-c57b8f-dev.apps.silver.devops.gov.bc.ca
+  to:
+    kind: Service
+    name: nr-ticdi-git
+    weight: 100
+  port:
+    targetPort: 8080-tcp
+  wildcardPolicy: None
+status:
+  ingress:
+    - host: nr-ticdi-git-c57b8f-dev.apps.silver.devops.gov.bc.ca
+      routerName: default
+      conditions:
+        - type: Admitted
+          status: 'True'
+          lastTransitionTime: '2022-03-05T16:44:23Z'
+      wildcardPolicy: None
+      routerCanonicalHostname: router-default.apps.silver.devops.gov.bc.ca

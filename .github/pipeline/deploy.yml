@@ -3,8 +3,8 @@ kind: Template
 metadata:
   name: ${NAME}
   annotations:
-    description: "TICDI"
-    tags: "nr-ticdi"
+    description: "Greenfield Template"
+    tags: "gfp"
     iconClass: icon-js
 labels:
   app.kubernetes.io/part-of: "${NAME}"
@@ -12,7 +12,7 @@ labels:
 parameters:
   - name: NAME
     description: Module name
-    value: nr-ticdi
+    value: gfp
   - name: SUFFIX
     description: Deployment suffix, e.g. pr-### or prod
     required: true

@@ -3,7 +3,7 @@ kind: Template
 metadata:
   name: ${NAME}
   annotations:
-    description: "Greenfield Template"
+    description: "TICDI"
     tags: "gfp"
     iconClass: icon-js
 labels:
@@ -39,7 +39,7 @@ objects:
       - name: pr-${SUFFIX}
         from:
           kind: DockerImage
-          name: ghcr.io/bcgov/greenfield-template:pr-${SUFFIX}
+          name: ghcr.io/bcgov/nr-ticdi:pr-${SUFFIX}
         referencePolicy:
           type: Local
   - apiVersion: v1

@@ -61,7 +61,7 @@ objects:
             name: ${NAME}-${SUFFIX}
         spec:
           containers:
-            - image: ghcr.io/bcgov/nr-ticdi:pr-${SUFFIX}
+            - image: image-registry.openshift-image-registry.svc:5000/${NAMESPACE}/${NAME}-${SUFFIX}:pr-${SUFFIX}
               imagePullPolicy: Always
               name: ${NAME}
               ports:

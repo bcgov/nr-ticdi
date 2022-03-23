@@ -216,7 +216,7 @@ function App() {
     router = blankRouter;
   }
 
-  return router;
+  return mainRouter;
 }
 
 function RegistrantsSearch() {

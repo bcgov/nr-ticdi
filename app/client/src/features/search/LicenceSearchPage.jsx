@@ -67,7 +67,7 @@ export default function LicenceSearchPage() {
 
   return (
     <section>
-      <PageHeading>Find a Licence</PageHeading>
+      <PageHeading>Find a DTID</PageHeading>
       <section>
         <Form noValidate onSubmit={performSimpleSearch}>
           <Container>
@@ -79,8 +79,6 @@ export default function LicenceSearchPage() {
                   name="keyword"
                   defaultValue={defaultParameters.keyword}
                   disabled={searchType === SEARCH_TYPE.ADVANCED}
-                  placeholder="Registrant Last Name, Company Name, Licence Number or IRMA"
-                  aria-label="Registrant Last Name, Company Name, Licence Number or IRMA"
                   onChange={(e) => setParameter("keyword", e.target.value)}
                 />
               </Col>
@@ -93,26 +91,6 @@ export default function LicenceSearchPage() {
                 >
                   <FaSearch />
                 </Button>
-              </Col>
-              <Col lg={3}>
-                <Form.Group>
-                  <Button
-                    type="button"
-                    variant="secondary"
-                    block
-                    onClick={toggleSearchType}
-                  >
-                    {searchType === SEARCH_TYPE.SIMPLE ? (
-                      <div>
-                        <FaChevronDown /> Advanced Search
-                      </div>
-                    ) : (
-                      <div>
-                        <FaChevronUp /> Simple Search
-                      </div>
-                    )}
-                  </Button>
-                </Form.Group>
               </Col>
             </Form.Row>
           </Container>

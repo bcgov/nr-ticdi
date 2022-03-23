@@ -89,26 +89,6 @@ export default function SiteSearchPage() {
                   <FaSearch />
                 </Button>
               </Col>
-              <Col lg={3}>
-                <Form.Group>
-                  <Button
-                    type="button"
-                    variant="secondary"
-                    block
-                    onClick={toggleSearchType}
-                  >
-                    {searchType === SEARCH_TYPE.SIMPLE ? (
-                      <div>
-                        <FaChevronDown /> Advanced Search
-                      </div>
-                    ) : (
-                      <div>
-                        <FaChevronUp /> Simple Search
-                      </div>
-                    )}
-                  </Button>
-                </Form.Group>
-              </Col>
             </Form.Row>
           </Container>
         </Form>

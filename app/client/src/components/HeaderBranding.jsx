@@ -22,7 +22,7 @@ function HeaderBranding() {
             alt="B.C. Government Logo"
           />
         </a>
-        <div className="navbar-brand">Agriculture Licensing System</div>
+        <div className="navbar-brand">Tantalis Integrated Common Document Generator Interface</div>
       </div>
     </nav>
   );

@@ -61,8 +61,7 @@ export default function LicenceSearchModal({
   useEffect(() => {}, [dispatch]);
 
   const onSearchSubmit = async () => {
-    await dispatch(setLicenceParameters({ keyword: parameters.keyword }));
-    dispatch(fetchAssociatedLicenceResults(licenceTypeId));
+
   };
 
   const onAssociateSubmit = async (data) => {

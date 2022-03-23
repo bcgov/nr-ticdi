@@ -12,6 +12,7 @@ import {
   ButtonGroup,
 } from "react-bootstrap";
 
+import Api, { ApiError } from "../../utilities/api.ts";
 import {
   REQUEST_STATUS,
   CREATE_LICENSES_PATHNAME,
@@ -27,12 +28,18 @@ import {
 import RenderOnRole from "../../components/RenderOnRole";
 import LinkButton from "../../components/LinkButton";
 import PageHeading from "../../components/PageHeading";
+import HorizontalField from "../../components/HorizontalField";
+import VerticalField from "../../components/VerticalField";
+import SectionHeading from "../../components/SectionHeading";
+import CustomCheckBox from "../../components/CustomCheckBox";
 
 import {
   fetchLicenceResults,
   selectLicenceResults,
   setLicenceSearchPage,
+  fetchTTLSResults
 } from "./searchSlice";
+
 
 function formatResultRow(result) {
   const url = `${LICENSES_PATHNAME}/${result.licenceId}`;
@@ -55,124 +62,202 @@ function formatResultRow(result) {
 
 function navigateToSearchPage(dispatch, page) {
   dispatch(setLicenceSearchPage(page));
-  dispatch(fetchLicenceResults());
+  // dispatch(fetchLicenceResults());
+}
+
+function wait(ms){
+  const start = new Date().getTime();
+  let end = start;
+  while(end < start + ms) {
+    end = new Date().getTime();
+ }
 }
 
 export default function LicenceResultsPage() {
-  const results = useSelector(selectLicenceResults);
+  
+//   const results = fetchLicenceResults();
+//   wait(2000);
 
-  const dispatch = useDispatch();
+  // eslint-disable-next-line
+  // console.log(results);   
 
-  useEffect(() => {
-    dispatch(fetchLicenceResults());
-  }, [dispatch]);
+  // useEffect(() => {
+  //  dispatch(fetchTTLSResults());
+  // }, [dispatch]);
 
   let control = null;
-  const createLicenceButton = (
-    <Link
-      to={CREATE_LICENSES_PATHNAME}
-      component={LinkButton}
-      variant="primary"
-      block
-    >
-      Create Licence
-    </Link>
-  );
 
-  if (results.status === REQUEST_STATUS.PENDING) {
-    control = (
-      <div>
-        <Spinner animation="border" role="status">
-          <span className="sr-only">Searching...</span>
-        </Spinner>
-      </div>
-    );
-  } else if (results.status === REQUEST_STATUS.REJECTED) {
-    control = (
-      <Alert variant="danger">
-        <Alert.Heading>
-          An error was encountered while retrieving results.
-        </Alert.Heading>
-        <p>
-          {results.error.code}: {results.error.description}
-        </p>
-      </Alert>
-    );
-  } else if (
-    results.status === REQUEST_STATUS.FULFILLED &&
-    results.count === 0
-  ) {
-    control = (
-      <>
-        <Alert variant="success" className="mt-3">
-          <div>Sorry, there were no results matching your search terms.</div>
-          <div>
-            Search Tips: check your spelling and try again, or try a different
-            search term.
-          </div>
-        </Alert>
-        <RenderOnRole roles={[SYSTEM_ROLES.USER, SYSTEM_ROLES.SYSTEM_ADMIN]}>
-          <Row className="mt-3">
-            <Col md="3">{createLicenceButton}</Col>
-          </Row>
-        </RenderOnRole>
-      </>
-    );
-  } else if (results.status === REQUEST_STATUS.FULFILLED && results.count > 0) {
-    control = (
-      <>
-        <Table striped size="sm" responsive className="mt-3" hover>
-          <thead className="thead-dark">
-            <tr>
-              <th>Licence</th>
-              <th className="text-nowrap">Licence Type</th>
-              <th className="text-nowrap">Last Names</th>
-              <th className="text-nowrap">Company Names</th>
-              <th className="text-nowrap">Licence Status</th>
-              <th className="text-nowrap">Issued On Date</th>
-              <th className="text-nowrap">Expiry Date</th>
-              <th>Region</th>
-              <th>District</th>
-            </tr>
-          </thead>
-          <tbody>{results.data.map((result) => formatResultRow(result))}</tbody>
-        </Table>
-        <Row className="mt-3">
-          <RenderOnRole roles={[SYSTEM_ROLES.USER, SYSTEM_ROLES.SYSTEM_ADMIN]}>
-            <Col md="3">{createLicenceButton}</Col>
-          </RenderOnRole>
-          <Col className="d-flex justify-content-center">
-            Showing {results.data.length} of {results.count} entries
+
+
+  control = (
+
+    <Container className="mt-3 mb-4">
+        <Row>
+          <HorizontalField
+            label="DTID"
+            value="921711"
+          />
+          <div className="w-100 d-xl-none" />
+        </Row>
+        <Row>
+          <HorizontalField
+            label="Name"
+            value="TBD"
+          />
+
+          <div className="w-100 d-xl-none" />
+        </Row>
+        <Row>
+          <HorizontalField
+            label="Document Type"
+            value="Land Use Report"
+          />
+          <div className="w-100 d-xl-none" />
+        </Row>
+        <SectionHeading>Disposition Transaction ID Details</SectionHeading>
+        <Row>
+          <Col>
+          <VerticalField
+            label="Contact or Agent Name"
+            value="Billy Jean"
+          />
           </Col>
-          <Col md="auto">
-            <ButtonGroup>
-              <Button
-                disabled={results.page < 2}
-                onClick={() =>
-                  navigateToSearchPage(dispatch, (results.page ?? 2) - 1)
-                }
-              >
-                Previous
-              </Button>
-              <Button disabled>{results.page}</Button>
-              <Button
-                disabled={results.page * 20 > results.count}
-                onClick={() =>
-                  navigateToSearchPage(dispatch, (results.page ?? 0) + 1)
-                }
-              >
-                Next
-              </Button>
-            </ButtonGroup>
+          <Col>
+          <VerticalField
+            label="Email Address"
+            value="billy@email.com"
+          />
           </Col>
         </Row>
-      </>
-    );
-  }
+        <Row>
+          <Col>
+          <VerticalField
+            label="Organization Unit"
+            value="OM - LAND MGMNT - NORTHERN SERVICE REGION"
+          />
+          </Col>
+          <Col>
+          <VerticalField
+            label="Inspected Date"
+            value="2020-01-02"
+          />
+          </Col>
+        </Row>
+        <Row>
+          <Col>
+          <VerticalField
+            label="Incorporation Number"
+            value="1231223"
+          />
+          </Col>
+          <Col>
+          <VerticalField
+            label="Inspected Date"
+            value="2022-01-03"
+          />
+          </Col>
+        </Row>
+        <Row>
+          <Col>
+          <VerticalField
+            label="Policy Name"
+            value="TBD"
+          />
+          </Col>
+          <Col>
+          <VerticalField
+            label="Purpose Statement"
+            value="TBD"
+          />
+          </Col>
+        </Row>
+        <SectionHeading>Tenure Details</SectionHeading>
+        <Row>
+          <Col>
+          <VerticalField
+            label="File Number"
+            value="7409801"
+          />
+          </Col>
+          <Col>
+          <VerticalField
+            label="Address Mailing Tenant"
+            value=""
+          />
+          </Col>
+        </Row>
+        <Row>
+          <Col>
+          <VerticalField
+            label="Type"
+            value="LICENCE"
+          />
+          </Col>
+          <Col>
+          <VerticalField
+            label="Subtype"
+            value="LICENCE OF OCCUPATION"
+          />
+          </Col>
+        </Row>
+        <Row>
+          <Col>
+          <VerticalField
+            label="Purpose"
+            value="QUARRYING"
+          />
+          </Col>
+          <Col>
+          <VerticalField
+            label="Subpurpose"
+            value="SAND AND GRAVEL"
+          />
+          </Col>
+        </Row>
+        <Row>
+          <Col>
+          <VerticalField
+            label="Area"
+            value="30"
+          />
+          </Col>
+          <Col>
+          <VerticalField
+            label="Location Land"
+            value="1km down Crocker FSR"
+          />
+          </Col>
+        </Row>
+        <Row>
+          <Col>
+        <VerticalField
+            label="Legal Description"
+            value="UNSURVEYED CROWN LAND IN THE VICINITY OF ANZAC RIVER AND COLBOURNE ROAD, CARIBOO DISTRICT."
+          />
+          </Col>
+        </Row>
+        <SectionHeading>Provision List</SectionHeading>
+        <Row>
+          <Col>
+          <input type='text' value='TEMPLATE VARIABLES - LAND USE REPORT UPDATED' /><CustomCheckBox id="provision_list_cb_id"/>
+          </Col>
+        </Row>
+        <Row>
+          <Col>
+          <input type='text' /><CustomCheckBox id="provision_list_cb_id2"/>
+          </Col>
+        </Row>
+        <Row>
+          <input type='submit' value='Create Document' />
+        </Row>
+      </Container>
+  );
+
+ 
 
   return (
     <section>
-      <PageHeading>Licence Search Results</PageHeading>
+      <PageHeading>Client</PageHeading>
       <Container>{control}</Container>
     </section>
   );

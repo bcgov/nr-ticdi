@@ -1,6 +1,6 @@
 {
   "name": "ticdi",
-  "version": "5.1.0",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
     "postinstall": "cd client && npm install && cd ../ && npm run build-client",
@@ -75,7 +75,8 @@
     "lodash": "^4.17.21",
     "morgan": "~1.9.1",
     "react-bootstrap-typeahead": "^5.1.4",
-    "read-excel-file": "^5.0.0"
+    "read-excel-file": "^5.0.0",
+    "request": "^2.88.2"
   },
   "devDependencies": {
     "concurrently": "^5.2.0",

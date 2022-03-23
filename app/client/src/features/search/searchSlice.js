@@ -9,6 +9,7 @@ export const selectLicenceSearchType = (state) =>
 export const selectLicenceParameters = (state) =>
   state.search.licences.parameters;
 export const selectLicenceResults = (state) => state.search.licences.results;
+export const dtidsResults = (state) => state.search.dtids.results;
 
 export const selectSiteSearchType = (state) => state.search.sites.searchType;
 export const selectSiteParameters = (state) => state.search.sites.parameters;
@@ -33,31 +34,27 @@ export const selectDairyTestHistoryParameters = (state) =>
 export const selectDairyTestHistoryResults = (state) =>
   state.search.dairyTestHistory.results;
 
-export const fetchLicenceResults = createAsyncThunk(
-  "search/fetchLicenceResults",
+export const fetchLicenceResults = async () => {
+  const response = await fetch('http://127.0.0.1:3001/data');
+  const json = await response.json();
+  console.log(json);
+}
+
+export const fetchTTLSResults = createAsyncThunk(
+  "search/fetchTTLSResults",
   async (_, thunkApi) => {
     try {
-      const parameters = selectLicenceParameters(thunkApi.getState());
+    const response = await fetch(`https://localhost:3001/data`);
 
-      const parsedParameters = {
-        ...parameters,
-        issuedDateFrom: parseAsDate(parameters.issuedDateFrom),
-        issuedDateTo: parseAsDate(parameters.issuedDateTo),
-        renewalDateFrom: parseAsDate(parameters.renewalDateFrom),
-        renewalDateTo: parseAsDate(parameters.renewalDateTo),
-        expiryDateFrom: parseAsDate(parameters.expiryDateFrom),
-        expiryDateTo: parseAsDate(parameters.expiryDateTo),
-      };
-
-      const response = await Api.get(`licences/search`, parsedParameters);
-      return response.data;
-    } catch (error) {
-      if (error instanceof ApiError) {
-        return thunkApi.rejectWithValue(error.serialize());
-      }
-      return thunkApi.rejectWithValue({ code: -1, description: error.message });
+    return response.json();
+  } catch (error) {
+    if (error instanceof ApiError) {
+      return thunkApi.rejectWithValue(error.serialize());
     }
+    return thunkApi.rejectWithValue({ code: -16, description: error.message });
   }
+  }
+
 );
 
 export const fetchAssociatedLicenceResults = createAsyncThunk(
@@ -80,7 +77,7 @@ export const fetchAssociatedLicenceResults = createAsyncThunk(
       if (error instanceof ApiError) {
         return thunkApi.rejectWithValue(error.serialize());
       }
-      return thunkApi.rejectWithValue({ code: -1, description: error.message });
+      return thunkApi.rejectWithValue({ code: -13, description: error.message });
     }
   }
 );
@@ -101,7 +98,7 @@ export const fetchSiteResults = createAsyncThunk(
       if (error instanceof ApiError) {
         return thunkApi.rejectWithValue(error.serialize());
       }
-      return thunkApi.rejectWithValue({ code: -1, description: error.message });
+      return thunkApi.rejectWithValue({ code: -15, description: error.message });
     }
   }
 );
@@ -125,7 +122,7 @@ export const fetchInventoryHistoryResults = createAsyncThunk(
       if (error instanceof ApiError) {
         return thunkApi.rejectWithValue(error.serialize());
       }
-      return thunkApi.rejectWithValue({ code: -1, description: error.message });
+      return thunkApi.rejectWithValue({ code: -16, description: error.message });
     }
   }
 );
@@ -148,7 +145,7 @@ export const fetchAssociatedLicencesResults = createAsyncThunk(
       if (error instanceof ApiError) {
         return thunkApi.rejectWithValue(error.serialize());
       }
-      return thunkApi.rejectWithValue({ code: -1, description: error.message });
+      return thunkApi.rejectWithValue({ code: -18, description: error.message });
     }
   }
 );
@@ -172,7 +169,7 @@ export const fetchDairyTestHistoryResults = createAsyncThunk(
       if (error instanceof ApiError) {
         return thunkApi.rejectWithValue(error.serialize());
       }
-      return thunkApi.rejectWithValue({ code: -1, description: error.message });
+      return thunkApi.rejectWithValue({ code: -19, description: error.message });
     }
   }
 );
@@ -181,6 +178,17 @@ export const searchSlice = createSlice({
   name: "search",
   initialState: {
     licences: {
+      searchType: SEARCH_TYPE.SIMPLE,
+      parameters: {},
+      results: {
+        data: undefined,
+        page: undefined,
+        count: undefined,
+        error: undefined,
+        status: REQUEST_STATUS.IDLE,
+      },
+    },
+    dtids: {
       searchType: SEARCH_TYPE.SIMPLE,
       parameters: {},
       results: {
@@ -372,6 +380,24 @@ export const searchSlice = createSlice({
       state.licences.results.data = undefined;
       state.licences.results.error = action.payload;
       state.licences.results.status = REQUEST_STATUS.REJECTED;
+    },
+
+    // DTIDs
+    [fetchTTLSResults.pending]: (state) => {
+      state.dtids.results.error = undefined;
+      state.dtids.results.status = REQUEST_STATUS.PENDING;
+    },
+    [fetchTTLSResults.fulfilled]: (state, action) => {
+      state.dtids.results.data = action.payload.results;
+      state.dtids.results.page = action.payload.page;
+      state.dtids.results.count = action.payload.count;
+      state.dtids.results.error = undefined;
+      state.dtids.results.status = REQUEST_STATUS.FULFILLED;
+    },
+    [fetchTTLSResults.rejected]: (state, action) => {
+      state.dtids.results.data = undefined;
+      state.dtids.results.error = action.payload;
+      state.dtids.results.status = REQUEST_STATUS.REJECTED;
     },
 
     // Associated Licences - uses licence state

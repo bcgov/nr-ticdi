@@ -32,57 +32,19 @@ function HeaderNavigation() {
             <Nav>
               <HeaderDropdown
                 id="licenses-dropdown"
-                title="Licenses"
+                title="Search"
                 pathPrefix={Constant.LICENSES_PATHNAME}
               >
                 <DropdownNavLink to={Constant.SEARCH_LICENSES_PATHNAME}>
-                  Search Licenses
+                  Search by DTID
                 </DropdownNavLink>
               </HeaderDropdown>
-              {/* <HeaderDropdown
-                id="registrants-dropdown"
-                title="Registrants"
-                pathPrefix={Constant.REGISTRANTS_PATHNAME}
-              >
-                <DropdownNavLink to={Constant.SEARCH_REGISTRANTS_PATHNAME}>
-                  Search Registrants
-                </DropdownNavLink>
-              </HeaderDropdown> */}
-              <HeaderDropdown
-                id="sites-and-contacts-dropdown"
-                title="Sites"
-                pathPrefix={[
-                  Constant.SITES_PATHNAME,
-                  Constant.CONTACTS_PATHNAME,
-                ]}
-              >
-                <DropdownNavLink to={Constant.SEARCH_SITES_PATHNAME}>
-                  Search Sites
-                </DropdownNavLink>
-              </HeaderDropdown>
-              {/* <HeaderDropdown
-                id="inspections-dropdown"
-                title="Inspections"
-                pathPrefix={Constant.INSPECTIONS_PATHNAME}
-              >
-                <DropdownNavLink to={Constant.SEARCH_INSPECTIONS_PATHNAME}>
-                  Search Inspections
-                </DropdownNavLink>
-                <DropdownNavLink to={Constant.CREATE_INSPECTIONS_PATHNAME}>
-                  Create Inspection
-                </DropdownNavLink>
-              </HeaderDropdown> */}
+
               <HeaderDropdown
                 id="document-generation-dropdown"
                 title="Document Generation"
                 pathPrefix={Constant.DOCUMENT_GENERATION_PATHNAME}
               >
-                <RenderOnRole
-                  roles={[
-                    Constant.SYSTEM_ROLES.USER,
-                    Constant.SYSTEM_ROLES.SYSTEM_ADMIN,
-                  ]}
-                >
                   <DropdownNavLink to={Constant.SELECT_RENEWALS_PATHNAME}>
                     Renewals
                   </DropdownNavLink>
@@ -99,40 +61,13 @@ function HeaderNavigation() {
                   >
                     Dairy Tank ReCheck Notices
                   </DropdownNavLink>
-                </RenderOnRole>
                 <DropdownNavLink to={Constant.REPORTS_PATHNAME}>
                   Reports
                 </DropdownNavLink>
-                <RenderOnRole
-                  roles={[
-                    Constant.SYSTEM_ROLES.USER,
-                    Constant.SYSTEM_ROLES.SYSTEM_ADMIN,
-                  ]}
-                >
                   <DropdownNavLink to={Constant.SELECT_CERTIFICATES_PATHNAME}>
                     Certificates
                   </DropdownNavLink>
-                </RenderOnRole>
               </HeaderDropdown>
-              <RenderOnRole roles={[Constant.SYSTEM_ROLES.SYSTEM_ADMIN]}>
-                <HeaderDropdown
-                  id="admin-dropdown"
-                  title="Administration"
-                  pathPrefix={Constant.ADMIN_PATHNAME}
-                >
-                  <DropdownNavLink to={Constant.ADMIN_CONFIG_PATHNAME}>
-                    Configuration
-                  </DropdownNavLink>
-                  <DropdownNavLink
-                    to={Constant.ADMIN_DAIRY_TEST_RESULTS_PATHNAME}
-                  >
-                    Dairy Test Results
-                  </DropdownNavLink>
-                  <DropdownNavLink to={Constant.ADMIN_PREMISES_ID_PATHNAME}>
-                    Premises ID
-                  </DropdownNavLink>
-                </HeaderDropdown>
-              </RenderOnRole>
             </Nav>
           </Navbar.Collapse>
         </Container>

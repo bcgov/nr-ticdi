@@ -7,7 +7,7 @@ WORKDIR /app
 RUN npm install
 
 # Deployment container
-FROM registry.access.redhat.com/ubi8/ubi-micro
+FROM registry.access.redhat.com/ubi8/nodejs-14-minimal
 
 # Set node to production 
 ENV NODE_ENV production

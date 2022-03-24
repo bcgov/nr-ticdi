@@ -26,5 +26,7 @@ COPY --from=builder /usr/lib64/libbrotlicommon.so.1 /usr/lib64/
 # Expose port - mostly a convention, for readability
 EXPOSE 3000
 
+WORKDIR /app
+
 # Start up command
-CMD ["npm", "start"]
+RUN npm start

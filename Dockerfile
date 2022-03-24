@@ -3,7 +3,7 @@ FROM registry.access.redhat.com/ubi8/ubi as builder
 RUN dnf module install -y nodejs:14
 
 # Install packages, build and keep only prod packages
-WORKDIR /app
+WORKDIR /usr/src/app
 COPY . ./
 RUN npm ci && \
     npm run build && \
@@ -28,7 +28,7 @@ COPY --from=builder /usr/lib64/libgcc_s.so.1 /usr/lib64/
 COPY --from=builder /usr/lib64/libbrotlicommon.so.1 /usr/lib64/
 
 # Copy over app
-WORKDIR /app
+WORKDIR /usr/src/app
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/dist ./dist
 
@@ -36,4 +36,4 @@ COPY --from=builder /app/dist ./dist
 EXPOSE 3000
 
 # Start up command
-ENTRYPOINT ["node", "dist/main"]
+ENTRYPOINT ["node", "server/server.js"]

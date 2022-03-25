@@ -17,7 +17,7 @@ export class AppController {
   @Get('dtid/:id')
   findOne(@Param('id') id): string {
     console.log(id);
-    return `Received dtid #${id} `;
+    return `Received dtid  #${id} `;
   }
 
 }

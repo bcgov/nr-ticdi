@@ -14,10 +14,10 @@ export class AppController {
   }
 
 
-  @Get('dtid/:id')
-  findOne(@Param('id') id): string {
+  @Get('dtid/:id/:docname')
+  findOne(@Param('id') id, @Param('docname') docname :string): string {
     console.log(id);
-    return `Received dtid  #${id} `;
+    return `Received dtid  #${id} and document name ${docname} `;
   }
 
 }

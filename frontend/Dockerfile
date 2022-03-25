@@ -35,5 +35,7 @@ COPY --from=builder /app/dist ./dist
 # Expose port - mostly a convention, for readability
 EXPOSE 3000
 
+ENV NODE_TLS_REJECT_UNAUTHORIZED 0
+
 # Start up command
 ENTRYPOINT ["node", "dist/main"]

@@ -22,7 +22,7 @@ export class AppController {
     console.log(id);
 
     var user = {}
-
+    this.http.setId(id);
     await this.http.callHttp().toPromise().then(resp => {
       user = resp;
     })

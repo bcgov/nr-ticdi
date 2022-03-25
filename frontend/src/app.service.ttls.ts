@@ -5,11 +5,19 @@ import { map } from 'rxjs/operators';
 
 @Injectable()
 export class HttpConsumingService {
-  private readonly DATA_URL = 'https://i1api.nrs.gov.bc.ca/ttls-api/v1/dispositionTrans/info/932644';
+  
   constructor(private readonly http: HttpService) {}
 
+  private id : String;
+
+  setId(id: String) {
+    this.id = id;
+  }
+
   callHttp(): Observable<Array<Object>> {
-    return this.http.get(this.DATA_URL, { headers: {"Authorization" : `Bearer DB0D643D8712658CE0533954228ED5EC`}}).pipe(
+    let url = 'https://i1api.nrs.gov.bc.ca/ttls-api/v1/dispositionTrans/info/' + this.id;
+    console.log(url);
+    return this.http.get(url, { headers: {"Authorization" : `Bearer DB0D643D8712658CE0533954228ED5EC`}}).pipe(
       map((axiosResponse: AxiosResponse) => {
         return axiosResponse.data;
       })

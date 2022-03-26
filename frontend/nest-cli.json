@@ -4,13 +4,13 @@
   "compilerOptions": {    
     "assets": [
       {
-        "include": "public",
-        "outDir": "dist",
+        "include": "../public",
+        "outDir": "dist/public",
         "watchAssets": true
       },
       {
-        "include": "views",
-        "outDir": "dist",
+        "include": "../views",
+        "outDir": "dist/views",
         "watchAssets": true
       }
     ],

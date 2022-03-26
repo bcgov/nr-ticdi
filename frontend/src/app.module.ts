@@ -1,4 +1,5 @@
-import { Module, HttpService, HttpModule } from '@nestjs/common'
+import { Module } from '@nestjs/common'
+import {HttpService, HttpModule} from '@nestjs/axios'
 import { AppController } from './app.controller'
 import { AppService } from './app.service'
 import { HttpConsumingService  } from './app.service.ttls'

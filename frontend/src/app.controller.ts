@@ -1,5 +1,6 @@
 /* eslint-disable no-useless-constructor */
-import { Controller, Get, Param, Render, HttpService } from '@nestjs/common'
+import { Controller, Get, Param, Render } from '@nestjs/common'
+import {HttpService} from '@nestjs/axios'
 import { AppService } from './app.service'
 import { HttpConsumingService } from './app.service.ttls'
 import { Request } from 'express';
@@ -29,6 +30,18 @@ export class AppController {
     console.log(user);
 
     return { message: user };
+  }
+
+  @Get('test')
+  async getCDogsToken() {
+    
+    var cdogsToken;
+
+    await this.http.callGetToken().then(resp => {
+      cdogsToken = resp;
+    })
+    console.log(cdogsToken);
+
   }
  
 

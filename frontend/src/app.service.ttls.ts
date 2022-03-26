@@ -30,73 +30,46 @@ export class HttpConsumingService {
     let url = 'https://dev.oidc.gov.bc.ca/auth/realms/jbd6rnxw/protocol/openid-connect/token';
     let service_client_id = 'MALS_SERVICE_CLIENT';
     let service_client_secret = '8b15adbd-2ab7-4e24-9d0f-3efccf738225'
-    const headersRequest = {'Content-Type': 'application/x-www-form-urlencoded',
-    'Authorization' : 'Basic e3tzZXJ2aWNlX2NsaWVudF9pZH19Ont7c2VydmljZV9jbGllbnRfc2VjcmV0fX0='};
 
-
-                            const headersRequest2 = {'Content-Type': 'application/x-www-form-urlencoded',
-                            'auth': {username: service_client_id,
-                              password: service_client_secret}};
-    const auth = {
-      username: service_client_id,
-      password: service_client_secret,
-      grant_type: 'client_credentials'
-  }
-    const authHeader = {auth: {
-      username: service_client_id,
-      password: service_client_secret
-    }};
-    console.log(url);
-
-
-
-    const data ={'url-encode' : {
-      grant_type: 'client_credentials',
-      client_id: service_client_id,
-      client_secret: service_client_secret
-    }};
-    
-    const headers2 = {
-      
-    };
-
-
-/*
-
+    const token = `${service_client_id}:${service_client_secret}`;
+    const encodedToken = Buffer.from(token).toString('base64');
+    console.debug(encodedToken);
     let config = {
       headers: {
-        'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
-        'Authorization' : 'Basic e3tzZXJ2aWNlX2NsaWVudF9pZH19Ont7c2VydmljZV9jbGllbnRfc2VjcmV0fX0='
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'Authorization' : 'Basic '+encodedToken
       }
     };
 
     const grantTypeParam = new URLSearchParams();
     grantTypeParam.append('grant_type','client_credentials');
 
-    return axios.post(url, grantTypeParam,  config).then(response => {console.log(response); return response.data})
-  .catch(error => {
-      console.log(error.response)
-  });*/
-
-  return axios.request({
-    method: "post",
-    baseURL: 'https://dev.oidc.gov.bc.ca/auth/realms/jbd6rnxw/protocol/openid-connect/token',
-    auth: {
-      username: service_client_id,
-      password: service_client_secret
-    },
-    data: {
-      "grant_type": "client_credentials",
-      "scope": "public"    
-    }
-  }).then(function(res) {
-
-    console.log(res);  
-    return res.data}
-  );
-
-    
+    return axios.post(url, grantTypeParam,  config).then(response => {console.log(response); return response.data.access_token})
+    .catch(error => {
+        console.log(error.response)
+    });
   }
 
+  async generateReport(): Promise<Object> {
+
+    let cdogsToken = await this.callGetToken();
+
+    let url = 'https://cdogs-dev.apps.silver.devops.gov.bc.ca/api/v2/template/render';
+
+    let config = {
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization' : 'Bearer '+cdogsToken
+      }
+    };
+
+    const grantTypeParam = new URLSearchParams();
+    grantTypeParam.append('grant_type','client_credentials');
+
+    return axios.post(url, grantTypeParam,  config).then(response => {console.log(response); return response.data.access_token})
+    .catch(error => {
+        console.log(error.response)
+    });
+  }
   
 }

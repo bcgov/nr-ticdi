@@ -40,8 +40,9 @@ export class AppController {
     await this.http.callGetToken().then(resp => {
       cdogsToken = resp;
     })
-    console.log(cdogsToken);
-
+    console.log('Test1');
+    console.log(cdogsToken.access_token);
+    console.log('Test2');
   }
  
 

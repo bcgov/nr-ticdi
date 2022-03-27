@@ -6,6 +6,7 @@
     <title>App</title>
   </head>
   <body>
+      <form action="/generateReport">
     <h3>
         Client
     </h3>
@@ -45,6 +46,7 @@
     <div>
         Last Name: {{ message.tenantAddr.lastName }}
     </div>
-    <button>Generate Document</button>
+    <button type="submit">Generate Document</button>
+    </form>
   </body>
 </html>

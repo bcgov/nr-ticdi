@@ -25,14 +25,33 @@ export class AppController {
   async findOne(@Param('id') id, @Param('docname') docname :string) {
     console.log(id);
 
-    var user = {}
+    var ttlsJSON = {}
     this.http.setId(id);
-    await this.http.callHttp().toPromise().then(resp => {
-      user = resp;
-    })
-    console.log(user);
+    //await this.http.callHttp().toPromise().then(resp => {
+      //ttlsJSON = resp;
 
-    return { message: user };
+      ttlsJSON = {
+        "dtid": 921711,
+        "FileNum": "7409801",
+        "OrganizationUnit": "OM - LAND MGMNT - NORTHERN SERVICE REGION",
+        "complexLevel": "2",
+        "Purpose": "QUARRYING",
+        "SubPurpose": "SAND AND GRAVEL",
+        "TenureSubType": "LICENCE OF OCCUPATION",
+        "TenureType": "LICENCE",
+        "bcgsSheet": "93J088",
+        "airPhotoNum": null,
+        "TenureArea": 30,
+        "Location": "1km down Crocker FSR",
+        "LegalDescription": "UNSURVEYED CROWN LAND IN THE VICINITY OF ANZAC RIVER AND COLBOURNE ROAD, CARIBOO DISTRICT.",
+        "tenantAddr": "{\"firstName\":null,\"middleName\":null,\"lastName\":null,\"legalName\":\"728928 BC LTD\",\"locationSid\":1,\"ipSid\":223001,\"addrSid\":1,\"addrLine1\":\"333 HIGHPOINTE CRT\",\"postalCode\":\"V1V2Y3\",\"city\":\"KELOWNA\",\"zipCode\":null,\"addrLine2\":null,\"addrLine3\":null,\"countryCd\":\"CA\",\"regionCd\":\"BC\",\"country\":\"CANADA\",\"provAbbr\":\"BC\",\"stateAbbr\":null,\"addrType\":\"MAILING\"}"
+    };
+
+      this.http.setJSONDataFile(ttlsJSON);
+    //})
+    console.log(ttlsJSON);
+
+    return { message: ttlsJSON };
   }
 
   @Get('test')

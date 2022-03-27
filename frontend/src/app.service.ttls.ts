@@ -14,9 +14,14 @@ export class HttpConsumingService {
   constructor(private readonly http: HttpService) {}
 
   private id : String;
+  private jsonDataFile: {}
 
   setId(id: String) {
     this.id = id;
+  }
+
+  setJSONDataFile(jsonDataFile: {}) {
+    this.jsonDataFile = jsonDataFile;
   }
 
   callHttp(): Observable<Array<Object>> {
@@ -63,22 +68,7 @@ export class HttpConsumingService {
 
 
   var data = JSON.stringify({
-    "data": {
-      "dtid": 921711,
-      "FileNum": "7409801",
-      "OrganizationUnit": "OM - LAND MGMNT - NORTHERN SERVICE REGION",
-      "complexLevel": "2",
-      "Purpose": "QUARRYING",
-      "SubPurpose": "SAND AND GRAVEL",
-      "TenureSubType": "LICENCE OF OCCUPATION",
-      "TenureType": "LICENCE",
-      "bcgsSheet": "93J088",
-      "airPhotoNum": null,
-      "TenureArea": 30,
-      "Location": "1km down Crocker FSR",
-      "LegalDescription": "UNSURVEYED CROWN LAND IN THE VICINITY OF ANZAC RIVER AND COLBOURNE ROAD, CARIBOO DISTRICT.",
-      "tenantAddr": "{\"firstName\":null,\"middleName\":null,\"lastName\":null,\"legalName\":\"728928 BC LTD\",\"locationSid\":1,\"ipSid\":223001,\"addrSid\":1,\"addrLine1\":\"333 HIGHPOINTE CRT\",\"postalCode\":\"V1V2Y3\",\"city\":\"KELOWNA\",\"zipCode\":null,\"addrLine2\":null,\"addrLine3\":null,\"countryCd\":\"CA\",\"regionCd\":\"BC\",\"country\":\"CANADA\",\"provAbbr\":\"BC\",\"stateAbbr\":null,\"addrType\":\"MAILING\"}"
-  },
+    "data": this.jsonDataFile,
     "formatters": "{\"myFormatter\":\"_function_myFormatter|function(data) { return data.slice(1); }\",\"myOtherFormatter\":\"_function_myOtherFormatter|function(data) {return data.slice(2);}\"}",
     "options": {
       "cacheReport": true,

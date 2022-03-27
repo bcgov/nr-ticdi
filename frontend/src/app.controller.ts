@@ -1,5 +1,5 @@
 /* eslint-disable no-useless-constructor */
-import { Controller, Get, Param, Render } from '@nestjs/common'
+import { Controller, Get, Param, Render,StreamableFile  } from '@nestjs/common'
 import {HttpService} from '@nestjs/axios'
 import { AppService } from './app.service'
 import { HttpConsumingService } from './app.service.ttls'
@@ -46,9 +46,12 @@ export class AppController {
   }
 
   @Get('generateReport')
-  generateReport() {
+  async generateReport() {
+
+    let t = await this.http.generateReport();
     
-    return this.http.generateReport();
+    
+    return new StreamableFile(t);
   }
  
 

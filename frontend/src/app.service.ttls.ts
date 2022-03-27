@@ -46,7 +46,7 @@ export class HttpConsumingService {
     const grantTypeParam = new URLSearchParams();
     grantTypeParam.append('grant_type','client_credentials');
 
-    return axios.post(url, grantTypeParam,  config).then(response => {console.log(response); return response.data.access_token})
+    return axios.post(url, grantTypeParam,  config).then(response => {return response.data.access_token})
     .catch(error => {
         console.log(error.response)
     });
@@ -64,10 +64,21 @@ export class HttpConsumingService {
 
   var data = JSON.stringify({
     "data": {
-      "firstName": "Jane",
-      "lastName": "Smith",
-      "title": "CEO"
-    },
+      "dtid": 921711,
+      "FileNum": "7409801",
+      "OrganizationUnit": "OM - LAND MGMNT - NORTHERN SERVICE REGION",
+      "complexLevel": "2",
+      "Purpose": "QUARRYING",
+      "SubPurpose": "SAND AND GRAVEL",
+      "TenureSubType": "LICENCE OF OCCUPATION",
+      "TenureType": "LICENCE",
+      "bcgsSheet": "93J088",
+      "airPhotoNum": null,
+      "TenureArea": 30,
+      "Location": "1km down Crocker FSR",
+      "LegalDescription": "UNSURVEYED CROWN LAND IN THE VICINITY OF ANZAC RIVER AND COLBOURNE ROAD, CARIBOO DISTRICT.",
+      "tenantAddr": "{\"firstName\":null,\"middleName\":null,\"lastName\":null,\"legalName\":\"728928 BC LTD\",\"locationSid\":1,\"ipSid\":223001,\"addrSid\":1,\"addrLine1\":\"333 HIGHPOINTE CRT\",\"postalCode\":\"V1V2Y3\",\"city\":\"KELOWNA\",\"zipCode\":null,\"addrLine2\":null,\"addrLine3\":null,\"countryCd\":\"CA\",\"regionCd\":\"BC\",\"country\":\"CANADA\",\"provAbbr\":\"BC\",\"stateAbbr\":null,\"addrType\":\"MAILING\"}"
+  },
     "formatters": "{\"myFormatter\":\"_function_myFormatter|function(data) { return data.slice(1); }\",\"myOtherFormatter\":\"_function_myOtherFormatter|function(data) {return data.slice(2);}\"}",
     "options": {
       "cacheReport": true,
@@ -93,7 +104,7 @@ export class HttpConsumingService {
     data : data
   };
   const axios = require('axios');
-  return axios(config).then(response => {return response.data})
+  return axios(config).then(response => {console.log('Generated File'); return response.data})
   .catch(error => {
       console.log(error.response)
   });

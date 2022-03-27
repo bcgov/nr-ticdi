@@ -1,11 +1,14 @@
 /* eslint-disable no-useless-constructor */
-import { Controller, Get, Param, Render,StreamableFile  } from '@nestjs/common'
+import { Controller, Get, Param, Render,StreamableFile, Header  } from '@nestjs/common'
 import {HttpService} from '@nestjs/axios'
 import { AppService } from './app.service'
 import { HttpConsumingService } from './app.service.ttls'
 import { Request } from 'express';
+import { Response } from 'express';
 import { AxiosResponse } from 'axios'
 import { map, Observable } from 'rxjs'
+import { createReadStream, ReadStream } from 'fs';
+
 
 
 @Controller()
@@ -46,11 +49,11 @@ export class AppController {
   }
 
   @Get('generateReport')
+  @Header('Content-Type', 'application/pdf')
+  @Header('Content-Disposition', 'attachment; filename=test.pdf')
   async generateReport() {
 
     let t = await this.http.generateReport();
-    
-    
     return new StreamableFile(t);
   }
  

@@ -48,9 +48,7 @@ export class AppController {
   @Get('generateReport')
   generateReport() {
     
-    var cdogsToken;
-
-    this.http.generateReport();
+    return this.http.generateReport();
   }
  
 

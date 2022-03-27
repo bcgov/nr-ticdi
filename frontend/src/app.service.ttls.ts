@@ -21,13 +21,32 @@ export class HttpConsumingService {
   }
 
   setJSONDataFile(jsonDataFile: {}) {
-    this.jsonDataFile = jsonDataFile;
+    console.log(jsonDataFile);
+
+    
+
+    this.jsonDataFile = {
+      FileNum: jsonDataFile['fileNum'],
+      LicenceHolderName: jsonDataFile['firstName'] + ' ' + jsonDataFile['firstName'] + ' ' +jsonDataFile['legalName'] ,
+      MailingAddress: jsonDataFile['addrLine1'],
+      MailingCity: jsonDataFile['city'],
+      MailingProv: jsonDataFile['regionCd'],
+      PostCode: jsonDataFile['postalCode'],
+      Purpose: jsonDataFile['purpose'],
+      SubPurpose: jsonDataFile['subPurpose'],
+      TenureType: jsonDataFile['type'],
+      TenureSubType: jsonDataFile['subType:'],
+      TenureArea: jsonDataFile['area'],
+      Location: jsonDataFile['locLand'],
+      LegalDescription: jsonDataFile['legalDesc']
+    
+    };
   }
 
   callHttp(): Observable<Array<Object>> {
     let url = 'https://i1api.nrs.gov.bc.ca/ttls-api/v1/dispositionTrans/info/' + this.id;
     console.log(url);
-    return this.http.get(url, { headers: {"Authorization" : `Bearer DB209A1605D5488BE0533954228E4942`}}).pipe(
+    return this.http.get(url, { headers: {"Authorization" : `Bearer DB350E5A32F47E1DE0533954228E8659`}}).pipe(
       map((axiosResponse: AxiosResponse) => {
         return axiosResponse.data;
       })

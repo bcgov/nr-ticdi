@@ -4,6 +4,9 @@ import axios, { AxiosResponse } from 'axios';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { URLSearchParams } from 'url';
+import * as fs from 'fs';
+import * as path from 'path';
+
 
 @Injectable()
 export class HttpConsumingService {
@@ -62,14 +65,42 @@ export class HttpConsumingService {
         'Authorization' : 'Bearer '+cdogsToken
       }
     };
+    const formatters = {"myFormatter":"_function_myFormatter|function(data) { return data.slice(1); }","myOtherFormatter":"_function_myOtherFormatter|function(data) {return data.slice(2);}"};
+    
+    const options = {
+      "cacheReport": true,
+      "convertTo": "pdf",
+      "overwrite": true,
+      "reportName": "test.pdf"
+    };
 
-    const grantTypeParam = new URLSearchParams();
-    grantTypeParam.append('grant_type','client_credentials');
+    const templateName = 'LUR_Template.docx';
 
-    return axios.post(url, grantTypeParam,  config).then(response => {console.log(response); return response.data.access_token})
+    const filePath = path.resolve(__dirname, './public/' + templateName);
+
+
+
+
+    const buffer = fs.readFileSync(path.resolve(__dirname, 'LUR_Template.docx'), 'utf8')
+
+    const bufferBase64 = Buffer.from(buffer).toString('base64');
+
+    console.log(bufferBase64);
+
+    const template = {
+      "encodingType": "base64",
+      "fileType": "docx",
+      "content": bufferBase64
+    };
+
+    const reportParam = new URLSearchParams();
+    reportParam.append('template',''+template);
+
+    return axios.post(url, reportParam,  config)
+    .then(response => {console.log(response); return response.data})
     .catch(error => {
         console.log(error.response)
-    });
+    })
   }
   
 }

@@ -41,8 +41,16 @@ export class AppController {
       cdogsToken = resp;
     })
     console.log('Test1');
-    console.log(cdogsToken.access_token);
+    console.log(cdogsToken);
     console.log('Test2');
+  }
+
+  @Get('generateReport')
+  generateReport() {
+    
+    var cdogsToken;
+
+    this.http.generateReport();
   }
  
 

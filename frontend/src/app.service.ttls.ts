@@ -20,10 +20,9 @@ export class HttpConsumingService {
     this.id = id;
   }
 
+  // convert the TTLS JSON package to a format that conforms to the CDOGS template
   setJSONDataFile(jsonDataFile: {}) {
     console.log(jsonDataFile);
-
-    
 
     this.jsonDataFile = {
       FileNum: jsonDataFile['fileNum'],
@@ -48,7 +47,6 @@ export class HttpConsumingService {
     let bearerToken = process.env.TTLS_API_KEY;
 
     let url = 'https://i1api.nrs.gov.bc.ca/ttls-api/v1/dispositionTrans/info/' + this.id;
-    console.log(url);
     return this.http.get(url, { headers: {"Authorization" : "Bearer " + bearerToken}}).pipe(
       map((axiosResponse: AxiosResponse) => {
         return axiosResponse.data;
@@ -56,6 +54,7 @@ export class HttpConsumingService {
     );
   }
 
+  // grab a CDOGS token for future requests
   callGetToken(): Promise<Object> {
     let url = 'https://dev.oidc.gov.bc.ca/auth/realms/jbd6rnxw/protocol/openid-connect/token';
     let service_client_id = process.env.service_client_id;
@@ -79,6 +78,7 @@ export class HttpConsumingService {
     });
   }
 
+  // generate the report via CDOGS
   async generateReport() {
 
     let cdogsToken = await this.callGetToken();

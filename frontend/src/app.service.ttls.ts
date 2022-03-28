@@ -58,8 +58,8 @@ export class HttpConsumingService {
 
   callGetToken(): Promise<Object> {
     let url = 'https://dev.oidc.gov.bc.ca/auth/realms/jbd6rnxw/protocol/openid-connect/token';
-    let service_client_id = 'MALS_SERVICE_CLIENT';
-    let service_client_secret = '8b15adbd-2ab7-4e24-9d0f-3efccf738225'
+    let service_client_id = process.env.service_client_id;
+    let service_client_secret = process.env.service_client_secret;
 
     const token = `${service_client_id}:${service_client_secret}`;
     const encodedToken = Buffer.from(token).toString('base64');

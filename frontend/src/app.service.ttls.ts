@@ -44,9 +44,12 @@ export class HttpConsumingService {
   }
 
   callHttp(): Observable<Array<Object>> {
+
+    let bearerToken = process.env.TTLS_API_KEY;
+
     let url = 'https://i1api.nrs.gov.bc.ca/ttls-api/v1/dispositionTrans/info/' + this.id;
     console.log(url);
-    return this.http.get(url, { headers: {"Authorization" : `Bearer DB350E5A32F47E1DE0533954228E8659`}}).pipe(
+    return this.http.get(url, { headers: {"Authorization" : "Bearer " + bearerToken}}).pipe(
       map((axiosResponse: AxiosResponse) => {
         return axiosResponse.data;
       })

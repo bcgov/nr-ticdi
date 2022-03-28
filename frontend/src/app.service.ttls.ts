@@ -22,22 +22,33 @@ export class HttpConsumingService {
 
   // convert the TTLS JSON package to a format that conforms to the CDOGS template
   setJSONDataFile(jsonDataFile: {}) {
+
+
     console.log(jsonDataFile);
 
+    var string = JSON.stringify(jsonDataFile);
+    var jsonFormatted = JSON.parse(string);
+
+    let legalName = jsonFormatted.tenantAddr.legalName;
+    if ( typeof legalName === 'undefined' || !legalName ) {
+      legalName = jsonFormatted.tenantAddr.firstName + ' ' + jsonFormatted.tenantAddr.lastName;
+    } 
+
     this.jsonDataFile = {
-      FileNum: jsonDataFile['fileNum'],
-      LicenceHolderName: jsonDataFile['firstName'] + ' ' + jsonDataFile['firstName'] + ' ' +jsonDataFile['legalName'] ,
-      MailingAddress: jsonDataFile['addrLine1'],
-      MailingCity: jsonDataFile['city'],
-      MailingProv: jsonDataFile['regionCd'],
-      PostCode: jsonDataFile['postalCode'],
-      Purpose: jsonDataFile['purpose'],
-      SubPurpose: jsonDataFile['subPurpose'],
-      TenureType: jsonDataFile['type'],
-      TenureSubType: jsonDataFile['subType:'],
-      TenureArea: jsonDataFile['area'],
-      Location: jsonDataFile['locLand'],
-      LegalDescription: jsonDataFile['legalDesc']
+      FileNum: jsonFormatted.fileNum,
+      OrganizationUnit: jsonFormatted.orgUnit,
+      LicenceHolderName: legalName,
+      MailingAddress: jsonFormatted.tenantAddr.addrLine1,
+      MailingCity: jsonFormatted.tenantAddr.city,
+      MailingProv: jsonFormatted.tenantAddr.regionCd,
+      PostCode: jsonFormatted.tenantAddr.postalCode,
+      Purpose: jsonFormatted.purpose,
+      SubPurpose: jsonFormatted.subPurpose,
+      TenureType: jsonFormatted.type,
+      TenureSubType: jsonFormatted.subType,
+      TenureArea: jsonFormatted.area,
+      Location: jsonFormatted.locLand,
+      LegalDescription: jsonFormatted.legalDesc
     
     };
   }
@@ -94,9 +105,8 @@ export class HttpConsumingService {
     "formatters": "{\"myFormatter\":\"_function_myFormatter|function(data) { return data.slice(1); }\",\"myOtherFormatter\":\"_function_myOtherFormatter|function(data) {return data.slice(2);}\"}",
     "options": {
       "cacheReport": true,
-      "convertTo": "pdf",
       "overwrite": true,
-      "reportName": "{d.firstName}-{d.lastName}.pdf"
+      "reportName": "landusereport.docx"
     },
     "template": {
       "encodingType": "base64",

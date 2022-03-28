@@ -1,0 +1,31 @@
+       
+    hr{
+        height: 4px;
+        background-color: #003366;
+        border: none;
+    }
+
+    fieldset.collapsible > legend {
+        margin-left: -32px;
+    }
+
+       
+    fieldset.collapsible > div {
+        display: block;
+    }
+
+    .toggleIcon {
+        border-radius: 4px;
+        border: 2px #003366;
+      }
+
+      input[type=checkbox]
+      {
+        padding-left: 20px;
+        /* Double-sized Checkboxes */
+        -ms-transform: scale(2); /* IE */
+        -moz-transform: scale(2); /* FF */
+        -webkit-transform: scale(2); /* Safari and Chrome */
+        -o-transform: scale(2); /* Opera */
+        margin-left: 10px;
+      }

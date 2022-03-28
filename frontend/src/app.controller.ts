@@ -26,8 +26,8 @@ export class AppController {
   }
 
   @Get('generateReport')
-  @Header('Content-Type', 'application/pdf')
-  @Header('Content-Disposition', 'attachment; filename=test.pdf')
+  @Header('Content-Type', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document')
+  @Header('Content-Disposition', 'attachment; filename=landusereport.docx')
   async generateReport() {
 
     return new StreamableFile(await this.http.generateReport());

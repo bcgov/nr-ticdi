@@ -82,9 +82,7 @@
     "ts-loader": "^9.2.6",
     "ts-node": "^10.3.0",
     "tsconfig-paths": "^3.11.0",
-    "typescript": "^4.4.4",
-    "@bcgov/bootstrap-theme": "https://github.com/bcgov/bootstrap-theme/releases/download/v1.1.1/bcgov-bootstrap-theme-1.1.1.tgz",
-    "bootstrap": "~4.3.1"
+    "typescript": "^4.4.4"
   },
   "jest": {
     "moduleFileExtensions": [

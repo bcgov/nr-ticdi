@@ -9,6 +9,11 @@ import { HttpConsumingService } from './app.service.ttls'
 export class AppController {
   constructor (private readonly appService: AppService, private readonly http: HttpConsumingService) {}
 
+  @Get()
+  getHello (): string {
+    return this.appService.getHello()
+  }
+
   @Get('dtid/:id/:docname')
   @Render('index')
   async findOne(@Param('id') id, @Param('docname') docname :string) {

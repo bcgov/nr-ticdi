@@ -13,7 +13,21 @@ Forestry Client Services' greenfield starter template and pull request based pip
 
 # Overview
 
-The Greenfield-template is a node.js application built with [nestJS](https://docs.nestjs.com), and the main purpose is to provide a [GitHub Actions](https://docs.github.com/en/actions/quickstart) template to automate the process for testing, security scanning, code quality checking, image building and deploying for an application.  
+Tantalis Integrated Common Document Generator Interface (TICDI) is a node.js application built with [nestJS](https://docs.nestjs.com), and the main purpose is to act as an integration point between TANTALIS (TTLS) and the Common Document Generation Service (CDOGS).  For CDOGS documentation, please refer to https://digital.gov.bc.ca/common-components/common-document-generation-service.
+
+TICDI has an exposed endpoint at {hostname}/DTID/{DTID_NUMBER}/{FILE_NAME} (for example https://nr-ticdi-10.apps.silver.devops.gov.bc.ca/DTID/928437/test) that is initiated from the Tantalis application.  This endpoint will trigger TICDI to consume a REST endpoint on Tantalis-API using a WebADE generated OAUTH token.  TICDI users can then click the "Generate Document" button to generate a document via CDOGS.
+
+The following OpenShift secrets are used:
+
+* nr-ticdi-api: The WebADE oauth token used to authenticate against the TTLS-API.
+* nr-ticdi-cdogs
+   * service_client_id: Populate using Keycloak's client ID.
+   * service_client_secret: Populate using Keycloak's client secret.
+
+The Greenfield template (https://github.com/bcgov/greenfield-template/) was used to bootstrap the application.
+
+
+[GitHub Actions](https://docs.github.com/en/actions/quickstart) template to automate the process for testing, security scanning, code quality checking, image building and deploying for an application.  
 
 This project is in active development.  Please visit our [issues](https://github.com/bcgov/greenfield-template/issues) page to view or request features.
 
@@ -40,8 +54,6 @@ Currently, our most exciting offering is the [GitHub Actions](https://github.com
 
 # Getting Started
 
-Initial setup can be completed in around half a business day.  Please keep reading for directions.
-
 Included:
 
 - Documentation:
@@ -50,10 +62,6 @@ Included:
     - Pull Request-based (.github/workflows/pr-open.yml)
     - On Close (.github/workflows/pr-close.yml)
     - Main Merge (.github/workflows/main-merge.yml)
-- Hello World! starter application
-    - TypeScript source in src/
-    - One Jest test in test/
-    - JavaScript container in Dockerfile
 - Misc:
     - nestjs
     - eslint
@@ -80,17 +88,6 @@ The following are required:
 - Project namespaces (pick one):
     - OpenShift - [Register a New Project](https://registry.developer.gov.bc.ca/public-landing)
     - Amazon Web Services coming soon
-
-
-## Consuming This Template
-
-![image](./.github/graphics/newRepo.png)
-
-Create a new repository using this repository as a template.
-- Select bcgov/greenfield-template under Repository template
-- Check Codecov | Code Coverage to grant access
-- Jira cannot be unchecked (I try every time!)
-
 
 ## Setting Up the GitHub Repository
 

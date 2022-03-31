@@ -53,6 +53,13 @@ Currently, our most exciting offering is the [GitHub Actions](https://github.com
 
 ![Pipeline Action](.github/graphics/pr.png)
 
+# Local Setup
+
+Create a .env file in /frontend with the following environment parameters:
+
+* service_client_id=<GTOC client id>
+* service_client_secret=<GTOK client secret>
+* TTLS_API_KEY=<TTLS API KEY from WebADE>
 
 # Getting Started
 

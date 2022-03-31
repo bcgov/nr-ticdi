@@ -21,8 +21,10 @@ The following OpenShift secrets are used:
 
 * nr-ticdi-api: The WebADE oauth token used to authenticate against the TTLS-API.
 * nr-ticdi-cdogs
-   * service_client_id: Populate using Keycloak's client ID.
-   * service_client_secret: Populate using Keycloak's client secret.
+   * service_client_id: GTOK* Service Client ID.
+   * service_client_secret: GTOK Client Secret.
+
+*GTOK: https://getok.nrs.gov.bc.ca/app/apps/TICDI
 
 The Greenfield template (https://github.com/bcgov/greenfield-template/) was used to bootstrap the application.
 

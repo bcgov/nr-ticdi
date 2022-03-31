@@ -28,6 +28,12 @@ The following OpenShift secrets are used:
 
 The Greenfield template (https://github.com/bcgov/greenfield-template/) was used to bootstrap the application.
 
+# TODO
+
+* Create OpenShift realm to handle authentication.
+* Grab WebADE oauth token without relying on secrets.  Currently, we have to update the nr-ticdi-api secret daily with the latest token.  We should be able to call a WebADE endpoint to do this for us before making calls to TTLS-API
+
+# Github
 
 [GitHub Actions](https://docs.github.com/en/actions/quickstart) template to automate the process for testing, security scanning, code quality checking, image building and deploying for an application.  
 

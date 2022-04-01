@@ -114,7 +114,7 @@ objects:
         app: ${NAME}
       name: ${NAME}
     spec:
-      host: ${NAME}.${DOMAIN}
+      host: ${NAME}-${NAMESPACE}-dev.${DOMAIN}
       port:
         targetPort: 3000-tcp
       to:

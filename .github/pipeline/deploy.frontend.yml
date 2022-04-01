@@ -61,7 +61,7 @@ objects:
             name: ${NAME}
         spec:
           containers:
-            - image: image-registry.openshift-image-registry.svc:5000/${NAMESPACE}/${NAME}:pr
+            - image: image-registry.openshift-image-registry.svc:5000/${NAMESPACE}/${NAME}:latest
               imagePullPolicy: Always
               name: ${NAME}
               ports:

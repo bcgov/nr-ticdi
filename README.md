@@ -31,7 +31,13 @@ The Greenfield template (https://github.com/bcgov/greenfield-template/) was used
 # TODO
 
 * Create OpenShift realm to handle authentication.
-* Grab WebADE oauth token without relying on secrets.  Currently, we have to update the nr-ticdi-api secret daily with the latest token.  We should be able to call a WebADE endpoint to do this for us before making calls to TTLS-API
+* Grab WebADE oauth token without relying on secrets.  Currently, we have to update the nr-ticdi-api secret daily with the latest token.  We should be able to call a WebADE endpoint to do this for us before making calls to TTLS-API.  In the meantime, this John Vestner provides us with these tokens daily.  To apply the tokens:
+
+1. Login to c57b8f-dev in OpenShift and access the secrets within the workloads section (or just go to https://console.apps.silver.devops.gov.bc.ca/k8s/ns/c57b8f-dev/secrets)
+2. Select the "nr-ticdi-api" secret
+3. Click "Actions" in the top-right of the screen, and then select "Edit Secret"
+4. Click save
+5. Delete the ticdi pod
 
 # Github
 

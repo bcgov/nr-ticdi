@@ -7,7 +7,7 @@ metadata:
     tags: "nr-ticdi-db"
     iconClass: icon-js
 labels:
-  app: ${NAME}-${SUFFIX}
+  app: ${NAME}
   app.kubernetes.io/part-of: "${NAME}"
 parameters:
   - name: NAME
@@ -35,9 +35,9 @@ objects:
   - apiVersion: v1
     kind: Secret
     metadata:
-      name: ${NAME}-${COMPONENT}-${SUFFIX}
+      name: ${NAME}-${COMPONENT}
       labels:
-        app: ${NAME}-${SUFFIX}
+        app: ${NAME}
     stringData:
       database-name: "${NAME}"
       database-password: "${DB_PASSWORD}"
@@ -45,9 +45,9 @@ objects:
   - kind: PersistentVolumeClaim
     apiVersion: v1
     metadata:
-      name: ${NAME}-${COMPONENT}-${SUFFIX}
+      name: ${NAME}-${COMPONENT}
       labels:
-        app: ${NAME}-${SUFFIX}
+        app: ${NAME}
     spec:
       accessModes:
         - ReadWriteOnce
@@ -58,14 +58,14 @@ objects:
   - kind: ImageStream
     apiVersion: v1
     metadata:
-      name: ${NAME}-${COMPONENT}-${SUFFIX}
+      name: ${NAME}-${COMPONENT}
       labels:
-        app: ${NAME}-${SUFFIX}
+        app: ${NAME}
     spec:
       lookupPolicy:
         local: false
       tags:
-      - name: pr-${SUFFIX}
+      - name: pr
         from:
           kind: DockerImage
           name: image-registry.openshift-image-registry.svc:5000/openshift/postgresql:12
@@ -74,9 +74,9 @@ objects:
   - kind: DeploymentConfig
     apiVersion: v1
     metadata:
-      name: ${NAME}-${COMPONENT}-${SUFFIX}
+      name: ${NAME}-${COMPONENT}
       labels:
-        app: ${NAME}-${SUFFIX}
+        app: ${NAME}
     spec:
       replicas: 1
       strategy:
@@ -88,17 +88,17 @@ objects:
       revisionHistoryLimit: 10
       template:
         metadata:
-          name: ${NAME}-${COMPONENT}-${SUFFIX}
+          name: ${NAME}-${COMPONENT}
           labels:
-            app: ${NAME}-${SUFFIX}
+            app: ${NAME}
         spec:
           volumes:
-            - name: ${NAME}-${COMPONENT}-${SUFFIX}
+            - name: ${NAME}-${COMPONENT}
               persistentVolumeClaim:
-                claimName: ${NAME}-${COMPONENT}-${SUFFIX}
+                claimName: ${NAME}-${COMPONENT}
           containers:
-            - name: ${NAME}-${COMPONENT}-${SUFFIX}
-              image: image-registry.openshift-image-registry.svc:5000/${NAMESPACE}/${NAME}-${COMPONENT}-${SUFFIX}:pr-${SUFFIX}
+            - name: ${NAME}-${COMPONENT}
+              image: image-registry.openshift-image-registry.svc:5000/${NAMESPACE}/${NAME}-${COMPONENT}:pr
               ports:
                 - containerPort: 5432
                   protocol: TCP
@@ -106,20 +106,20 @@ objects:
                 - name: POSTGRESQL_DATABASE
                   valueFrom:
                     secretKeyRef:
-                      name: ${NAME}-${COMPONENT}-${SUFFIX}
+                      name: ${NAME}-${COMPONENT}
                       key: database-name
                 - name: POSTGRESQL_PASSWORD
                   valueFrom:
                     secretKeyRef:
-                      name: ${NAME}-${COMPONENT}-${SUFFIX}
+                      name: ${NAME}-${COMPONENT}
                       key: database-password
                 - name: POSTGRESQL_USER
                   valueFrom:
                     secretKeyRef:
-                      name: ${NAME}-${COMPONENT}-${SUFFIX}
+                      name: ${NAME}-${COMPONENT}
                       key: database-user
               volumeMounts:
-                - name: ${NAME}-${COMPONENT}-${SUFFIX}
+                - name: ${NAME}-${COMPONENT}
                   mountPath: "/var/lib/pgsql/data"
               livenessProbe:
                 initialDelaySeconds: 30

@@ -8,7 +8,7 @@ on:
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
-  TRIGGERS: ('frontend/' '.github/pipeline')
+  TRIGGERS: ('frontend/' '.github/pipeline' 'apis/')
 
 jobs:
   check:
@@ -78,7 +78,7 @@ jobs:
         with:
           context: ./frontend/
           push: true
-          tags: ghcr.io/bcgov/nr-ticdi:pr-${{ github.event.number }}
+          tags: ghcr.io/bcgov/nr-ticdi:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -138,11 +138,11 @@ jobs:
           oc project ${{ secrets.NAMESPACE }}
 
           # Cancel any rollouts in progress
-          oc rollout cancel dc/nr-ticdi-${{ github.event.number }} 2> /dev/null \
+          oc rollout cancel dc/nr-ticdi 2> /dev/null \
             || true && echo "No rollout in progress"
           
           # Remove any stale imagestreams
-          oc delete is/nr-ticdi-${{ github.event.number }} 2> /dev/null \
+          oc delete is/nr-ticdi 2> /dev/null \
             || true && echo "No stale imagestreams"
 
           # Process and apply deployment template
@@ -152,12 +152,12 @@ jobs:
           done
 
           # Start rollout (if necessary) and follow it
-          oc rollout latest dc/nr-ticdi-${{ github.event.number }} 2> /dev/null \
+          oc rollout latest dc/nr-ticdi 2> /dev/null \
             || true && echo "Rollout in progress"
-          oc logs -f dc/nr-ticdi-${{ github.event.number }}
+          oc logs -f dc/nr-ticdi
 
           # Get status, returns 0 if rollout is successful
-          oc rollout status dc/nr-ticdi-${{ github.event.number }}
+          oc rollout status dc/nr-ticdi
 
       - name: Deployment update
         uses: mshick/add-pr-comment@v1

@@ -36,10 +36,10 @@ objects:
       lookupPolicy:
         local: false
       tags:
-      - name: pr
+      - name: latest
         from:
           kind: DockerImage
-          name: ghcr.io/bcgov/nr-ticdi:pr
+          name: ghcr.io/bcgov/nr-ticdi:latest
         referencePolicy:
           type: Local
   - apiVersion: v1

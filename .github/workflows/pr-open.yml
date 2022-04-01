@@ -78,7 +78,7 @@ jobs:
         with:
           context: ./frontend/
           push: true
-          tags: ghcr.io/bcgov/nr-ticdi:pr-${{ github.event.number }}
+          tags: ghcr.io/bcgov/nr-ticdi:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
 

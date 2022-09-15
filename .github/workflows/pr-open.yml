@@ -20,7 +20,7 @@ jobs:
           - component: frontend
             triggers: ('frontend/')
     secrets:
-      gh_token: ${{ secrets.GITHUB_TOKEN }}
+      gh_token: ${{ secrets.GHCR_TOKEN }}
     with:
       component: ${{ matrix.component }}
       img_build: ${{ github.event.number }}

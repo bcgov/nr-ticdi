@@ -1,25 +1,66 @@
-name: Cleanup
+name: Pull Request Closed
 
 on:
   pull_request:
     types:
       - closed
-    branches:
-      - main
+    paths-ignore:
+      - ".github/ISSUE_TEMPLATE/*"
+      - "**.md"
+
+env:
+  name: devops-quickstart
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  cleanup:
-    name: Cleanup
-    runs-on: ubuntu-latest
-    environment:
-      name: dev
+  # Clean up OpenShift when PR closed, no conditions
+  cleanup-openshift:
+    name: Cleanup OpenShift
+    runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Remove OpenShift artifacts
         run: |
-          set -ex
           oc login --token=${{ secrets.OC_TOKEN }} --server=${{ secrets.OC_SERVER }}
-          oc project ${{ secrets.NAMESPACE }}
+          oc project ${{ secrets.OC_NAMESPACE }}
 
           # Remove old build runs, build pods and deployment pods
-          # oc delete all -l app=nr-ticdi-${{ github.event.number }}
+          oc delete all,pvc,secret -l app=${{ env.name }}-${{ github.event.number }}
+
+  # If merged into main, then handle any image promotions
+  image-promotions:
+    name: Image Promotions
+    if: github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'main'
+    uses: ./.github/workflows/_image_promote.yml
+    strategy:
+      matrix:
+        component: [backend, frontend]
+    with:
+      app_name: devops-quickstart
+      component: ${{ matrix.component }}
+      env_source: ${{ github.event.number }}
+      env_target: test
+    secrets:
+      oc_namespace: ${{ secrets.OC_NAMESPACE }}
+      oc_server: ${{ secrets.OC_SERVER }}
+      oc_token: ${{ secrets.OC_TOKEN }}
+
+  # Notify when PR merged into main
+  merge-notification:
+    name: Merge Notification
+    runs-on: ubuntu-22.04
+    if: github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'main'
+    steps:
+      - name: Pre-merge update
+        uses: mshick/add-pr-comment@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          allow-repeats: false
+          message: |
+            Your Pull Request code is being promoted!  Please follow the link below.
+
+            [Main Merge Workflow](https://github.com/${{ github.repository }}/actions/workflows/merge-main.yml)

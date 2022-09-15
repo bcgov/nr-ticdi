@@ -70,10 +70,9 @@ export class HttpConsumingService {
 
   // grab a CDOGS token for future requests
   callGetToken(): Promise<Object> {
-    let url =
-      "https://dev.oidc.gov.bc.ca/auth/realms/jbd6rnxw/protocol/openid-connect/token";
-    let service_client_id = process.env.service_client_id;
-    let service_client_secret = process.env.service_client_secret;
+    let url = process.env.CDOGS_TOKEN_ENDPOINT;
+    let service_client_id = process.env.CDOGS_SERVICE_CLIENT_ID;
+    let service_client_secret = process.env.CDOGS_SERVICE_CLIENT_SECRET
 
     const token = `${service_client_id}:${service_client_secret}`;
     const encodedToken = Buffer.from(token).toString("base64");
@@ -125,7 +124,7 @@ export class HttpConsumingService {
 
     let config = {
       method: "post",
-      url: "https://cdogs-dev.apps.silver.devops.gov.bc.ca/api/v2/template/render",
+      url: process.env.CDOGS_URL,
       responseType: "arraybuffer",
       headers: {
         Authorization: "Bearer " + cdogsToken,

@@ -1,7 +1,7 @@
 {
-  "name": "devops-quickstart",
+  "name": "ticdi-backend",
   "version": "0.0.1",
-  "description": "BCGov devops quickstart. For reference, testing and new projects.",
+  "description": "TICDI Backend.",
   "main": "index.js",
   "scripts": {
     "prebuild": "rimraf dist",
@@ -23,7 +23,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/bcgov/devops-quickstart.git"
+    "url": "git+https://github.com/bcgov/greenfield-template.git"
   },
   "keywords": [
     "openshift",
@@ -36,24 +36,26 @@
   "author": "Derek Roberts",
   "license": "Apache-2.0",
   "bugs": {
-    "url": "https://github.com/bcgov/devops-quickstart/issues"
+    "url": "https://github.com/bcgov/greenfield-template/issues"
   },
-  "homepage": "https://github.com/bcgov/devops-quickstart#readme",
+  "homepage": "https://github.com/bcgov/greenfield-template#readme",
   "dependencies": {
-    "@nestjs/cli": "^8.2.6",
-    "@nestjs/common": "^8.4.6",
-    "@nestjs/config": "^2.1.0",
-    "@nestjs/core": "^8.4.6",
-    "@nestjs/platform-express": "^8.4.6",
-    "@nestjs/schematics": "^8.0.11",
+    "@nestjs/cli": "^8.2.5",
+    "@nestjs/common": "^8.4.4",
+    "@nestjs/config": "^2.0.0",
+    "@nestjs/core": "^8.4.4 ",
+    "@nestjs/platform-express": "^8.4.4",
+    "@nestjs/schedule": "^1.1.0",
+    "@nestjs/schematics": "^8.0.10",
     "@nestjs/swagger": "^5.2.1",
-    "@nestjs/testing": "^8.4.6",
-    "@nestjs/typeorm": "^8.1.2",
-    "dotenv": "^16.0.1",
+    "@nestjs/testing": "^8.4.4",
+    "@nestjs/typeorm": "^8.0.3",
+    "aws4-axios": "^2.4.9",
+    "csvtojson": "^2.0.10",
     "pg": "^8.7.3",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.5.5",
-    "swagger-ui-express": "^4.4.0",
+    "swagger-ui-express": "^4.3.0",
     "typeorm": "^0.2.45"
   },
   "devDependencies": {
@@ -109,7 +111,6 @@
     "coverageReporters": [
       "text",
       "lcov",
-      "cobertura",
       "jest-badges"
     ],
     "testEnvironment": "node",

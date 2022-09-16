@@ -96,8 +96,8 @@ export class HttpConsumingService {
       });
   }
 
-  // generate the report via CDOGS
-  async generateReport() {
+  // generate the Land use Report via CDOGS
+  async generateLURReport() {
     let cdogsToken = await this.callGetToken();
 
     const buffer = fs.readFileSync(

@@ -48,7 +48,7 @@ objects:
   - kind: PersistentVolumeClaim
     apiVersion: v1
     metadata:
-      name: esra-sessions
+      name: ticdi-sessions
       labels:
         app: ${NAME}-${ZONE}
     spec:

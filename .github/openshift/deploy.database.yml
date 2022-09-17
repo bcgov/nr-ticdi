@@ -24,7 +24,7 @@ parameters:
     displayName: Database Volume Capacity
     name: DB_PVC_SIZE
     required: true
-    value: 1Gi
+    value: 512Mi
   - name: REGISTRY
     value: image-registry.openshift-image-registry.svc:5000
   - name: PROMOTE

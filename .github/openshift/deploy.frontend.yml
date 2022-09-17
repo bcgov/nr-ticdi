@@ -56,7 +56,7 @@ objects:
         - ReadWriteMany
       resources:
         requests:
-          storage: "1Gi"
+          storage: "512Mi"
       storageClassName: netapp-file-standard
   - apiVersion: v1
     kind: DeploymentConfig

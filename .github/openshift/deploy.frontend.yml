@@ -169,8 +169,6 @@ objects:
                     secretKeyRef:
                       name: ttls
                       key: ttls_api_key
-                - name: ttls_api_key
-                  value:
                 - name: backend_url
                   value: https://${NAME}-${ZONE}-backend.${DOMAIN}
                 - name: session_path
@@ -208,17 +206,17 @@ objects:
                 - name: cdogs_service_client_id
                   valueFrom:
                     secretKeyRef: 
-                      name: common-services
+                      name: cdogs
                       key: cdogs_service_client_id
                 - name: cdogs_service_client_secret
                   valueFrom:
                     secretKeyRef: 
-                      name: common-services
+                      name: cdogs
                       key: cdogs_service_client_secret
                 - name: cdogs_url
                   valueFrom:
                     secretKeyRef: 
-                      name: common-services
+                      name: cdogs
                       key: cdogs_url
                 - name: ttls_api_key
                   valueFrom:

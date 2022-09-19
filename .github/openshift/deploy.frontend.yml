@@ -97,11 +97,11 @@ objects:
   - apiVersion: v1
     kind: Secret
     metadata:
-      name: ticdi_environment
+      name: ticdi-environment
       labels:
         app: ${NAME}-${ZONE}
     stringData:
-      ticdi_environment: PROD   
+      ticdi_environment: production   
   - kind: PersistentVolumeClaim
     apiVersion: v1
     metadata:
@@ -157,7 +157,7 @@ objects:
                 - name: ticdi_environment
                   valueFrom:
                     secretKeyRef:
-                      name: ticdi_environment
+                      name: ticdi-environment
                       key: ticdi_environment
                 - name: ttls_url
                   valueFrom:

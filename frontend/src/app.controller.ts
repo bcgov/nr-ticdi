@@ -13,8 +13,8 @@ export class AppController {
 
   @Get()
   @Render('index')
-//  @UseFilters(AuthenticationFilter)
-//  @UseGuards(AuthenticationGuard)
+  //@UseFilters(AuthenticationFilter)
+  //@UseGuards(AuthenticationGuard)
   async root(@Session() session: { data?: SessionData }) {
     const username = session.data.name;
     const label =

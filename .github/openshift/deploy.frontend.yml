@@ -10,6 +10,14 @@ parameters:
   - name: COMPONENT
     description: Component name
     value: frontend
+  - description: Password for the Cookie Secret.
+    from: "[a-zA-Z0-9]{16}"
+    generate: expression
+    name: COOKIE_SECRET
+  - description: Password for the Session Secret.
+    from: "[a-zA-Z0-9]{16}"
+    generate: expression
+    name: SESSION_SECRET
   - name: ZONE
     description: Deployment zone, e.g. pr-### or prod
     required: true
@@ -52,8 +60,8 @@ objects:
       labels:
         app: ${NAME}-${ZONE}
     stringData:
-      cookie-secret: ${COOKIE_SECRET}
-      session-secret: ${SESSION_SECRET}
+      cookie_secret: ${COOKIE_SECRET}
+      session_secret: ${SESSION_SECRET}
   - kind: PersistentVolumeClaim
     apiVersion: v1
     metadata:
@@ -106,6 +114,12 @@ objects:
               env:
                 - name: NODE_TLS_REJECT_UNAUTHORIZED 
                   value: '0'
+                - name: ticdi_environment
+                  value: 'Prod'
+                - name: TTLS_URL
+                  value: https://i1api.nrs.gov.bc.ca/ttls-api/v1/dispositionTrans/info/
+                - name: TTLS_API_KEY
+                  value:
                 - name: BACKEND_URL
                   value: https://${NAME}-${ZONE}-backend.${DOMAIN}
                 - name: SESSION_PATH
@@ -114,12 +128,12 @@ objects:
                   valueFrom:
                     secretKeyRef:
                       name: ticdi-sessions
-                      key: cookie-secret
+                      key: cookie_secret
                 - name: SESSION_SECRET
                   valueFrom:
                     secretKeyRef: 
                       name: ticdi-sessions
-                      key: session-secret
+                      key: session_secret
                 - name: KEYCLOAK_BASE_URL
                   valueFrom:
                     secretKeyRef: 

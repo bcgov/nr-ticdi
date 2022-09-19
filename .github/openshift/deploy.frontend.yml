@@ -69,7 +69,7 @@ objects:
       labels:
         app: ${NAME}-${ZONE}
     stringData:
-      ttls_url: 
+      ttls_url: https://i1api.nrs.gov.bc.ca/ttls-api/v1/dispositionTrans/info/
       ttls_api_key: 
   - apiVersion: v1
     kind: Secret
@@ -92,7 +92,7 @@ objects:
       keycloak_base_url: https://dev.oidc.gov.bc.ca/auth
       keycloak_client_id: ticdi-3202 
       keycloak_realm: onestopauth
-      keycloak_secret: f65e62de-6d2d-4171-bd26-e83f805a4a16
+      keycloak_secret: 
       keycloak_xapi_key:
   - apiVersion: v1
     kind: Secret
@@ -155,12 +155,20 @@ objects:
                 - name: NODE_TLS_REJECT_UNAUTHORIZED 
                   value: '0'
                 - name: ticdi_environment
-                  value: 'Prod'
+                  valueFrom:
+                    secretKeyRef:
+                      name: ticdi_environment
+                      key: ticdi_environment
                 - name: ttls_url
                   valueFrom:
                     secretKeyRef:
-                      name: ttls_url
+                      name: ttls
                       key: ttls_url
+                - name: ttls_api_key
+                  valueFrom:
+                    secretKeyRef:
+                      name: ttls
+                      key: ttls_api_key
                 - name: ttls_api_key
                   value:
                 - name: backend_url

@@ -55,9 +55,9 @@ export class HttpConsumingService {
   }
 
   callHttp(): Observable<Array<Object>> {
-    let bearerToken = process.env.TTLS_API_KEY;
+    let bearerToken = process.env.ttls_api_key;
 
-    let url = process.env.TTLS_URL + this.id;
+    let url = process.env.ttls_url + this.id;
 
     return this.http
       .get(url, { headers: { Authorization: "Bearer " + bearerToken } })
@@ -70,9 +70,9 @@ export class HttpConsumingService {
 
   // grab a CDOGS token for future requests
   callGetToken(): Promise<Object> {
-    let url = process.env.CDOGS_TOKEN_ENDPOINT;
-    let service_client_id = process.env.CDOGS_SERVICE_CLIENT_ID;
-    let service_client_secret = process.env.CDOGS_SERVICE_CLIENT_SECRET
+    let url = process.env.cdogs_token_endpoint;
+    let service_client_id = process.env.cdogs_service_client_id;
+    let service_client_secret = process.env.cdogs_service_client_secret
 
     const token = `${service_client_id}:${service_client_secret}`;
     const encodedToken = Buffer.from(token).toString("base64");
@@ -124,7 +124,7 @@ export class HttpConsumingService {
 
     let config = {
       method: "post",
-      url: process.env.CDOGS_URL,
+      url: process.env.cdogs_url,
       responseType: "arraybuffer",
       headers: {
         Authorization: "Bearer " + cdogsToken,

@@ -18,10 +18,10 @@ async function bootstrap() {
 
   let sessionOptions: expressSession.SessionOptions;
   sessionOptions = {
-    secret: process.env.session_secret,
+    secret: process.env.cookie_secret,
     resave: false,
     saveUninitialized: false,
-    store: new fileSession({ path: resolve('./', process.env.SESSION_PATH) }),
+    store: new fileSession({ path: resolve('./', process.env.session_path) }),
     cookie: { maxAge: 3600000, secure: false, httpOnly: true },
   };
 

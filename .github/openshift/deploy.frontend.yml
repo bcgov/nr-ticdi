@@ -45,6 +45,15 @@ objects:
             name: ${REGISTRY}/${PROMOTE}
           referencePolicy:
             type: Local
+  - apiVersion: v1
+    kind: Secret
+    metadata:
+      name: ticdi-sessions
+      labels:
+        app: ${NAME}-${ZONE}
+    stringData:
+      cookie-secret: ${COOKIE_SECRET}
+      session-secret: ${SESSION_SECRET}
   - kind: PersistentVolumeClaim
     apiVersion: v1
     metadata:
@@ -105,12 +114,12 @@ objects:
                   valueFrom:
                     secretKeyRef:
                       name: ticdi-sessions
-                      key: COOKIE_SECRET
+                      key: cookie-secret
                 - name: SESSION_SECRET
                   valueFrom:
                     secretKeyRef: 
                       name: ticdi-sessions
-                      key: SESSION_SECRET
+                      key: session-secret
                 - name: KEYCLOAK_BASE_URL
                   valueFrom:
                     secretKeyRef: 

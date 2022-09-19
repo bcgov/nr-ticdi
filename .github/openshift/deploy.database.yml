@@ -6,7 +6,7 @@ labels:
 parameters:
   - name: NAME
     description: Product name
-    value: nr-ticdi-db
+    value: nr-ticdi
   - name: COMPONENT
     description: Component name
     value: database
@@ -25,6 +25,14 @@ parameters:
     name: DB_PVC_SIZE
     required: true
     value: 512Mi
+  - description: Password for the Cookie Secret.
+    from: "[a-zA-Z0-9]{16}"
+    generate: expression
+    name: COOKIE_SECRET
+  - description: Password for the Session Secret.
+    from: "[a-zA-Z0-9]{16}"
+    generate: expression
+    name: SESSION_SECRET
   - name: REGISTRY
     value: image-registry.openshift-image-registry.svc:5000
   - name: PROMOTE

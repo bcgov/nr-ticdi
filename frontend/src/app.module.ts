@@ -12,7 +12,7 @@ import { HttpModule } from '@nestjs/axios';
     HttpModule,
     AuthenticationModule,
     SessionModule.forRoot({
-      session: { secret: process.env.SESSION_SECRET },
+      session: { secret: process.env.session_secret },
     }),
   ],
   controllers: [AppController],

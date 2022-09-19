@@ -6,7 +6,7 @@ labels:
 parameters:
   - name: NAME
     description: Module name
-    value: ticdi-backend
+    value: nr-ticdi
   - name: COMPONENT
     description: Component name
     value: backend

@@ -70,7 +70,6 @@ objects:
         app: ${NAME}-${ZONE}
     stringData:
       ttls_url: https://i1api.nrs.gov.bc.ca/ttls-api/v1/dispositionTrans/info/
-      ttls_api_key: a
   - apiVersion: v1
     kind: Secret
     metadata:
@@ -79,7 +78,6 @@ objects:
         app: ${NAME}-${ZONE}
     stringData:
       cdogs_service_client_id: TICDI_SERVICE_CLIENT
-      cdogs_service_client_secret: a
       cdogs_url: https://cdogs-dev.apps.silver.devops.gov.bc.ca/api/v2/template/render
       cdogs_token_endpoint: https://dev.oidc.gov.bc.ca/auth/realms/jbd6rnxw/protocol/openid-connect/token
   - apiVersion: v1
@@ -92,8 +90,6 @@ objects:
       keycloak_base_url: https://dev.oidc.gov.bc.ca/auth
       keycloak_client_id: ticdi-3202 
       keycloak_realm: onestopauth
-      keycloak_secret: a
-      keycloak_xapi_key:
   - apiVersion: v1
     kind: Secret
     metadata:

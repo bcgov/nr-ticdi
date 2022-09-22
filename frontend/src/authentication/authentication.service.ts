@@ -18,10 +18,10 @@ export class AuthenticationService {
   private redirect_uri: string;
 
   constructor() {
-    this.keycloak_base_url = process.env.KEYCLOAK_BASE_URL;
-    this.realm = process.env.KEYCLOAK_REALM;
-    this.client_id = process.env.KEYCLOAK_CLIENT_ID;
-    this.secret = process.env.KEYCLOAK_SECRET;
+    this.keycloak_base_url = process.env.keycloak_base_url;
+    this.realm = process.env.keycloak_realm;
+    this.client_id = process.env.keycloak_client_id;
+    this.secret = process.env.keycloak_secret;
     this.grant_type = 'authorization_code';
     this.xapikey = process.env.KEYCLOAK_XAPIKEY;
   }

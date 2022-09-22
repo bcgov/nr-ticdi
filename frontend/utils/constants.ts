@@ -1,5 +1,5 @@
 export const PAGE_TITLES = {
-  INDEX: 'BC Site Registry',
+  INDEX: 'TICDI',
   PARCEL_ID: 'Parcel ID Search',
   CROWN_PIN: 'Crown Lands PIN',
   CROWN_FILE: 'Crown Lands File #',

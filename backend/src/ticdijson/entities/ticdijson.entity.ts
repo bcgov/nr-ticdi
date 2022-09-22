@@ -1,5 +1,12 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { Entity, Column, PrimaryGeneratedColumn } from "typeorm";
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  OneToOne,
+  JoinColumn,
+} from "typeorm";
+import { TenantAddr } from "./tenantAddr.entity";
 
 @Entity()
 export class Ticdijson {
@@ -10,134 +17,65 @@ export class Ticdijson {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ApiProperty({
-    example: "Peter Green",
-    description: "The contact or agent name",
-  })
   @Column()
-  contactName: string;
-
-  @ApiProperty({
-    example: "abc@gmail.com",
-    description: "The email address",
-  })
+  dtid: number;
   @Column()
-  email: string;
-
-  @ApiProperty({
-    example: "",
-    description: "The organization unit",
-  })
+  fileNum: string;
   @Column()
-  organizationUnit: string;
-
-  @ApiProperty({
-    example: "123",
-    description: "The incorporation number",
-  })
+  orgUnit: string;
   @Column()
-  incorporationNumber: number;
-
-  @ApiProperty({
-    example: "",
-    description: "The policy name",
-  })
-  @Column()
-  policyName: string;
-
-  @ApiProperty({
-    example: "31-05-2022",
-    description: "The inspected date",
-  })
-  @Column()
-  inspectedDate: Date;
-
-  @ApiProperty({
-    example: "",
-    description: "The purpose statement",
-  })
-  @Column()
-  purposeStatement: string;
-
-  @ApiProperty({
-    example: "",
-    description: "The file number",
-  })
-  @Column()
-  fileNumber: string;
-
-  @ApiProperty({
-    example: "",
-    description: "The type",
-  })
-  @Column()
-  type: string;
-
-  @ApiProperty({
-    example: "",
-    description: "The purpose",
-  })
+  complexLevel: string;
   @Column()
   purpose: string;
-
-  @ApiProperty({
-    example: "",
-    description: "The area",
-  })
+  @Column()
+  subPurpose: string;
+  @Column()
+  subType: string;
+  @Column()
+  type: string;
+  @Column()
+  bcgsSheet: string;
+  @Column()
+  airPhotoNum: string;
   @Column()
   area: string;
-
-  @ApiProperty({
-    example: "",
-    description: "The legal description",
-  })
   @Column()
-  legalDescription: string;
-
-  @ApiProperty({
-    example: "",
-    description: "The mailing address",
-  })
+  locLand: string;
   @Column()
-  mailingAddress: string;
+  legalDesc: string;
+  @OneToOne(() => TenantAddr, (tenantAddr) => tenantAddr.ticdijson)
+  @JoinColumn({ name: "dtid" })
+  tenantAddr: TenantAddr;
 
-  @ApiProperty({
-    example: "",
-    description: "The subtype",
-  })
-  @Column()
-  subtype: string;
-
-  @ApiProperty({
-    example: "",
-    description: "The subpurpose",
-  })
-  @Column()
-  subpurpose: string;
-
-  @ApiProperty({
-    example: "",
-    description: "The location of land",
-  })
-  @Column()
-  locationOfLand: string;
-
-  constructor(name?: string, email?: string) {
-    this.contactName = name || "";
-    this.email = email || "";
-    this.organizationUnit || "";
-    this.incorporationNumber || "";
-    this.policyName || "";
-    this.inspectedDate || "";
-    this.purposeStatement || "";
-    this.fileNumber || "";
-    this.type || "";
-    this.purpose || "";
-    this.area || "";
-    this.legalDescription || "";
-    this.mailingAddress || "";
-    this.subtype || "";
-    this.subpurpose || "";
-    this.locationOfLand || "";
+  constructor(
+    dtid?: number,
+    fileNum?: string,
+    orgUnit?: string,
+    complexLevel?: string,
+    purpose?: string,
+    subPurpose?: string,
+    subType?: string,
+    type?: string,
+    bcgsSheet?: string,
+    airPhotoNum?: string,
+    area?: string,
+    locLand?: string,
+    legalDesc?: string,
+    tenantAddr?: TenantAddr
+  ) {
+    this.dtid = dtid || null;
+    this.fileNum = fileNum || "";
+    this.orgUnit = orgUnit || "";
+    this.complexLevel = complexLevel || "";
+    this.purpose = purpose || "";
+    this.subPurpose = subPurpose || "";
+    this.subType = subType || "";
+    this.type = type || "";
+    this.bcgsSheet = bcgsSheet || "";
+    this.airPhotoNum = airPhotoNum || "";
+    this.area = area || "";
+    this.locLand = locLand || "";
+    this.legalDesc = legalDesc || "";
+    this.tenantAddr = tenantAddr || null;
   }
 }

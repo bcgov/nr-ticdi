@@ -11,7 +11,7 @@ import * as dotenv from "dotenv";
 dotenv.config();
 
 @Injectable()
-export class HttpConsumingService {
+export class TTLSService {
   constructor(private readonly http: HttpService) {}
 
   private id: String;

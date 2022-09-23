@@ -16,29 +16,38 @@ export class TicdijsonService {
     ticdiJson: CreateTicdijsonDto,
     tenantAddr: TenantAddr
   ): Promise<Ticdijson> {
-    const existingTicdi = await this.ticdijsonRepository.findOne({
+    const newItem = new Ticdijson();
+    newItem.airPhotoNum = ticdiJson.airPhotoNum;
+    newItem.area = ticdiJson.area;
+    newItem.bcgsSheet = ticdiJson.bcgsSheet;
+    newItem.complexLevel = ticdiJson.complexLevel;
+    newItem.dtid = ticdiJson.dtid;
+    newItem.fileNum = ticdiJson.fileNum;
+    newItem.legalDesc = ticdiJson.legalDesc;
+    newItem.locLand = ticdiJson.locLand;
+    newItem.orgUnit = ticdiJson.orgUnit;
+    newItem.purpose = ticdiJson.purpose;
+    newItem.subPurpose = ticdiJson.subPurpose;
+    newItem.subType = ticdiJson.subType;
+    newItem.type = ticdiJson.type;
+    newItem.tenantAddr = tenantAddr;
+    const existingTicdi = await this.ticdijsonRepository.find({
       dtid: ticdiJson.dtid,
     });
     if (!existingTicdi) {
-      const newItem = new Ticdijson();
-      newItem.airPhotoNum = ticdiJson.airPhotoNum;
-      newItem.area = ticdiJson.area;
-      newItem.bcgsSheet = ticdiJson.bcgsSheet;
-      newItem.complexLevel = ticdiJson.complexLevel;
-      newItem.dtid = ticdiJson.dtid;
-      newItem.fileNum = ticdiJson.fileNum;
-      newItem.legalDesc = ticdiJson.legalDesc;
-      newItem.locLand = ticdiJson.locLand;
-      newItem.orgUnit = ticdiJson.orgUnit;
-      newItem.purpose = ticdiJson.purpose;
-      newItem.subPurpose = ticdiJson.subPurpose;
-      newItem.subType = ticdiJson.subType;
-      newItem.type = ticdiJson.type;
-      newItem.tenantAddr = tenantAddr;
+      newItem.version = 1;
       const newTicdi = this.ticdijsonRepository.create(newItem);
       return this.ticdijsonRepository.save(newTicdi);
     } else {
-      return existingTicdi;
+      let currentVersion = 0;
+      for (let item of existingTicdi) {
+        if (item.version > currentVersion) {
+          currentVersion = item.version;
+        }
+      }
+      newItem.version = currentVersion + 1;
+      const newTicdi = this.ticdijsonRepository.create(newItem);
+      return this.ticdijsonRepository.save(newTicdi);
     }
   }
 

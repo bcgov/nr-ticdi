@@ -17,8 +17,10 @@ export class Ticdijson {
     default: () => "CURRENT_TIMESTAMP(6)",
   })
   createdAt: Date;
-  @Column({ unique: true })
+  @Column()
   dtid: number;
+  @Column()
+  version: number;
   @Column({ nullable: true })
   fileNum: string;
   @Column({ nullable: true })
@@ -48,6 +50,7 @@ export class Ticdijson {
 
   constructor(
     dtid?: number,
+    version?: number,
     fileNum?: string,
     orgUnit?: string,
     complexLevel?: string,
@@ -63,6 +66,7 @@ export class Ticdijson {
     tenantAddr?: TenantAddr
   ) {
     this.dtid = dtid || null;
+    this.version = version || null;
     this.fileNum = fileNum || "";
     this.orgUnit = orgUnit || "";
     this.complexLevel = complexLevel || "";

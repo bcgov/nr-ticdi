@@ -30,7 +30,7 @@ jobs:
           # Remove old build runs, build pods and deployment pods
           oc delete all,pvc,secret -l app=${{ env.name }}-${{ github.event.number }}
 
-  # If merged into main, then handle any image promotions
+  # If merged into main, then handle any image promotions 
   image-promotions:
     name: Image Promotions
     if: github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'main'

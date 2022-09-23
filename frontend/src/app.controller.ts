@@ -64,9 +64,9 @@ export class AppController {
       .callHttp()
       .toPromise()
       .then(
-        (resp) => {
+        async (resp) => {
           ttlsJSON = resp;
-          this.ttlsService.sendToBackend(ttlsJSON);
+          await this.ttlsService.sendToBackend(ttlsJSON);
           return ttlsJSON;
         },
         (reason) => {

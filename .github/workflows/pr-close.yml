@@ -10,6 +10,9 @@ on:
 
 env:
   name: nr-ticdi
+  OC_TOKEN: ${{ secrets.OC_TOKEN }} # Needed to get PR information, if any
+  OC_SERVER: ${{ secrets.OC_SERVER }} # Needed to get PR information, if any
+  OC_NAMESPACE: ${{ secrets.OC_NAMESPACE }} # Needed to get PR information, if any
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}

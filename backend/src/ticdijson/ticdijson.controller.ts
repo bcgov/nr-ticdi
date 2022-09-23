@@ -33,8 +33,8 @@ export class TicdijsonController {
   }
 
   @Get(":dtid")
-  findOne(@Param("dtid") dtid: string) {
-    return this.ticdijsonService.findOne(+dtid);
+  findByDtid(@Param("dtid") dtid: string) {
+    return this.ticdijsonService.findByDtid(+dtid);
   }
 
   @Delete(":dtid")

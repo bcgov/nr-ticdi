@@ -24,17 +24,22 @@ export class TTLSService {
 
   private id: String;
   private jsonDataFile: {};
+  private jsonDataArray: any[];
 
   setId(id: String) {
     this.id = id;
   }
 
   // convert the TTLS JSON package to a format that conforms to the CDOGS template
-  setJSONDataFile(jsonDataFile: {}) {
-    // console.log(jsonDataFile);
-
-    var string = JSON.stringify(jsonDataFile);
-    var jsonFormatted = JSON.parse(string);
+  setJSONDataFile(jsonDataFile: [{}]) {
+    const formattedJsonArray = [];
+    for (let s of jsonDataFile) {
+      let string = JSON.stringify(s);
+      let jsonFormatted = JSON.parse(string);
+      formattedJsonArray.push(jsonFormatted);
+    }
+    this.jsonDataArray = formattedJsonArray;
+    var jsonFormatted = formattedJsonArray[0];
 
     let legalName = jsonFormatted.tenantAddr.legalName;
     if (typeof legalName === "undefined" || !legalName) {
@@ -45,6 +50,7 @@ export class TTLSService {
     }
 
     this.jsonDataFile = {
+      DataArray: formattedJsonArray,
       FileNum: jsonFormatted.fileNum,
       OrganizationUnit: jsonFormatted.orgUnit,
       LicenceHolderName: legalName,
@@ -89,7 +95,7 @@ export class TTLSService {
   }
 
   // get a ticdi json object from the backend using a dtid
-  async getItem(dtid: number): Promise<any> {
+  async getJSONsByDTID(dtid: number): Promise<any> {
     const url = `${hostname}:${port}/ticdijson/${dtid}`;
     return axios
       .get(url, {

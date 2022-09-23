@@ -57,8 +57,13 @@ export class TicdijsonService {
     });
   }
 
-  async findOne(dtid: number): Promise<Ticdijson> {
-    return this.ticdijsonRepository.findOne({ dtid: dtid });
+  async findByDtid(dtid: number): Promise<Ticdijson[]> {
+    return this.ticdijsonRepository.find({
+      where: {
+        dtid: dtid,
+      },
+      relations: ["tenantAddr"],
+    });
   }
 
   async remove(dtid: number): Promise<{ deleted: boolean; message?: string }> {

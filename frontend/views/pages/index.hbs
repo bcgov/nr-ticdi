@@ -15,10 +15,22 @@
                 </div>
                 <div class="form-group row">
                     <div class="col-md-2">
+                        <p class="font-weight-bold">Version</p>
+                    </div>
+                    <div class="col-md-2">
+                        <select id="versionSelect" class="form-control">
+                            {{#each version}}
+                            <option value="{{this}}">{{this}}</option>
+                            {{/each}}
+                      </select>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-md-2">
                         <p class="font-weight-bold">Report</p>
                     </div>
                     <div class="col-md-2">
-                        <select lass="form-control-plaintext" id="document_type_id">
+                        <select class="form-control" id="document_type_id">
                             <option>Land Use Report</option>
                         </select>
                     </div>
@@ -39,7 +51,7 @@
                         <div class="form-row">
                             <div class="form-group col-md-5">
                                 <dt>Organization Unit</dt>
-                                <dd>{{ message.orgUnit }}</dd>
+                                <dd id="orgUnit">{{ message.orgUnit }}</dd>
                             </div>
                             <div class="form-group col-md-5">
                                 <dt>Inspected Date</dt>
@@ -59,11 +71,11 @@
                         <div class="form-row">
                             <div class="form-group col-md-5">
                                 <dt>Policy Name</dt>
-                                <dd>{{ message.orgUnit }}</dd>
+                                <dd id="orgUnit2">{{ message.orgUnit }}</dd>
                             </div>
                             <div class="form-group col-md-5">
                                 <dt>Purpose Statement</dt>
-                                <dd>{{message.purpose}}</dd>
+                                <dd id="purpose">{{message.purpose}}</dd>
                             </div>
                         </div>
                     </div>
@@ -74,49 +86,55 @@
                         <div class="form-row">
                             <div class="form-group col-md-5">
                                 <dt>File Number</dt>
-                                <dd>{{ message.fileNum }}</dd>
+                                <dd id="fileNum">{{ message.fileNum }}</dd>
                             </div>
                             <div class="form-group col-md-5">
                                 <dt>Mailing Address</dt>
-                                <dd>{{message.tenantAddr.addrLine1}}</dd>
-                                <dd>{{message.tenantAddr.city}} {{message.tenantAddr.provAbbr}}</dd>
-                                <dd>{{message.tenantAddr.postalCode}}</dd>
+                                <dd id="address">{{message.tenantAddr.addrLine1}}</dd>
+                                <dd id="cityProv">{{message.tenantAddr.city}} {{message.tenantAddr.provAbbr}}</dd>
+                                <dd id="postalCode">{{message.tenantAddr.postalCode}}</dd>
                             </div>
                         </div>
                         <div class="form-row">
                             <div class="form-group col-md-5">
                                 <dt>Type</dt>
-                                <dd>{{ message.type }}</dd>
+                                <dd id="type">{{ message.type }}</dd>
                             </div>
                             <div class="form-group col-md-5">
                                 <dt>Subtype</dt>
-                                <dd>{{message.subType}}</dd>
+                                <dd id="subType">{{message.subType}}</dd>
                             </div>
                         </div>
                         <div class="form-row">
                             <div class="form-group col-md-5">
                                 <dt>Purpose</dt>
-                                <dd>{{ message.purpose }}</dd>
+                                <dd id="purpose2">{{ message.purpose }}</dd>
                             </div>
                             <div class="form-group col-md-5">
                                 <dt>Subpurpose</dt>
-                                <dd>{{message.subPurpose}}</dd>
+                                <dd id="subPurpose">{{message.subPurpose}}</dd>
                             </div>
                         </div>
                         <div class="form-row">
                             <div class="form-group col-md-5">
                                 <dt>Area</dt>
-                                <dd>{{ message.area }}</dd>
+                                <dd id="area">{{ message.area }}</dd>
                             </div>
                             <div class="form-group col-md-5">
                                 <dt>Location of Land</dt>
-                                <dd>{{message.locLand}}</dd>
+                                <dd id="locLand">{{message.locLand}}</dd>
                             </div>
                         </div>
                         <div class="form-row">
                             <div class="form-group">
                                 <dt>Legal Description</dt>
-                                <dd>{{message.legalDesc}}</dd>
+                                <dd id="legalDesc">{{message.legalDesc}}</dd>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <dt>Version</dt>
+                                <dd id="versionNum">1</dd>
                             </div>
                         </div>
                     </div>
@@ -125,5 +143,61 @@
             </div>
         </form>
     </main>
+    <script>
+        var dataArray = [];
+        $( document ).ready(function() {
+            {{#each data}}
+            dataArray.push({
+                dtid: {{this.dtid}},
+                version: {{this.version}},
+                orgUnit: "{{this.orgUnit}}",
+                purpose: "{{this.purpose}}",
+                subPurpose: "{{this.subPurpose}}",
+                fileNum: "{{this.fileNum}}",
+                type: "{{this.type}}",
+                subType: "{{this.subType}}",
+                area: "{{this.area}}",
+                locLand: "{{this.locLand}}",
+                legalDesc: "{{this.legalDesc}}",
+                tenantAddr: {
+                    addrLine1: "{{this.tenantAddr.addrLine1}}",
+                    city: "{{this.tenantAddr.city}}",
+                    provAbbr: "{{this.tenantAddr.provAbbr}}",
+                    postalCode: "{{this.tenantAddr.postalCode}}",
+                }
+
+            });
+            {{/each}}
+        })
+        $( "#versionSelect" ).change(function () {
+            $( "#versionSelect option:selected" ).each(function() {
+                let data;
+                for (let item of dataArray) {
+                    if (item.version == $(this).text()) {
+                        data = item;
+                    }
+                }
+                if (data) {
+                    $("#orgUnit").text(data.orgUnit)
+                    $("#orgUnit2").text(data.orgUnit)
+                    $("#purpose").text(data.purpose)
+                    $("#fileNum").text(data.fileNum)
+                    $("#address").text(data.tenantAddr.addrLine1)
+                    $("#cityProv").text(data.tenantAddr.city+" "+data.tenantAddr.provAbbr)
+                    $("#postalCode").text(data.tenantAddr.postalCode)
+                    $("#type").text(data.tenantAddr.type)
+                    $("#subType").text(data.tenantAddr.subType)
+                    $("#purpose2").text(data.purpose)
+                    $("#subPurpose").text(data.subPurpose)
+                    $("#area").text(data.area)
+                    $("#locLand").text(data.locLand)
+                    $("#legalDesc").text(data.legalDesc)
+                    $("#versionNum").text(data.version)
+                } else {
+                    console.log("Error changing version number");
+                }
+            })
+        })
+    </script>
   {{/inline}}
 {{/template}}

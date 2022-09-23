@@ -56,7 +56,9 @@ export class AppController {
   @Get("dtid/:id/:docname")
   @Render("index")
   async findOne(@Param("id") id, @Param("docname") docname: string) {
-    var ttlsJSON = {};
+    let ttlsJSON;
+    let array;
+    let version = [];
     this.ttlsService.setId(id);
     await this.ttlsService
       .callHttp()
@@ -64,14 +66,22 @@ export class AppController {
       .then(
         (resp) => {
           ttlsJSON = resp;
-          this.ttlsService.setJSONDataFile(ttlsJSON);
           this.ttlsService.sendToBackend(ttlsJSON);
+          return ttlsJSON;
         },
         (reason) => {
           console.log("Error");
         }
-      );
-    return { message: ttlsJSON };
+      )
+      .then(async (resp) => {
+        ttlsJSON = resp;
+        array = await this.ttlsService.getJSONsByDTID(ttlsJSON.dtid);
+        for (let a of array) {
+          version.push(a.version);
+        }
+        this.ttlsService.setJSONDataFile(array);
+      });
+    return { message: ttlsJSON, version: version, data: array };
   }
 
   @Get("generateReport")

@@ -9,7 +9,7 @@ on:
       - "**.md"
 
 env:
-  name: dev
+  name: nr-ticdi
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -20,7 +20,7 @@ jobs:
   cleanup-openshift:
     name: Cleanup OpenShift
     runs-on: ubuntu-22.04
-    env:
+    environment:
       name: dev
     steps:
       - uses: actions/checkout@v3

@@ -16,7 +16,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  # Clean up OpenShift when PR closed, no conditions
+  # Clean up OpenShift when PR closed, no conditions 
   cleanup-openshift:
     name: Cleanup OpenShift
     runs-on: ubuntu-22.04

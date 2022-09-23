@@ -15,4 +15,5 @@ export class CreateTicdijsonDto extends PickType(TicdijsonDto, [
   "area",
   "locLand",
   "legalDesc",
+  "tenantAddr",
 ] as const) {}

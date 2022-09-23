@@ -1,4 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
+import { TenantAddr } from "../../tenantAddr/entities/tenantAddr.entity";
 
 export class TicdijsonDto {
   @ApiProperty({ example: "", description: "" })
@@ -27,4 +28,6 @@ export class TicdijsonDto {
   locLand: string;
   @ApiProperty({ example: "", description: "" })
   legalDesc: string;
+  @ApiProperty({ example: "", description: "" })
+  tenantAddr: TenantAddr;
 }

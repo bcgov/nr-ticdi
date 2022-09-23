@@ -5,52 +5,52 @@ import {
   OneToOne,
   PrimaryGeneratedColumn,
 } from "typeorm";
-import { Ticdijson } from "./ticdijson.entity";
+import { Ticdijson } from "../../ticdijson/entities/ticdijson.entity";
 
 @Entity()
 export class TenantAddr {
   @PrimaryGeneratedColumn()
   id: number;
-  @Column()
+  @Column({ nullable: true })
   firstName: string;
-  @Column()
+  @Column({ nullable: true })
   middleName: string;
-  @Column()
+  @Column({ nullable: true })
   lastName: string;
-  @Column()
+  @Column({ nullable: true })
   legalName: string;
-  @Column()
+  @Column({ nullable: true })
   locationSid: string;
-  @Column()
+  @Column({ nullable: true })
   ipSid: string;
-  @Column()
+  @Column({ nullable: true })
   addrSid: string;
-  @Column()
+  @Column({ nullable: true })
   addrLine1: string;
-  @Column()
+  @Column({ nullable: true })
   postalCode: string;
-  @Column()
+  @Column({ nullable: true })
   city: string;
-  @Column()
+  @Column({ nullable: true })
   zipCode: string;
-  @Column()
+  @Column({ nullable: true })
   addrLine2: string;
-  @Column()
+  @Column({ nullable: true })
   addrLine3: string;
-  @Column()
+  @Column({ nullable: true })
   countryCd: string;
-  @Column()
+  @Column({ nullable: true })
   regionCd: string;
-  @Column()
+  @Column({ nullable: true })
   country: string;
-  @Column()
+  @Column({ nullable: true })
   provAbbr: string;
-  @Column()
+  @Column({ nullable: true })
   stateAbbr: string;
-  @Column()
+  @Column({ nullable: true })
   addrType: string;
   @OneToOne(() => Ticdijson, (ticdijson) => ticdijson.tenantAddr)
-  @JoinColumn({ name: "dtid" })
+  @JoinColumn()
   ticdijson: Ticdijson;
 
   constructor(

@@ -9,10 +9,18 @@ import * as path from "path";
 import * as dotenv from "dotenv";
 
 dotenv.config();
+let hostname: string;
+let port: number;
 
 @Injectable()
 export class TTLSService {
-  constructor(private readonly http: HttpService) {}
+  constructor(private readonly http: HttpService) {
+    hostname = process.env.BACKEND_URL
+      ? process.env.BACKEND_URL
+      : `http://localhost`;
+    // local development backend port is 3001, docker backend port is 3000
+    port = process.env.BACKEND_URL ? 3000 : 3001;
+  }
 
   private id: String;
   private jsonDataFile: {};
@@ -23,7 +31,7 @@ export class TTLSService {
 
   // convert the TTLS JSON package to a format that conforms to the CDOGS template
   setJSONDataFile(jsonDataFile: {}) {
-    console.log(jsonDataFile);
+    // console.log(jsonDataFile);
 
     var string = JSON.stringify(jsonDataFile);
     var jsonFormatted = JSON.parse(string);
@@ -54,6 +62,46 @@ export class TTLSService {
     };
   }
 
+  // sends json data to the backend to be inserted into the database
+  async sendToBackend(jsonDataFile: any): Promise<any> {
+    const url = `${hostname}:${port}/ticdijson`;
+    const { tenantAddr, ...ticdiJson } = jsonDataFile;
+
+    // if these are needed I will update the entities for them later
+    delete tenantAddr["@type"];
+    delete tenantAddr["links"];
+    delete ticdiJson["@type"];
+    delete ticdiJson["links"];
+
+    return axios
+      .post(
+        url,
+        { ticdijson: ticdiJson, tenantAddr: tenantAddr },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      )
+      .then((res) => {
+        return res.data;
+      });
+  }
+
+  // get a ticdi json object from the backend using a dtid
+  async getItem(dtid: number): Promise<any> {
+    const url = `${hostname}:${port}/ticdijson/${dtid}`;
+    return axios
+      .get(url, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      })
+      .then((res) => {
+        return res.data;
+      });
+  }
+
   callHttp(): Observable<Array<Object>> {
     let bearerToken = process.env.ttls_api_key;
 
@@ -72,7 +120,7 @@ export class TTLSService {
   callGetToken(): Promise<Object> {
     let url = process.env.cdogs_token_endpoint;
     let service_client_id = process.env.cdogs_service_client_id;
-    let service_client_secret = process.env.cdogs_service_client_secret
+    let service_client_secret = process.env.cdogs_service_client_secret;
 
     const token = `${service_client_id}:${service_client_secret}`;
     const encodedToken = Buffer.from(token).toString("base64");

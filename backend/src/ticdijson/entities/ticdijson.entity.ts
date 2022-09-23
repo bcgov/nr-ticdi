@@ -1,50 +1,49 @@
-import { ApiProperty } from "@nestjs/swagger";
+import { TenantAddr } from "../../tenantAddr/entities/tenantAddr.entity";
 import {
   Entity,
   Column,
   PrimaryGeneratedColumn,
   OneToOne,
   JoinColumn,
+  CreateDateColumn,
 } from "typeorm";
-import { TenantAddr } from "./tenantAddr.entity";
 
 @Entity()
 export class Ticdijson {
-  @ApiProperty({
-    example: "1",
-    description: "The ID of the ticdijson",
-  })
   @PrimaryGeneratedColumn()
   id: number;
-
-  @Column()
+  @CreateDateColumn({
+    type: "timestamp",
+    default: () => "CURRENT_TIMESTAMP(6)",
+  })
+  createdAt: Date;
+  @Column({ nullable: true })
   dtid: number;
-  @Column()
+  @Column({ nullable: true })
   fileNum: string;
-  @Column()
+  @Column({ nullable: true })
   orgUnit: string;
-  @Column()
+  @Column({ nullable: true })
   complexLevel: string;
-  @Column()
+  @Column({ nullable: true })
   purpose: string;
-  @Column()
+  @Column({ nullable: true })
   subPurpose: string;
-  @Column()
+  @Column({ nullable: true })
   subType: string;
-  @Column()
+  @Column({ nullable: true })
   type: string;
-  @Column()
+  @Column({ nullable: true })
   bcgsSheet: string;
-  @Column()
+  @Column({ nullable: true })
   airPhotoNum: string;
-  @Column()
+  @Column({ nullable: true })
   area: string;
-  @Column()
+  @Column({ nullable: true })
   locLand: string;
-  @Column()
+  @Column({ nullable: true })
   legalDesc: string;
   @OneToOne(() => TenantAddr, (tenantAddr) => tenantAddr.ticdijson)
-  @JoinColumn({ name: "dtid" })
   tenantAddr: TenantAddr;
 
   constructor(

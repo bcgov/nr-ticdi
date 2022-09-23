@@ -65,6 +65,7 @@ export class AppController {
         (resp) => {
           ttlsJSON = resp;
           this.ttlsService.setJSONDataFile(ttlsJSON);
+          this.ttlsService.sendToBackend(ttlsJSON);
         },
         (reason) => {
           console.log("Error");

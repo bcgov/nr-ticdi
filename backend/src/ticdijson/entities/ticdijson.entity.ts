@@ -17,7 +17,7 @@ export class Ticdijson {
     default: () => "CURRENT_TIMESTAMP(6)",
   })
   createdAt: Date;
-  @Column({ nullable: true })
+  @Column({ unique: true })
   dtid: number;
   @Column({ nullable: true })
   fileNum: string;

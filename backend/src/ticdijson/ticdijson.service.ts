@@ -16,27 +16,36 @@ export class TicdijsonService {
     ticdiJson: CreateTicdijsonDto,
     tenantAddr: TenantAddr
   ): Promise<Ticdijson> {
-    const newItem = new Ticdijson();
-    newItem.airPhotoNum = ticdiJson.airPhotoNum;
-    newItem.area = ticdiJson.area;
-    newItem.bcgsSheet = ticdiJson.bcgsSheet;
-    newItem.complexLevel = ticdiJson.complexLevel;
-    newItem.dtid = ticdiJson.dtid;
-    newItem.fileNum = ticdiJson.fileNum;
-    newItem.legalDesc = ticdiJson.legalDesc;
-    newItem.locLand = ticdiJson.locLand;
-    newItem.orgUnit = ticdiJson.orgUnit;
-    newItem.purpose = ticdiJson.purpose;
-    newItem.subPurpose = ticdiJson.subPurpose;
-    newItem.subType = ticdiJson.subType;
-    newItem.type = ticdiJson.type;
-    newItem.tenantAddr = tenantAddr;
-    const newTicdi = this.ticdijsonRepository.create(newItem);
-    return this.ticdijsonRepository.save(newTicdi);
+    const existingTicdi = await this.ticdijsonRepository.findOne({
+      dtid: ticdiJson.dtid,
+    });
+    if (!existingTicdi) {
+      const newItem = new Ticdijson();
+      newItem.airPhotoNum = ticdiJson.airPhotoNum;
+      newItem.area = ticdiJson.area;
+      newItem.bcgsSheet = ticdiJson.bcgsSheet;
+      newItem.complexLevel = ticdiJson.complexLevel;
+      newItem.dtid = ticdiJson.dtid;
+      newItem.fileNum = ticdiJson.fileNum;
+      newItem.legalDesc = ticdiJson.legalDesc;
+      newItem.locLand = ticdiJson.locLand;
+      newItem.orgUnit = ticdiJson.orgUnit;
+      newItem.purpose = ticdiJson.purpose;
+      newItem.subPurpose = ticdiJson.subPurpose;
+      newItem.subType = ticdiJson.subType;
+      newItem.type = ticdiJson.type;
+      newItem.tenantAddr = tenantAddr;
+      const newTicdi = this.ticdijsonRepository.create(newItem);
+      return this.ticdijsonRepository.save(newTicdi);
+    } else {
+      return existingTicdi;
+    }
   }
 
   async findAll(): Promise<Ticdijson[]> {
-    return this.ticdijsonRepository.find();
+    return this.ticdijsonRepository.find({
+      relations: ["tenantAddr"],
+    });
   }
 
   async findOne(dtid: number): Promise<Ticdijson> {

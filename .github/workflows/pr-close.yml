@@ -20,6 +20,8 @@ jobs:
   cleanup-openshift:
     name: Cleanup OpenShift
     runs-on: ubuntu-22.04
+    env:
+      name: dev
     steps:
       - uses: actions/checkout@v3
       - name: Remove OpenShift artifacts

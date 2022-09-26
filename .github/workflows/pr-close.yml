@@ -10,9 +10,9 @@ on:
 
 env:
   name: nr-ticdi
-  OC_TOKEN: ${{ secrets.OC_TOKEN }} # Needed to get PR information, if any
-  OC_SERVER: ${{ secrets.OC_SERVER }} # Needed to get PR information, if any
-  OC_NAMESPACE: ${{ secrets.OC_NAMESPACE }} # Needed to get PR information, if any
+  oc_token: ${{ secrets.OC_TOKEN }} # Needed to get PR information, if any
+  oc_server: ${{ secrets.OC_SERVER }} # Needed to get PR information, if any
+  oc_namespace: ${{ secrets.OC_NAMESPACE }} # Needed to get PR information, if any
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -27,8 +27,8 @@ jobs:
       - uses: actions/checkout@v3
       - name: Remove OpenShift artifacts
         run: |
-          oc login --token=${{ secrets.OC_TOKEN }} --server=${{ secrets.OC_SERVER }}
-          oc project ${{ secrets.OC_NAMESPACE }}
+          oc login --token=${{ env.oc_token }} --server=${{ env.oc_server }}
+          oc project ${{ env.oc_namespace }}
 
           # Remove old build runs, build pods and deployment pods
           oc delete all,pvc,secret -l app=${{ env.name }}-${{ github.event.number }}

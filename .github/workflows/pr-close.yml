@@ -31,7 +31,7 @@ jobs:
           oc project ${{ env.oc_namespace }}
 
           # Remove old build runs, build pods and deployment pods
-          oc delete all,pvc,secret -l app=${{ env.name }}-${{ github.event.number }}
+          oc delete deploymentconfig,route,service,pvc,secret -l app=${{ env.name }}-${{ github.event.number }}
 
   # If merged into main, then handle any image promotions 
   image-promotions:
@@ -49,7 +49,7 @@ jobs:
     secrets:
       oc_namespace: ${{ secrets.OC_NAMESPACE }}
       oc_server: ${{ secrets.OC_SERVER }}
-      oc_token: ${{ secrets.GHCR_TOKEN }}
+      oc_token: ${{ secrets.OC_TOKEN }}
 
   # Notify when PR merged into main
   merge-notification:

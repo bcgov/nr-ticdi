@@ -25,14 +25,6 @@ parameters:
     name: DB_PVC_SIZE
     required: true
     value: 512Mi
-  - description: Password for the Cookie Secret.
-    from: "[a-zA-Z0-9]{16}"
-    generate: expression
-    name: COOKIE_SECRET
-  - description: Password for the Session Secret.
-    from: "[a-zA-Z0-9]{16}"
-    generate: expression
-    name: SESSION_SECRET
   - name: REGISTRY
     value: image-registry.openshift-image-registry.svc:5000
   - name: PROMOTE
@@ -52,7 +44,7 @@ objects:
   - kind: PersistentVolumeClaim
     apiVersion: v1
     metadata:
-      name: ${NAME}-${ZONE}-${COMPONENT}
+      name: ticdi-database
       labels:
         app: ${NAME}-${ZONE}
     spec:
@@ -113,7 +105,7 @@ objects:
           volumes:
             - name: ${NAME}-${ZONE}-${COMPONENT}
               persistentVolumeClaim:
-                claimName: ${NAME}-${ZONE}-${COMPONENT}
+                claimName: ticdi-database
           containers:
             - name: ${NAME}
               image: ${NAME}-${ZONE}-${COMPONENT}:${IMAGE_TAG}

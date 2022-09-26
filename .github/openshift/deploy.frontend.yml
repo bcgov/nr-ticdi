@@ -10,6 +10,14 @@ parameters:
   - name: COMPONENT
     description: Component name
     value: frontend
+  - description: Password for the Cookie Secret.
+    from: "[a-zA-Z0-9]{16}"
+    generate: expression
+    name: cookie_secret
+  - description: Password for the Session Secret.
+    from: "[a-zA-Z0-9]{16}"
+    generate: expression
+    name: session_secret
   - name: ZONE
     description: Deployment zone, e.g. pr-### or prod
     required: true
@@ -52,8 +60,44 @@ objects:
       labels:
         app: ${NAME}-${ZONE}
     stringData:
-      cookie-secret: ${COOKIE_SECRET}
-      session-secret: ${SESSION_SECRET}
+      cookie_secret: ${cookie_secret}
+      session_secret: ${session_secret}
+  - apiVersion: v1
+    kind: Secret
+    metadata:
+      name: ttls
+      labels:
+        app: ${NAME}-${ZONE}
+    stringData:
+      ttls_url: https://i1api.nrs.gov.bc.ca/ttls-api/v1/dispositionTrans/info/
+  - apiVersion: v1
+    kind: Secret
+    metadata:
+      name: cdogs
+      labels:
+        app: ${NAME}-${ZONE}
+    stringData:
+      cdogs_service_client_id: TICDI_SERVICE_CLIENT
+      cdogs_url: https://cdogs-dev.apps.silver.devops.gov.bc.ca/api/v2/template/render
+      cdogs_token_endpoint: https://dev.oidc.gov.bc.ca/auth/realms/jbd6rnxw/protocol/openid-connect/token
+  - apiVersion: v1
+    kind: Secret
+    metadata:
+      name: keycloak
+      labels:
+        app: ${NAME}-${ZONE}
+    stringData:
+      keycloak_base_url: https://dev.oidc.gov.bc.ca/auth
+      keycloak_client_id: ticdi-3202 
+      keycloak_realm: onestopauth
+  - apiVersion: v1
+    kind: Secret
+    metadata:
+      name: ticdi-environment
+      labels:
+        app: ${NAME}-${ZONE}
+    stringData:
+      ticdi_environment: production   
   - kind: PersistentVolumeClaim
     apiVersion: v1
     metadata:
@@ -106,60 +150,70 @@ objects:
               env:
                 - name: NODE_TLS_REJECT_UNAUTHORIZED 
                   value: '0'
-                - name: BACKEND_URL
+                - name: ticdi_environment
+                  valueFrom:
+                    secretKeyRef:
+                      name: ticdi-environment
+                      key: ticdi_environment
+                - name: ttls_url
+                  valueFrom:
+                    secretKeyRef:
+                      name: ttls
+                      key: ttls_url
+                - name: ttls_api_key
+                  valueFrom:
+                    secretKeyRef:
+                      name: ttls
+                      key: ttls_api_key
+                - name: backend_url
                   value: https://${NAME}-${ZONE}-backend.${DOMAIN}
-                - name: SESSION_PATH
+                - name: session_path
                   value: '/mnt/sessions'
-                - name: COOKIE_SECRET
+                - name: cookie_secret
                   valueFrom:
                     secretKeyRef:
                       name: ticdi-sessions
-                      key: cookie-secret
-                - name: SESSION_SECRET
+                      key: cookie_secret
+                - name: session_secret
                   valueFrom:
                     secretKeyRef: 
                       name: ticdi-sessions
-                      key: session-secret
-                - name: KEYCLOAK_BASE_URL
+                      key: session_secret
+                - name: keycloak_base_url
                   valueFrom:
                     secretKeyRef: 
                       name: keycloak
-                      key: KEYCLOAK_BASE_URL
-                - name: KEYCLOAK_REALM
+                      key: keycloak_base_url
+                - name: keycloak_realm
                   valueFrom:
                     secretKeyRef: 
                       name: keycloak
-                      key: KEYCLOAK_REALM
-                - name: KEYCLOAK_CLIENT_ID
+                      key: keycloak_realm
+                - name: keycloak_client_id
                   valueFrom:
                     secretKeyRef: 
                       name: keycloak
-                      key: KEYCLOAK_CLIENT_ID
-                - name: KEYCLOAK_SECRET
+                      key: keycloak_client_id
+                - name: keycloak_secret
                   valueFrom:
                     secretKeyRef: 
                       name: keycloak
-                      key: KEYCLOAK_SECRET
-                - name: CDOGS_SERVICE_CLIENT_ID
+                      key: keycloak_secret
+                - name: cdogs_service_client_id
                   valueFrom:
                     secretKeyRef: 
-                      name: common-services
+                      name: cdogs
                       key: cdogs_service_client_id
-                - name: CDOGS_SERVICE_CLIENT_SECRET
+                - name: cdogs_service_client_secret
                   valueFrom:
                     secretKeyRef: 
-                      name: common-services
+                      name: cdogs
                       key: cdogs_service_client_secret
-                - name: CDOGS_URL
+                - name: cdogs_url
                   valueFrom:
                     secretKeyRef: 
-                      name: common-services
+                      name: cdogs
                       key: cdogs_url
-                - name: TTLS_API_KEY
-                  valueFrom:
-                    secretKeyRef: 
-                      name: nr-ticdi-api
-                      key: TTLS_API_KEY
               ports:
                 - containerPort: 3000
                   protocol: TCP

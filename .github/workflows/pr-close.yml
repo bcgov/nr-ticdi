@@ -50,6 +50,7 @@ jobs:
       oc_namespace: ${{ secrets.OC_NAMESPACE }}
       oc_server: ${{ secrets.OC_SERVER }}
       oc_token: ${{ secrets.OC_TOKEN }}
+      gh_token: ${{ secrets.GHCR_TOKEN }}
 
   # Notify when PR merged into main
   merge-notification:

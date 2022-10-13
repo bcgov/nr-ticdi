@@ -29,6 +29,9 @@ on:
       oc_token:
         required: true
         description: OpenShift access token
+      gh_token:
+        required: true
+        description: GH Token to retag
 
 env:
   registry: ghcr.io
@@ -80,11 +83,12 @@ jobs:
           fi
           echo "Image promotion not required"
 
-      - name: Promote Backend Image
+      - name: Promote ${{ inputs.component }} Image
         if: steps.check.outputs.build == 'true'
         uses: shrink/actions-docker-registry-tag@v2
         with:
           registry: ${{ env.registry }}
+          token: ${{ secrets.oc_token }}
           repository: ${{ github.repository }}
           target: ${{ inputs.env_source }}-${{ inputs.component }}
           tags: |

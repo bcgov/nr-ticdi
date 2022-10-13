@@ -57,6 +57,8 @@ objects:
     kind: Secret
     metadata:
       name: ticdi-sessions
+      labels:
+        app: ${NAME}
     stringData:
       cookie_secret: ${cookie_secret}
       session_secret: ${session_secret}
@@ -64,12 +66,16 @@ objects:
     kind: Secret
     metadata:
       name: ttls
+      labels:
+        app: ${NAME}
     stringData:
       ttls_url: https://i1api.nrs.gov.bc.ca/ttls-api/v1/dispositionTrans/info/
   - apiVersion: v1
     kind: Secret
     metadata:
       name: cdogs
+      labels:
+        app: ${NAME}
     stringData:
       cdogs_service_client_id: TICDI_SERVICE_CLIENT
       cdogs_url: https://cdogs-dev.apps.silver.devops.gov.bc.ca/api/v2/template/render
@@ -78,14 +84,18 @@ objects:
     kind: Secret
     metadata:
       name: keycloak
+      labels:
+        app: ${NAME}
     stringData:
-      keycloak_base_url: https://dev.oidc.gov.bc.ca/auth
-      keycloak_client_id: ticdi-3202 
-      keycloak_realm: onestopauth
+      keycloak_base_url: https://dev.loginproxy.gov.bc.ca/auth
+      keycloak_client_id: ticdi-4133
+      keycloak_realm: standard
   - apiVersion: v1
     kind: Secret
     metadata:
       name: ticdi-environment
+      labels:
+        app: ${NAME}
     stringData:
       ticdi_environment: production   
   - kind: PersistentVolumeClaim

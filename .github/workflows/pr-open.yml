@@ -2,205 +2,148 @@ name: Pull Request
 
 on:
   pull_request:
-    branches:
-      - main
 
-env:
-  REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}
-  TRIGGERS: ('frontend/' '.github/pipeline' 'apis/')
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  check:
-    name: Check
-    outputs:
-      build: ${{ steps.check.outputs.build }}
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
+  builds:
+    name: Builds
+    uses: ./.github/workflows/_build.yml
+    strategy:
+      matrix:
+        component: [backend, frontend]
+        include:
+          - component: backend
+            triggers: ('backend/')
+          - component: frontend
+            triggers: ('frontend/')
+    secrets:
+      gh_token: ${{ secrets.GHCR_TOKEN }}
+    with:
+      component: ${{ matrix.component }}
+      img_build: ${{ github.event.number }}
+      img_fallback: prod
+      triggers: ${{ matrix.triggers }}
 
-      - name: Check and process modified files
-        id: check
-        run: |
-          # Fetch main to diff against
-          git fetch origin main:refs/remotes/origin/master
+  #tests:
+  #  name: Unit Tests
+  #  uses: ./.github/workflows/_code-cov.yml
+  #  strategy:
+  #    matrix:
+  #      component: [backend, frontend]
+  #  secrets:
+  #    gh_token: ${{ secrets.GITHUB_TOKEN }}
+  #  with:
+  #    component: ${{ matrix.component }}
+  #    lcov_file: ${{ matrix.component }}/coverage/lcov.info
+  #    test_cmd: npm run test:cov
 
-          # Trigger build if diff matches any triggers
-          TRIGGERS=${{ env.TRIGGERS }}
-          while read -r check
-          do
-              for t in "${TRIGGERS[@]}"; do
-                  if [[ "${check}" =~ "${t}" ]]
-                  then
-                      # Output build=true for next steps
-                      echo "::set-output name=build::true"
-                      echo -e "${t}\n --> ${check}\n"
-                      exit 0
-                  fi
-              done
-          done < <(git diff origin/main --name-only)
-          echo "Build and deploy workflows not triggered"
+  #sonarcloud:
+  #  name: Static Analysis
+  #  needs:
+  #    - tests
+  #  runs-on: ubuntu-22.04
+  #  steps:
+  #    # Disable shallow clone for SonarCloud analysis
+  #    - uses: actions/checkout@v3
+  #      with:
+  #        fetch-depth: 0
 
-  build:
-    name: Build
+  #    - name: Get backend coverage from cache
+  #      uses: actions/cache@v3
+  #      with:
+  #        path: backend/coverage
+  #        key: coverage-backend-${{ github.run_number }}
+  #        restore-keys: |
+  #          coverage-backend-
+
+  #    - name: Get frontend coverage from cache
+  #      uses: actions/cache@v3
+  #      with:
+  #        path: frontend/coverage
+  #        key: coverage-frontend-${{ github.run_number }}
+  #        restore-keys: |
+  #          coverage-frontend-
+
+  #    - name: SonarCloud Scan
+  #      uses: SonarSource/sonarcloud-github-action@master
+  #      env:
+  #        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Needed to get PR information, if any
+  #        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+  #      with:
+  #        args: >
+  #          -Dsonar.exclusions=**/test/**,.github/**/*,*.md
+  #          -Dsonar.organization=bcgov-sonarcloud
+  #          -Dsonar.javascript.lcov.reportPaths=backend/coverage/lcov.info,frontend/coverage/lcov.info
+  #          -Dsonar.cobertura.reportPaths=backend/coverage/cobertura-coverage.xml,frontend/coverage/cobertura-coverage.xml
+  #          -Dsonar.project.monorepo.enabled=true
+  #          -Dsonar.projectKey=${{ github.event.repository.name }}
+  #          -Dsonar.sources=backend,frontend
+  #          -Dsonar.tests=backend/test,frontend/test
+
+  deploys:
+    name: Deploys
     needs:
-      - check
-    if: needs.check.outputs.build == 'true'
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
+      - builds
+    # If any of the prerequs created a build, then deploy
+    if: contains(needs.*.outputs.build, 'true')
+    uses: ./.github/workflows/_deploy.yml
+    strategy:
+      matrix:
+        component: [backend, database, frontend]
+        include:
+          - component: database
+            overwrite: false
+            template_file: .github/openshift/deploy.database.yml
+            template_vars: -p ZONE=${{ github.event.number }}
+          - component: backend
+            overwrite: true
+            template_file: .github/openshift/deploy.backend.yml
+            template_vars: -p ZONE=${{ github.event.number }} -p PROMOTE=${{ github.repository }}:${{ github.event.number }}-backend
+          - component: frontend
+            overwrite: true
+            template_file: .github/openshift/deploy.frontend.yml
+            template_vars: -p ZONE=${{ github.event.number }} -p PROMOTE=${{ github.repository }}:${{ github.event.number }}-frontend
+    secrets:
+      oc_namespace: ${{ secrets.OC_NAMESPACE }}
+      oc_server: ${{ secrets.OC_SERVER }}
+      oc_token: ${{ secrets.OC_TOKEN }}
+    with:
+      component: ${{ matrix.component }}
+      overwrite: ${{ matrix.overwrite }}
+      template_file: ${{ matrix.template_file }}
+      template_vars: ${{ matrix.template_vars }}
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
-
-      - name: Cache Docker layers
-        uses: actions/cache@v2
-        with:
-          path: /tmp/.buildx-cache
-          key: ${{ runner.os }}-buildx-${{ github.sha }}
-          restore-keys: |
-            ${{ runner.os }}-buildx-
-
-      - name: Log in to the Container registry
-        uses: docker/login-action@v1
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ secrets.GHCR_USERNAME }}
-          password: ${{ secrets.GHCR_TOKEN }}
-
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v2
-        with:
-          context: ./frontend/
-          push: true
-          tags: ghcr.io/bcgov/nr-ticdi:latest
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-
-  tests:
-    name: Tests
+  post-deploy:
+    name: Post-deploy
     needs:
-      - check
-    if: needs.check.outputs.build == 'true'
-    runs-on: ubuntu-latest
+      - deploys
+    env:
+      DOMAIN: apps.silver.devops.gov.bc.ca
+      NAME: ticdi
+    runs-on: ubuntu-22.04
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-
-      - name: Tests
-        run: |
-          cd frontend
-          npm ci
-          npm test
-
-  codeql:
-    name: CodeQL
-    needs:
-      - check
-    if: needs.check.outputs.build == 'true'
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-
-      - name: Initialize
-        uses: github/codeql-action/init@v1
-        with:
-          languages: javascript
-
-      - name: Autobuild
-        uses: github/codeql-action/autobuild@v1
-
-      - name: Analysis
-        uses: github/codeql-action/analyze@v1
-
-  deploy:
-    name: Deploy
-    needs: 
-      - build
-    if: needs.check.outputs.build == 'true'
-    runs-on: ubuntu-latest
-    environment:
-      name: dev
-    steps:
-      - uses: actions/checkout@v2
-      - name: Deploy
-        run: |
-          set -eux
-
-          # Login to OpenShift and select project
-          oc login --token=${{ secrets.OC_TOKEN }} --server=${{ secrets.OC_SERVER }}
-          oc project ${{ secrets.NAMESPACE }}
-
-          # Cancel any rollouts in progress
-          oc rollout cancel dc/nr-ticdi 2> /dev/null \
-            || true && echo "No rollout in progress"
-          
-          # Remove any stale imagestreams
-          oc delete is/nr-ticdi 2> /dev/null \
-            || true && echo "No stale imagestreams"
-
-          # Process and apply deployment template
-          for y in .github/pipeline/deploy.*.yml
-          do oc process -f ${y} -p SUFFIX=${{ github.event.number }} -p NAMESPACE=${{ secrets.NAMESPACE }} \
-              | oc apply -f -
-          done
-
-          # Start rollout (if necessary) and follow it
-          oc rollout latest dc/nr-ticdi 2> /dev/null \
-            || true && echo "Rollout in progress"
-          oc logs -f dc/nr-ticdi
-
-          # Get status, returns 0 if rollout is successful
-          oc rollout status dc/nr-ticdi
-
-      - name: Deployment update
+      - name: Comment with links
         uses: mshick/add-pr-comment@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          message: |
-            [${{ secrets.ENV }} deployment](https://nr-ticdi-${{ github.event.number }}.apps.silver.devops.gov.bc.ca/) available
           allow-repeats: false
+          message: |
+            DEV deployments have completed successfully!
+            [Frontend](https://${{ env.NAME }}-${{ github.event.number }}-frontend.${{ env.DOMAIN }}/) available
 
-  zap:
-    name: Zap
-    needs:
-      - check
-      - deploy
-    if: needs.check.outputs.build == 'true'
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-
-      - name: ZAP Scan
-        uses: zaproxy/action-full-scan@v0.3.0
-        with:
-          target: https://nr-ticdi-${{ github.event.number }}.apps.silver.devops.gov.bc.ca/
-          cmd_options: '-a'
-          allow_issue_writing: false
-          fail_action: false
-
-  # trivy:
-  #   name: Trivy
-  #   needs:
-  #     - build
-  #   if: needs.check.outputs.build == 'true'
-  #   runs-on: ubuntu-latest
-  #   timeout-minutes: 60
+  # # Uncomment to view GitHub context object
+  # # https://docs.github.com/en/actions/learn-github-actions/contexts
+  # view-context:
+  #   name: View GitHub Context
+  #   runs-on: ubuntu-22.04
   #   steps:
-  #   - name: Trivy Vulnerability Scan
-  #     uses: aquasecurity/trivy-action@master
-  #     with:
-  #       image-ref: ghcr.io/bcgov/greenfield-template:pr-${{ github.event.number }}
-  #       format: table
-  #       exit-code: '1'
-  #       ignore-unfixed: true
-  #       vuln-type: os,library
-  #       severity: CRITICAL
+  #     - name: Echo GitHub context
+  #       uses: satackey/action-js-inline@v0.0.2
+  #       with:
+  #         script: |
+  #           const github = require('@actions/github');
+  #           console.log(JSON.stringify(github, null, 2));

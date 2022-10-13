@@ -1,0 +1,129 @@
+{{#> template}}
+  {{#*inline "content"}}
+    <main role="main">
+      <form action="/generateReport">
+            <div class="container">
+                <h1>Client</h1>
+                <hr />
+                <div class="form-group row">
+                    <div class="col-md-2">
+                        <p class="font-weight-bold">DTID</p>
+                    </div>
+                    <div class="col-md-2">
+                        <p>{{ message.dtid }}</p>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-md-2">
+                        <p class="font-weight-bold">Report</p>
+                    </div>
+                    <div class="col-md-2">
+                        <select lass="form-control-plaintext" id="document_type_id">
+                            <option>Land Use Report</option>
+                        </select>
+                    </div>
+                </div>
+                <fieldset class="form-group collapsible">
+                    <legend class='togvis'>Disposition Transaction ID Details</legend>
+                    <div class="contents">
+                        <div class="form-row">
+                            <div class="form-group col-md-5">
+                                <dt>Contact or Agent Name</dt>
+                                <dd>TBD</dd>
+                            </div>
+                            <div class="form-group col-md-5">
+                                <dt>Email Address</dt>
+                                <dd>TBD</dd>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group col-md-5">
+                                <dt>Organization Unit</dt>
+                                <dd>{{ message.orgUnit }}</dd>
+                            </div>
+                            <div class="form-group col-md-5">
+                                <dt>Inspected Date</dt>
+                                <dd>TBD</dd>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group col-md-5">
+                                <dt>Incorporation Number</dt>
+                                <dd>TBD</dd>
+                            </div>
+                            <div class="form-group col-md-5">
+                                <dt>Inspected Date</dt>
+                                <dd>TBD</dd>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group col-md-5">
+                                <dt>Policy Name</dt>
+                                <dd>{{ message.orgUnit }}</dd>
+                            </div>
+                            <div class="form-group col-md-5">
+                                <dt>Purpose Statement</dt>
+                                <dd>{{message.purpose}}</dd>
+                            </div>
+                        </div>
+                    </div>
+                </fieldset>
+                <fieldset class="form-group collapsible">
+                    <legend class='togvis'>Tenure Details</legend>
+                    <div class="contents">
+                        <div class="form-row">
+                            <div class="form-group col-md-5">
+                                <dt>File Number</dt>
+                                <dd>{{ message.fileNum }}</dd>
+                            </div>
+                            <div class="form-group col-md-5">
+                                <dt>Mailing Address</dt>
+                                <dd>{{message.tenantAddr.addrLine1}}</dd>
+                                <dd>{{message.tenantAddr.city}} {{message.tenantAddr.provAbbr}}</dd>
+                                <dd>{{message.tenantAddr.postalCode}}</dd>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group col-md-5">
+                                <dt>Type</dt>
+                                <dd>{{ message.type }}</dd>
+                            </div>
+                            <div class="form-group col-md-5">
+                                <dt>Subtype</dt>
+                                <dd>{{message.subType}}</dd>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group col-md-5">
+                                <dt>Purpose</dt>
+                                <dd>{{ message.purpose }}</dd>
+                            </div>
+                            <div class="form-group col-md-5">
+                                <dt>Subpurpose</dt>
+                                <dd>{{message.subPurpose}}</dd>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group col-md-5">
+                                <dt>Area</dt>
+                                <dd>{{ message.area }}</dd>
+                            </div>
+                            <div class="form-group col-md-5">
+                                <dt>Location of Land</dt>
+                                <dd>{{message.locLand}}</dd>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <dt>Legal Description</dt>
+                                <dd>{{message.legalDesc}}</dd>
+                            </div>
+                        </div>
+                    </div>
+                </fieldset>
+                <button type="submit" class="btn btn-primary">Generate Document</button>
+            </div>
+        </form>
+    </main>
+  {{/inline}}
+{{/template}}

@@ -1,0 +1,275 @@
+apiVersion: template.openshift.io/v1
+kind: Template
+labels:
+  app: ${NAME}-${ZONE}
+  app.kubernetes.io/part-of: ${NAME}-${ZONE}
+parameters:
+  - name: NAME
+    description: Module name
+    value: nr-ticdi
+  - name: COMPONENT
+    description: Component name
+    value: frontend
+  - description: Password for the Cookie Secret.
+    from: "[a-zA-Z0-9]{16}"
+    generate: expression
+    name: cookie_secret
+  - description: Password for the Session Secret.
+    from: "[a-zA-Z0-9]{16}"
+    generate: expression
+    name: session_secret
+  - name: ZONE
+    description: Deployment zone, e.g. pr-### or prod
+    required: true
+  - name: IMAGE_TAG
+    description: Image tag to use
+    value: latest
+  - name: DOMAIN
+    value: apps.silver.devops.gov.bc.ca
+  - name: CPU_REQUEST
+    value: 100m
+  - name: MEMORY_REQUEST
+    value: 0.5Gi
+  - name: REGISTRY
+    description: Container registry to import from (internal is image-registry.openshift-image-registry.svc:5000)
+    value: ghcr.io
+  - name: PROMOTE
+    description: Image (namespace/name:tag) to promote/import
+    value: bcgov/devops-quickstart:prod-frontend
+objects:
+  - apiVersion: v1
+    kind: ImageStream
+    metadata:
+      labels:
+        app: ${NAME}-${ZONE}
+      name: ${NAME}-${ZONE}-${COMPONENT}
+    spec:
+      lookupPolicy:
+        local: false
+      tags:
+        - name: ${IMAGE_TAG}
+          from:
+            kind: DockerImage
+            name: ${REGISTRY}/${PROMOTE}
+          referencePolicy:
+            type: Local
+  - apiVersion: v1
+    kind: Secret
+    metadata:
+      name: ticdi-sessions
+      labels:
+        app: ${NAME}
+    stringData:
+      cookie_secret: ${cookie_secret}
+      session_secret: ${session_secret}
+  - apiVersion: v1
+    kind: Secret
+    metadata:
+      name: ttls
+      labels:
+        app: ${NAME}
+    stringData:
+      ttls_url: https://i1api.nrs.gov.bc.ca/ttls-api/v1/dispositionTrans/info/
+  - apiVersion: v1
+    kind: Secret
+    metadata:
+      name: cdogs
+      labels:
+        app: ${NAME}
+    stringData:
+      cdogs_service_client_id: TICDI_SERVICE_CLIENT
+      cdogs_url: https://cdogs-dev.apps.silver.devops.gov.bc.ca/api/v2/template/render
+      cdogs_token_endpoint: https://dev.oidc.gov.bc.ca/auth/realms/jbd6rnxw/protocol/openid-connect/token
+  - apiVersion: v1
+    kind: Secret
+    metadata:
+      name: keycloak
+      labels:
+        app: ${NAME}
+    stringData:
+      keycloak_base_url: https://dev.oidc.gov.bc.ca/auth
+      keycloak_client_id: ticdi-3202 
+      keycloak_realm: onestopauth
+  - apiVersion: v1
+    kind: Secret
+    metadata:
+      name: ticdi-environment
+      labels:
+        app: ${NAME}
+    stringData:
+      ticdi_environment: production   
+  - kind: PersistentVolumeClaim
+    apiVersion: v1
+    metadata:
+      name: ticdi-sessions
+      labels:
+        app: ${NAME}-${ZONE}
+    spec:
+      accessModes:
+        - ReadWriteMany
+      resources:
+        requests:
+          storage: "512Mi"
+      storageClassName: netapp-file-standard
+  - apiVersion: v1
+    kind: DeploymentConfig
+    metadata:
+      labels:
+        app: ${NAME}-${ZONE}
+      name: ${NAME}-${ZONE}-${COMPONENT}
+    spec:
+      replicas: 1
+      triggers:
+        - type: ConfigChange
+        - type: ImageChange
+          imageChangeParams:
+            automatic: true
+            containerNames:
+              - ${NAME}
+            from:
+              kind: ImageStreamTag
+              name: ${NAME}-${ZONE}-${COMPONENT}:${IMAGE_TAG}
+      selector:
+        deploymentconfig: ${NAME}-${ZONE}-${COMPONENT}
+      strategy:
+        type: Rolling
+      template:
+        metadata:
+          labels:
+            app: ${NAME}-${ZONE}
+            deploymentconfig: ${NAME}-${ZONE}-${COMPONENT}
+        spec:
+          volumes:
+            - name: ticdi-sessions
+              persistentVolumeClaim:
+                claimName: ticdi-sessions
+          containers:
+            - image: ${NAME}-${ZONE}-${COMPONENT}:${IMAGE_TAG}
+              imagePullPolicy: Always
+              name: ${NAME}
+              env:
+                - name: NODE_TLS_REJECT_UNAUTHORIZED 
+                  value: '0'
+                - name: ticdi_environment
+                  valueFrom:
+                    secretKeyRef:
+                      name: ticdi-environment
+                      key: ticdi_environment
+                - name: ttls_url
+                  valueFrom:
+                    secretKeyRef:
+                      name: ttls
+                      key: ttls_url
+                - name: ttls_api_key
+                  valueFrom:
+                    secretKeyRef:
+                      name: ttls
+                      key: ttls_api_key
+                - name: backend_url
+                  value: https://${NAME}-${ZONE}-backend.${DOMAIN}
+                - name: session_path
+                  value: '/mnt/sessions'
+                - name: cookie_secret
+                  valueFrom:
+                    secretKeyRef:
+                      name: ticdi-sessions
+                      key: cookie_secret
+                - name: session_secret
+                  valueFrom:
+                    secretKeyRef: 
+                      name: ticdi-sessions
+                      key: session_secret
+                - name: keycloak_base_url
+                  valueFrom:
+                    secretKeyRef: 
+                      name: keycloak
+                      key: keycloak_base_url
+                - name: keycloak_realm
+                  valueFrom:
+                    secretKeyRef: 
+                      name: keycloak
+                      key: keycloak_realm
+                - name: keycloak_client_id
+                  valueFrom:
+                    secretKeyRef: 
+                      name: keycloak
+                      key: keycloak_client_id
+                - name: keycloak_secret
+                  valueFrom:
+                    secretKeyRef: 
+                      name: keycloak
+                      key: keycloak_secret
+                - name: cdogs_service_client_id
+                  valueFrom:
+                    secretKeyRef: 
+                      name: cdogs
+                      key: cdogs_service_client_id
+                - name: cdogs_service_client_secret
+                  valueFrom:
+                    secretKeyRef: 
+                      name: cdogs
+                      key: cdogs_service_client_secret
+                - name: cdogs_url
+                  valueFrom:
+                    secretKeyRef: 
+                      name: cdogs
+                      key: cdogs_url
+              ports:
+                - containerPort: 3000
+                  protocol: TCP
+              resources:
+                requests:
+                  cpu: ${CPU_REQUEST}
+                  memory: ${MEMORY_REQUEST}
+              readinessProbe:
+                httpGet:
+                  path: /
+                  port: 3000
+                  scheme: HTTP
+                initialDelaySeconds: 15
+                periodSeconds: 30
+                timeoutSeconds: 1
+              livenessProbe:
+                successThreshold: 1
+                failureThreshold: 3
+                httpGet:
+                  path: /
+                  port: 3000
+                  scheme: HTTP
+                initialDelaySeconds: 15
+                periodSeconds: 30
+                timeoutSeconds: 5
+              volumeMounts:
+                - mountPath: /mnt/sessions
+                  name: ticdi-sessions
+  - apiVersion: v1
+    kind: Service
+    metadata:
+      labels:
+        app: ${NAME}-${ZONE}
+      name: ${NAME}-${ZONE}-${COMPONENT}
+    spec:
+      ports:
+        - name: 3000-tcp
+          protocol: TCP
+          port: 80
+          targetPort: 3000
+      selector:
+        deploymentconfig: ${NAME}-${ZONE}-${COMPONENT}
+  - apiVersion: route.openshift.io/v1
+    kind: Route
+    metadata:
+      labels:
+        app: ${NAME}-${ZONE}
+      name: ${NAME}-${ZONE}-${COMPONENT}
+    spec:
+      host: ${NAME}-${ZONE}-${COMPONENT}.${DOMAIN}
+      port:
+        targetPort: 3000-tcp
+      to:
+        kind: Service
+        name: ${NAME}-${ZONE}-${COMPONENT}
+        weight: 100
+      tls:
+        termination: edge
+        insecureEdgeTerminationPolicy: Redirect

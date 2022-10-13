@@ -87,9 +87,9 @@ objects:
       labels:
         app: ${NAME}
     stringData:
-      keycloak_base_url: https://dev.oidc.gov.bc.ca/auth
-      keycloak_client_id: ticdi-3202 
-      keycloak_realm: onestopauth
+      keycloak_base_url: https://dev.loginproxy.gov.bc.ca/auth
+      keycloak_client_id: ticdi-4133
+      keycloak_realm: standard
   - apiVersion: v1
     kind: Secret
     metadata:

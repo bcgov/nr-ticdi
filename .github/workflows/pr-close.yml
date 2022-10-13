@@ -31,7 +31,7 @@ jobs:
           oc project ${{ env.oc_namespace }}
 
           # Remove old build runs, build pods and deployment pods
-          oc delete deploymentconfig,route,service,pvc,image -l app=${{ env.name }}-${{ github.event.number }}
+          oc delete deploymentconfig,route,service,pvc -l app=${{ env.name }}-${{ github.event.number }}
 
   # If merged into main, then handle any image promotions 
   image-promotions:

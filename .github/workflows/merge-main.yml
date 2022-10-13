@@ -11,7 +11,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  NAME: devops-quickstart
+  NAME: nr-ticdi
 
 concurrency:
   group: ${{ github.workflow }}
@@ -308,7 +308,7 @@ jobs:
           fi
           echo "Image promotion not required"
 
-      - name: Promote Backend Image
+      - name: Promote Frontend Image
         if: steps.check.outputs.build == 'true'
         uses: shrink/actions-docker-registry-tag@v2
         with:

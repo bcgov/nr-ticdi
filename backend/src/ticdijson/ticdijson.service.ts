@@ -31,7 +31,7 @@ export class TicdijsonService {
     newItem.subType = ticdiJson.subType;
     newItem.type = ticdiJson.type;
     newItem.tenantAddr = tenantAddr;
-    const existingTicdi = await this.ticdijsonRepository.find({
+    const existingTicdi = await this.ticdijsonRepository.findBy({
       dtid: ticdiJson.dtid,
     });
     if (!existingTicdi) {

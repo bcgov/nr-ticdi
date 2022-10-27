@@ -7,6 +7,7 @@ import { URLSearchParams } from "url";
 import * as fs from "fs";
 import * as path from "path";
 import * as dotenv from "dotenv";
+declare const Buffer;
 
 dotenv.config();
 let hostname: string;

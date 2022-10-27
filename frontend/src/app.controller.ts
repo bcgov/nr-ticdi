@@ -27,9 +27,10 @@ export class AppController {
 
   @Get()
   @Render("index")
-  //@UseFilters(AuthenticationFilter)
-  //@UseGuards(AuthenticationGuard)
+  @UseFilters(AuthenticationFilter)
+  @UseGuards(AuthenticationGuard)
   async root(@Session() session: { data?: SessionData }) {
+    console.log(session.data);
     const username = "Test User"; //session.data.name;
     const label = "Test Label";
     const accounts = "Test Account";
@@ -66,6 +67,7 @@ export class AppController {
       .then(
         async (resp) => {
           ttlsJSON = resp;
+          console.log(resp);
           await this.ttlsService.sendToBackend(ttlsJSON);
           return ttlsJSON;
         },

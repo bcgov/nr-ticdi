@@ -22,7 +22,7 @@ export class TenantAddrService {
   }
 
   async findOne(id: number): Promise<TenantAddr> {
-    return this.tenantAddrRepository.findOneOrFail(id);
+    return this.tenantAddrRepository.findOneByOrFail({ id: id });
   }
 
   async remove(id: number): Promise<{ deleted: boolean; message?: string }> {

@@ -10,9 +10,6 @@ on:
 
 env:
   name: nr-ticdi
-  oc_token: ${{ secrets.OC_TOKEN }} # Needed to get PR information, if any
-  oc_server: ${{ secrets.OC_SERVER }} # Needed to get PR information, if any
-  oc_namespace: ${{ secrets.OC_NAMESPACE }} # Needed to get PR information, if any
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -27,17 +24,17 @@ jobs:
       - uses: actions/checkout@v3
       - name: Remove OpenShift artifacts
         run: |
-          oc login --token=${{ env.oc_token }} --server=${{ env.oc_server }}
-          oc project ${{ env.oc_namespace }}
+          oc login --token=${{ secrets.OC_TOKEN }} --server=${{ secrets.OC_SERVER }}
+          oc project ${{ secrets.OC_NAMESPACE }}
 
           # Remove old build runs, build pods and deployment pods
-          oc delete deploymentconfig,route,service -l app=${{ env.name }}-${{ github.event.number }}
+          oc delete all -l app=${{ env.name }}-${{ github.event.number }}
 
-  # If merged into main, then handle any image promotions 
+  # If merged into main, then handle any image promotions
   image-promotions:
     name: Image Promotions
     if: github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'main'
-    uses: ./.github/workflows/_image_promote.yml
+    uses: bcgov/nr-quickstart-helpers/.github/workflows/_image_promote.yml@main
     strategy:
       matrix:
         component: [backend, frontend]
@@ -50,7 +47,6 @@ jobs:
       oc_namespace: ${{ secrets.OC_NAMESPACE }}
       oc_server: ${{ secrets.OC_SERVER }}
       oc_token: ${{ secrets.OC_TOKEN }}
-      gh_token: ${{ secrets.GHCR_TOKEN }}
 
   # Notify when PR merged into main
   merge-notification:

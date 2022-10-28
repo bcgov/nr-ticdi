@@ -59,7 +59,7 @@ jobs:
         uses: github/codeql-action/analyze@v2
 
   # SonarCloud runs in the main branch are needed to compare against PRs
-  #sonarcloud:
+  # sonarcloud:
   #  name: Static Analysis
   #  runs-on: ubuntu-22.04
   #  steps:
@@ -101,7 +101,7 @@ jobs:
     needs:
       - cleanup-ghcr
       - codeql
-      - sonarcloud
+#      - sonarcloud
     runs-on: ubuntu-22.04
     environment:
       name: test

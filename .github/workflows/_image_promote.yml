@@ -38,9 +38,6 @@ jobs:
     name: ${{ inputs.component }}
     runs-on: ubuntu-22.04
     environment: ${{ inputs.env_target }}
-    secrets:
-      gh_token: ${{ secrets.GHCR_TOKEN }}
-
     steps:
       - name: Check for image changes
         id: check
@@ -82,13 +79,6 @@ jobs:
             exit 0
           fi
           echo "Image promotion not required"
-
-      - name: Log in to the Container registry
-        uses: docker/login-action@v2.0.0
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.gh_token }}
 
       - name: Promote Backend Image
         if: steps.check.outputs.build == 'true'

@@ -32,7 +32,7 @@ jobs:
     uses: ./.github/workflows/_code-cov.yml
     strategy:
       matrix:
-        component: [backend, frontend]
+        component: [backend]
     secrets:
       gh_token: ${{ secrets.GHCR_TOKEN }}
     with:

@@ -55,4 +55,9 @@ export class AppController {
 
     return new StreamableFile(await this.ttlsService.generateLURReport());
   }
+
+  @Get('getHello')
+  getHello(): string {
+    return this.appService.getHello();
+  }
 }

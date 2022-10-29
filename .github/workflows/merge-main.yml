@@ -33,7 +33,7 @@ jobs:
           owner: orgs/bcgov
           package: ${{ github.event.repository.name }}
           skip_tags: prod-frontend,prod-backend
-          token: ${{ secrets.DELETE_PACKAGES_TOKEN }}
+          token: ${{ secrets.GHCR_TOKEN }}
 
   codeql:
     name: Semantic Code Analysis

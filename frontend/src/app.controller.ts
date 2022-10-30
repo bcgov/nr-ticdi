@@ -14,29 +14,21 @@ export class AppController {
 
   @Get()
   @Render('index')
-  //@UseFilters(AuthenticationFilter)
-  //@UseGuards(AuthenticationGuard)
+  @UseFilters(AuthenticationFilter)
+  @UseGuards(AuthenticationGuard)
   async root(@Session() session: { data?: SessionData }) {
-    const username = 'Test User'; //session.data.name;
+    const username = session.data.name;
     const label = 'Test Label';
-    const accounts = 'Test Account';
-      //session.data.activeAccount !== null && session.data.activeAccount !== undefined
-      //  ? session.data.activeAccount.label
-      //  : session.data.accounts.length == 0
-      //  ? '~'
-      //  : '-';
     return process.env.ticdi_environment == 'DEVELOPMENT'
       ? {
           title: 'DEVELOPMENT - ' + PAGE_TITLES.INDEX,
           username: username,
-          label: label,
-          accounts: accounts,//session.data.accounts,
+          label: label
         }
       : {
           title: PAGE_TITLES.INDEX,
           username: username,
-          label: label,
-          accounts: accounts,//session.data.accounts,
+          label: label
         };
   }
 
@@ -62,5 +54,10 @@ export class AppController {
   async generateReport() {
 
     return new StreamableFile(await this.ttlsService.generateLURReport());
+  }
+
+  @Get('getHello')
+  getHello(): string {
+    return this.appService.getHello();
   }
 }

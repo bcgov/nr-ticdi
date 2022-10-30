@@ -223,7 +223,7 @@ objects:
                   memory: ${MEMORY_REQUEST}
               readinessProbe:
                 httpGet:
-                  path: /
+                  path: /getHello
                   port: 3000
                   scheme: HTTP
                 initialDelaySeconds: 15

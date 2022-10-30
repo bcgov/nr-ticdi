@@ -9,7 +9,7 @@ let keycloak_login_fullurl, keycloak_login_baseurl, keycloak_login_params;
 export class AuthenticationFilter implements ExceptionFilter {
   constructor() {
     // keycloak_login_params = `response_type=code&client_id=${process.env.keycloak_client_id}&redirect_uri=${redirectUri}`;
-    keycloak_login_baseurl = `${process.env.KEYCLOAK_BASE_URL}/auth/realms/${process.env.keycloak_realm}/protocol/openid-connect/auth`;
+    keycloak_login_baseurl = `${process.env.keycloak_base_url}/auth/realms/${process.env.keycloak_realm}/protocol/openid-connect/auth`;
     keycloak_login_fullurl = keycloak_login_baseurl + '?' + keycloak_login_params;
   }
   catch(exception: UnauthorizedException, host: ArgumentsHost) {

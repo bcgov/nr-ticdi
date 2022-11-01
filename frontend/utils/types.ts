@@ -12,20 +12,18 @@ export type SessionData = {
   refresh_token: string;
   accounts: AccountObject[];
   activeAccount: AccountObject;
-  name: string;
-  contacts: string[];
-  savedReports: savedReport[];
 };
 
 export type AccountObject = {
-  accountStatus: string;
-  accountType: string;
-  id: number;
-  label: string;
-  type: string;
+  // accountStatus: string;
+  // accountType: string;
+  // id: number;
+  // label: string;
+  // type: string;
+  name: string;
+  display_name: string;
+  client_roles: string[];
 };
-
-type savedReport = [string, string];
 
 export type TokenObject = {
   access_token: string;

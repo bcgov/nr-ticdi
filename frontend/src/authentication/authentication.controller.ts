@@ -12,11 +12,11 @@ export class AuthenticationController {
     @Body() data: { label: string },
     @Session() session: { data?: SessionData }
   ): Promise<{ message: string }> {
-    for (const entry of session.data.accounts) {
-      if (entry.label == data.label) {
-        session.data.activeAccount = entry;
-      }
-    }
+    // for (const entry of session.data.accounts) {
+    //   if (entry.label == data.label) {
+    //     session.data.activeAccount = entry;
+    //   }
+    // }
     if (session.data.activeAccount !== undefined) {
       return { message: 'Account Set' };
     } else {

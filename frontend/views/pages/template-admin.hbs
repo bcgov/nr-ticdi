@@ -1,0 +1,138 @@
+{{#> template}}
+  {{#*inline "content"}}
+    <main role="main">
+        <div class="container">
+            <h1>Template Administration</h1>
+            <hr />
+            <div class="form-group row">
+                <div class="col-md-2">
+                    <p class="font-weight-bold" style="font-size: larger">Document Type</p>
+                </div>
+                <div class="col-md-3">
+                    <select id="documentTypeSelect" class="form-control">
+                        {{#each documentTypes}}
+                        <option value="{{this}}">{{this}}</option>
+                        {{/each}}
+                    </select>
+                </div>
+            </div>
+            <div style="display: none">
+                <table id="document_type">
+                </table>
+            </div>
+            <div class="documentTableDiv" style="margin-bottom: 50px">
+                <table id="documentTable">
+                    <thead>
+                        <tr>
+                            <th>Code</th>
+                            <th>Description</th>
+                            <th>Created By</th>
+                            <th>Created Date</th>
+                            <th>Updated By</th>
+                            <th>Updated Date</th>
+                        </tr>
+                    </thead>
+                    <tbody id="documentTbody">
+                        <tr>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="col-md-3">
+                <p class="font-weight-bold" style="font-size: larger">Upload Template</p>
+            </div>
+            <form class="upload">
+            <div class="form-group row">
+                <div class="col-md-4">
+                    <input class="form-control" id="uploadFile" style="height: auto" type="file">
+                </div>
+                <div class="col-md-3">
+                    <button type="submit" class="btn btn-primary">Upload</button>
+                </div>
+            </div>
+            </form>
+        </div>
+    </main>
+    <script>
+        var dataArray = [];
+        $( document ).ready(function() {
+            {{#each data}}
+            dataArray.push({
+                code: "{{this.document_type}}", // lur
+                description: "{{this.document_description}}", // Land Use Report
+                who_created: "{{this.author}}",
+                when_created: "{{this.created_date}}",
+                who_updated: "{{this.updated_by}}",
+                when_updated: "{{this.updated_date}}",
+            });
+            {{/each}}
+            var t = "";
+            for (let entry of dataArray) {
+                var tr = "<tr>";
+                tr += "<td>"+entry.code+"</td>";
+                tr += "<td>"+entry.description+"</td>";
+                tr += "<td>"+entry.who_created+"</td>";
+                tr += "<td>"+entry.when_created+"</td>";
+                tr += "<td>"+entry.who_updated+"</td>";
+                tr += "<td>"+entry.when_updated+"</td>";
+                tr += "<td>"+entry.when_updated+"</td>";
+                tr += "</tr>";
+                t += tr;
+            }
+            $("#document_type tr").remove();
+            table = $("#document_type");
+            $("#document_type").innerHTML = t;
+        })
+        $( "#documentTypeSelect" ).change(function () {
+            $( "#documentTypeSelect option:selected" ).each(function() {
+                $("#documentTable tbody tr").remove();
+                var t = "";
+                for (let entry of dataArray) {
+                    if (entry.description == $(this).text()) {
+                        var tr = "<tr>";
+                        tr += "<td>"+entry.code+"</td>";
+                        tr += "<td>"+entry.description+"</td>";
+                        tr += "<td>"+entry.who_created+"</td>";
+                        tr += "<td>"+entry.when_created+"</td>";
+                        tr += "<td>"+entry.who_updated+"</td>";
+                        tr += "<td>"+entry.when_updated+"</td>";
+                        tr += "<td>"+entry.when_updated+"</td>";
+                        tr += "</tr>";
+                        t += tr;
+                    }
+                }
+                document.getElementById("documentTbody").innerHTML = t;            
+            })
+        })
+
+        const uploadForm = document.querySelector(".upload");
+        uploadForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const file = e.target.uploadFile.files[0];
+            const data = {template: btoa(file)}
+            fetch('http://localhost:3000/admin/upload-template', {
+                method: 'POST',
+                responseType: 'application/json',
+                headers: {
+                'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data),
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.errors) {
+                    alert(data.errors);
+                } else {
+                    console.log(data);
+                }
+            })
+        })
+    </script>
+  {{/inline}}
+{{/template}}

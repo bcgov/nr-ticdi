@@ -7,6 +7,7 @@ import { URLSearchParams } from "url";
 import * as fs from "fs";
 import * as path from "path";
 import * as dotenv from "dotenv";
+import * as base64 from "base-64";
 declare const Buffer;
 
 dotenv.config();
@@ -15,12 +16,21 @@ let port: number;
 
 @Injectable()
 export class TTLSService {
+  private readonly webade_url: string;
+  private readonly webade_username: string;
+  private readonly webade_secret: string;
+  private readonly tantalis_api: string;
+  private webade_token: string;
   constructor(private readonly http: HttpService) {
     hostname = process.env.BACKEND_URL
       ? process.env.BACKEND_URL
       : `http://localhost`;
     // local development backend port is 3001, docker backend port is 3000
     port = process.env.BACKEND_URL ? 3000 : 3001;
+    this.webade_url = process.env.WEBADE_AUTH_ENDPOINT;
+    this.webade_username = process.env.WEBADE_USERNAME;
+    this.webade_secret = process.env.WEBADE_PASSWORD;
+    this.tantalis_api = process.env.TTLS_API_ENDPOINT;
   }
 
   private id: String;
@@ -31,8 +41,15 @@ export class TTLSService {
     this.id = id;
   }
 
+  async setWebadeToken() {
+    console.log("Getting a new webade token");
+    this.webade_token = await this.getWebadeToken();
+  }
+
   // convert the TTLS JSON package to a format that conforms to the CDOGS template
   setJSONDataFile(jsonDataFile: [{}]) {
+    console.log("setJSONDataFile");
+    // console.log(jsonDataFile);
     const formattedJsonArray = [];
     for (let s of jsonDataFile) {
       let string = JSON.stringify(s);
@@ -42,48 +59,173 @@ export class TTLSService {
     this.jsonDataArray = formattedJsonArray;
     var jsonFormatted = formattedJsonArray[0];
 
-    let legalName = jsonFormatted.tenantAddr.legalName;
-    if (typeof legalName === "undefined" || !legalName) {
-      legalName =
-        jsonFormatted.tenantAddr.firstName +
-        " " +
-        jsonFormatted.tenantAddr.lastName;
-    }
+    let legalName = "???";
+    // if (typeof legalName === "undefined" || !legalName) {
+    //   legalName =
+    //     jsonFormatted.tenantAddr.firstName +
+    //     " " +
+    //     jsonFormatted.tenantAddr.lastName;
+    // }
+    console.log("jsonFormatted");
+    console.log("jsonFormatted");
+    console.log("jsonFormatted");
+    console.log("jsonFormatted");
+    console.log(jsonFormatted);
 
     this.jsonDataFile = {
       DataArray: formattedJsonArray,
-      FileNum: jsonFormatted.fileNum,
-      OrganizationUnit: jsonFormatted.orgUnit,
+      FileNum: jsonFormatted.tenure_file_number,
+      OrganizationUnit: jsonFormatted.organization_unit,
       LicenceHolderName: legalName,
-      MailingAddress: jsonFormatted.tenantAddr.addrLine1,
-      MailingCity: jsonFormatted.tenantAddr.city,
-      MailingProv: jsonFormatted.tenantAddr.regionCd,
-      PostCode: jsonFormatted.tenantAddr.postalCode,
-      Purpose: jsonFormatted.purpose,
-      SubPurpose: jsonFormatted.subPurpose,
-      TenureType: jsonFormatted.type,
-      TenureSubType: jsonFormatted.subType,
-      TenureArea: jsonFormatted.area,
-      Location: jsonFormatted.locLand,
-      LegalDescription: jsonFormatted.legalDesc,
+      MailingAddress: jsonFormatted.mailing_address_line_1,
+      MailingCity: jsonFormatted.mailing_city,
+      MailingProv: jsonFormatted.mailing_province_state_code,
+      PostCode: jsonFormatted.mailing_postal_code,
+      Purpose: jsonFormatted.purpose_name,
+      SubPurpose: jsonFormatted.sub_purpose_name,
+      TenureType: jsonFormatted.type_name,
+      TenureSubType: jsonFormatted.sub_type_name,
+      TenureArea: jsonFormatted.area_ha_number,
+      Location: jsonFormatted.location_description,
+      LegalDescription: jsonFormatted.legal_description,
     };
   }
 
   // sends json data to the backend to be inserted into the database
-  async sendToBackend(jsonDataFile: any): Promise<any> {
-    const url = `${hostname}:${port}/ticdijson`;
-    const { tenantAddr, ...ticdiJson } = jsonDataFile;
+  async sendToBackend(jdf: any): Promise<any> {
+    console.log("sendToBackend");
+    // console.log(jsonDataFile);
+    const url = `${hostname}:${port}/print-request-detail`;
+    const { ...printRequestDetail } = jdf;
 
-    // if these are needed I will update the entities for them later
-    delete tenantAddr["@type"];
-    delete tenantAddr["links"];
-    delete ticdiJson["@type"];
-    delete ticdiJson["links"];
+    let interestedParty, interestParcel, subPurposeCodes, landUseSubTypeCodes;
+    if (
+      printRequestDetail.interestedParties &&
+      printRequestDetail.interestedParties[0]
+    ) {
+      interestedParty = printRequestDetail.interestedParties[0];
+    } else {
+      interestedParty = null;
+    }
+    if (
+      printRequestDetail.interestParcels &&
+      printRequestDetail.interestParcels[0]
+    ) {
+      interestParcel = printRequestDetail.interestParcels[0];
+    } else {
+      interestParcel = null;
+    }
+    if (
+      printRequestDetail.purposeCode &&
+      printRequestDetail.purposeCode.subPurposeCodes &&
+      printRequestDetail.purposeCode.subPurposeCodes[0]
+    ) {
+      subPurposeCodes = printRequestDetail.purposeCode.subPurposeCodes[0];
+    } else {
+      subPurposeCodes = null;
+    }
+    if (
+      printRequestDetail.landUseTypeCode &&
+      printRequestDetail.landUseTypeCode.landUseSubTypeCodes &&
+      printRequestDetail.landUseTypeCode.landUseSubTypeCodes[0]
+    ) {
+      landUseSubTypeCodes =
+        printRequestDetail.landUseTypeCode.landUseSubTypeCodes[0];
+    } else {
+      landUseSubTypeCodes = null;
+    }
+    let individual, orgUnit;
+    if (interestedParty && interestedParty.individual) {
+      individual = interestedParty.individual;
+    } else {
+      individual = null;
+    }
+    if (interestedParty && interestedParty.organization) {
+      orgUnit = interestedParty.organization;
+    } else {
+      orgUnit = null;
+    }
+
+    const mappedData = {
+      dtid: printRequestDetail.landUseApplicationId,
+      tenure_file_number: parseInt(printRequestDetail.fileNumber),
+      organization_unit: orgUnit,
+      purpose_name: printRequestDetail.purposeCode.description,
+      sub_purpose_name: subPurposeCodes.description
+        ? subPurposeCodes.description
+        : null,
+      type_name: printRequestDetail.landUseTypeCode.description,
+      sub_type_name: landUseSubTypeCodes.description
+        ? landUseSubTypeCodes.description
+        : null,
+      area_ha_number: interestParcel.areaInHectares
+        ? interestParcel.areaInHectares
+        : null,
+      first_name: individual
+        ? individual.firstname
+          ? individual.firstname
+          : null
+        : null,
+      middle_name: individual
+        ? individual.middlename
+          ? individual.middlename
+          : null
+        : null,
+      last_name: individual
+        ? individual.lastname
+          ? individual.lastname
+          : null
+        : null,
+      mailing_address_line_1: interestedParty
+        ? interestedParty.addressLine1
+          ? interestedParty.addressLine1
+          : null
+        : null,
+      mailing_address_line_2: interestedParty
+        ? interestedParty.addressLine2
+          ? interestedParty.addressLine2
+          : null
+        : null,
+      mailing_address_line_3: interestedParty
+        ? interestedParty.addressLine3
+          ? interestedParty.addressLine3
+          : null
+        : null,
+      mailing_city: interestedParty.city ? interestedParty.city : null,
+      mailing_province_state_code: interestedParty
+        ? interestedParty.province
+          ? interestedParty.province
+          : null
+        : null,
+      mailing_postal_code: interestedParty
+        ? interestedParty.postalCode
+          ? interestedParty.postalCode
+          : null
+        : null,
+      mailing_zip: interestedParty
+        ? interestedParty.zipCode
+          ? interestedParty.zipCode
+          : null
+        : null,
+      mailing_country_code: null,
+      mailing_country: interestedParty
+        ? interestedParty.country
+          ? interestedParty.country
+          : null
+        : null,
+      location_description: printRequestDetail.locationDescription,
+      legal_description: interestParcel
+        ? interestParcel.legalDescription
+          ? interestParcel.legalDescription
+          : null
+        : null,
+    };
+    console.log(mappedData.area_ha_number);
 
     return axios
       .post(
         url,
-        { ticdijson: ticdiJson, tenantAddr: tenantAddr },
+        { printRequestDetail: mappedData },
         {
           headers: {
             "Content-Type": "application/json",
@@ -97,7 +239,9 @@ export class TTLSService {
 
   // get a ticdi json object from the backend using a dtid
   async getJSONsByDTID(dtid: number): Promise<any> {
-    const url = `${hostname}:${port}/ticdijson/${dtid}`;
+    console.log("getJSONsByDTID");
+    console.log(dtid);
+    const url = `${hostname}:${port}/print-request-detail/${dtid}`;
     return axios
       .get(url, {
         headers: {
@@ -105,14 +249,17 @@ export class TTLSService {
         },
       })
       .then((res) => {
+        // console.log(res);
         return res.data;
       });
   }
 
   callHttp(): Observable<Array<Object>> {
-    let bearerToken = process.env.ttls_api_key;
+    const bearerToken = this.webade_token;
+    // const bearerToken = process.env.ttls_api_key;
 
-    let url = process.env.ttls_url + this.id;
+    // const url = process.env.ttls_url + this.id;
+    const url = this.tantalis_api + "landUseApplications/" + this.id;
 
     return this.http
       .get(url, { headers: { Authorization: "Bearer " + bearerToken } })
@@ -148,6 +295,47 @@ export class TTLSService {
       })
       .catch((error) => {
         console.log(error.response);
+      });
+  }
+
+  async getWebadeToken(): Promise<string> {
+    const url =
+      this.webade_url +
+      "oauth/token?grant_type=client_credentials&disableDeveloperFilter=true&scope=TTLS.*";
+    const authorization = base64.encode(
+      this.webade_username + ":" + this.webade_secret
+    );
+    const config = {
+      headers: {
+        Authorization: `Basic ${authorization}`,
+      },
+    };
+    return axios
+      .get(url, config)
+      .then((res) => {
+        return res.data.access_token;
+      })
+      .catch((error) => {
+        if (error.response) {
+          // The request was made and the server responded with a status code
+          // that falls out of the range of 2xx
+          console.log("Response:");
+          console.log(error.response.data);
+          console.log(error.response.status);
+          console.log(error.response.headers);
+        } else if (error.request) {
+          // The request was made but no response was received
+          // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+          // http.ClientRequest in node.js
+          console.log("Request:");
+          console.log(error.request);
+        } else {
+          // Something happened in setting up the request that triggered an Error
+          console.log("Error", error.message);
+        }
+        console.log("Error config:");
+        console.log(error.config);
+        console.log(error);
       });
   }
 

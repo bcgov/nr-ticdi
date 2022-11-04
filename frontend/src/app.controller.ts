@@ -104,29 +104,35 @@ export class AppController {
     let array;
     let version = [];
     this.ttlsService.setId(id);
-    await this.ttlsService
+    await this.ttlsService.setWebadeToken();
+    this.ttlsService
       .callHttp()
       .toPromise()
       .then(
         async (resp) => {
-          ttlsJSON = resp;
-          console.log(resp);
-          await this.ttlsService.sendToBackend(ttlsJSON);
+          // let asdf: any = resp;
+          // console.log(resp);
+          // console.log(asdf.interestedParties[0].individual);
+          // console.log(asdf.purposeCode.subPurposeCodes);
+          ttlsJSON = await this.ttlsService.sendToBackend(resp);
           return ttlsJSON;
         },
         (reason) => {
+          console.log(reason);
           console.log("Error");
         }
       )
       .then(async (resp) => {
         ttlsJSON = resp;
+        console.log(ttlsJSON);
         array = await this.ttlsService.getJSONsByDTID(ttlsJSON.dtid);
-        for (let a of array) {
-          version.push(a.version);
-        }
+        // console.log(array);
+        // for (let a of array) {
+        //   version.push(a.version);
+        // }
         this.ttlsService.setJSONDataFile(array);
+        return { message: ttlsJSON, data: array };
       });
-    return { message: ttlsJSON, version: version, data: array };
   }
 
   @Get("template-admin")

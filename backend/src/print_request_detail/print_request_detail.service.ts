@@ -1,0 +1,84 @@
+import { Injectable } from "@nestjs/common";
+import { InjectRepository } from "@nestjs/typeorm";
+import { Repository } from "typeorm";
+import { CreatePrintRequestDetailDto } from "./dto/create-print_request_detail.dto";
+import { PrintRequestDetail } from "./entities/print_request_detail.entity";
+
+@Injectable()
+export class PrintRequestDetailService {
+  constructor(
+    @InjectRepository(PrintRequestDetail)
+    private printRequestDetailRepository: Repository<PrintRequestDetail>
+  ) {}
+
+  async create(
+    printRequestDetail: CreatePrintRequestDetailDto
+  ): Promise<PrintRequestDetail> {
+    const newItem = new PrintRequestDetail();
+    newItem.dtid = printRequestDetail.dtid;
+    newItem.tenure_file_number = printRequestDetail.tenure_file_number;
+    newItem.organization_unit = printRequestDetail.organization_unit;
+    newItem.purpose_name = printRequestDetail.purpose_name;
+    newItem.sub_purpose_name = printRequestDetail.sub_purpose_name;
+    newItem.type_name = printRequestDetail.type_name;
+    newItem.sub_type_name = printRequestDetail.sub_type_name;
+    newItem.area_ha_number = printRequestDetail.area_ha_number.toString();
+    newItem.first_name = printRequestDetail.first_name;
+    newItem.middle_name = printRequestDetail.middle_name;
+    newItem.last_name = printRequestDetail.last_name;
+    newItem.mailing_address_line_1 = printRequestDetail.mailing_address_line_1;
+    newItem.mailing_address_line_2 = printRequestDetail.mailing_address_line_2;
+    newItem.mailing_address_line_3 = printRequestDetail.mailing_address_line_3;
+    newItem.mailing_city = printRequestDetail.mailing_city;
+    newItem.mailing_province_state_code =
+      printRequestDetail.mailing_province_state_code;
+    newItem.mailing_postal_code = printRequestDetail.mailing_postal_code;
+    newItem.mailing_zip = printRequestDetail.mailing_zip;
+    newItem.mailing_country_code = printRequestDetail.mailing_country_code;
+    newItem.mailing_country = printRequestDetail.mailing_country;
+    newItem.location_description = printRequestDetail.location_description;
+    newItem.legal_description = printRequestDetail.legal_description;
+    newItem.create_userid = printRequestDetail.create_userid;
+    // const existingTicdi = await this.printRequestDetailRepository.findBy({
+    //   dtid: printRequestDetail.dtid,
+    // });
+    // if (!existingTicdi) {
+    //   newItem.version = 1;
+    //   const newPRD = this.printRequestDetailRepository.create(newItem);
+    //   return this.printRequestDetailRepository.save(newPRD);
+    // } else {
+    //   let currentVersion = 0;
+    //   for (let item of existingTicdi) {
+    //     if (item.version > currentVersion) {
+    //       currentVersion = item.version;
+    //     }
+    //   }
+    //   newItem.version = currentVersion + 1;
+    //   const newPRD = this.printRequestDetailRepository.create(newItem);
+    //   return this.printRequestDetailRepository.save(newPRD);
+    // }
+    const newPRD = this.printRequestDetailRepository.create(newItem);
+    return this.printRequestDetailRepository.save(newPRD);
+  }
+
+  async findAll(): Promise<PrintRequestDetail[]> {
+    return this.printRequestDetailRepository.find();
+  }
+
+  async findByDtid(dtid: number): Promise<PrintRequestDetail[]> {
+    return this.printRequestDetailRepository.find({
+      where: {
+        dtid: dtid,
+      },
+    });
+  }
+
+  async remove(dtid: number): Promise<{ deleted: boolean; message?: string }> {
+    try {
+      await this.printRequestDetailRepository.delete({ dtid: dtid });
+      return { deleted: true };
+    } catch (err) {
+      return { deleted: false, message: err.message };
+    }
+  }
+}

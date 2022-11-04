@@ -1,0 +1,26 @@
+import { Body, Controller, Get, Post } from "@nestjs/common";
+import { DocumentTemplateService } from "./document_template.service";
+import { CreateDocumentTemplateDto } from "./dto/create-document_template.dto";
+import { UpdateDocumentTemplateDto } from "./dto/update-document_template.dto";
+
+@Controller("document-template")
+export class DocumentTemplateController {
+  constructor(private readonly templateService: DocumentTemplateService) {}
+
+  @Post("create")
+  create(@Body() data: { template: CreateDocumentTemplateDto }) {
+    let templateData = data.template;
+    return this.templateService.create(templateData);
+  }
+
+  @Post("update")
+  update(@Body() data: { template: UpdateDocumentTemplateDto }) {
+    let templateData = data.template;
+    return this.templateService.update(templateData);
+  }
+
+  @Get()
+  findAll() {
+    return this.templateService.findAll();
+  }
+}

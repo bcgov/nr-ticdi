@@ -6,6 +6,9 @@ import { AppController } from "./app.controller";
 import { AppService } from "./app.service";
 import { TicdijsonModule } from "./ticdijson/ticdijson.module";
 import { TemplateModule } from "./template/template.module";
+import { DocumentTemplateModule } from './document_template/document_template.module';
+import { PrintRequestDetailModule } from './print_request_detail/print_request_detail.module';
+import { PrintRequestLogModule } from './print_request_log/print_request_log.module';
 
 console.log("Var check - POSTGRESQL_HOST", process.env.POSTGRESQL_HOST);
 console.log("Var check - POSTGRESQL_DATABASE", process.env.POSTGRESQL_DATABASE);
@@ -32,6 +35,9 @@ if (process.env.POSTGRESQL_PASSWORD != null) {
     }),
     TicdijsonModule,
     TemplateModule,
+    DocumentTemplateModule,
+    PrintRequestDetailModule,
+    PrintRequestLogModule,
   ],
   controllers: [AppController],
   providers: [AppService],

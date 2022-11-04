@@ -14,7 +14,7 @@
                     </div>
                 </div>
                 <div class="form-group row">
-                    <div class="col-md-2">
+                    {{!-- <div class="col-md-2">
                         <p class="font-weight-bold">Version</p>
                     </div>
                     <div class="col-md-2">
@@ -23,7 +23,7 @@
                             <option value="{{this}}">{{this}}</option>
                             {{/each}}
                       </select>
-                    </div>
+                    </div> --}}
                 </div>
                 <div class="form-group row">
                     <div class="col-md-2">
@@ -51,7 +51,7 @@
                         <div class="form-row">
                             <div class="form-group col-md-5">
                                 <dt>Organization Unit</dt>
-                                <dd id="orgUnit">{{ message.orgUnit }}</dd>
+                                <dd id="orgUnit">{{ message.organization_unit }}</dd>
                             </div>
                             <div class="form-group col-md-5">
                                 <dt>Inspected Date</dt>
@@ -71,11 +71,11 @@
                         <div class="form-row">
                             <div class="form-group col-md-5">
                                 <dt>Policy Name</dt>
-                                <dd id="orgUnit2">{{ message.orgUnit }}</dd>
+                                <dd id="orgUnit2">{{ message.organization_unit }}</dd>
                             </div>
                             <div class="form-group col-md-5">
                                 <dt>Purpose Statement</dt>
-                                <dd id="purpose">{{message.purpose}}</dd>
+                                <dd id="purpose">{{message.purpose_name}}</dd>
                             </div>
                         </div>
                     </div>
@@ -86,49 +86,49 @@
                         <div class="form-row">
                             <div class="form-group col-md-5">
                                 <dt>File Number</dt>
-                                <dd id="fileNum">{{ message.fileNum }}</dd>
+                                <dd id="fileNum">{{ message.tenure_file_number }}</dd>
                             </div>
                             <div class="form-group col-md-5">
                                 <dt>Mailing Address</dt>
-                                <dd id="address">{{message.tenantAddr.addrLine1}}</dd>
-                                <dd id="cityProv">{{message.tenantAddr.city}} {{message.tenantAddr.provAbbr}}</dd>
-                                <dd id="postalCode">{{message.tenantAddr.postalCode}}</dd>
+                                <dd id="address">{{message.mailing_address_line_1}}</dd>
+                                <dd id="cityProv">{{message.mailing_city}} {{message.mailing_province_state_code}}</dd>
+                                <dd id="postalCode">{{message.mailing_postal_code}}</dd>
                             </div>
                         </div>
                         <div class="form-row">
                             <div class="form-group col-md-5">
                                 <dt>Type</dt>
-                                <dd id="type">{{ message.type }}</dd>
+                                <dd id="type">{{ message.type_name }}</dd>
                             </div>
                             <div class="form-group col-md-5">
                                 <dt>Subtype</dt>
-                                <dd id="subType">{{message.subType}}</dd>
+                                <dd id="subType">{{message.sub_type_name}}</dd>
                             </div>
                         </div>
                         <div class="form-row">
                             <div class="form-group col-md-5">
                                 <dt>Purpose</dt>
-                                <dd id="purpose2">{{ message.purpose }}</dd>
+                                <dd id="purpose2">{{ message.purpose_name }}</dd>
                             </div>
                             <div class="form-group col-md-5">
                                 <dt>Subpurpose</dt>
-                                <dd id="subPurpose">{{message.subPurpose}}</dd>
+                                <dd id="subPurpose">{{message.sub_purpose_name}}</dd>
                             </div>
                         </div>
                         <div class="form-row">
                             <div class="form-group col-md-5">
                                 <dt>Area</dt>
-                                <dd id="area">{{ message.area }}</dd>
+                                <dd id="area">{{ message.area_ha_number }}</dd>
                             </div>
                             <div class="form-group col-md-5">
                                 <dt>Location of Land</dt>
-                                <dd id="locLand">{{message.locLand}}</dd>
+                                <dd id="locLand">{{message.location_description}}</dd>
                             </div>
                         </div>
                         <div class="form-row">
                             <div class="form-group">
                                 <dt>Legal Description</dt>
-                                <dd id="legalDesc">{{message.legalDesc}}</dd>
+                                <dd id="legalDesc">{{message.legal_description}}</dd>
                             </div>
                         </div>
                         <div class="form-row">
@@ -149,55 +149,52 @@
             {{#each data}}
             dataArray.push({
                 dtid: {{this.dtid}},
-                version: {{this.version}},
-                orgUnit: "{{this.orgUnit}}",
-                purpose: "{{this.purpose}}",
-                subPurpose: "{{this.subPurpose}}",
-                fileNum: "{{this.fileNum}}",
-                type: "{{this.type}}",
-                subType: "{{this.subType}}",
-                area: "{{this.area}}",
-                locLand: "{{this.locLand}}",
-                legalDesc: "{{this.legalDesc}}",
-                tenantAddr: {
-                    addrLine1: "{{this.tenantAddr.addrLine1}}",
-                    city: "{{this.tenantAddr.city}}",
-                    provAbbr: "{{this.tenantAddr.provAbbr}}",
-                    postalCode: "{{this.tenantAddr.postalCode}}",
-                }
-
+                //version: {{this.version}},
+                organization_unit: "{{this.organization_unit}}",
+                purpose_name: "{{this.purpose_name}}",
+                sub_purpose_name: "{{this.sub_purpose_name}}",
+                tenure_file_number: "{{this.tenure_file_number}}",
+                type_name: "{{this.type_name}}",
+                sub_type_name: "{{this.sub_type_name}}",
+                area_ha_number: "{{this.area_ha_number}}",
+                location_description: "{{this.location_description}}",
+                legal_description: "{{this.legal_description}}",
+                mailing_address_line_1: "{{this.mailing_address_line_1}}",
+                mailing_city: "{{this.mailing_city}}",
+                mailing_province_state_code: "{{this.mailing_province_state_code}}",
+                mailing_postal_code: "{{this.mailing_postal_code}}",
             });
             {{/each}}
         })
-        $( "#versionSelect" ).change(function () {
-            $( "#versionSelect option:selected" ).each(function() {
-                let data;
-                for (let item of dataArray) {
-                    if (item.version == $(this).text()) {
-                        data = item;
-                    }
-                }
-                if (data) {
-                    $("#orgUnit").text(data.orgUnit)
-                    $("#orgUnit2").text(data.orgUnit)
-                    $("#purpose").text(data.purpose)
-                    $("#fileNum").text(data.fileNum)
-                    $("#address").text(data.tenantAddr.addrLine1)
-                    $("#cityProv").text(data.tenantAddr.city+" "+data.tenantAddr.provAbbr)
-                    $("#postalCode").text(data.tenantAddr.postalCode)
-                    $("#type").text(data.tenantAddr.type)
-                    $("#subType").text(data.tenantAddr.subType)
-                    $("#purpose2").text(data.purpose)
-                    $("#subPurpose").text(data.subPurpose)
-                    $("#area").text(data.area)
-                    $("#locLand").text(data.locLand)
-                    $("#legalDesc").text(data.legalDesc)
-                    $("#versionNum").text(data.version)
-                } else {
-                    console.log("Error changing version number");
-                }
-            })
-        })
+        //$( "#versionSelect" ).change(function () {
+        //    $( "#versionSelect option:selected" ).each(function() {
+        //        let data;
+        //        for (let item of dataArray) {
+        //            if (item.version == $(this).text()) {
+        //                data = item;
+        //            }
+        //        }
+        //        if (data) {
+        //            $("#orgUnit").text(data.organization_unit)
+        //            $("#orgUnit2").text(data.organization_unit)
+        //            $("#purpose").text(data.purpose_name)
+        //            $("#fileNum").text(data.tenure_file_number)
+        //            $("#address").text(data.mailing_address_line_1)
+        //            $("#cityProv").text(data.mailing_city+" "+data.mailing_province_state_code)
+        //            $("#postalCode").text(data.mailing_postal_code)
+        //            $("#type").text(data.type_name)
+        //            $("#subType").text(data.sub_type_name)
+        //            $("#purpose2").text(data.purpose_name)
+        //            $("#subPurpose").text(data.sub_purpose_name)
+        //            $("#area").text(data.area_ha_number)
+        //            $("#locLand").text(data.location_description)
+        //            $("#legalDesc").text(data.legal_description)
+        //            //$("#versionNum").text(data.version)
+        //        } else {
+        //            console.log("Error changing version number");
+        //        }
+        //    })
+        //})
     </script>
   {{/inline}}
 {{/template}}

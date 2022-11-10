@@ -29,6 +29,11 @@ export class PrintRequestDetailController {
     return this.printRequestDetailService.findByDtid(+dtid);
   }
 
+  @Get("view/:prdid")
+  findViewByPRDID(@Param("prdid") prdid: string) {
+    return this.printRequestDetailService.findViewByPRDID(+prdid);
+  }
+
   @Delete(":dtid")
   remove(@Param("dtid") dtid: string) {
     return this.printRequestDetailService.remove(+dtid);

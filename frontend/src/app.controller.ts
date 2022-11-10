@@ -19,7 +19,7 @@ import { AccountFilter } from "./account/account.filter";
 import { TTLSService } from "./ttls/ttls.service";
 import { AdminGuard } from "./admin/admin.guard";
 import { AxiosRequestConfig } from "axios";
-import { lastValueFrom, map } from "rxjs";
+import { firstValueFrom, lastValueFrom, map } from "rxjs";
 import { HttpService } from "@nestjs/axios";
 
 let requestUrl: string;
@@ -36,7 +36,7 @@ export class AppController {
       ? process.env.BACKEND_URL
       : `http://localhost`;
     const port = process.env.BACKEND_URL ? 3000 : 3001;
-    requestUrl = `${hostname}:${port}/template/`;
+    requestUrl = `${hostname}:${port}/document-template/`;
     requestConfig = {
       headers: {
         "Content-Type": "application/json",
@@ -49,7 +49,6 @@ export class AppController {
   @UseFilters(AuthenticationFilter)
   @UseGuards(AuthenticationGuard)
   async root(@Session() session: { data?: SessionData }) {
-    // console.log(session.data);
     const username = session.data
       ? session.data.activeAccount
         ? session.data.activeAccount.name
@@ -98,41 +97,89 @@ export class AppController {
   }
 
   @Get("dtid/:id/:docname")
+  @UseFilters(AuthenticationFilter)
+  @UseGuards(AuthenticationGuard)
   @Render("index")
-  async findOne(@Param("id") id, @Param("docname") docname: string) {
-    let ttlsJSON;
-    let array;
+  async findOne(
+    @Session() session: { data?: SessionData },
+    @Param("id") id,
+    @Param("docname") docname: string
+  ) {
+    const username = session.data
+      ? session.data.activeAccount
+        ? session.data.activeAccount.name
+          ? session.data.activeAccount.name
+          : ""
+        : ""
+      : "";
+    const label = session.data
+      ? session.data.activeAccount
+        ? session.data.activeAccount.display_name
+          ? session.data.activeAccount.display_name
+          : ""
+        : ""
+      : "";
+    let isAdmin = false;
+    if (
+      session.data &&
+      session.data.activeAccount &&
+      session.data.activeAccount.client_roles
+    ) {
+      for (let role of session.data.activeAccount.client_roles) {
+        if (role == "ticdi_admin") {
+          isAdmin = true;
+        }
+      }
+    }
+    const displayAdmin = isAdmin ? "Template Administration" : "-";
     let version = [];
     this.ttlsService.setId(id);
     await this.ttlsService.setWebadeToken();
-    this.ttlsService
-      .callHttp()
-      .toPromise()
-      .then(
-        async (resp) => {
-          // let asdf: any = resp;
-          // console.log(resp);
-          // console.log(asdf.interestedParties[0].individual);
-          // console.log(asdf.purposeCode.subPurposeCodes);
-          ttlsJSON = await this.ttlsService.sendToBackend(resp);
-          return ttlsJSON;
-        },
-        (reason) => {
-          console.log(reason);
-          console.log("Error");
+    const response = await firstValueFrom(this.ttlsService.callHttp()).then(
+      (res) => {
+        return res;
+      }
+    );
+    const ttlsJSON = await this.ttlsService.sendToBackend(response);
+    const array = await this.ttlsService.getJSONsByDTID(ttlsJSON.dtid);
+    // for (let a of array) {
+    //   version.push(a.version);
+    // }
+    // this.ttlsService.setJSONDataFile(array); // probably unneeded as cdogs template is stored in a view now
+    const documentTypes = [];
+    const documents = await lastValueFrom(
+      this.httpService
+        .get(requestUrl, requestConfig)
+        .pipe(map((response) => response.data))
+    );
+    for (let entry of documents) {
+      if (!documentTypes.includes(entry.comments)) {
+        documentTypes.push(entry.comments);
+      }
+    }
+    return process.env.ticdi_environment == "DEVELOPMENT"
+      ? {
+          title: "DEVELOPMENT - " + PAGE_TITLES.INDEX,
+          username: username,
+          label: label,
+          displayAdmin: displayAdmin,
+          message: ttlsJSON,
+          data: array,
+          // version: version,
+          documentTypes: documentTypes,
+          prdid: ttlsJSON.id,
         }
-      )
-      .then(async (resp) => {
-        ttlsJSON = resp;
-        console.log(ttlsJSON);
-        array = await this.ttlsService.getJSONsByDTID(ttlsJSON.dtid);
-        // console.log(array);
-        // for (let a of array) {
-        //   version.push(a.version);
-        // }
-        this.ttlsService.setJSONDataFile(array);
-        return { message: ttlsJSON, data: array };
-      });
+      : {
+          title: PAGE_TITLES.INDEX,
+          username: username,
+          label: label,
+          displayAdmin: displayAdmin,
+          message: ttlsJSON,
+          data: array,
+          // version: version,
+          documentTypes: documentTypes,
+          prdid: ttlsJSON.id,
+        };
   }
 
   @Get("template-admin")

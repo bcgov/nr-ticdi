@@ -14,142 +14,174 @@
                     </div>
                 </div>
                 <div class="form-group row">
-                    {{!-- <div class="col-md-2">
+                    <div class="col-md-2">
                         <p class="font-weight-bold">Version</p>
                     </div>
-                    <div class="col-md-2">
+                    <div class="col-md-1">
                         <select id="versionSelect" class="form-control">
-                            {{#each version}}
+                            {{!-- {{#each version}}
                             <option value="{{this}}">{{this}}</option>
-                            {{/each}}
+                            {{/each}} --}}
+                            <option value="1">1</option>
                       </select>
-                    </div> --}}
+                    </div>
                 </div>
                 <div class="form-group row">
                     <div class="col-md-2">
                         <p class="font-weight-bold">Report</p>
                     </div>
-                    <div class="col-md-2">
+                    <div class="col-md-3">
                         <select class="form-control" id="document_type_id">
-                            <option>Land Use Report</option>
+                            {{#each documentTypes}}
+                            <option value="{{this}}">{{this}}</option>
+                            {{/each}}
                         </select>
                     </div>
                 </div>
-                <fieldset class="form-group collapsible">
-                    <legend class='togvis'>Disposition Transaction ID Details</legend>
-                    <div class="contents">
-                        <div class="form-row">
-                            <div class="form-group col-md-5">
-                                <dt>Contact or Agent Name</dt>
-                                <dd>TBD</dd>
-                            </div>
-                            <div class="form-group col-md-5">
-                                <dt>Email Address</dt>
-                                <dd>TBD</dd>
-                            </div>
+                <div class="mt-3 mb-3">
+                <div class="accordion" id="collapseContents">
+                    <div class="card">
+                        <div class="card-header" id="headingOne">
+                            <h2 class="mb-0">
+                                <button type="button" class="btn collapsed" data-toggle="collapse" data-target="#collapseOne">Disposition Transaction ID Details <i class="fa fa-angle-down"></i></button>
+                            </h2>
                         </div>
-                        <div class="form-row">
-                            <div class="form-group col-md-5">
-                                <dt>Organization Unit</dt>
-                                <dd id="orgUnit">{{ message.organization_unit }}</dd>
+                        <div id="collapseOne" class="collapse" aria-labelledby="headingOne" data-parent="#collapseContents">
+                            <div class="card-body">
+                                <div class="contents">
+                                <div class="form-row">
+                                    <div class="form-group col-md-5">
+                                        <dt>Contact or Agent Name</dt>
+                                        <dd>TBD</dd>
+                                    </div>
+                                    <div class="form-group col-md-5">
+                                        <dt>Email Address</dt>
+                                        <dd>TBD</dd>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group col-md-5">
+                                        <dt>Organization Unit</dt>
+                                        <dd id="orgUnit">{{ message.organization_unit }}</dd>
+                                    </div>
+                                    <div class="form-group col-md-5">
+                                        <dt>Inspected Date</dt>
+                                        <dd>TBD</dd>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group col-md-5">
+                                        <dt>Incorporation Number</dt>
+                                        <dd>TBD</dd>
+                                    </div>
+                                    <div class="form-group col-md-5">
+                                        <dt>Inspected Date</dt>
+                                        <dd>TBD</dd>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group col-md-5">
+                                        <dt>Policy Name</dt>
+                                        <dd id="orgUnit2">{{ message.organization_unit }}</dd>
+                                    </div>
+                                    <div class="form-group col-md-5">
+                                        <dt>Purpose Statement</dt>
+                                        <dd id="purpose">{{message.purpose_name}}</dd>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="form-group col-md-5">
-                                <dt>Inspected Date</dt>
-                                <dd>TBD</dd>
-                            </div>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group col-md-5">
-                                <dt>Incorporation Number</dt>
-                                <dd>TBD</dd>
-                            </div>
-                            <div class="form-group col-md-5">
-                                <dt>Inspected Date</dt>
-                                <dd>TBD</dd>
-                            </div>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group col-md-5">
-                                <dt>Policy Name</dt>
-                                <dd id="orgUnit2">{{ message.organization_unit }}</dd>
-                            </div>
-                            <div class="form-group col-md-5">
-                                <dt>Purpose Statement</dt>
-                                <dd id="purpose">{{message.purpose_name}}</dd>
-                            </div>
-                        </div>
-                    </div>
-                </fieldset>
-                <fieldset class="form-group collapsible">
-                    <legend class='togvis'>Tenure Details</legend>
-                    <div class="contents">
-                        <div class="form-row">
-                            <div class="form-group col-md-5">
-                                <dt>File Number</dt>
-                                <dd id="fileNum">{{ message.tenure_file_number }}</dd>
-                            </div>
-                            <div class="form-group col-md-5">
-                                <dt>Mailing Address</dt>
-                                <dd id="address">{{message.mailing_address_line_1}}</dd>
-                                <dd id="cityProv">{{message.mailing_city}} {{message.mailing_province_state_code}}</dd>
-                                <dd id="postalCode">{{message.mailing_postal_code}}</dd>
-                            </div>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group col-md-5">
-                                <dt>Type</dt>
-                                <dd id="type">{{ message.type_name }}</dd>
-                            </div>
-                            <div class="form-group col-md-5">
-                                <dt>Subtype</dt>
-                                <dd id="subType">{{message.sub_type_name}}</dd>
-                            </div>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group col-md-5">
-                                <dt>Purpose</dt>
-                                <dd id="purpose2">{{ message.purpose_name }}</dd>
-                            </div>
-                            <div class="form-group col-md-5">
-                                <dt>Subpurpose</dt>
-                                <dd id="subPurpose">{{message.sub_purpose_name}}</dd>
-                            </div>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group col-md-5">
-                                <dt>Area</dt>
-                                <dd id="area">{{ message.area_ha_number }}</dd>
-                            </div>
-                            <div class="form-group col-md-5">
-                                <dt>Location of Land</dt>
-                                <dd id="locLand">{{message.location_description}}</dd>
-                            </div>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group">
-                                <dt>Legal Description</dt>
-                                <dd id="legalDesc">{{message.legal_description}}</dd>
-                            </div>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group">
-                                <dt>Version</dt>
-                                <dd id="versionNum">1</dd>
                             </div>
                         </div>
                     </div>
-                </fieldset>
-                <button type="submit" class="btn btn-primary">Generate Document</button>
+                </div>
+                <div class="accordion" id="collapseContentsTwo">
+                    <div class="card">
+                        <div class="card-header" id="headingTwo">
+                            <h2 class="mb-0">
+                                <button type="button" class="btn" data-toggle="collapse" data-target="#collapseTwo">Tenure Details <i class="fa fa-angle-down"></i></button>
+                            </h2>
+                        </div>
+                        <div id="collapseTwo" class="collapse show" aria-labelledby="headingTwo" data-parent="#collapseContents">
+                            <div class="card-body">
+                                <div class="contents">
+                                    <div class="form-row">
+                                        <div class="form-group col-md-5">
+                                            <dt>File Number</dt>
+                                            <dd id="fileNum">{{ message.tenure_file_number }}</dd>
+                                        </div>
+                                        <div class="form-group col-md-5">
+                                            <dt>Mailing Address</dt>
+                                            <dd id="address">{{message.mailing_address_line_1}}</dd>
+                                            <dd id="cityProv">{{message.mailing_city}} {{message.mailing_province_state_code}}</dd>
+                                            <dd id="postalCode">{{message.mailing_postal_code}}</dd>
+                                        </div>
+                                    </div>
+                                    <div class="form-row">
+                                        <div class="form-group col-md-5">
+                                            <dt>Type</dt>
+                                            <dd id="type">{{ message.type_name }}</dd>
+                                        </div>
+                                        <div class="form-group col-md-5">
+                                            <dt>Subtype</dt>
+                                            <dd id="subType">{{message.sub_type_name}}</dd>
+                                        </div>
+                                    </div>
+                                    <div class="form-row">
+                                        <div class="form-group col-md-5">
+                                            <dt>Purpose</dt>
+                                            <dd id="purpose2">{{ message.purpose_name }}</dd>
+                                        </div>
+                                        <div class="form-group col-md-5">
+                                            <dt>Subpurpose</dt>
+                                            <dd id="subPurpose">{{message.sub_purpose_name}}</dd>
+                                        </div>
+                                    </div>
+                                    <div class="form-row">
+                                        <div class="form-group col-md-5">
+                                            <dt>Area</dt>
+                                            <dd id="area">{{ message.area_ha_number }}</dd>
+                                        </div>
+                                        <div class="form-group col-md-5">
+                                            <dt>Location of Land</dt>
+                                            <dd id="locLand">{{message.location_description}}</dd>
+                                        </div>
+                                    </div>
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <dt>Legal Description</dt>
+                                            <dd id="legalDesc">{{message.legal_description}}</dd>
+                                        </div>
+                                    </div>
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <dt>Version</dt>
+                                            <dd id="versionNum">1</dd>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-md-4">
+                        <button type="submit" class="btn btn-primary">Generate Document</button>
+                    </div>
+                </div>
             </div>
         </form>
     </main>
     <script>
         var dataArray = [];
+        var prdid;
+        
         $( document ).ready(function() {
+            prdid = {{this.prdid}};
             {{#each data}}
             dataArray.push({
                 dtid: {{this.dtid}},
-                //version: {{this.version}},
+                // version: {{this.version}},
                 organization_unit: "{{this.organization_unit}}",
                 purpose_name: "{{this.purpose_name}}",
                 sub_purpose_name: "{{this.sub_purpose_name}}",
@@ -165,6 +197,16 @@
                 mailing_postal_code: "{{this.mailing_postal_code}}",
             });
             {{/each}}
+             // Add minus icon for collapse element which is open by default
+            $(".collapse.show").each(function(){
+                $(this).prev(".card-header").find(".fa").addClass("fa-angle-up").removeClass("fa-angle-down");
+            });
+            // Toggle plus minus icon on show hide of collapse element
+            $(".collapse").on('show.bs.collapse', function(){
+                $(this).prev(".card-header").find(".fa").removeClass("fa-angle-down").addClass("fa-angle-up");
+            }).on('hide.bs.collapse', function(){
+                $(this).prev(".card-header").find(".fa").removeClass("fa-angle-up").addClass("fa-angle-down");
+            });
         })
         //$( "#versionSelect" ).change(function () {
         //    $( "#versionSelect option:selected" ).each(function() {
@@ -189,7 +231,7 @@
         //            $("#area").text(data.area_ha_number)
         //            $("#locLand").text(data.location_description)
         //            $("#legalDesc").text(data.legal_description)
-        //            //$("#versionNum").text(data.version)
+        //            $("#versionNum").text(data.version)
         //        } else {
         //            console.log("Error changing version number");
         //        }

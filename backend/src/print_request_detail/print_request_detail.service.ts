@@ -1,15 +1,30 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
+import { DataSource, Repository } from "typeorm";
 import { CreatePrintRequestDetailDto } from "./dto/create-print_request_detail.dto";
 import { PrintRequestDetail } from "./entities/print_request_detail.entity";
+import { PrintRequestDetailView } from "./entities/print_request_detail_vw";
 
 @Injectable()
 export class PrintRequestDetailService {
   constructor(
     @InjectRepository(PrintRequestDetail)
-    private printRequestDetailRepository: Repository<PrintRequestDetail>
-  ) {}
+    private printRequestDetailRepository: Repository<PrintRequestDetail>,
+    private dataSource: DataSource
+  ) {
+    // dataSource = new DataSource({
+    //   type: "postgres",
+    //   host: process.env.POSTGRESQL_HOST || "localhost",
+    //   port: 5432,
+    //   database: process.env.POSTGRESQL_DATABASE || "postgres",
+    //   username: process.env.POSTGRESQL_USER || "postgres",
+    //   password: process.env.POSTGRESQL_PASSWORD,
+    //   entities: [
+    //     PrintRequestDetailView,
+    //   ],
+    //   synchronize: false
+    // })
+  }
 
   async create(
     printRequestDetail: CreatePrintRequestDetailDto
@@ -39,16 +54,17 @@ export class PrintRequestDetailService {
     newItem.location_description = printRequestDetail.location_description;
     newItem.legal_description = printRequestDetail.legal_description;
     newItem.create_userid = printRequestDetail.create_userid;
-    // const existingTicdi = await this.printRequestDetailRepository.findBy({
+
+    // const existingPRD = await this.printRequestDetailRepository.findBy({
     //   dtid: printRequestDetail.dtid,
     // });
-    // if (!existingTicdi) {
+    // if (!existingPRD) {
     //   newItem.version = 1;
     //   const newPRD = this.printRequestDetailRepository.create(newItem);
     //   return this.printRequestDetailRepository.save(newPRD);
     // } else {
     //   let currentVersion = 0;
-    //   for (let item of existingTicdi) {
+    //   for (let item of existingPRD) {
     //     if (item.version > currentVersion) {
     //       currentVersion = item.version;
     //     }
@@ -57,6 +73,7 @@ export class PrintRequestDetailService {
     //   const newPRD = this.printRequestDetailRepository.create(newItem);
     //   return this.printRequestDetailRepository.save(newPRD);
     // }
+
     const newPRD = this.printRequestDetailRepository.create(newItem);
     return this.printRequestDetailRepository.save(newPRD);
   }
@@ -70,6 +87,12 @@ export class PrintRequestDetailService {
       where: {
         dtid: dtid,
       },
+    });
+  }
+
+  async findViewByPRDID(prdid: number): Promise<PrintRequestDetailView> {
+    return this.dataSource.manager.findOneBy(PrintRequestDetailView, {
+      PRDID: prdid,
     });
   }
 

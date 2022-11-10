@@ -46,6 +46,7 @@ export class TTLSService {
     this.webade_token = await this.getWebadeToken();
   }
 
+  // probably unneeded as cdogs template is stored in a view now
   // convert the TTLS JSON package to a format that conforms to the CDOGS template
   setJSONDataFile(jsonDataFile: [{}]) {
     console.log("setJSONDataFile");
@@ -66,11 +67,6 @@ export class TTLSService {
     //     " " +
     //     jsonFormatted.tenantAddr.lastName;
     // }
-    console.log("jsonFormatted");
-    console.log("jsonFormatted");
-    console.log("jsonFormatted");
-    console.log("jsonFormatted");
-    console.log(jsonFormatted);
 
     this.jsonDataFile = {
       DataArray: formattedJsonArray,
@@ -96,151 +92,159 @@ export class TTLSService {
     console.log("sendToBackend");
     // console.log(jsonDataFile);
     const url = `${hostname}:${port}/print-request-detail`;
-    const { ...printRequestDetail } = jdf;
+    if (jdf) {
+      const { ...printRequestDetail } = jdf;
 
-    let interestedParty, interestParcel, subPurposeCodes, landUseSubTypeCodes;
-    if (
-      printRequestDetail.interestedParties &&
-      printRequestDetail.interestedParties[0]
-    ) {
-      interestedParty = printRequestDetail.interestedParties[0];
-    } else {
-      interestedParty = null;
-    }
-    if (
-      printRequestDetail.interestParcels &&
-      printRequestDetail.interestParcels[0]
-    ) {
-      interestParcel = printRequestDetail.interestParcels[0];
-    } else {
-      interestParcel = null;
-    }
-    if (
-      printRequestDetail.purposeCode &&
-      printRequestDetail.purposeCode.subPurposeCodes &&
-      printRequestDetail.purposeCode.subPurposeCodes[0]
-    ) {
-      subPurposeCodes = printRequestDetail.purposeCode.subPurposeCodes[0];
-    } else {
-      subPurposeCodes = null;
-    }
-    if (
-      printRequestDetail.landUseTypeCode &&
-      printRequestDetail.landUseTypeCode.landUseSubTypeCodes &&
-      printRequestDetail.landUseTypeCode.landUseSubTypeCodes[0]
-    ) {
-      landUseSubTypeCodes =
-        printRequestDetail.landUseTypeCode.landUseSubTypeCodes[0];
-    } else {
-      landUseSubTypeCodes = null;
-    }
-    let individual, orgUnit;
-    if (interestedParty && interestedParty.individual) {
-      individual = interestedParty.individual;
-    } else {
-      individual = null;
-    }
-    if (interestedParty && interestedParty.organization) {
-      orgUnit = interestedParty.organization;
-    } else {
-      orgUnit = null;
-    }
+      let interestedParty, interestParcel, subPurposeCodes, landUseSubTypeCodes;
+      if (
+        printRequestDetail.interestedParties &&
+        printRequestDetail.interestedParties[0]
+      ) {
+        interestedParty = printRequestDetail.interestedParties[0];
+      } else {
+        console.log("null interestedParty");
+        interestedParty = null;
+      }
+      if (
+        printRequestDetail.interestParcels &&
+        printRequestDetail.interestParcels[0]
+      ) {
+        interestParcel = printRequestDetail.interestParcels[0];
+      } else {
+        interestParcel = null;
+      }
+      if (
+        printRequestDetail.purposeCode &&
+        printRequestDetail.purposeCode.subPurposeCodes &&
+        printRequestDetail.purposeCode.subPurposeCodes[0]
+      ) {
+        subPurposeCodes = printRequestDetail.purposeCode.subPurposeCodes[0];
+      } else {
+        subPurposeCodes = null;
+      }
+      if (
+        printRequestDetail.landUseTypeCode &&
+        printRequestDetail.landUseTypeCode.landUseSubTypeCodes &&
+        printRequestDetail.landUseTypeCode.landUseSubTypeCodes[0]
+      ) {
+        landUseSubTypeCodes =
+          printRequestDetail.landUseTypeCode.landUseSubTypeCodes[0];
+      } else {
+        landUseSubTypeCodes = null;
+      }
+      let individual, orgUnit;
+      if (interestedParty && interestedParty.individual) {
+        individual = interestedParty.individual;
+      } else {
+        individual = null;
+      }
+      if (interestedParty && interestedParty.organization) {
+        orgUnit = interestedParty.organization.legalName;
+      } else {
+        orgUnit = null;
+      }
 
-    const mappedData = {
-      dtid: printRequestDetail.landUseApplicationId,
-      tenure_file_number: parseInt(printRequestDetail.fileNumber),
-      organization_unit: orgUnit,
-      purpose_name: printRequestDetail.purposeCode.description,
-      sub_purpose_name: subPurposeCodes.description
-        ? subPurposeCodes.description
-        : null,
-      type_name: printRequestDetail.landUseTypeCode.description,
-      sub_type_name: landUseSubTypeCodes.description
-        ? landUseSubTypeCodes.description
-        : null,
-      area_ha_number: interestParcel.areaInHectares
-        ? interestParcel.areaInHectares
-        : null,
-      first_name: individual
-        ? individual.firstname
+      const mappedData = {
+        dtid: printRequestDetail.landUseApplicationId,
+        tenure_file_number: parseInt(printRequestDetail.fileNumber),
+        organization_unit: orgUnit,
+        purpose_name: printRequestDetail.purposeCode.description,
+        sub_purpose_name: subPurposeCodes.description
+          ? subPurposeCodes.description
+          : null,
+        type_name: printRequestDetail.landUseTypeCode.description,
+        sub_type_name: landUseSubTypeCodes.description
+          ? landUseSubTypeCodes.description
+          : null,
+        area_ha_number: interestParcel.areaInHectares
+          ? interestParcel.areaInHectares
+          : null,
+        first_name: individual
           ? individual.firstname
-          : null
-        : null,
-      middle_name: individual
-        ? individual.middlename
+            ? individual.firstname
+            : null
+          : null,
+        middle_name: individual
           ? individual.middlename
-          : null
-        : null,
-      last_name: individual
-        ? individual.lastname
+            ? individual.middlename
+            : null
+          : null,
+        last_name: individual
           ? individual.lastname
-          : null
-        : null,
-      mailing_address_line_1: interestedParty
-        ? interestedParty.addressLine1
+            ? individual.lastname
+            : null
+          : null,
+        mailing_address_line_1: interestedParty
           ? interestedParty.addressLine1
-          : null
-        : null,
-      mailing_address_line_2: interestedParty
-        ? interestedParty.addressLine2
+            ? interestedParty.addressLine1
+            : null
+          : null,
+        mailing_address_line_2: interestedParty
           ? interestedParty.addressLine2
-          : null
-        : null,
-      mailing_address_line_3: interestedParty
-        ? interestedParty.addressLine3
+            ? interestedParty.addressLine2
+            : null
+          : null,
+        mailing_address_line_3: interestedParty
           ? interestedParty.addressLine3
-          : null
-        : null,
-      mailing_city: interestedParty.city ? interestedParty.city : null,
-      mailing_province_state_code: interestedParty
-        ? interestedParty.province
+            ? interestedParty.addressLine3
+            : null
+          : null,
+        mailing_city: interestedParty
+          ? interestedParty.city
+            ? interestedParty.city
+            : null
+          : null,
+        mailing_province_state_code: interestedParty
           ? interestedParty.province
-          : null
-        : null,
-      mailing_postal_code: interestedParty
-        ? interestedParty.postalCode
+            ? interestedParty.province
+            : null
+          : null,
+        mailing_postal_code: interestedParty
           ? interestedParty.postalCode
-          : null
-        : null,
-      mailing_zip: interestedParty
-        ? interestedParty.zipCode
+            ? interestedParty.postalCode
+            : null
+          : null,
+        mailing_zip: interestedParty
           ? interestedParty.zipCode
-          : null
-        : null,
-      mailing_country_code: null,
-      mailing_country: interestedParty
-        ? interestedParty.country
+            ? interestedParty.zipCode
+            : null
+          : null,
+        mailing_country_code: null,
+        mailing_country: interestedParty
           ? interestedParty.country
-          : null
-        : null,
-      location_description: printRequestDetail.locationDescription,
-      legal_description: interestParcel
-        ? interestParcel.legalDescription
+            ? interestedParty.country
+            : null
+          : null,
+        location_description: printRequestDetail.locationDescription,
+        legal_description: interestParcel
           ? interestParcel.legalDescription
-          : null
-        : null,
-    };
-    console.log(mappedData.area_ha_number);
+            ? interestParcel.legalDescription
+            : null
+          : null,
+      };
 
-    return axios
-      .post(
-        url,
-        { printRequestDetail: mappedData },
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      )
-      .then((res) => {
-        return res.data;
-      });
+      return axios
+        .post(
+          url,
+          { printRequestDetail: mappedData },
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        )
+        .then((res) => {
+          return res.data;
+        });
+    } else {
+      console.log("Error");
+      return { message: "No data found" };
+    }
   }
 
   // get a ticdi json object from the backend using a dtid
   async getJSONsByDTID(dtid: number): Promise<any> {
     console.log("getJSONsByDTID");
-    console.log(dtid);
     const url = `${hostname}:${port}/print-request-detail/${dtid}`;
     return axios
       .get(url, {
@@ -249,7 +253,6 @@ export class TTLSService {
         },
       })
       .then((res) => {
-        // console.log(res);
         return res.data;
       });
   }
@@ -265,6 +268,7 @@ export class TTLSService {
       .get(url, { headers: { Authorization: "Bearer " + bearerToken } })
       .pipe(
         map((axiosResponse: AxiosResponse) => {
+          console.log(axiosResponse.data);
           return axiosResponse.data;
         })
       );

@@ -11,20 +11,7 @@ export class PrintRequestDetailService {
     @InjectRepository(PrintRequestDetail)
     private printRequestDetailRepository: Repository<PrintRequestDetail>,
     private dataSource: DataSource
-  ) {
-    // dataSource = new DataSource({
-    //   type: "postgres",
-    //   host: process.env.POSTGRESQL_HOST || "localhost",
-    //   port: 5432,
-    //   database: process.env.POSTGRESQL_DATABASE || "postgres",
-    //   username: process.env.POSTGRESQL_USER || "postgres",
-    //   password: process.env.POSTGRESQL_PASSWORD,
-    //   entities: [
-    //     PrintRequestDetailView,
-    //   ],
-    //   synchronize: false
-    // })
-  }
+  ) {}
 
   async create(
     printRequestDetail: CreatePrintRequestDetailDto

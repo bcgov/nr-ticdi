@@ -8,19 +8,22 @@ export class DocumentTemplateController {
   constructor(private readonly templateService: DocumentTemplateService) {}
 
   @Post("create")
-  create(@Body() data: { template: CreateDocumentTemplateDto }) {
-    let templateData = data.template;
-    return this.templateService.create(templateData);
+  create(@Body() data: CreateDocumentTemplateDto) {
+    return this.templateService.create(data);
   }
 
   @Post("update")
-  update(@Body() data: { template: UpdateDocumentTemplateDto }) {
-    let templateData = data.template;
-    return this.templateService.update(templateData);
+  update(@Body() data: UpdateDocumentTemplateDto) {
+    return this.templateService.update(data);
   }
 
   @Get()
   findAll() {
     return this.templateService.findAll();
+  }
+
+  @Post("get-one")
+  findOne(@Body() data: { version: number; comments: string }) {
+    return this.templateService.findOne(data.version, data.comments);
   }
 }

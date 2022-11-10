@@ -48,14 +48,14 @@
                 <p class="font-weight-bold" style="font-size: larger">Upload Template</p>
             </div>
             <form class="upload">
-            <div class="form-group row">
-                <div class="col-md-4">
-                    <input class="form-control" id="uploadFile" style="height: auto" type="file">
+                <div class="form-group row">
+                    <div class="col-md-4">
+                        <input class="form-control-file" id="uploadFile" style="height: auto" type="file" accept=".docx">
+                    </div>
+                    <div class="col-md-3">
+                        <button type="submit" class="btn btn-primary">Upload</button>
+                    </div>
                 </div>
-                <div class="col-md-3">
-                    <button type="submit" class="btn btn-primary">Upload</button>
-                </div>
-            </div>
             </form>
         </div>
     </main>
@@ -65,14 +65,15 @@
             {{#each data}}
             dataArray.push({
                 code: "{{this.document_type}}", // lur
-                description: "{{this.document_description}}", // Land Use Report
-                who_created: "{{this.author}}",
-                when_created: "{{this.created_date}}",
+                description: "{{this.comments}}", // Land Use Report
+                who_created: "{{this.template_author}}",
+                when_created: "{{this.template_creation_date}}",
                 who_updated: "{{this.updated_by}}",
                 when_updated: "{{this.updated_date}}",
             });
             {{/each}}
             var t = "";
+            // fill the hidden table
             for (let entry of dataArray) {
                 var tr = "<tr>";
                 tr += "<td>"+entry.code+"</td>";
@@ -81,14 +82,33 @@
                 tr += "<td>"+entry.when_created+"</td>";
                 tr += "<td>"+entry.who_updated+"</td>";
                 tr += "<td>"+entry.when_updated+"</td>";
-                tr += "<td>"+entry.when_updated+"</td>";
                 tr += "</tr>";
                 t += tr;
             }
             $("#document_type tr").remove();
             table = $("#document_type");
             $("#document_type").innerHTML = t;
+
+            // fill the displayed table with instances of the selected option
+            const initialSelection = $("#documentTypeSelect option:selected").text();
+            $("#documentTable tbody tr").remove();
+            t = ""
+            for (let entry of dataArray) {
+                if (initialSelection == entry.description) {
+                    var tr = "<tr>";
+                    tr += "<td>"+entry.code+"</td>";
+                    tr += "<td>"+entry.description+"</td>";
+                    tr += "<td>"+entry.who_created+"</td>";
+                    tr += "<td>"+entry.when_created+"</td>";
+                    tr += "<td>"+entry.who_updated+"</td>";
+                    tr += "<td>"+entry.when_updated+"</td>";
+                    tr += "</tr>";
+                    t += tr;
+                }
+            }
+            document.getElementById("documentTbody").innerHTML = t;
         })
+        // when the selected option changes, update the table
         $( "#documentTypeSelect" ).change(function () {
             $( "#documentTypeSelect option:selected" ).each(function() {
                 $("#documentTable tbody tr").remove();
@@ -102,7 +122,6 @@
                         tr += "<td>"+entry.when_created+"</td>";
                         tr += "<td>"+entry.who_updated+"</td>";
                         tr += "<td>"+entry.when_updated+"</td>";
-                        tr += "<td>"+entry.when_updated+"</td>";
                         tr += "</tr>";
                         t += tr;
                     }
@@ -111,28 +130,73 @@
             })
         })
 
+        
+    </script>
+    <script>
+        let fileBase64;
+        const streamToText = async (blob) => {
+            const readableStream = await blob.getReader();
+            const chunk = await readableStream.read();
+
+            return new TextDecoder('utf-8').decode(chunk.value);
+        };
+
+        const bufferToText = (buffer) => {
+            const bufferByteLength = buffer.byteLength;
+            const bufferUint8Array = new Uint8Array(buffer, 0, bufferByteLength);
+
+            return new TextDecoder().decode(bufferUint8Array);
+        };
+
+        document.getElementById('uploadFile').addEventListener('change', function(e) {
+            let file = document.getElementById('uploadFile').files[0];
+
+            (async () => {
+                const fileContent = await file.text();
+                const fileContentStream = await file.stream();
+                const buffer = await file.arrayBuffer();
+                var reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = function () {
+                    fileBase64 = reader.result.split('base64,')[1];
+                };
+                reader.onerror = function (error) {
+                    console.log("Error: ", error);
+                };
+            })();
+        });
         const uploadForm = document.querySelector(".upload");
         uploadForm.addEventListener('submit', function(e) {
             e.preventDefault();
-            const file = e.target.uploadFile.files[0];
-            const data = {template: btoa(file)}
+            let file = document.getElementById('uploadFile').files[0];
+            const data = JSON.stringify({
+                the_file: fileBase64,
+                comments: 'Land Use Report',
+                active_flag: true,
+                template_version: '1',
+                template_author: 'Mike',
+                template_creation_date: new Date(),
+                mime_type: 'no',
+                file_name: 'landusereport',
+                create_userid: '123'
+            });
             fetch('http://localhost:3000/admin/upload-template', {
                 method: 'POST',
                 responseType: 'application/json',
                 headers: {
                 'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(data),
+                body: data,
             })
             .then(res => res.json())
             .then(data => {
                 if (data.errors) {
                     alert(data.errors);
                 } else {
-                    console.log(data);
+                    //console.log(data);
                 }
-            })
-        })
-    </script>
+            });
+        });
+  </script>
   {{/inline}}
 {{/template}}

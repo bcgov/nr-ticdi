@@ -1,14 +1,14 @@
 import { Controller, Post, Session, Body } from "@nestjs/common";
 import { SessionData } from "utils/types";
 import { AxiosRequestConfig } from "axios";
-import { HttpService } from "@nestjs/axios";
+import { AdminService } from "./admin.service";
 
 let requestUrl: string;
 let requestConfig: AxiosRequestConfig;
 
 @Controller("admin")
 export class AdminController {
-  constructor(private readonly httpService: HttpService) {
+  constructor(private readonly adminService: AdminService) {
     const hostname = process.env.BACKEND_URL
       ? process.env.BACKEND_URL
       : `http://localhost`;
@@ -24,7 +24,18 @@ export class AdminController {
   @Post("upload-template")
   async root(
     @Session() session: { data?: SessionData },
-    @Body() template: any
+    @Body()
+    data: {
+      the_file: string;
+      comments: string;
+      active_flag: boolean;
+      template_version: string;
+      template_author: string;
+      template_creation_date: Date;
+      mime_type: string;
+      file_name: string;
+      create_userid: string;
+    }
   ) {
     let isAdmin = false;
     if (
@@ -39,7 +50,7 @@ export class AdminController {
       }
     }
     if (isAdmin) {
-      return { data: template };
+      return this.adminService.uploadTemplate(data);
     } else {
       return { message: "NO" };
     }

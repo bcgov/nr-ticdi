@@ -1,7 +1,7 @@
 {{#> template}}
   {{#*inline "content"}}
     <main role="main">
-      <form action="/generateReport">
+      <form>
             <div class="container">
                 <h1>Client</h1>
                 <hr />
@@ -10,7 +10,7 @@
                         <p class="font-weight-bold">DTID</p>
                     </div>
                     <div class="col-md-2">
-                        <p>{{ message.dtid }}</p>
+                        <p id="dtid">{{ message.dtid }}</p>
                     </div>
                 </div>
                 <div class="form-group row">
@@ -19,10 +19,9 @@
                     </div>
                     <div class="col-md-1">
                         <select id="versionSelect" class="form-control">
-                            {{!-- {{#each version}}
+                            {{#each version}}
                             <option value="{{this}}">{{this}}</option>
-                            {{/each}} --}}
-                            <option value="1">1</option>
+                            {{/each}}
                       </select>
                     </div>
                 </div>
@@ -95,13 +94,13 @@
                     </div>
                 </div>
                 <div class="accordion" id="collapseContentsTwo">
-                    <div class="card">
+                    <div class="card" style="border-bottom: 1px solid #dddddd">
                         <div class="card-header" id="headingTwo">
                             <h2 class="mb-0">
                                 <button type="button" class="btn" data-toggle="collapse" data-target="#collapseTwo">Tenure Details <i class="fa fa-angle-down"></i></button>
                             </h2>
                         </div>
-                        <div id="collapseTwo" class="collapse show" aria-labelledby="headingTwo" data-parent="#collapseContents">
+                        <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#collapseContents">
                             <div class="card-body">
                                 <div class="contents">
                                     <div class="form-row">
@@ -166,7 +165,7 @@
                 </div>
                 <div class="form-group row">
                     <div class="col-md-4">
-                        <button type="submit" class="btn btn-primary">Generate Document</button>
+                        <button type="button" class="btn btn-primary" onclick="generateReport()" id="genReport">Generate Document</button>
                     </div>
                 </div>
             </div>
@@ -181,7 +180,7 @@
             {{#each data}}
             dataArray.push({
                 dtid: {{this.dtid}},
-                // version: {{this.version}},
+                version: {{this.version}},
                 organization_unit: "{{this.organization_unit}}",
                 purpose_name: "{{this.purpose_name}}",
                 sub_purpose_name: "{{this.sub_purpose_name}}",

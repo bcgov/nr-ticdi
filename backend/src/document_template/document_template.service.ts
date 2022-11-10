@@ -15,6 +15,7 @@ export class DocumentTemplateService {
   async create(
     documentTemplate: CreateDocumentTemplateDto
   ): Promise<DocumentTemplate> {
+    console.log(documentTemplate);
     const newItem = new DocumentTemplate();
     newItem.document_type = documentTemplate.document_type;
     newItem.template_version = documentTemplate.template_version;
@@ -82,21 +83,13 @@ export class DocumentTemplateService {
   }
 
   async findAll(): Promise<DocumentTemplate[]> {
-    const template1 = new DocumentTemplate();
-    template1.the_file = "ASDFA231";
-    template1.template_author = "Mike";
-    template1.template_creation_date = new Date().toLocaleString();
-    template1.document_type = "lur";
-    template1.comments = "Land Use Report";
-    template1.template_version = 0;
-    const template2 = new DocumentTemplate();
-    template2.the_file = "HDFHGDF43";
-    template2.template_author = "Bill";
-    template2.template_creation_date = new Date().toLocaleString();
-    template2.document_type = "rul";
-    template2.comments = "Report Use Land";
-    template2.template_version = 1;
-    return [template1, template2];
-    // return this.documentTemplateRepository.find();
+    return this.documentTemplateRepository.find();
+  }
+
+  async findOne(version: number, comments: string): Promise<DocumentTemplate> {
+    return this.documentTemplateRepository.findOneBy({
+      template_version: version,
+      comments: comments,
+    });
   }
 }

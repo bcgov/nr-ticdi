@@ -54,70 +54,48 @@ import { PrintRequestDetail } from "./print_request_detail.entity";
 export class PrintRequestDetailView {
   @ViewColumn()
   DTID: number;
-
   @ViewColumn()
   PRDID: number;
-
   @ViewColumn()
   TenureFileNumber: string;
-
   @ViewColumn()
   OrganizationUnit: string;
-
   @ViewColumn()
   PurposeName: string;
-
   @ViewColumn()
   SubPurposeName: string;
-
   @ViewColumn()
   Type_name: string;
-
   @ViewColumn()
   SubTypeName: string;
-
   @ViewColumn()
   AreaHaNumber: number;
-
   @ViewColumn()
   FirstName: string;
-
   @ViewColumn()
   MiddleName: string;
-
   @ViewColumn()
   LastName: string;
-
   @ViewColumn()
   MailingAddressLine1: string;
-
   @ViewColumn()
   MailingAddressLine2: string;
-
   @ViewColumn()
   MailingAddressLine3: string;
-
   @ViewColumn()
   MailingCity: string;
-
   @ViewColumn()
   MailingProvinceStateCode: string;
-
   @ViewColumn()
   MailingPostalCode: string;
-
   @ViewColumn()
   MailingZip: string;
-
   @ViewColumn()
   MailingCountryCode: string;
-
   @ViewColumn()
   MailingCountry: string;
-
   @ViewColumn()
   LocationDescription: string;
-
   @ViewColumn()
   LegalDescription: string;
 }

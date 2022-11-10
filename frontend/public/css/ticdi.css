@@ -51,9 +51,3 @@ input[type="checkbox"] {
   color: #ffffff;
   transform: rotate(0);
 }
-
-.accordion > .card {
-  border-bottom: 1px solid #dddddd !important;
-  border-bottom-left-radius: 0.25rem;
-  border-bottom-right-radius: 0.25rem;
-}

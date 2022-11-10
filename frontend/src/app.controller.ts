@@ -8,14 +8,14 @@ import {
   UseGuards,
   UseFilters,
   Session,
+  Body,
+  Post,
 } from "@nestjs/common";
 import { AppService } from "./app.service";
 import { PAGE_TITLES } from "utils/constants";
 import { SessionData } from "utils/types";
 import { AuthenticationGuard } from "./authentication/authentication.guard";
 import { AuthenticationFilter } from "./authentication/authentication.filter";
-import { AccountGuard } from "./account/account.guard";
-import { AccountFilter } from "./account/account.filter";
 import { TTLSService } from "./ttls/ttls.service";
 import { AdminGuard } from "./admin/admin.guard";
 import { AxiosRequestConfig } from "axios";
@@ -142,9 +142,9 @@ export class AppController {
     );
     const ttlsJSON = await this.ttlsService.sendToBackend(response);
     const array = await this.ttlsService.getJSONsByDTID(ttlsJSON.dtid);
-    // for (let a of array) {
-    //   version.push(a.version);
-    // }
+    const versions = await this.ttlsService.getTemplateVersions(
+      "Land Use Report"
+    );
     // this.ttlsService.setJSONDataFile(array); // probably unneeded as cdogs template is stored in a view now
     const documentTypes = [];
     const documents = await lastValueFrom(
@@ -165,7 +165,7 @@ export class AppController {
           displayAdmin: displayAdmin,
           message: ttlsJSON,
           data: array,
-          // version: version,
+          version: versions,
           documentTypes: documentTypes,
           prdid: ttlsJSON.id,
         }
@@ -176,7 +176,7 @@ export class AppController {
           displayAdmin: displayAdmin,
           message: ttlsJSON,
           data: array,
-          // version: version,
+          version: versions,
           documentTypes: documentTypes,
           prdid: ttlsJSON.id,
         };
@@ -220,11 +220,11 @@ export class AppController {
         .get(requestUrl, requestConfig)
         .pipe(map((response) => response.data))
     );
-    const documentTypes = [""];
+    const documentTypes = [];
     for (let entry of data) {
-      entry.created_date = new Date(entry.created_date).toLocaleDateString();
-      if (!documentTypes.includes(entry.document_description)) {
-        documentTypes.push(entry.document_description);
+      // entry.created_date = new Date(entry.created_date).toLocaleDateString();
+      if (!documentTypes.includes(entry.comments)) {
+        documentTypes.push(entry.comments);
       }
     }
     return process.env.ticdi_environment == "DEVELOPMENT"
@@ -246,13 +246,21 @@ export class AppController {
         };
   }
 
-  @Get("generateReport")
+  @Post("generateReport")
   @Header(
     "Content-Type",
     "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
   )
   @Header("Content-Disposition", "attachment; filename=landusereport.docx")
-  async generateReport() {
-    return new StreamableFile(await this.ttlsService.generateLURReport());
+  async generateReport(
+    @Body() data: { prdid: string; version: string; comments: string }
+  ) {
+    return new StreamableFile(
+      await this.ttlsService.generateLURReport(
+        +data.prdid,
+        +data.version,
+        data.comments
+      )
+    );
   }
 }

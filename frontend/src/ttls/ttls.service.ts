@@ -49,8 +49,6 @@ export class TTLSService {
   // probably unneeded as cdogs template is stored in a view now
   // convert the TTLS JSON package to a format that conforms to the CDOGS template
   setJSONDataFile(jsonDataFile: [{}]) {
-    console.log("setJSONDataFile");
-    // console.log(jsonDataFile);
     const formattedJsonArray = [];
     for (let s of jsonDataFile) {
       let string = JSON.stringify(s);
@@ -89,8 +87,6 @@ export class TTLSService {
 
   // sends json data to the backend to be inserted into the database
   async sendToBackend(jdf: any): Promise<any> {
-    console.log("sendToBackend");
-    // console.log(jsonDataFile);
     const url = `${hostname}:${port}/print-request-detail`;
     if (jdf) {
       const { ...printRequestDetail } = jdf;
@@ -244,7 +240,6 @@ export class TTLSService {
 
   // get a ticdi json object from the backend using a dtid
   async getJSONsByDTID(dtid: number): Promise<any> {
-    console.log("getJSONsByDTID");
     const url = `${hostname}:${port}/print-request-detail/${dtid}`;
     return axios
       .get(url, {
@@ -255,6 +250,26 @@ export class TTLSService {
       .then((res) => {
         return res.data;
       });
+  }
+
+  async getTemplateVersions(comments: string): Promise<string[]> {
+    const url = `${hostname}:${port}/document-template`;
+    const templates = await axios
+      .get(url, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      })
+      .then((res) => {
+        return res.data;
+      });
+    const versions = [];
+    for (let t of templates) {
+      if (t.comments == comments) {
+        versions.push(t.template_version);
+      }
+    }
+    return versions;
   }
 
   callHttp(): Observable<Array<Object>> {
@@ -268,7 +283,6 @@ export class TTLSService {
       .get(url, { headers: { Authorization: "Bearer " + bearerToken } })
       .pipe(
         map((axiosResponse: AxiosResponse) => {
-          console.log(axiosResponse.data);
           return axiosResponse.data;
         })
       );
@@ -344,49 +358,57 @@ export class TTLSService {
   }
 
   // generate the Land use Report via CDOGS
-  async generateLURReport() {
-    let cdogsToken = await this.callGetToken();
+  async generateLURReport(prdid: number, version: number, comments: string) {
+    const url = `${hostname}:${port}/print-request-detail/view/` + prdid;
+    const templateUrl = `${hostname}:${port}/document-template/get-one`;
+    const data = await axios
+      .get(url, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      })
+      .then((res) => {
+        return res.data;
+      });
+    const documentTemplateObject: { data: { the_file: string } } =
+      await axios.post(templateUrl, {
+        version: version,
+        comments: comments,
+      });
+    const cdogsToken = await this.callGetToken();
+    let bufferBase64 = documentTemplateObject.data.the_file;
 
-    const buffer = fs.readFileSync(
-      path.resolve(__dirname, "./public/" + "LUR_Template.docx")
-    );
-
-    const bufferBase64 = await Buffer.from(buffer).toString("base64");
-
-    var data = JSON.stringify({
-      data: this.jsonDataFile,
+    const md = JSON.stringify({
+      data,
       formatters:
         '{"myFormatter":"_function_myFormatter|function(data) { return data.slice(1); }","myOtherFormatter":"_function_myOtherFormatter|function(data) {return data.slice(2);}"}',
       options: {
-        cacheReport: true,
+        cacheReport: false,
+        convertTo: "docx",
         overwrite: true,
-        reportName: "landusereport.docx",
+        reportName: "test-report",
       },
       template: {
+        content: `${bufferBase64}`,
         encodingType: "base64",
         fileType: "docx",
-        content: bufferBase64,
       },
     });
 
-    let config = {
+    const conf = {
       method: "post",
       url: process.env.cdogs_url,
-      responseType: "arraybuffer",
       headers: {
-        Authorization: "Bearer " + cdogsToken,
+        Authorization: `Bearer ${cdogsToken}`,
         "Content-Type": "application/json",
       },
-      data: data,
+      responseType: "arraybuffer",
+      data: md,
     };
-    const axios = require("axios");
-    return axios(config)
-      .then((response) => {
-        console.log("Generated File");
-        return response.data;
-      })
-      .catch((error) => {
-        console.log(error.response);
-      });
+    const ax = require("axios");
+    const response = await ax(conf).catch((error) => {
+      console.log(error.response);
+    });
+    return response.data;
   }
 }

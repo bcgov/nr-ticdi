@@ -1,7 +1,18 @@
 function generateReport() {
+  const dtid = $("#dtid").text();
   $("#genReport").prop("disabled", true);
-  // fetch(`/getReportName/${id}`)
-  const reportName = "LUR_nnnnnnn_0001";
+  let reportName;
+  fetch(`/report/getReportName/${dtid}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    responseType: "application/json",
+  }).then((res) => {
+    console.log(res);
+    console.log(res.data);
+  });
+  reportName = "LUR_nnnnnnn_0001";
   const comments = $("#document_type_id option:selected").text();
   const version = $("#versionSelect option:selected").text();
   const data = {
@@ -9,7 +20,7 @@ function generateReport() {
     version: version,
     comments: comments,
   };
-  fetch(`/generateReport`, {
+  fetch(`/report/generateReport`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

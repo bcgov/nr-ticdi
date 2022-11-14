@@ -245,22 +245,4 @@ export class AppController {
           documentTypes: documentTypes,
         };
   }
-
-  @Post("generateReport")
-  @Header(
-    "Content-Type",
-    "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-  )
-  @Header("Content-Disposition", "attachment; filename=landusereport.docx")
-  async generateReport(
-    @Body() data: { prdid: string; version: string; comments: string }
-  ) {
-    return new StreamableFile(
-      await this.ttlsService.generateLURReport(
-        +data.prdid,
-        +data.version,
-        data.comments
-      )
-    );
-  }
 }

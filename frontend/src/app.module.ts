@@ -8,6 +8,7 @@ import { SessionModule } from "nestjs-session";
 import { HttpModule } from "@nestjs/axios";
 import { AdminController } from "./admin/admin.controller";
 import { AdminModule } from "./admin/admin.module";
+import { ReportModule } from "./report/report.module";
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { AdminModule } from "./admin/admin.module";
     HttpModule,
     AuthenticationModule,
     AdminModule,
+    ReportModule,
     SessionModule.forRoot({
       session: { secret: process.env.session_secret },
     }),

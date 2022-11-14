@@ -18,10 +18,10 @@ let requestConfig: AxiosRequestConfig;
 @Controller("report")
 export class ReportController {
   constructor(private readonly ttlsService: TTLSService) {
-    const hostname = process.env.BACKEND_URL
-      ? process.env.BACKEND_URL
+    const hostname = process.env.backend_url
+      ? process.env.backend_url
       : `http://localhost`;
-    const port = process.env.BACKEND_URL ? 3000 : 3001;
+    const port = process.env.backend_url ? 3000 : 3001;
     requestUrl = `${hostname}:${port}/document-template/`;
     requestConfig = {
       headers: {

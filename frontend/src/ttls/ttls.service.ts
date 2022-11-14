@@ -22,11 +22,11 @@ export class TTLSService {
   private readonly tantalis_api: string;
   private webade_token: string;
   constructor(private readonly http: HttpService) {
-    hostname = process.env.BACKEND_URL
-      ? process.env.BACKEND_URL
+    hostname = process.env.backend_url
+      ? process.env.backend_url
       : `http://localhost`;
     // local development backend port is 3001, docker backend port is 3000
-    port = process.env.BACKEND_URL ? 3000 : 3001;
+    port = process.env.backend_url ? 3000 : 3001;
     this.webade_url = process.env.WEBADE_AUTH_ENDPOINT;
     this.webade_username = process.env.WEBADE_USERNAME;
     this.webade_secret = process.env.WEBADE_PASSWORD;

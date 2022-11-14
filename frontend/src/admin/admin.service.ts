@@ -9,11 +9,11 @@ let port: number;
 @Injectable()
 export class AdminService {
   constructor() {
-    hostname = process.env.BACKEND_URL
-      ? process.env.BACKEND_URL
+    hostname = process.env.backend_url
+      ? process.env.backend_url
       : `http://localhost`;
     // local development backend port is 3001, docker backend port is 3000
-    port = process.env.BACKEND_URL ? 3000 : 3001;
+    port = process.env.backend_url ? 3000 : 3001;
   }
 
   // get a ticdi json object from the backend using a dtid

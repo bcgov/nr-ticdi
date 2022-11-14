@@ -165,6 +165,26 @@ objects:
                     secretKeyRef:
                       name: ttls
                       key: ttls_api_key
+                - name: WEBADE_AUTH_ENDPOINT
+                  valueFrom:
+                    secretKeyRef:
+                      name: ttls
+                      key: webade_auth_endpoint
+                - name: WEBADE_USERNAME
+                  valueFrom:
+                    secretKeyRef:
+                      name: ttls
+                      key: webade_username
+                - name: WEBADE_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: ttls
+                      key: webade_password
+                - name: TTLS_API_ENDPOINT
+                  valueFrom:
+                    secretKeyRef:
+                      name: ttls
+                      key: ttls_api_endpoint
                 - name: backend_url
                   value: https://${NAME}-${ZONE}-backend.${DOMAIN}
                 - name: session_path

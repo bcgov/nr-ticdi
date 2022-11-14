@@ -170,17 +170,16 @@
                 </div>
             </div>
         </form>
+        <div class="d-none" id="prdid"></div>
     </main>
     <script>
-        var dataArray = [];
-        var prdid;
-        
+        var dataArray = [];       
         $( document ).ready(function() {
-            prdid = {{this.prdid}};
+            $("#prdid").text("{{this.prdid}}");
             {{#each data}}
             dataArray.push({
-                dtid: {{this.dtid}},
-                version: {{this.version}},
+                dtid: "{{this.dtid}}",
+                version: "{{this.version}}",
                 organization_unit: "{{this.organization_unit}}",
                 purpose_name: "{{this.purpose_name}}",
                 sub_purpose_name: "{{this.sub_purpose_name}}",

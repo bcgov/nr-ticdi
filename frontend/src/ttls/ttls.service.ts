@@ -357,10 +357,32 @@ export class TTLSService {
       });
   }
 
+  async generateReportName(dtid: number) {
+    const url = `${hostname}:${port}/print-request-log/version/` + dtid;
+    // grab the next version string for the dtid
+    const version = await axios
+      .get(url, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      })
+      .then((res) => {
+        return res.data;
+      });
+    return { reportName: "LUR_" + dtid + "_" + version };
+  }
+
   // generate the Land use Report via CDOGS
-  async generateLURReport(prdid: number, version: number, comments: string) {
+  async generateLURReport(
+    prdid: number,
+    version: number,
+    comments: string,
+    username: string
+  ) {
     const url = `${hostname}:${port}/print-request-detail/view/` + prdid;
     const templateUrl = `${hostname}:${port}/document-template/get-one`;
+    const logUrl = `${hostname}:${port}/print-request-log/`;
+    // get the view given the print request detail id
     const data = await axios
       .get(url, {
         headers: {
@@ -370,14 +392,23 @@ export class TTLSService {
       .then((res) => {
         return res.data;
       });
-    const documentTemplateObject: { data: { the_file: string } } =
+    // get the document template, comments refers to the document type (Land Use Report)
+    const documentTemplateObject: { data: { id: number; the_file: string } } =
       await axios.post(templateUrl, {
         version: version,
         comments: comments,
       });
+
+    // log the request
+    const document_template_id = documentTemplateObject.data.id;
+    await axios.post(logUrl, {
+      document_template_id: document_template_id,
+      print_request_detail_id: prdid,
+      request_app_user: username,
+    });
+
     const cdogsToken = await this.callGetToken();
     let bufferBase64 = documentTemplateObject.data.the_file;
-
     const md = JSON.stringify({
       data,
       formatters:

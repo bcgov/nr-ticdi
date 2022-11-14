@@ -31,8 +31,8 @@ export class ReportController {
   }
 
   @Get("getReportName/:dtid")
-  async getReportName(@Param("dtid") dtid: string): Promise<string> {
-    return "REPORTNAME";
+  getReportName(@Param("dtid") dtid: string): Promise<{ reportName: string }> {
+    return this.ttlsService.generateReportName(+dtid);
   }
 
   @Post("generateReport")
@@ -42,20 +42,21 @@ export class ReportController {
   )
   @Header("Content-Disposition", "attachment; filename=landusereport.docx")
   async generateReport(
-    @Session() session: SessionData,
+    @Session() session: { data: SessionData },
     @Body() data: { prdid: string; version: string; comments: string }
   ) {
-    console.log(session);
-    if (session.activeAccount) {
+    // this should eventually check permissions and prevent unauthorized users from generating documents
+    if (session.data.activeAccount) {
       console.log("active account found");
     } else {
-      console.log("angery");
+      console.log("no active account found");
     }
     return new StreamableFile(
       await this.ttlsService.generateLURReport(
         +data.prdid,
         +data.version,
-        data.comments
+        data.comments,
+        session.data.activeAccount.name
       )
     );
   }

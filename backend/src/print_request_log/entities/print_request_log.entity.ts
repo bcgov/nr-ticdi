@@ -16,8 +16,8 @@ export class PrintRequestLog {
   print_request_detail_id: number;
   @Column()
   request_app_user: string;
-  @Column()
-  request_timestamp: string;
+  // @Column()
+  // request_timestamp: string;
   // @Column()
   // request_json: JSON;
   @Column()
@@ -33,7 +33,7 @@ export class PrintRequestLog {
     document_template_id?: number,
     print_request_detail_id?: number,
     request_app_user?: string,
-    request_timestamp?: string,
+    // request_timestamp?: string,
     // request_json?: JSON,
     create_userid?: string,
     update_userid?: string
@@ -41,7 +41,7 @@ export class PrintRequestLog {
     this.document_template_id = document_template_id || null;
     this.print_request_detail_id = print_request_detail_id || null;
     this.request_app_user = request_app_user || "";
-    this.request_timestamp = request_timestamp || "";
+    // this.request_timestamp = request_timestamp || "";
     // this.request_json = request_json || null;
     this.create_userid = create_userid || "";
     this.update_userid = update_userid || "";

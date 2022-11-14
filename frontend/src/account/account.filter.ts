@@ -10,6 +10,6 @@ export class AccountFilter implements ExceptionFilter {
     const protocol = process.env.ticdi_environment == 'DEVELOPMENT' ? 'http://' : 'https://';
     const url = new URL(protocol + request.headers.host + response.req.url);
     const status = exception.getStatus();
-    response.status(status).redirect(url.origin);
+    response.status(status).redirect(url.origin); 
   }
 }

@@ -35,7 +35,7 @@ parameters:
     value: ghcr.io
   - name: PROMOTE
     description: Image (namespace/name:tag) to promote/import
-    value: bcgov/devops-quickstart:prod-frontend
+    value: bcgov/nr-ticdi:prod-frontend
 objects:
   - apiVersion: v1
     kind: ImageStream
@@ -58,7 +58,7 @@ objects:
     metadata:
       name: ticdi-sessions
       labels:
-        app: ${NAME}-${ZONE}
+        app: ${NAME}
     stringData:
       cookie_secret: ${cookie_secret}
       session_secret: ${session_secret}
@@ -67,7 +67,7 @@ objects:
     metadata:
       name: ttls
       labels:
-        app: ${NAME}-${ZONE}
+        app: ${NAME}
     stringData:
       ttls_url: https://i1api.nrs.gov.bc.ca/ttls-api/v1/dispositionTrans/info/
   - apiVersion: v1
@@ -75,7 +75,7 @@ objects:
     metadata:
       name: cdogs
       labels:
-        app: ${NAME}-${ZONE}
+        app: ${NAME}
     stringData:
       cdogs_service_client_id: TICDI_SERVICE_CLIENT
       cdogs_url: https://cdogs-dev.apps.silver.devops.gov.bc.ca/api/v2/template/render
@@ -85,17 +85,17 @@ objects:
     metadata:
       name: keycloak
       labels:
-        app: ${NAME}-${ZONE}
+        app: ${NAME}
     stringData:
-      keycloak_base_url: https://dev.oidc.gov.bc.ca/auth
-      keycloak_client_id: ticdi-3202 
-      keycloak_realm: onestopauth
+      keycloak_base_url: https://dev.loginproxy.gov.bc.ca/auth
+      keycloak_client_id: ticdi-4133
+      keycloak_realm: standard
   - apiVersion: v1
     kind: Secret
     metadata:
       name: ticdi-environment
       labels:
-        app: ${NAME}-${ZONE}
+        app: ${NAME}
     stringData:
       ticdi_environment: production   
   - kind: PersistentVolumeClaim
@@ -223,7 +223,7 @@ objects:
                   memory: ${MEMORY_REQUEST}
               readinessProbe:
                 httpGet:
-                  path: /
+                  path: /getHello
                   port: 3000
                   scheme: HTTP
                 initialDelaySeconds: 15
@@ -233,7 +233,7 @@ objects:
                 successThreshold: 1
                 failureThreshold: 3
                 httpGet:
-                  path: /
+                  path: /getHello
                   port: 3000
                   scheme: HTTP
                 initialDelaySeconds: 15

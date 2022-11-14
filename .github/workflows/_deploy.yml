@@ -31,7 +31,7 @@ on:
         description: OpenShift access token
 
 jobs:
-  deploy:
+  deploy: 
     name: ${{ inputs.component }}
     runs-on: ubuntu-22.04
     steps:

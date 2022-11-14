@@ -11,7 +11,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  NAME: devops-quickstart
+  NAME: nr-ticdi
 
 concurrency:
   group: ${{ github.workflow }}
@@ -33,7 +33,7 @@ jobs:
           owner: orgs/bcgov
           package: ${{ github.event.repository.name }}
           skip_tags: prod-frontend,prod-backend
-          token: ${{ secrets.DELETE_PACKAGES_TOKEN }}
+          token: ${{ secrets.GHCR_TOKEN }}
 
   codeql:
     name: Semantic Code Analysis
@@ -59,7 +59,7 @@ jobs:
         uses: github/codeql-action/analyze@v2
 
   # SonarCloud runs in the main branch are needed to compare against PRs
-  #sonarcloud:
+  # sonarcloud:
   #  name: Static Analysis
   #  runs-on: ubuntu-22.04
   #  steps:
@@ -101,7 +101,7 @@ jobs:
     needs:
       - cleanup-ghcr
       - codeql
-      - sonarcloud
+#      - sonarcloud
     runs-on: ubuntu-22.04
     environment:
       name: test
@@ -257,16 +257,6 @@ jobs:
           fi
           echo "Image promotion not required"
 
-      - name: Promote Backend Image
-        if: steps.check.outputs.build == 'true'
-        uses: shrink/actions-docker-registry-tag@v2
-        with:
-          registry: ${{ env.REGISTRY }}
-          repository: ${{ github.repository }}
-          target: ${{ env.PREV }}-${{ env.COMPONENT }}
-          tags: |
-            ${{ env.ZONE }}-${{ env.COMPONENT }}
-
   image-frontend:
     name: Frontend Image Handling
     needs:
@@ -308,22 +298,12 @@ jobs:
           fi
           echo "Image promotion not required"
 
-      - name: Promote Backend Image
-        if: steps.check.outputs.build == 'true'
-        uses: shrink/actions-docker-registry-tag@v2
-        with:
-          registry: ${{ env.REGISTRY }}
-          repository: ${{ github.repository }}
-          target: ${{ env.PREV }}-${{ env.COMPONENT }}
-          tags: |
-            ${{ env.ZONE }}-${{ env.COMPONENT }}
-
   deploy-prod:
     name: PROD Deployment
     needs:
       - image-backend
       - image-frontend
-      - snyk
+#      - snyk
       - trivy-repo
     runs-on: ubuntu-22.04
     environment:
@@ -382,7 +362,7 @@ jobs:
           done
 
       - name: Promote Backend Image to PROD
-        uses: shrink/actions-docker-registry-tag@v2
+        uses: shrink/actions-docker-registry-tag@v3
         with:
           registry: ${{ env.REGISTRY }}
           repository: ${{ github.repository }}
@@ -391,7 +371,7 @@ jobs:
             prod-backend
 
       - name: Promote Frontend Image to PROD
-        uses: shrink/actions-docker-registry-tag@v2
+        uses: shrink/actions-docker-registry-tag@v3
         with:
           registry: ${{ env.REGISTRY }}
           repository: ${{ github.repository }}

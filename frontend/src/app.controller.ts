@@ -245,4 +245,14 @@ export class AppController {
           documentTypes: documentTypes,
         };
   }
+
+  @Get("getHello")
+  getHello(): string {
+    return this.appService.getHello();
+  }
+
+  @Get("getHello2")
+  getHello2(): string {
+    return this.appService.getHello();
+  }
 }

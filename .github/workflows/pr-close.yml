@@ -9,7 +9,7 @@ on:
       - "**.md"
 
 env:
-  name: devops-quickstart
+  name: nr-ticdi
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -24,11 +24,11 @@ jobs:
       - uses: actions/checkout@v3
       - name: Remove OpenShift artifacts
         run: |
-          oc login --token=${{ secrets.GHCR_TOKEN }} --server=${{ secrets.OC_SERVER }}
+          oc login --token=${{ secrets.OC_TOKEN }} --server=${{ secrets.OC_SERVER }}
           oc project ${{ secrets.OC_NAMESPACE }}
 
           # Remove old build runs, build pods and deployment pods
-          oc delete all,pvc,secret -l app=${{ env.name }}-${{ github.event.number }}
+          oc delete all -l app=${{ env.name }}-${{ github.event.number }}
 
   # If merged into main, then handle any image promotions
   image-promotions:
@@ -39,14 +39,14 @@ jobs:
       matrix:
         component: [backend, frontend]
     with:
-      app_name: devops-quickstart
+      app_name: nr-ticdi
       component: ${{ matrix.component }}
       env_source: ${{ github.event.number }}
       env_target: test
     secrets:
       oc_namespace: ${{ secrets.OC_NAMESPACE }}
       oc_server: ${{ secrets.OC_SERVER }}
-      oc_token: ${{ secrets.GHCR_TOKEN }}
+      oc_token: ${{ secrets.OC_TOKEN }}
 
   # Notify when PR merged into main
   merge-notification:
@@ -57,7 +57,7 @@ jobs:
       - name: Pre-merge update
         uses: mshick/add-pr-comment@v1
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GHCR_TOKEN }}
         with:
           allow-repeats: false
           message: |

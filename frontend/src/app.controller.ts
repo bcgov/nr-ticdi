@@ -49,20 +49,20 @@ export class AppController {
   @UseFilters(AuthenticationFilter)
   @UseGuards(AuthenticationGuard)
   async root(@Session() session: { data?: SessionData }) {
-    const username = session.data
-      ? session.data.activeAccount
-        ? session.data.activeAccount.name
-          ? session.data.activeAccount.name
-          : ""
-        : ""
-      : "";
-    const label = session.data
-      ? session.data.activeAccount
-        ? session.data.activeAccount.display_name
-          ? session.data.activeAccount.display_name
-          : ""
-        : ""
-      : "";
+    // const username = session.data
+    //   ? session.data.activeAccount
+    //     ? session.data.activeAccount.name
+    //       ? session.data.activeAccount.name
+    //       : ""
+    //     : ""
+    //   : "";
+    // const label = session.data
+    //   ? session.data.activeAccount
+    //     ? session.data.activeAccount.display_name
+    //       ? session.data.activeAccount.display_name
+    //       : ""
+    //     : ""
+    //   : "";
     //session.data.activeAccount !== null && session.data.activeAccount !== undefined
     //  ? session.data.activeAccount.label
     //  : session.data.accounts.length == 0
@@ -84,14 +84,12 @@ export class AppController {
     return process.env.ticdi_environment == "DEVELOPMENT"
       ? {
           title: "DEVELOPMENT - " + PAGE_TITLES.INDEX,
-          username: username,
-          label: label,
+          primaryContactName: "",
           displayAdmin: displayAdmin,
         }
       : {
           title: PAGE_TITLES.INDEX,
-          username: username,
-          label: label,
+          primaryContactName: "",
           displayAdmin: displayAdmin,
         };
   }
@@ -105,20 +103,20 @@ export class AppController {
     @Param("id") id,
     @Param("docname") docname: string
   ) {
-    const username = session.data
-      ? session.data.activeAccount
-        ? session.data.activeAccount.name
-          ? session.data.activeAccount.name
-          : ""
-        : ""
-      : "";
-    const label = session.data
-      ? session.data.activeAccount
-        ? session.data.activeAccount.display_name
-          ? session.data.activeAccount.display_name
-          : ""
-        : ""
-      : "";
+    // const username = session.data
+    //   ? session.data.activeAccount
+    //     ? session.data.activeAccount.name
+    //       ? session.data.activeAccount.name
+    //       : ""
+    //     : ""
+    //   : "";
+    // const label = session.data
+    //   ? session.data.activeAccount
+    //     ? session.data.activeAccount.display_name
+    //       ? session.data.activeAccount.display_name
+    //       : ""
+    //     : ""
+    //   : "";
     let isAdmin = false;
     if (
       session.data &&
@@ -141,11 +139,11 @@ export class AppController {
       }
     );
     const ttlsJSON = await this.ttlsService.sendToBackend(response);
+    console.log(ttlsJSON);
     const array = await this.ttlsService.getJSONsByDTID(ttlsJSON.dtid);
     const versions = await this.ttlsService.getTemplateVersions(
       "Land Use Report"
     );
-    // this.ttlsService.setJSONDataFile(array); // probably unneeded as cdogs template is stored in a view now
     const documentTypes = [];
     const documents = await lastValueFrom(
       this.httpService
@@ -157,11 +155,13 @@ export class AppController {
         documentTypes.push(entry.comments);
       }
     }
+    const primaryContactName = await this.ttlsService.getPrimaryContactName(
+      ttlsJSON
+    );
     return process.env.ticdi_environment == "DEVELOPMENT"
       ? {
           title: "DEVELOPMENT - " + PAGE_TITLES.INDEX,
-          username: username,
-          label: label,
+          primaryContactName: primaryContactName,
           displayAdmin: displayAdmin,
           message: ttlsJSON,
           data: array,
@@ -171,8 +171,7 @@ export class AppController {
         }
       : {
           title: PAGE_TITLES.INDEX,
-          username: username,
-          label: label,
+          primaryContactName: primaryContactName,
           displayAdmin: displayAdmin,
           message: ttlsJSON,
           data: array,
@@ -188,20 +187,20 @@ export class AppController {
   @UseGuards(AuthenticationGuard)
   @UseGuards(AdminGuard)
   async adminPage(@Session() session: { data?: SessionData }) {
-    const username = session.data
-      ? session.data.activeAccount
-        ? session.data.activeAccount.name
-          ? session.data.activeAccount.name
-          : ""
-        : ""
-      : "";
-    const label = session.data
-      ? session.data.activeAccount
-        ? session.data.activeAccount.display_name
-          ? session.data.activeAccount.display_name
-          : ""
-        : ""
-      : "";
+    // const username = session.data
+    //   ? session.data.activeAccount
+    //     ? session.data.activeAccount.name
+    //       ? session.data.activeAccount.name
+    //       : ""
+    //     : ""
+    //   : "";
+    // const label = session.data
+    //   ? session.data.activeAccount
+    //     ? session.data.activeAccount.display_name
+    //       ? session.data.activeAccount.display_name
+    //       : ""
+    //     : ""
+    //   : "";
     let isAdmin = false;
     if (
       session.data &&
@@ -230,16 +229,14 @@ export class AppController {
     return process.env.ticdi_environment == "DEVELOPMENT"
       ? {
           title: "DEVELOPMENT - " + PAGE_TITLES.INDEX,
-          username: username,
-          label: label,
+          primaryContactName: "",
           displayAdmin: displayAdmin,
           data: data,
           documentTypes: documentTypes,
         }
       : {
           title: PAGE_TITLES.INDEX,
-          username: username,
-          label: label,
+          primaryContactName: "",
           displayAdmin: displayAdmin,
           data: data,
           documentTypes: documentTypes,

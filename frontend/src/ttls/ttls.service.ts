@@ -272,6 +272,27 @@ export class TTLSService {
     return versions;
   }
 
+  getPrimaryContactName(ttlsJson: {
+    first_name: string;
+    middle_name: string;
+    last_name: string;
+    organization_unit: string;
+  }) {
+    if (ttlsJson.first_name || ttlsJson.middle_name || ttlsJson.last_name) {
+      return (
+        ttlsJson.first_name +
+        " " +
+        ttlsJson.middle_name +
+        " " +
+        ttlsJson.last_name
+      );
+    } else if (ttlsJson.organization_unit) {
+      return ttlsJson.organization_unit;
+    } else {
+      return "No primary contact name was found";
+    }
+  }
+
   callHttp(): Observable<Array<Object>> {
     const bearerToken = this.webade_token;
     // const bearerToken = process.env.ttls_api_key;

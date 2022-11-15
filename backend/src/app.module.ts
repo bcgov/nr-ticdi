@@ -4,8 +4,6 @@ import { TypeOrmModule } from "@nestjs/typeorm";
 import { ConfigModule } from "@nestjs/config";
 import { AppController } from "./app.controller";
 import { AppService } from "./app.service";
-import { TicdijsonModule } from "./ticdijson/ticdijson.module";
-import { TemplateModule } from "./template/template.module";
 import { DocumentTemplateModule } from "./document_template/document_template.module";
 import { PrintRequestDetailModule } from "./print_request_detail/print_request_detail.module";
 import { PrintRequestLogModule } from "./print_request_log/print_request_log.module";
@@ -42,8 +40,6 @@ if (process.env.POSTGRESQL_PASSWORD != null) {
       autoLoadEntities: true, // Auto load all entities regiestered by typeorm forFeature method.
       synchronize: true, // This changes the DB schema to match changes to entities, which we might not want.
     }),
-    TicdijsonModule,
-    TemplateModule,
     DocumentTemplateModule,
     PrintRequestDetailModule,
     PrintRequestLogModule,

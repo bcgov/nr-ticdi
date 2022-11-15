@@ -40,18 +40,13 @@
       <div class="float-right">
         <table>
           <tr>
-            <td class="m-0 p-0" style="font-size:small; color: white" id="navbarUsername">{{username}}</td>
+            <td class="m-0 p-0" style="font-size:small; color: white" id="navbarFileNumber">File Number: {{message.tenure_file_number}}</td>
           </tr>
           <tr>
-            <td class="m-0 p-0" style="font-size:x-small; color: white" id="navbarLabel"><a
-                data-toggle="modal"
-                data-target="#setAccountModal"
-                id="setAccountLink"
-                style="font-size:small; color: white; text-decoration: none; cursor: pointer"
-              >{{label}}</a></td>
+            <td class="m-0 p-0" style="font-size:small; color: white" id="navbarDTID">DTID: {{message.dtid}}</td>
           </tr>
           <tr>
-            <td class="m-0 p-0" style="font-size:x-small; color: white">{{downloaddate}}</td>
+            <td class="m-0 p-0" style="font-size:x-small; color: white" id="navbarPrimaryContactName">Primary Contact Name: {{primaryContactName}}</td>
           </tr>
         </table>
       </div>

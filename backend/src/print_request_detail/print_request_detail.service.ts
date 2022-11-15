@@ -24,7 +24,6 @@ export class PrintRequestDetailService {
     newItem.sub_purpose_name = printRequestDetail.sub_purpose_name;
     newItem.type_name = printRequestDetail.type_name;
     newItem.sub_type_name = printRequestDetail.sub_type_name;
-    newItem.area_ha_number = printRequestDetail.area_ha_number.toString();
     newItem.first_name = printRequestDetail.first_name;
     newItem.middle_name = printRequestDetail.middle_name;
     newItem.last_name = printRequestDetail.last_name;
@@ -39,7 +38,7 @@ export class PrintRequestDetailService {
     newItem.mailing_country_code = printRequestDetail.mailing_country_code;
     newItem.mailing_country = printRequestDetail.mailing_country;
     newItem.location_description = printRequestDetail.location_description;
-    newItem.legal_description = printRequestDetail.legal_description;
+    newItem.parcels = printRequestDetail.parcels;
     newItem.create_userid = printRequestDetail.create_userid;
 
     // const existingPRD = await this.printRequestDetailRepository.findBy({

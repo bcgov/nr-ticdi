@@ -17,10 +17,11 @@ export class PrintRequestLogService {
     const newItem = new PrintRequestLog();
     newItem.document_template_id = printRequestLog.document_template_id;
     newItem.print_request_detail_id = printRequestLog.print_request_detail_id;
+    newItem.dtid = printRequestLog.dtid;
     newItem.request_app_user = printRequestLog.request_app_user;
-    newItem.request_timestamp = printRequestLog.request_timestamp;
+    // newItem.request_timestamp = printRequestLog.request_timestamp;
     // newItem.request_json = printRequestLog.request_json;
-    newItem.create_userid = printRequestLog.create_userid;
+    // newItem.create_userid = printRequestLog.create_userid;
     const newPRL = this.printRequestLogRepository.create(newItem);
     return this.printRequestLogRepository.save(newPRL);
   }
@@ -35,5 +36,19 @@ export class PrintRequestLogService {
         document_template_id: dtid,
       },
     });
+  }
+
+  async findNextVersion(dtid: number): Promise<string> {
+    const requestLogs = await this.printRequestLogRepository.findAndCount({
+      where: {
+        dtid: dtid,
+      },
+    });
+    let version = (requestLogs[1] + 1).toString();
+    // prepend zeroes to the version before returning
+    while (version.length < 4) {
+      version = "0" + version;
+    }
+    return version;
   }
 }

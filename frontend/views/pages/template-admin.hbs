@@ -180,7 +180,7 @@
                 file_name: 'landusereport',
                 create_userid: '123'
             });
-            fetch('http://localhost:3000/admin/upload-template', {
+            fetch('/admin/upload-template', {
                 method: 'POST',
                 responseType: 'application/json',
                 headers: {
@@ -193,7 +193,7 @@
                 if (data.errors) {
                     alert(data.errors);
                 } else {
-                    //console.log(data);
+                    location.reload();
                 }
             });
         });

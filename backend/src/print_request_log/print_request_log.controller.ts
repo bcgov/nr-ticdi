@@ -1,5 +1,6 @@
 import { Body, Controller, Get, Param, Post } from "@nestjs/common";
 import { CreatePrintRequestLogDto } from "./dto/create-print_request_log.dto";
+import { PrintRequestLog } from "./entities/print_request_log.entity";
 import { PrintRequestLogService } from "./print_request_log.service";
 
 @Controller("print-request-log")
@@ -11,21 +12,23 @@ export class PrintRequestLogController {
   @Post()
   async create(
     @Body()
-    data: {
-      printRequestLog: CreatePrintRequestLogDto;
-    }
-  ) {
-    let printRequestLog = data.printRequestLog;
+    printRequestLog: CreatePrintRequestLogDto
+  ): Promise<PrintRequestLog> {
     return this.printRequestLogService.create(printRequestLog);
   }
 
   @Get()
-  findAll() {
+  findAll(): Promise<PrintRequestLog[]> {
     return this.printRequestLogService.findAll();
   }
 
   @Get(":dtid")
-  findByDtid(@Param("dtid") dtid: string) {
+  findByDtid(@Param("dtid") dtid: string): Promise<PrintRequestLog[]> {
     return this.printRequestLogService.findByDtid(+dtid);
+  }
+
+  @Get("version/:dtid")
+  findNextVersion(@Param("dtid") dtid: string): Promise<string> {
+    return this.printRequestLogService.findNextVersion(+dtid);
   }
 }

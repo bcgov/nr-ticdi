@@ -91,7 +91,10 @@ export class TTLSService {
     if (jdf) {
       const { ...printRequestDetail } = jdf;
 
-      let interestedParty, interestParcel, subPurposeCodes, landUseSubTypeCodes;
+      let interestedParty,
+        interestParcels,
+        subPurposeCodes,
+        landUseSubTypeCodes;
       if (
         printRequestDetail.interestedParties &&
         printRequestDetail.interestedParties[0]
@@ -101,13 +104,10 @@ export class TTLSService {
         console.log("null interestedParty");
         interestedParty = null;
       }
-      if (
-        printRequestDetail.interestParcels &&
-        printRequestDetail.interestParcels[0]
-      ) {
-        interestParcel = printRequestDetail.interestParcels[0];
+      if (printRequestDetail.interestParcels) {
+        interestParcels = printRequestDetail.interestParcels;
       } else {
-        interestParcel = null;
+        interestParcels = null;
       }
       if (
         printRequestDetail.purposeCode &&
@@ -139,6 +139,13 @@ export class TTLSService {
       } else {
         orgUnit = null;
       }
+      const parcels = [];
+      for (let entry of interestParcels) {
+        parcels.push({
+          area: entry.areaInHectares,
+          legal_description: entry.legalDescription,
+        });
+      }
 
       const mappedData = {
         dtid: printRequestDetail.landUseApplicationId,
@@ -151,9 +158,6 @@ export class TTLSService {
         type_name: printRequestDetail.landUseTypeCode.description,
         sub_type_name: landUseSubTypeCodes.description
           ? landUseSubTypeCodes.description
-          : null,
-        area_ha_number: interestParcel.areaInHectares
-          ? interestParcel.areaInHectares
           : null,
         first_name: individual
           ? individual.firstname
@@ -212,11 +216,7 @@ export class TTLSService {
             : null
           : null,
         location_description: printRequestDetail.locationDescription,
-        legal_description: interestParcel
-          ? interestParcel.legalDescription
-            ? interestParcel.legalDescription
-            : null
-          : null,
+        parcels: JSON.stringify(parcels),
       };
 
       return axios
@@ -270,6 +270,27 @@ export class TTLSService {
       }
     }
     return versions;
+  }
+
+  getPrimaryContactName(ttlsJson: {
+    first_name: string;
+    middle_name: string;
+    last_name: string;
+    organization_unit: string;
+  }) {
+    if (ttlsJson.first_name || ttlsJson.middle_name || ttlsJson.last_name) {
+      return (
+        ttlsJson.first_name +
+        " " +
+        ttlsJson.middle_name +
+        " " +
+        ttlsJson.last_name
+      );
+    } else if (ttlsJson.organization_unit) {
+      return ttlsJson.organization_unit;
+    } else {
+      return "No primary contact name was found";
+    }
   }
 
   callHttp(): Observable<Array<Object>> {
@@ -357,10 +378,32 @@ export class TTLSService {
       });
   }
 
+  async generateReportName(dtid: number) {
+    const url = `${hostname}:${port}/print-request-log/version/` + dtid;
+    // grab the next version string for the dtid
+    const version = await axios
+      .get(url, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      })
+      .then((res) => {
+        return res.data;
+      });
+    return { reportName: "LUR_" + dtid + "_" + version };
+  }
+
   // generate the Land use Report via CDOGS
-  async generateLURReport(prdid: number, version: number, comments: string) {
+  async generateLURReport(
+    prdid: number,
+    version: number,
+    comments: string,
+    username: string
+  ) {
     const url = `${hostname}:${port}/print-request-detail/view/` + prdid;
     const templateUrl = `${hostname}:${port}/document-template/get-one`;
+    const logUrl = `${hostname}:${port}/print-request-log/`;
+    // get the view given the print request detail id
     const data = await axios
       .get(url, {
         headers: {
@@ -370,14 +413,27 @@ export class TTLSService {
       .then((res) => {
         return res.data;
       });
-    const documentTemplateObject: { data: { the_file: string } } =
+    if (data.Parcels) {
+      data["Parcels"] = JSON.parse(data.Parcels);
+    }
+    // get the document template, comments refers to the document type (Land Use Report)
+    const documentTemplateObject: { data: { id: number; the_file: string } } =
       await axios.post(templateUrl, {
         version: version,
         comments: comments,
       });
+
+    // log the request
+    const document_template_id = documentTemplateObject.data.id;
+    await axios.post(logUrl, {
+      document_template_id: document_template_id,
+      print_request_detail_id: prdid,
+      dtid: data.DTID,
+      request_app_user: username,
+    });
+
     const cdogsToken = await this.callGetToken();
     let bufferBase64 = documentTemplateObject.data.the_file;
-
     const md = JSON.stringify({
       data,
       formatters:

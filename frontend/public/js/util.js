@@ -1,18 +1,18 @@
-function generateReport() {
+async function generateReport() {
   const dtid = $("#dtid").text();
+  const prdid = $("#prdid").text();
   $("#genReport").prop("disabled", true);
-  let reportName;
-  fetch(`/report/getReportName/${dtid}`, {
+  const reportName = await fetch(`/report/getReportName/${dtid}`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
     },
     responseType: "application/json",
-  }).then((res) => {
-    console.log(res);
-    console.log(res.data);
-  });
-  reportName = "LUR_nnnnnnn_0001";
+  })
+    .then((res) => res.json())
+    .then((resJson) => {
+      return resJson.reportName;
+    });
   const comments = $("#document_type_id option:selected").text();
   const version = $("#versionSelect option:selected").text();
   const data = {

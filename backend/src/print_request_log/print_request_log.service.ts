@@ -17,6 +17,7 @@ export class PrintRequestLogService {
     const newItem = new PrintRequestLog();
     newItem.document_template_id = printRequestLog.document_template_id;
     newItem.print_request_detail_id = printRequestLog.print_request_detail_id;
+    newItem.dtid = printRequestLog.dtid;
     newItem.request_app_user = printRequestLog.request_app_user;
     // newItem.request_timestamp = printRequestLog.request_timestamp;
     // newItem.request_json = printRequestLog.request_json;
@@ -40,7 +41,7 @@ export class PrintRequestLogService {
   async findNextVersion(dtid: number): Promise<string> {
     const requestLogs = await this.printRequestLogRepository.findAndCount({
       where: {
-        document_template_id: dtid,
+        dtid: dtid,
       },
     });
     let version = (requestLogs[1] + 1).toString();

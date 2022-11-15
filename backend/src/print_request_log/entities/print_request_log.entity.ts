@@ -15,6 +15,8 @@ export class PrintRequestLog {
   @Column()
   print_request_detail_id: number;
   @Column()
+  dtid: number;
+  @Column()
   request_app_user: string;
   // @Column()
   // request_timestamp: string;
@@ -32,6 +34,7 @@ export class PrintRequestLog {
   constructor(
     document_template_id?: number,
     print_request_detail_id?: number,
+    dtid?: number,
     request_app_user?: string,
     // request_timestamp?: string,
     // request_json?: JSON,
@@ -40,6 +43,7 @@ export class PrintRequestLog {
   ) {
     this.document_template_id = document_template_id || null;
     this.print_request_detail_id = print_request_detail_id || null;
+    this.dtid = dtid || null;
     this.request_app_user = request_app_user || "";
     // this.request_timestamp = request_timestamp || "";
     // this.request_json = request_json || null;

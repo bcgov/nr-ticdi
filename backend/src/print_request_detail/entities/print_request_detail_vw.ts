@@ -13,7 +13,6 @@ import { PrintRequestDetail } from "./print_request_detail.entity";
       .addSelect("print_request_detail.sub_purpose_name", "SubPurposeName")
       .addSelect("print_request_detail.type_name", "Type_name")
       .addSelect("print_request_detail.sub_type_name", "SubTypeName")
-      .addSelect("print_request_detail.area_ha_number", "AreaHaNumber")
       .addSelect("print_request_detail.first_name", "FirstName")
       .addSelect("print_request_detail.middle_name", "MiddleName")
       .addSelect("print_request_detail.last_name", "LastName")
@@ -48,7 +47,7 @@ import { PrintRequestDetail } from "./print_request_detail.entity";
         "print_request_detail.location_description",
         "LocationDescription"
       )
-      .addSelect("print_request_detail.legal_description", "LegalDescription")
+      .addSelect("print_request_detail.parcels", "Parcels")
       .from(PrintRequestDetail, "print_request_detail"),
 })
 export class PrintRequestDetailView {
@@ -68,8 +67,6 @@ export class PrintRequestDetailView {
   Type_name: string;
   @ViewColumn()
   SubTypeName: string;
-  @ViewColumn()
-  AreaHaNumber: number;
   @ViewColumn()
   FirstName: string;
   @ViewColumn()
@@ -97,5 +94,5 @@ export class PrintRequestDetailView {
   @ViewColumn()
   LocationDescription: string;
   @ViewColumn()
-  LegalDescription: string;
+  Parcels: string;
 }

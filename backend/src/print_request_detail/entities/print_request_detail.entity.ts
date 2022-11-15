@@ -25,8 +25,6 @@ export class PrintRequestDetail {
   @Column({ nullable: true })
   sub_type_name: string;
   @Column({ nullable: true })
-  area_ha_number: string;
-  @Column({ nullable: true })
   first_name: string;
   @Column({ nullable: true })
   middle_name: string;
@@ -53,7 +51,7 @@ export class PrintRequestDetail {
   @Column({ nullable: true })
   location_description: string;
   @Column({ nullable: true })
-  legal_description: string;
+  parcels: string;
   @Column({ nullable: true })
   create_userid: string;
   @Column({ nullable: true })
@@ -71,7 +69,6 @@ export class PrintRequestDetail {
     sub_purpose_name?: string,
     type_name?: string,
     sub_type_name?: string,
-    area_ha_number?: string,
     first_name?: string,
     middle_name?: string,
     last_name?: string,
@@ -85,7 +82,7 @@ export class PrintRequestDetail {
     mailing_country_code?: string,
     mailing_country?: string,
     location_description?: string,
-    legal_description?: string,
+    parcels?: string,
     create_userid?: string,
     update_userid?: string
   ) {
@@ -96,7 +93,6 @@ export class PrintRequestDetail {
     this.sub_purpose_name = sub_purpose_name || "";
     this.type_name = type_name || "";
     this.sub_type_name = sub_type_name || "";
-    this.area_ha_number = area_ha_number || "";
     this.first_name = first_name || "";
     this.middle_name = middle_name || "";
     this.last_name = last_name || "";
@@ -110,7 +106,7 @@ export class PrintRequestDetail {
     this.mailing_country_code = mailing_country_code || "";
     this.mailing_country = mailing_country || "";
     this.location_description = location_description || "";
-    this.legal_description = legal_description || "";
+    this.parcels = parcels || "";
     this.create_userid = create_userid || "";
     this.update_userid = update_userid || "";
   }

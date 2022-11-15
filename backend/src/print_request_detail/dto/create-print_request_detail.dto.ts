@@ -11,7 +11,6 @@ export class CreatePrintRequestDetailDto extends PickType(
     "sub_purpose_name",
     "type_name",
     "sub_type_name",
-    "area_ha_number",
     "first_name",
     "middle_name",
     "last_name",
@@ -25,7 +24,7 @@ export class CreatePrintRequestDetailDto extends PickType(
     "mailing_country_code",
     "mailing_country",
     "location_description",
-    "legal_description",
     "create_userid",
+    "parcels",
   ] as const
 ) {}

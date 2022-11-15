@@ -6,7 +6,6 @@ export class PrintRequestDetailDto {
   sub_purpose_name: string;
   type_name: string;
   sub_type_name: string;
-  area_ha_number: number;
   first_name: string;
   middle_name: string;
   last_name: string;
@@ -20,7 +19,7 @@ export class PrintRequestDetailDto {
   mailing_country_code: string;
   mailing_country: string;
   location_description: string;
-  legal_description: string;
   create_userid: string;
   update_userid: string;
+  parcels: string;
 }

@@ -7,14 +7,6 @@
                 <hr />
                 <div class="form-group row">
                     <div class="col-md-2">
-                        <p class="font-weight-bold">DTID</p>
-                    </div>
-                    <div class="col-md-2">
-                        <p id="dtid">{{ message.dtid }}</p>
-                    </div>
-                </div>
-                <div class="form-group row">
-                    <div class="col-md-2">
                         <p class="font-weight-bold">Report</p>
                     </div>
                     <div class="col-md-3">
@@ -38,130 +30,141 @@
                     </div>
                 </div>
                 <div class="mt-3 mb-3">
-                <div class="accordion" id="collapseContents">
-                    <div class="card">
-                        <div class="card-header" id="headingOne">
-                            <h2 class="mb-0">
-                                <button type="button" class="btn collapsed" data-toggle="collapse" data-target="#collapseOne">Disposition Transaction ID Details <i class="fa fa-angle-down"></i></button>
-                            </h2>
-                        </div>
-                        <div id="collapseOne" class="collapse" aria-labelledby="headingOne" data-parent="#collapseContents">
-                            <div class="card-body">
-                                <div class="contents">
-                                <div class="form-row">
-                                    <div class="form-group col-md-5 dataSection dataSection">
-                                        <dt>Contact or Agent Name</dt>
-                                        <dd>TBD</dd>
-                                    </div>
-                                    <div class="form-group col-md-5 dataSection dataSection">
-                                        <dt>Email Address</dt>
-                                        <dd>TBD</dd>
-                                    </div>
-                                </div>
-                                <div class="form-row">
-                                    <div class="form-group col-md-5 dataSection dataSection">
-                                        <dt>Organization Unit</dt>
-                                        <dd id="orgUnit">{{ message.organization_unit }}</dd>
-                                    </div>
-                                    <div class="form-group col-md-5 dataSection dataSection">
-                                        <dt>Inspected Date</dt>
-                                        <dd></dd>
-                                    </div>
-                                </div>
-                                <div class="form-row">
-                                    <div class="form-group col-md-5 dataSection dataSection">
-                                        <dt>Incorporation Number</dt>
-                                        <dd></dd>
-                                    </div>
-                                    <div class="form-group col-md-5 dataSection dataSection">
-                                        <dt>Inspected Date</dt>
-                                        <dd>TBD</dd>
-                                    </div>
-                                </div>
-                                <div class="form-row">
-                                    <div class="form-group col-md-5 dataSection dataSection">
-                                        <dt>Policy Name</dt>
-                                        <dd id="orgUnit2">{{ message.organization_unit }}</dd>
-                                    </div>
-                                    <div class="form-group col-md-5 dataSection dataSection">
-                                        <dt>Purpose Statement</dt>
-                                        <dd id="purpose">{{message.purpose_name}}</dd>
-                                    </div>
-                                </div>
+                    <div class="accordion" id="collapseContents">
+                        <div class="card">
+                            <div class="card-header" id="headingOne">
+                                <h2 class="mb-0">
+                                    <button type="button" class="btn collapsed" data-toggle="collapse" data-target="#collapseOne">Disposition Transaction ID Details <i class="fa fa-angle-down"></i></button>
+                                </h2>
                             </div>
+                            <div id="collapseOne" class="collapse" aria-labelledby="headingOne" data-parent="#collapseContents">
+                                <div class="card-body">
+                                    <div class="contents">
+                                    <div class="form-row">
+                                        <div class="form-group col-md-5 dataSection dataSection">
+                                            <dt>Contact or Agent Name</dt>
+                                            <dd>TBD</dd>
+                                        </div>
+                                        <div class="form-group col-md-5 dataSection dataSection">
+                                            <dt>Email Address</dt>
+                                            <dd>TBD</dd>
+                                        </div>
+                                    </div>
+                                    <div class="form-row">
+                                        <div class="form-group col-md-5 dataSection dataSection">
+                                            <dt>Organization Unit</dt>
+                                            <dd id="orgUnit">{{ message.organization_unit }}</dd>
+                                        </div>
+                                        <div class="form-group col-md-5 dataSection dataSection">
+                                            <dt>Inspected Date</dt>
+                                            <dd></dd>
+                                        </div>
+                                    </div>
+                                    <div class="form-row">
+                                        <div class="form-group col-md-5 dataSection dataSection">
+                                            <dt>Incorporation Number</dt>
+                                            <dd></dd>
+                                        </div>
+                                        <div class="form-group col-md-5 dataSection dataSection">
+                                            <dt>Inspected Date</dt>
+                                            <dd>TBD</dd>
+                                        </div>
+                                    </div>
+                                    <div class="form-row">
+                                        <div class="form-group col-md-5 dataSection dataSection">
+                                            <dt>Policy Name</dt>
+                                            <dd id="orgUnit2">{{ message.organization_unit }}</dd>
+                                        </div>
+                                        <div class="form-group col-md-5 dataSection dataSection">
+                                            <dt>Purpose Statement</dt>
+                                            <dd id="purpose">{{message.purpose_name}}</dd>
+                                        </div>
+                                    </div>
+                                </div>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-                <div class="accordion" id="collapseContentsTwo">
-                    <div class="card" style="border-bottom: 1px solid #dddddd">
-                        <div class="card-header" id="headingTwo">
-                            <h2 class="mb-0">
-                                <button type="button" class="btn" data-toggle="collapse" data-target="#collapseTwo">Tenure Details <i class="fa fa-angle-down"></i></button>
-                            </h2>
-                        </div>
-                        <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#collapseContents">
-                            <div class="card-body">
-                                <div class="contents">
-                                    <div class="form-row">
-                                        <div class="form-group col-md-5 dataSection">
-                                            <dt>File Number</dt>
-                                            <dd id="fileNum">{{ message.tenure_file_number }}</dd>
+                    <div class="accordion" id="collapseContentsTwo">
+                        <div class="card" style="border-bottom: 1px solid #dddddd">
+                            <div class="card-header" id="headingTwo">
+                                <h2 class="mb-0">
+                                    <button type="button" class="btn" data-toggle="collapse" data-target="#collapseTwo">Tenure Details <i class="fa fa-angle-down"></i></button>
+                                </h2>
+                            </div>
+                            <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#collapseContents">
+                                <div class="card-body">
+                                    <div class="contents">
+                                        <div class="form-row">
+                                            <div class="form-group col-md-5 dataSection">
+                                                <dt>File Number</dt>
+                                                <dd id="fileNum">{{ message.tenure_file_number }}</dd>
+                                            </div>
+                                            <div class="form-group col-md-5 dataSection">
+                                                <dt>Mailing Address</dt>
+                                                <dd id="address">{{message.mailing_address_line_1}}</dd>
+                                                <dd id="cityProv">{{message.mailing_city}} {{message.mailing_province_state_code}}</dd>
+                                                <dd id="postalCode">{{message.mailing_postal_code}}</dd>
+                                            </div>
                                         </div>
-                                        <div class="form-group col-md-5 dataSection">
-                                            <dt>Mailing Address</dt>
-                                            <dd id="address">{{message.mailing_address_line_1}}</dd>
-                                            <dd id="cityProv">{{message.mailing_city}} {{message.mailing_province_state_code}}</dd>
-                                            <dd id="postalCode">{{message.mailing_postal_code}}</dd>
+                                        <div class="form-row">
+                                            <div class="form-group col-md-5 dataSection">
+                                                <dt>Type</dt>
+                                                <dd id="type">{{ message.type_name }}</dd>
+                                            </div>
+                                            <div class="form-group col-md-5 dataSection">
+                                                <dt>Subtype</dt>
+                                                <dd id="subType">{{message.sub_type_name}}</dd>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="form-row">
-                                        <div class="form-group col-md-5 dataSection">
-                                            <dt>Type</dt>
-                                            <dd id="type">{{ message.type_name }}</dd>
+                                        <div class="form-row">
+                                            <div class="form-group col-md-5 dataSection">
+                                                <dt>Purpose</dt>
+                                                <dd id="purpose2">{{ message.purpose_name }}</dd>
+                                            </div>
+                                            <div class="form-group col-md-5 dataSection">
+                                                <dt>Subpurpose</dt>
+                                                <dd id="subPurpose">{{message.sub_purpose_name}}</dd>
+                                            </div>
                                         </div>
-                                        <div class="form-group col-md-5 dataSection">
-                                            <dt>Subtype</dt>
-                                            <dd id="subType">{{message.sub_type_name}}</dd>
-                                        </div>
-                                    </div>
-                                    <div class="form-row">
-                                        <div class="form-group col-md-5 dataSection">
-                                            <dt>Purpose</dt>
-                                            <dd id="purpose2">{{ message.purpose_name }}</dd>
-                                        </div>
-                                        <div class="form-group col-md-5 dataSection">
-                                            <dt>Subpurpose</dt>
-                                            <dd id="subPurpose">{{message.sub_purpose_name}}</dd>
-                                        </div>
-                                    </div>
-                                    <div class="form-row">
-                                        <div class="form-group col-md-5 dataSection">
-                                            <dt>Area</dt>
-                                            <dd id="area">{{ message.area_ha_number }}</dd>
-                                        </div>
-                                        <div class="form-group col-md-5 dataSection">
-                                            <dt>Location of Land</dt>
-                                            <dd id="locLand">{{message.location_description}}</dd>
-                                        </div>
-                                    </div>
-                                    <div class="form-row">
-                                        <div class="form-group">
-                                            <dt>Legal Description</dt>
-                                            <dd id="legalDesc">{{message.legal_description}}</dd>
-                                        </div>
-                                    </div>
-                                    <div class="form-row">
-                                        <div class="form-group">
-                                            <dt>Version</dt>
-                                            <dd id="versionNum">1</dd>
+                                        <div class="form-row">
+                                            <div class="form-group col-md-5 dataSection">
+                                                <dt>Location of Land</dt>
+                                                <dd id="locLand">{{message.location_description}}</dd>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
+                    <div class="accordion" id="collapseContentsThree">
+                        <div class="card" style="border-bottom: 1px solid #dddddd">
+                            <div class="card-header" id="headingThree">
+                                <h2 class="mb-0">
+                                    <button type="button" class="btn" data-toggle="collapse" data-target="#collapseThree">Area<i class="fa fa-angle-down"></i></button>
+                                </h2>
+                            </div>
+                            <div id="collapseThree" class="collapse" aria-labelledby="headingThree" data-parent="#collapseContents">
+                                <div class="card-body">
+                                    <div class="contents">
+                                        {{#each parcels}}
+                                        <div class="form-row">
+                                            <div class="form-group col-md-2 dataSection">
+                                                <dt>Area</dt>
+                                                <dd id="area">{{ this.area }}</dd>
+                                            </div>
+                                            <div class="form-group col-md-10">
+                                                <dt>Legal Description</dt>
+                                                <dd class="legalDesc" title="{{this.legal_description}}">{{this.legal_description}}</dd>
+                                            </div>
+                                        </div>
+                                        {{/each}}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div class="form-group row">
                     <div class="col-md-4">
@@ -171,11 +174,13 @@
             </div>
         </form>
         <div class="d-none" id="prdid"></div>
+        <div class="d-none" id="dtid"></div>
     </main>
     <script>
         var dataArray = [];       
         $( document ).ready(function() {
             $("#prdid").text("{{this.prdid}}");
+            $("#dtid").text("{{message.dtid}}");
             {{#each data}}
             dataArray.push({
                 dtid: "{{this.dtid}}",
@@ -210,6 +215,12 @@
                 if ($(this).text() == "" || $(this).text() == "TBD") {
                     $(this).text(" ");
                     $(this).css("background-color", "orange");
+                }
+            })
+
+            $(".legalDesc").each(function(){
+                if ($(this).text().length > 2000) {
+                    $(this).text($(this).text().substr(0,2000)+"...");
                 }
             })
         })

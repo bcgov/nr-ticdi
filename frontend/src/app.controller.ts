@@ -130,7 +130,6 @@ export class AppController {
       }
     }
     const displayAdmin = isAdmin ? "Template Administration" : "-";
-    let version = [];
     this.ttlsService.setId(id);
     await this.ttlsService.setWebadeToken();
     const response = await firstValueFrom(this.ttlsService.callHttp()).then(
@@ -139,7 +138,6 @@ export class AppController {
       }
     );
     const ttlsJSON = await this.ttlsService.sendToBackend(response);
-    console.log(ttlsJSON);
     const array = await this.ttlsService.getJSONsByDTID(ttlsJSON.dtid);
     const versions = await this.ttlsService.getTemplateVersions(
       "Land Use Report"
@@ -155,9 +153,9 @@ export class AppController {
         documentTypes.push(entry.comments);
       }
     }
-    const primaryContactName = await this.ttlsService.getPrimaryContactName(
-      ttlsJSON
-    );
+    const primaryContactName = this.ttlsService.getPrimaryContactName(ttlsJSON);
+    const p = JSON.parse(ttlsJSON.parcels);
+    ttlsJSON["parcels"] = JSON.stringify(p);
     return process.env.ticdi_environment == "DEVELOPMENT"
       ? {
           title: "DEVELOPMENT - " + PAGE_TITLES.INDEX,
@@ -168,6 +166,7 @@ export class AppController {
           version: versions,
           documentTypes: documentTypes,
           prdid: ttlsJSON.id,
+          parcels: ttlsJSON.parcels ? JSON.parse(ttlsJSON.parcels) : null,
         }
       : {
           title: PAGE_TITLES.INDEX,
@@ -221,7 +220,6 @@ export class AppController {
     );
     const documentTypes = [];
     for (let entry of data) {
-      // entry.created_date = new Date(entry.created_date).toLocaleDateString();
       if (!documentTypes.includes(entry.comments)) {
         documentTypes.push(entry.comments);
       }
@@ -241,15 +239,5 @@ export class AppController {
           data: data,
           documentTypes: documentTypes,
         };
-  }
-
-  @Get("getHello")
-  getHello(): string {
-    return this.appService.getHello();
-  }
-
-  @Get("getHello2")
-  getHello2(): string {
-    return this.appService.getHello();
   }
 }

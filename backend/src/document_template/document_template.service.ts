@@ -15,7 +15,6 @@ export class DocumentTemplateService {
   async create(
     documentTemplate: CreateDocumentTemplateDto
   ): Promise<DocumentTemplate> {
-    console.log(documentTemplate);
     const newItem = new DocumentTemplate();
     newItem.document_type = documentTemplate.document_type;
     newItem.template_version = documentTemplate.template_version;

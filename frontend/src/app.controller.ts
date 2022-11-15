@@ -240,4 +240,9 @@ export class AppController {
           documentTypes: documentTypes,
         };
   }
+
+  @Get("getHello")
+  getHello(): string {
+    return this.appService.getHello();
+  }
 }

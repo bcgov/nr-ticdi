@@ -97,7 +97,6 @@ export class TTLSService {
           legal_description: entry.legalDescription,
         });
       }
-      console.log(jdf);
 
       const mappedData = {
         dtid: printRequestDetail.landUseApplicationId,

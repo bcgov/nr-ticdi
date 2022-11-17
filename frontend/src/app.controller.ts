@@ -164,7 +164,7 @@ export class AppController {
         .get(requestUrl, requestConfig)
         .pipe(map((response) => response.data))
     );
-    const documentTypes = [];
+    const documentTypes = ["Land Use Report"];
     for (let entry of data) {
       if (!documentTypes.includes(entry.comments)) {
         documentTypes.push(entry.comments);

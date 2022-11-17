@@ -15,10 +15,14 @@ import { TTLSService } from "../ttls/ttls.service";
 import { AxiosRequestConfig } from "axios";
 import { AuthenticationFilter } from "src/authentication/authentication.filter";
 import { AuthenticationGuard } from "src/authentication/authentication.guard";
+import { GenerateReportGuard } from "src/authentication/generate-report.guard";
 
 let requestUrl: string;
 let requestConfig: AxiosRequestConfig;
 
+@UseFilters(AuthenticationFilter)
+@UseGuards(AuthenticationGuard)
+@UseGuards(GenerateReportGuard)
 @Controller("report")
 export class ReportController {
   constructor(private readonly ttlsService: TTLSService) {
@@ -39,8 +43,6 @@ export class ReportController {
     return this.ttlsService.generateReportName(+dtid);
   }
 
-  @UseFilters(AuthenticationFilter)
-  @UseGuards(AuthenticationGuard)
   @Post("generateReport")
   @Header(
     "Content-Type",

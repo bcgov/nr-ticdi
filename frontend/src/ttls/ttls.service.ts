@@ -97,11 +97,14 @@ export class TTLSService {
           legal_description: entry.legalDescription,
         });
       }
+      console.log(jdf);
 
       const mappedData = {
         dtid: printRequestDetail.landUseApplicationId,
         tenure_file_number: parseInt(printRequestDetail.fileNumber),
-        organization_unit: orgUnit,
+        organization_unit: printRequestDetail.businessUnit
+          ? printRequestDetail.businessUnit.name
+          : null,
         purpose_name: printRequestDetail.purposeCode.description,
         sub_purpose_name: subPurposeCodes.description
           ? subPurposeCodes.description
@@ -223,25 +226,31 @@ export class TTLSService {
     return versions;
   }
 
-  getPrimaryContactName(ttlsJson: {
-    first_name: string;
-    middle_name: string;
-    last_name: string;
-    organization_unit: string;
-  }) {
-    if (ttlsJson.first_name || ttlsJson.middle_name || ttlsJson.last_name) {
-      return (
-        ttlsJson.first_name +
-        " " +
-        ttlsJson.middle_name +
-        " " +
-        ttlsJson.last_name
-      );
-    } else if (ttlsJson.organization_unit) {
-      return ttlsJson.organization_unit;
-    } else {
-      return "No primary contact name was found";
+  getPrimaryContactName(
+    interestedParties: [
+      {
+        primaryContact: boolean;
+        organization: { divisionBranch: any; legalName: string };
+        individual: { firstName: string; lastName: string; middleName: string };
+      }
+    ]
+  ) {
+    for (let entry of interestedParties) {
+      if (entry.primaryContact) {
+        if (entry.individual) {
+          return (
+            entry.individual.firstName +
+            " " +
+            entry.individual.middleName +
+            " " +
+            entry.individual.lastName
+          );
+        } else if (entry.organization) {
+          return entry.organization.legalName;
+        }
+      }
     }
+    return "";
   }
 
   callHttp(id: string): Observable<Array<Object>> {

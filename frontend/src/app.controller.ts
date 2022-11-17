@@ -94,11 +94,11 @@ export class AppController {
     }
     const displayAdmin = isAdmin ? "Template Administration" : "-";
     await this.ttlsService.setWebadeToken();
-    const response = await firstValueFrom(this.ttlsService.callHttp(id)).then(
-      (res) => {
-        return res;
-      }
-    );
+    const response: any = await firstValueFrom(
+      this.ttlsService.callHttp(id)
+    ).then((res) => {
+      return res;
+    });
     const ttlsJSON = await this.ttlsService.sendToBackend(response);
     const array = await this.ttlsService.getJSONsByDTID(ttlsJSON.dtid);
     const versions = await this.ttlsService.getTemplateVersions(
@@ -115,7 +115,9 @@ export class AppController {
         documentTypes.push(entry.comments);
       }
     }
-    const primaryContactName = this.ttlsService.getPrimaryContactName(ttlsJSON);
+    const primaryContactName = this.ttlsService.getPrimaryContactName(
+      response.interestedParties
+    );
     return process.env.ticdi_environment == "DEVELOPMENT"
       ? {
           title: "DEVELOPMENT - " + PAGE_TITLES.INDEX,

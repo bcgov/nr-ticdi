@@ -30,12 +30,12 @@
                     </div>
                 </div>
                 <fieldset class="form-group collapsible">
-                    <legend class='togvis'>Disposition Transaction ID Details <i class="fa fa-plus"></i></legend>
+                    <legend class='togvis'><i class="fa fa-plus"></i>  Disposition Transaction ID Details</legend>
                     <div class="contents" style="display: none;">
                         <div class="form-row">
                             <div class="form-group col-md-5 dataSection dataSection">
                                 <dt>Contact or Agent Name</dt>
-                                <dd>TBD</dd>
+                                <dd>{{primaryContactName}}</dd>
                             </div>
                             <div class="form-group col-md-5 dataSection dataSection">
                                 <dt>Email Address</dt>
@@ -57,38 +57,12 @@
                                 <dt>Incorporation Number</dt>
                                 <dd></dd>
                             </div>
-                            <div class="form-group col-md-5 dataSection dataSection">
-                                <dt>Inspected Date</dt>
-                                <dd>TBD</dd>
-                            </div>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group col-md-5 dataSection dataSection">
-                                <dt>Policy Name</dt>
-                                <dd id="orgUnit2">{{ message.organization_unit }}</dd>
-                            </div>
-                            <div class="form-group col-md-5 dataSection dataSection">
-                                <dt>Purpose Statement</dt>
-                                <dd id="purpose">{{message.purpose_name}}</dd>
-                            </div>
                         </div>
                     </div>
                 </fieldset>
                 <fieldset class="form-group collapsible">
-                    <legend class='togvis'>Tenure Details <i class="fa fa-plus"></i></legend>
+                    <legend class='togvis'><i class="fa fa-plus"></i>  Tenure Details</legend>
                     <div class="contents" style="display: none;">
-                        <div class="form-row">
-                            <div class="form-group col-md-5 dataSection">
-                                <dt>File Number</dt>
-                                <dd id="fileNum">{{ message.tenure_file_number }}</dd>
-                            </div>
-                            <div class="form-group col-md-5 dataSection">
-                                <dt>Mailing Address</dt>
-                                <dd id="address">{{message.mailing_address_line_1}}</dd>
-                                <dd id="cityProv">{{message.mailing_city}} {{message.mailing_province_state_code}}</dd>
-                                <dd id="postalCode">{{message.mailing_postal_code}}</dd>
-                            </div>
-                        </div>
                         <div class="form-row">
                             <div class="form-group col-md-5 dataSection">
                                 <dt>Type</dt>
@@ -102,7 +76,7 @@
                         <div class="form-row">
                             <div class="form-group col-md-5 dataSection">
                                 <dt>Purpose</dt>
-                                <dd id="purpose2">{{ message.purpose_name }}</dd>
+                                <dd id="purpose">{{ message.purpose_name }}</dd>
                             </div>
                             <div class="form-group col-md-5 dataSection">
                                 <dt>Subpurpose</dt>
@@ -111,6 +85,12 @@
                         </div>
                         <div class="form-row">
                             <div class="form-group col-md-5 dataSection">
+                                <dt>Mailing Address</dt>
+                                <dd id="address">{{message.mailing_address_line_1}}</dd>
+                                <dd id="cityProv">{{message.mailing_city}} {{message.mailing_province_state_code}}</dd>
+                                <dd id="postalCode">{{message.mailing_postal_code}}</dd>
+                            </div>
+                            <div class="form-group col-md-5 dataSection">
                                 <dt>Location of Land</dt>
                                 <dd id="locLand">{{message.location_description}}</dd>
                             </div>
@@ -118,7 +98,7 @@
                     </div>
                 </fieldset>
                 <fieldset class="form-group collapsible">
-                    <legend class='togvis'>Area <i class="fa fa-plus"></i></legend>
+                    <legend class='togvis'><i class="fa fa-plus"></i>  Area</legend>
                     <div class="contents" style="display: none;">
                         {{#each parcels}}
                         <div class="form-row">

@@ -378,6 +378,7 @@ export class TTLSService {
       print_request_detail_id: prdid,
       dtid: data.DTID,
       request_app_user: username,
+      request_json: JSON.stringify(data),
     });
 
     const cdogsToken = await this.callGetToken();

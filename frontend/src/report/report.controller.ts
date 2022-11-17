@@ -52,9 +52,10 @@ export class ReportController {
     @Body() data: { prdid: string; version: string; comments: string }
   ) {
     // this should eventually check permissions and prevent unauthorized users from generating documents
-    let name = "No name found";
+    let idir_username = "";
+    console.log(session.data);
     if (session.data.activeAccount) {
-      name = session.data.activeAccount.name;
+      idir_username = session.data.activeAccount.idir_username;
       console.log("active account found");
     } else {
       console.log("no active account found");
@@ -64,7 +65,7 @@ export class ReportController {
         +data.prdid,
         +data.version,
         data.comments,
-        name
+        idir_username
       )
     );
   }

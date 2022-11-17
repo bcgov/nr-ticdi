@@ -19,9 +19,8 @@ export class PrintRequestLogService {
     newItem.print_request_detail_id = printRequestLog.print_request_detail_id;
     newItem.dtid = printRequestLog.dtid;
     newItem.request_app_user = printRequestLog.request_app_user;
-    // newItem.request_timestamp = printRequestLog.request_timestamp;
-    // newItem.request_json = printRequestLog.request_json;
-    // newItem.create_userid = printRequestLog.create_userid;
+    newItem.request_json = printRequestLog.request_json;
+    newItem.create_userid = printRequestLog.request_app_user; // same as request_app_user
     const newPRL = this.printRequestLogRepository.create(newItem);
     return this.printRequestLogRepository.save(newPRL);
   }

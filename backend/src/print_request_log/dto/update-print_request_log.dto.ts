@@ -6,7 +6,6 @@ export class UpdatePrintRequestLogDto extends PickType(PrintRequestLogDto, [
   "print_request_detail_id",
   "dtid",
   "request_app_user",
-  // "request_timestamp",
-  // "request_json",
+  "request_json",
   "update_userid",
 ] as const) {}

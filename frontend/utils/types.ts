@@ -21,7 +21,7 @@ export type AccountObject = {
   // label: string;
   // type: string;
   name: string;
-  display_name: string;
+  idir_username: string;
   client_roles: string[];
 };
 

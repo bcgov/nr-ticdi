@@ -3,13 +3,9 @@ import {
   Controller,
   Render,
   Param,
-  StreamableFile,
-  Header,
   UseGuards,
   UseFilters,
   Session,
-  Body,
-  Post,
 } from "@nestjs/common";
 import { AppService } from "./app.service";
 import { PAGE_TITLES } from "utils/constants";
@@ -49,25 +45,6 @@ export class AppController {
   @UseFilters(AuthenticationFilter)
   @UseGuards(AuthenticationGuard)
   async root(@Session() session: { data?: SessionData }) {
-    // const username = session.data
-    //   ? session.data.activeAccount
-    //     ? session.data.activeAccount.name
-    //       ? session.data.activeAccount.name
-    //       : ""
-    //     : ""
-    //   : "";
-    // const label = session.data
-    //   ? session.data.activeAccount
-    //     ? session.data.activeAccount.display_name
-    //       ? session.data.activeAccount.display_name
-    //       : ""
-    //     : ""
-    //   : "";
-    //session.data.activeAccount !== null && session.data.activeAccount !== undefined
-    //  ? session.data.activeAccount.label
-    //  : session.data.accounts.length == 0
-    //  ? '~'
-    //  : '-';
     let isAdmin = false;
     if (
       session.data &&
@@ -103,20 +80,6 @@ export class AppController {
     @Param("id") id,
     @Param("docname") docname: string
   ) {
-    // const username = session.data
-    //   ? session.data.activeAccount
-    //     ? session.data.activeAccount.name
-    //       ? session.data.activeAccount.name
-    //       : ""
-    //     : ""
-    //   : "";
-    // const label = session.data
-    //   ? session.data.activeAccount
-    //     ? session.data.activeAccount.display_name
-    //       ? session.data.activeAccount.display_name
-    //       : ""
-    //     : ""
-    //   : "";
     let isAdmin = false;
     if (
       session.data &&
@@ -130,13 +93,12 @@ export class AppController {
       }
     }
     const displayAdmin = isAdmin ? "Template Administration" : "-";
-    this.ttlsService.setId(id);
     await this.ttlsService.setWebadeToken();
-    const response = await firstValueFrom(this.ttlsService.callHttp()).then(
-      (res) => {
-        return res;
-      }
-    );
+    const response: any = await firstValueFrom(
+      this.ttlsService.callHttp(id)
+    ).then((res) => {
+      return res;
+    });
     const ttlsJSON = await this.ttlsService.sendToBackend(response);
     const array = await this.ttlsService.getJSONsByDTID(ttlsJSON.dtid);
     const versions = await this.ttlsService.getTemplateVersions(
@@ -153,9 +115,9 @@ export class AppController {
         documentTypes.push(entry.comments);
       }
     }
-    const primaryContactName = this.ttlsService.getPrimaryContactName(ttlsJSON);
-    const p = JSON.parse(ttlsJSON.parcels);
-    ttlsJSON["parcels"] = JSON.stringify(p);
+    const primaryContactName = this.ttlsService.getPrimaryContactName(
+      response.interestedParties
+    );
     return process.env.ticdi_environment == "DEVELOPMENT"
       ? {
           title: "DEVELOPMENT - " + PAGE_TITLES.INDEX,
@@ -166,7 +128,7 @@ export class AppController {
           version: versions,
           documentTypes: documentTypes,
           prdid: ttlsJSON.id,
-          parcels: ttlsJSON.parcels ? JSON.parse(ttlsJSON.parcels) : null,
+          parcels: ttlsJSON.parcels ? ttlsJSON.parcels : null,
         }
       : {
           title: PAGE_TITLES.INDEX,
@@ -186,20 +148,6 @@ export class AppController {
   @UseGuards(AuthenticationGuard)
   @UseGuards(AdminGuard)
   async adminPage(@Session() session: { data?: SessionData }) {
-    // const username = session.data
-    //   ? session.data.activeAccount
-    //     ? session.data.activeAccount.name
-    //       ? session.data.activeAccount.name
-    //       : ""
-    //     : ""
-    //   : "";
-    // const label = session.data
-    //   ? session.data.activeAccount
-    //     ? session.data.activeAccount.display_name
-    //       ? session.data.activeAccount.display_name
-    //       : ""
-    //     : ""
-    //   : "";
     let isAdmin = false;
     if (
       session.data &&
@@ -218,7 +166,7 @@ export class AppController {
         .get(requestUrl, requestConfig)
         .pipe(map((response) => response.data))
     );
-    const documentTypes = [];
+    const documentTypes = ["Land Use Report"];
     for (let entry of data) {
       if (!documentTypes.includes(entry.comments)) {
         documentTypes.push(entry.comments);

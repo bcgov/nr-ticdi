@@ -8,7 +8,6 @@ import {
 import { URL } from "url";
 
 let keycloak_login_fullurl, keycloak_login_baseurl, keycloak_login_params;
-let redirectUri = encodeURI("http://localhost:3000");
 
 @Catch(HttpException)
 export class AuthenticationFilter implements ExceptionFilter {

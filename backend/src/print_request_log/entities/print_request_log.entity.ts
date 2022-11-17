@@ -18,10 +18,8 @@ export class PrintRequestLog {
   dtid: number;
   @Column()
   request_app_user: string;
-  // @Column()
-  // request_timestamp: string;
-  // @Column()
-  // request_json: JSON;
+  @Column()
+  request_json: string;
   @Column()
   create_userid: string;
   @Column()
@@ -36,8 +34,7 @@ export class PrintRequestLog {
     print_request_detail_id?: number,
     dtid?: number,
     request_app_user?: string,
-    // request_timestamp?: string,
-    // request_json?: JSON,
+    request_json?: string,
     create_userid?: string,
     update_userid?: string
   ) {
@@ -45,8 +42,7 @@ export class PrintRequestLog {
     this.print_request_detail_id = print_request_detail_id || null;
     this.dtid = dtid || null;
     this.request_app_user = request_app_user || "";
-    // this.request_timestamp = request_timestamp || "";
-    // this.request_json = request_json || null;
+    this.request_json = request_json || "";
     this.create_userid = create_userid || "";
     this.update_userid = update_userid || "";
   }

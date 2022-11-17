@@ -1,12 +1,25 @@
-import { Controller, Post, Session, Body } from "@nestjs/common";
+import {
+  Controller,
+  Post,
+  Session,
+  Body,
+  UseFilters,
+  UseGuards,
+} from "@nestjs/common";
 import { SessionData } from "utils/types";
 import { AxiosRequestConfig } from "axios";
 import { AdminService } from "./admin.service";
+import { AuthenticationFilter } from "src/authentication/authentication.filter";
+import { AuthenticationGuard } from "src/authentication/authentication.guard";
+import { AdminGuard } from "./admin.guard";
 
 let requestUrl: string;
 let requestConfig: AxiosRequestConfig;
 
 @Controller("admin")
+@UseFilters(AuthenticationFilter)
+@UseGuards(AuthenticationGuard)
+@UseGuards(AdminGuard)
 export class AdminController {
   constructor(private readonly adminService: AdminService) {
     const hostname = process.env.backend_url

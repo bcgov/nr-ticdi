@@ -150,7 +150,7 @@ objects:
                       name: ttls
                       key: ttls_api_endpoint
                 - name: backend_url
-                  value: https://${NAME}-${ZONE}-backend.${DOMAIN}
+                  value: http://${NAME}-${ZONE}-${COMPONENT}
                 - name: session_path
                   value: '/mnt/sessions'
                 - name: cookie_secret
@@ -198,6 +198,11 @@ objects:
                     secretKeyRef: 
                       name: cdogs
                       key: cdogs_url
+                - name: cdogs_token_endpoint
+                  valueFrom:
+                    secretKeyRef: 
+                      name: cdogs
+                      key: cdogs_token_endpoint
               ports:
                 - containerPort: 3000
                   protocol: TCP

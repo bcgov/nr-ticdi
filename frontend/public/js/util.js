@@ -12,6 +12,9 @@ async function generateReport() {
     .then((res) => res.json())
     .then((resJson) => {
       return resJson.reportName;
+    })
+    .catch(() => {
+      location.reload();
     });
   const comments = $("#document_type_id option:selected").text();
   const version = $("#versionSelect option:selected").text();

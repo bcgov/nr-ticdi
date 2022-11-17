@@ -41,7 +41,7 @@ async function generateReport() {
       $("#genReport").prop("disabled", false);
     })
     .catch(() => {
-      alert("Something went wrong");
+      location.reload();
       $("#genReport").prop("disabled", false);
     });
 }

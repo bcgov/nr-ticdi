@@ -4,8 +4,6 @@ import axios, { AxiosResponse } from "axios";
 import { Observable } from "rxjs";
 import { map } from "rxjs/operators";
 import { URLSearchParams } from "url";
-import * as fs from "fs";
-import * as path from "path";
 import * as dotenv from "dotenv";
 import * as base64 from "base-64";
 declare const Buffer;
@@ -33,56 +31,9 @@ export class TTLSService {
     this.tantalis_api = process.env.TTLS_API_ENDPOINT;
   }
 
-  private id: String;
-  private jsonDataFile: {};
-  private jsonDataArray: any[];
-
-  setId(id: String) {
-    this.id = id;
-  }
-
   async setWebadeToken() {
     console.log("Getting a new webade token");
     this.webade_token = await this.getWebadeToken();
-  }
-
-  // probably unneeded as cdogs template is stored in a view now
-  // convert the TTLS JSON package to a format that conforms to the CDOGS template
-  setJSONDataFile(jsonDataFile: [{}]) {
-    const formattedJsonArray = [];
-    for (let s of jsonDataFile) {
-      let string = JSON.stringify(s);
-      let jsonFormatted = JSON.parse(string);
-      formattedJsonArray.push(jsonFormatted);
-    }
-    this.jsonDataArray = formattedJsonArray;
-    var jsonFormatted = formattedJsonArray[0];
-
-    let legalName = "???";
-    // if (typeof legalName === "undefined" || !legalName) {
-    //   legalName =
-    //     jsonFormatted.tenantAddr.firstName +
-    //     " " +
-    //     jsonFormatted.tenantAddr.lastName;
-    // }
-
-    this.jsonDataFile = {
-      DataArray: formattedJsonArray,
-      FileNum: jsonFormatted.tenure_file_number,
-      OrganizationUnit: jsonFormatted.organization_unit,
-      LicenceHolderName: legalName,
-      MailingAddress: jsonFormatted.mailing_address_line_1,
-      MailingCity: jsonFormatted.mailing_city,
-      MailingProv: jsonFormatted.mailing_province_state_code,
-      PostCode: jsonFormatted.mailing_postal_code,
-      Purpose: jsonFormatted.purpose_name,
-      SubPurpose: jsonFormatted.sub_purpose_name,
-      TenureType: jsonFormatted.type_name,
-      TenureSubType: jsonFormatted.sub_type_name,
-      TenureArea: jsonFormatted.area_ha_number,
-      Location: jsonFormatted.location_description,
-      LegalDescription: jsonFormatted.legal_description,
-    };
   }
 
   // sends json data to the backend to be inserted into the database
@@ -293,12 +244,12 @@ export class TTLSService {
     }
   }
 
-  callHttp(): Observable<Array<Object>> {
+  callHttp(id: string): Observable<Array<Object>> {
     const bearerToken = this.webade_token;
     // const bearerToken = process.env.ttls_api_key;
 
     // const url = process.env.ttls_url + this.id;
-    const url = this.tantalis_api + "landUseApplications/" + this.id;
+    const url = this.tantalis_api + "landUseApplications/" + id;
 
     return this.http
       .get(url, { headers: { Authorization: "Bearer " + bearerToken } })
@@ -413,9 +364,6 @@ export class TTLSService {
       .then((res) => {
         return res.data;
       });
-    if (data.Parcels) {
-      data["Parcels"] = JSON.parse(data.Parcels);
-    }
     // get the document template, comments refers to the document type (Land Use Report)
     const documentTemplateObject: { data: { id: number; the_file: string } } =
       await axios.post(templateUrl, {

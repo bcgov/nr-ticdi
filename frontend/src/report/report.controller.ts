@@ -7,10 +7,14 @@ import {
   Body,
   Post,
   Param,
+  UseGuards,
+  UseFilters,
 } from "@nestjs/common";
 import { SessionData } from "utils/types";
 import { TTLSService } from "../ttls/ttls.service";
 import { AxiosRequestConfig } from "axios";
+import { AuthenticationFilter } from "src/authentication/authentication.filter";
+import { AuthenticationGuard } from "src/authentication/authentication.guard";
 
 let requestUrl: string;
 let requestConfig: AxiosRequestConfig;
@@ -35,6 +39,8 @@ export class ReportController {
     return this.ttlsService.generateReportName(+dtid);
   }
 
+  @UseFilters(AuthenticationFilter)
+  @UseGuards(AuthenticationGuard)
   @Post("generateReport")
   @Header(
     "Content-Type",
@@ -46,7 +52,9 @@ export class ReportController {
     @Body() data: { prdid: string; version: string; comments: string }
   ) {
     // this should eventually check permissions and prevent unauthorized users from generating documents
+    let name = "No name found";
     if (session.data.activeAccount) {
+      name = session.data.activeAccount.name;
       console.log("active account found");
     } else {
       console.log("no active account found");
@@ -56,7 +64,7 @@ export class ReportController {
         +data.prdid,
         +data.version,
         data.comments,
-        session.data.activeAccount.name
+        name
       )
     );
   }

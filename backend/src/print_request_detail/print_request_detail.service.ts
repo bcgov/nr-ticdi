@@ -40,46 +40,34 @@ export class PrintRequestDetailService {
     newItem.location_description = printRequestDetail.location_description;
     newItem.parcels = printRequestDetail.parcels;
     newItem.create_userid = printRequestDetail.create_userid;
-
-    // const existingPRD = await this.printRequestDetailRepository.findBy({
-    //   dtid: printRequestDetail.dtid,
-    // });
-    // if (!existingPRD) {
-    //   newItem.version = 1;
-    //   const newPRD = this.printRequestDetailRepository.create(newItem);
-    //   return this.printRequestDetailRepository.save(newPRD);
-    // } else {
-    //   let currentVersion = 0;
-    //   for (let item of existingPRD) {
-    //     if (item.version > currentVersion) {
-    //       currentVersion = item.version;
-    //     }
-    //   }
-    //   newItem.version = currentVersion + 1;
-    //   const newPRD = this.printRequestDetailRepository.create(newItem);
-    //   return this.printRequestDetailRepository.save(newPRD);
-    // }
-
     const newPRD = this.printRequestDetailRepository.create(newItem);
-    return this.printRequestDetailRepository.save(newPRD);
+    return this.convertParcelsToJson(
+      await this.printRequestDetailRepository.save(newPRD)
+    );
   }
 
   async findAll(): Promise<PrintRequestDetail[]> {
-    return this.printRequestDetailRepository.find();
+    return this.convertParcelsToJson(
+      await this.printRequestDetailRepository.find()
+    );
   }
 
   async findByDtid(dtid: number): Promise<PrintRequestDetail[]> {
-    return this.printRequestDetailRepository.find({
-      where: {
-        dtid: dtid,
-      },
-    });
+    return this.convertParcelsToJson(
+      await this.printRequestDetailRepository.find({
+        where: {
+          dtid: dtid,
+        },
+      })
+    );
   }
 
   async findViewByPRDID(prdid: number): Promise<PrintRequestDetailView> {
-    return this.dataSource.manager.findOneBy(PrintRequestDetailView, {
-      PRDID: prdid,
-    });
+    return this.convertParcelsToJson(
+      await this.dataSource.manager.findOneBy(PrintRequestDetailView, {
+        PRDID: prdid,
+      })
+    );
   }
 
   async remove(dtid: number): Promise<{ deleted: boolean; message?: string }> {
@@ -88,6 +76,42 @@ export class PrintRequestDetailService {
       return { deleted: true };
     } catch (err) {
       return { deleted: false, message: err.message };
+    }
+  }
+
+  // converts the parcels/Parcels from a json string to a json object before returning
+  convertParcelsToJson(prd: any) {
+    let p;
+    if (Array.isArray(prd)) {
+      if (prd[0].parcels) {
+        prd = prd.map(function (entry) {
+          if (entry.parcels) {
+            p = JSON.parse(entry.parcels);
+            entry["parcels"] = p;
+            return entry;
+          }
+        });
+        return prd;
+      } else if (prd[0].Parcels) {
+        prd = prd.map(function (entry) {
+          if (entry.Parcels) {
+            p = JSON.parse(entry.Parcels);
+            entry["Parcels"] = p;
+            return entry;
+          }
+        });
+        return prd;
+      }
+    } else {
+      if (prd.parcels) {
+        p = JSON.parse(prd.parcels);
+        prd["parcels"] = p;
+        return prd;
+      } else if (prd.Parcels) {
+        p = JSON.parse(prd.Parcels);
+        prd["Parcels"] = p;
+        return prd;
+      }
     }
   }
 }

@@ -23,7 +23,7 @@ async function bootstrap() {
     resave: false,
     saveUninitialized: false,
     store: new fileSession({ path: resolve("./", process.env.session_path) }),
-    cookie: { maxAge: 3600000, secure: false, httpOnly: true },
+    cookie: { maxAge: 1800000, secure: false, httpOnly: true },
   };
 
   app.use(expressSession(sessionOptions));

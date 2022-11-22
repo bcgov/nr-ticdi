@@ -87,7 +87,7 @@
                             <div class="form-group col-md-5 dataSection">
                                 <dt>Mailing Address</dt>
                                 <dd id="address">{{message.mailing_address_line_1}}</dd>
-                                <dd id="cityProv">{{message.mailing_city}} {{message.mailing_province_state_code}}</dd>
+                                <dd id="cityProv">{{message.mailing_city}} {{message.mailing_province_state_code}}, {{message.mailing_country}}</dd>
                                 <dd id="postalCode">{{message.mailing_postal_code}}</dd>
                             </div>
                             <div class="form-group col-md-5 dataSection">
@@ -122,13 +122,13 @@
             </div>
         </form>
         <input type="hidden" id="prdid"></input>
-        <input type="hidden" id="dtid"></input>
+        <input type="hidden" id="tfn"></input>
     </main>
     <script>
         var dataArray = [];       
         $( document ).ready(function() {
             $("#prdid").text("{{this.prdid}}");
-            $("#dtid").text("{{message.dtid}}");
+            $("#tfn").text("{{message.tenure_file_number}}");
             {{#each data}}
             dataArray.push({
                 dtid: "{{this.dtid}}",
@@ -146,6 +146,7 @@
                 mailing_city: "{{this.mailing_city}}",
                 mailing_province_state_code: "{{this.mailing_province_state_code}}",
                 mailing_postal_code: "{{this.mailing_postal_code}}",
+                mailing_country: "{{this.mailing_country}}"
             });
             {{/each}}
 

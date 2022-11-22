@@ -38,9 +38,11 @@ export class ReportController {
     };
   }
 
-  @Get("getReportName/:dtid")
-  getReportName(@Param("dtid") dtid: string): Promise<{ reportName: string }> {
-    return this.ttlsService.generateReportName(+dtid);
+  @Get("getReportName/:tfn")
+  getReportName(
+    @Param("tfn") tenureFileNumber: string
+  ): Promise<{ reportName: string }> {
+    return this.ttlsService.generateReportName(+tenureFileNumber);
   }
 
   @Post("generateReport")

@@ -18,10 +18,7 @@ import { ReportModule } from "./report/report.module";
     AdminModule,
     ReportModule,
     SessionModule.forRoot({
-      session: {
-        secret: process.env.session_secret,
-        cookie: { maxAge: 1800000 }, // when the refresh token expires, so does the cookie
-      },
+      session: { secret: process.env.session_secret },
     }),
   ],
   controllers: [AppController, AdminController],

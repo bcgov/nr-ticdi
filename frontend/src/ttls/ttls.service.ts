@@ -337,8 +337,9 @@ export class TTLSService {
       });
   }
 
-  async generateReportName(dtid: number) {
-    const url = `${hostname}:${port}/print-request-log/version/` + dtid;
+  async generateReportName(tenureFileNumber: number) {
+    const url =
+      `${hostname}:${port}/print-request-log/version/` + tenureFileNumber;
     // grab the next version string for the dtid
     const version = await axios
       .get(url, {
@@ -349,7 +350,7 @@ export class TTLSService {
       .then((res) => {
         return res.data;
       });
-    return { reportName: "LUR_" + dtid + "_" + version };
+    return { reportName: "LUR_" + tenureFileNumber + "_" + version };
   }
 
   // generate the Land use Report via CDOGS

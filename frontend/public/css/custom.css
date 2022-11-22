@@ -110,7 +110,7 @@ input::-webkit-inner-spin-button {
 }
 
 /* Firefox */
-input[type='number'] {
+input[type="number"] {
   -moz-appearance: textfield;
 }
 
@@ -121,4 +121,14 @@ input[type='number'] {
 .account-error {
   color: red;
   text-align: center;
+}
+
+.version {
+  bottom: 0;
+  color: white;
+  display: block;
+  float: left;
+  right: 0;
+  position: absolute;
+  margin: 14px 40px;
 }

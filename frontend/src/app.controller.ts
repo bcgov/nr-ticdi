@@ -58,17 +58,15 @@ export class AppController {
       }
     }
     const displayAdmin = isAdmin ? "Template Administration" : "-";
-    return process.env.ticdi_environment == "DEVELOPMENT"
-      ? {
-          title: "DEVELOPMENT - " + PAGE_TITLES.INDEX,
-          primaryContactName: "",
-          displayAdmin: displayAdmin,
-        }
-      : {
-          title: PAGE_TITLES.INDEX,
-          primaryContactName: "",
-          displayAdmin: displayAdmin,
-        };
+    const title =
+      process.env.ticdi_environment == "DEVELOPMENT"
+        ? "DEVELOPMENT - " + PAGE_TITLES.INDEX
+        : PAGE_TITLES.INDEX;
+    return {
+      title: title,
+      primaryContactName: "",
+      displayAdmin: displayAdmin,
+    };
   }
 
   @Get("dtid/:id/:docname")
@@ -100,7 +98,6 @@ export class AppController {
       return res;
     });
     const ttlsJSON = await this.ttlsService.sendToBackend(response);
-    const array = await this.ttlsService.getJSONsByDTID(ttlsJSON.dtid);
     const versions = await this.ttlsService.getTemplateVersions(
       "Land Use Report"
     );
@@ -118,28 +115,19 @@ export class AppController {
     const primaryContactName = this.ttlsService.getPrimaryContactName(
       response.interestedParties
     );
-    return process.env.ticdi_environment == "DEVELOPMENT"
-      ? {
-          title: "DEVELOPMENT - " + PAGE_TITLES.INDEX,
-          primaryContactName: primaryContactName,
-          displayAdmin: displayAdmin,
-          message: ttlsJSON,
-          data: array,
-          version: versions,
-          documentTypes: documentTypes,
-          prdid: ttlsJSON.id,
-          parcels: ttlsJSON.parcels ? ttlsJSON.parcels : null,
-        }
-      : {
-          title: PAGE_TITLES.INDEX,
-          primaryContactName: primaryContactName,
-          displayAdmin: displayAdmin,
-          message: ttlsJSON,
-          data: array,
-          version: versions,
-          documentTypes: documentTypes,
-          prdid: ttlsJSON.id,
-        };
+    const title =
+      process.env.ticdi_environment == "DEVELOPMENT"
+        ? "DEVELOPMENT - " + PAGE_TITLES.INDEX
+        : PAGE_TITLES.INDEX;
+    return {
+      title: title,
+      primaryContactName: primaryContactName,
+      displayAdmin: displayAdmin,
+      message: ttlsJSON,
+      version: versions,
+      documentTypes: documentTypes,
+      prdid: ttlsJSON.id,
+    };
   }
 
   @Get("template-admin")
@@ -172,21 +160,17 @@ export class AppController {
         documentTypes.push(entry.comments);
       }
     }
-    return process.env.ticdi_environment == "DEVELOPMENT"
-      ? {
-          title: "DEVELOPMENT - " + PAGE_TITLES.INDEX,
-          primaryContactName: "",
-          displayAdmin: displayAdmin,
-          data: data,
-          documentTypes: documentTypes,
-        }
-      : {
-          title: PAGE_TITLES.INDEX,
-          primaryContactName: "",
-          displayAdmin: displayAdmin,
-          data: data,
-          documentTypes: documentTypes,
-        };
+    const title =
+      process.env.ticdi_environment == "DEVELOPMENT"
+        ? "DEVELOPMENT - " + PAGE_TITLES.ADMIN
+        : PAGE_TITLES.ADMIN;
+    return {
+      title: title,
+      primaryContactName: "",
+      displayAdmin: displayAdmin,
+      data: data,
+      documentTypes: documentTypes,
+    };
   }
 
   @Get("getHello")

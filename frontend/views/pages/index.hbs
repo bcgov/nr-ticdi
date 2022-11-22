@@ -100,7 +100,7 @@
                 <fieldset class="form-group collapsible">
                     <legend style="cursor: pointer" class='togvis'><i class="fa fa-plus"></i>  Area</legend>
                     <div class="contents" style="display: none;">
-                        {{#each parcels}}
+                        {{#each message.parcels}}
                         <div class="form-row">
                             <div class="form-group col-md-2 dataSection">
                                 <dt>Area</dt>
@@ -124,31 +124,10 @@
         <input type="hidden" id="prdid"></input>
         <input type="hidden" id="tfn"></input>
     </main>
-    <script>
-        var dataArray = [];       
+    <script>       
         $( document ).ready(function() {
             $("#prdid").text("{{this.prdid}}");
             $("#tfn").text("{{message.tenure_file_number}}");
-            {{#each data}}
-            dataArray.push({
-                dtid: "{{this.dtid}}",
-                version: "{{this.version}}",
-                organization_unit: "{{this.organization_unit}}",
-                purpose_name: "{{this.purpose_name}}",
-                sub_purpose_name: "{{this.sub_purpose_name}}",
-                tenure_file_number: "{{this.tenure_file_number}}",
-                type_name: "{{this.type_name}}",
-                sub_type_name: "{{this.sub_type_name}}",
-                area_ha_number: "{{this.area_ha_number}}",
-                location_description: "{{this.location_description}}",
-                legal_description: "{{this.legal_description}}",
-                mailing_address_line_1: "{{this.mailing_address_line_1}}",
-                mailing_city: "{{this.mailing_city}}",
-                mailing_province_state_code: "{{this.mailing_province_state_code}}",
-                mailing_postal_code: "{{this.mailing_postal_code}}",
-                mailing_country: "{{this.mailing_country}}"
-            });
-            {{/each}}
 
             $(".dataSection dd").each(function(){
                 if ($(this).text() == "" || $(this).text() == "TBD") {

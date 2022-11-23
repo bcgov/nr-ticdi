@@ -1,6 +1,7 @@
 import { Injectable } from "@nestjs/common";
-import axios from "axios";
 import * as dotenv from "dotenv";
+const axios = require("axios");
+const FormData = require("form-data");
 
 dotenv.config();
 let hostname: string;
@@ -16,21 +17,30 @@ export class AdminService {
     port = process.env.backend_url ? 3000 : 3001;
   }
 
-  // get a ticdi json object from the backend using a dtid
-  async uploadTemplate(data: any): Promise<any> {
+  async uploadTemplate(
+    data: {
+      document_type: string;
+      comments: string;
+      active_flag: boolean;
+      mime_type: string;
+      file_name: string;
+      template_author: string;
+      create_userid: string;
+    },
+    file: Express.Multer.File
+  ): Promise<any> {
     const url = `${hostname}:${port}/document-template/create`;
-    return axios
-      .post(
-        url,
-        { ...data },
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      )
-      .then((res) => {
-        return res.data;
-      });
+    const form: any = new FormData();
+    form.append("document_type", data.document_type);
+    form.append("comments", data.comments);
+    form.append("active_flag", data.active_flag);
+    form.append("mime_type", data.mime_type);
+    form.append("file_name", data.file_name);
+    form.append("template_author", data.template_author);
+    form.append("create_userid", data.create_userid);
+    form.append("file", file.buffer, "file");
+    return axios.post(url, form).then((res) => {
+      return res.data;
+    });
   }
 }

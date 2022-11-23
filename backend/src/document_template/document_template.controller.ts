@@ -1,15 +1,29 @@
-import { Body, Controller, Get, Post } from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  UploadedFile,
+  UseInterceptors,
+} from "@nestjs/common";
 import { DocumentTemplateService } from "./document_template.service";
 import { CreateDocumentTemplateDto } from "./dto/create-document_template.dto";
 import { UpdateDocumentTemplateDto } from "./dto/update-document_template.dto";
+import { FileInterceptor } from "@nestjs/platform-express";
+import { Express } from "express";
 
 @Controller("document-template")
 export class DocumentTemplateController {
   constructor(private readonly templateService: DocumentTemplateService) {}
 
   @Post("create")
-  create(@Body() data: CreateDocumentTemplateDto) {
-    return this.templateService.create(data);
+  @UseInterceptors(FileInterceptor("file"))
+  async create(
+    @UploadedFile()
+    file: Express.Multer.File,
+    @Body() params: CreateDocumentTemplateDto
+  ) {
+    return await this.templateService.create(params, file);
   }
 
   @Post("update")

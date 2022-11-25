@@ -19,6 +19,7 @@ import { AuthenticationGuard } from "src/authentication/authentication.guard";
 import { AdminGuard } from "./admin.guard";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { Express } from "express";
+import "multer";
 
 let requestUrl: string;
 let requestConfig: AxiosRequestConfig;

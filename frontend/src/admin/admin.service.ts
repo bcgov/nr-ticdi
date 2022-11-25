@@ -2,6 +2,8 @@ import { Injectable } from "@nestjs/common";
 import * as dotenv from "dotenv";
 const axios = require("axios");
 const FormData = require("form-data");
+import { Express } from "express";
+import "multer";
 
 dotenv.config();
 let hostname: string;

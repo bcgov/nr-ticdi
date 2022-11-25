@@ -10,23 +10,23 @@ import {
 export class PrintRequestLog {
   @PrimaryGeneratedColumn()
   id: number;
-  @Column()
+  @Column({ nullable: true })
   document_template_id: number;
-  @Column()
+  @Column({ nullable: true })
   print_request_detail_id: number;
-  @Column()
+  @Column({ nullable: true })
   dtid: number;
-  @Column()
+  @Column({ nullable: true })
   request_app_user: string;
-  @Column()
+  @Column({ nullable: true })
   request_json: string;
-  @Column()
+  @Column({ nullable: true })
   create_userid: string;
-  @Column()
+  @Column({ nullable: true })
   update_userid: string;
-  @CreateDateColumn()
+  @CreateDateColumn({ nullable: true })
   create_timestamp: Date;
-  @UpdateDateColumn()
+  @UpdateDateColumn({ nullable: true })
   update_timestamp: Date;
 
   constructor(

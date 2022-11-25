@@ -25,11 +25,15 @@ export class PrintRequestDetail {
   @Column({ nullable: true })
   sub_type_name: string;
   @Column({ nullable: true })
+  licence_holder_name: string;
+  @Column({ nullable: true })
   first_name: string;
   @Column({ nullable: true })
   middle_name: string;
   @Column({ nullable: true })
   last_name: string;
+  @Column({ nullable: true })
+  mailing_address: string;
   @Column({ nullable: true })
   mailing_address_line_1: string;
   @Column({ nullable: true })
@@ -53,6 +57,10 @@ export class PrintRequestDetail {
   @Column({ nullable: true })
   parcels: string;
   @Column({ nullable: true })
+  area_ha_number: string; // from first entry in parcels
+  @Column({ nullable: true })
+  legal_description: string; // from first entry in parcels
+  @Column({ nullable: true })
   create_userid: string;
   @Column({ nullable: true })
   update_userid: string;
@@ -69,9 +77,11 @@ export class PrintRequestDetail {
     sub_purpose_name?: string,
     type_name?: string,
     sub_type_name?: string,
+    licence_holder_name?: string,
     first_name?: string,
     middle_name?: string,
     last_name?: string,
+    mailing_address?: string,
     mailing_address_line_1?: string,
     mailing_address_line_2?: string,
     mailing_address_line_3?: string,
@@ -83,6 +93,8 @@ export class PrintRequestDetail {
     mailing_country?: string,
     location_description?: string,
     parcels?: string,
+    area_ha_number?: string,
+    legal_description?: string,
     create_userid?: string,
     update_userid?: string
   ) {
@@ -93,9 +105,11 @@ export class PrintRequestDetail {
     this.sub_purpose_name = sub_purpose_name || "";
     this.type_name = type_name || "";
     this.sub_type_name = sub_type_name || "";
+    this.licence_holder_name = licence_holder_name || "";
     this.first_name = first_name || "";
     this.middle_name = middle_name || "";
     this.last_name = last_name || "";
+    this.mailing_address = mailing_address || "";
     this.mailing_address_line_1 = mailing_address_line_1 || "";
     this.mailing_address_line_2 = mailing_address_line_2 || "";
     this.mailing_address_line_3 = mailing_address_line_3 || "";
@@ -107,6 +121,8 @@ export class PrintRequestDetail {
     this.mailing_country = mailing_country || "";
     this.location_description = location_description || "";
     this.parcels = parcels || "";
+    this.area_ha_number = area_ha_number || "";
+    this.legal_description = legal_description || "";
     this.create_userid = create_userid || "";
     this.update_userid = update_userid || "";
   }

@@ -40,10 +40,52 @@ export class PrintRequestDetailService {
     newItem.location_description = printRequestDetail.location_description;
     newItem.parcels = printRequestDetail.parcels;
     newItem.create_userid = printRequestDetail.create_userid;
+    let mailingAddress = "";
+    if (printRequestDetail.mailing_address_line_1) {
+      mailingAddress = printRequestDetail.mailing_address_line_1;
+    }
+    if (printRequestDetail.mailing_address_line_2) {
+      mailingAddress = mailingAddress.concat(
+        ", " + printRequestDetail.mailing_address_line_2
+      );
+    }
+    if (printRequestDetail.mailing_address_line_3) {
+      mailingAddress = mailingAddress.concat(
+        ", " + printRequestDetail.mailing_address_line_3
+      );
+    }
+    newItem.mailing_address = mailingAddress;
+    let licenceHolderName = "";
+    if (printRequestDetail.first_name) {
+      licenceHolderName = printRequestDetail.first_name;
+    }
+    if (printRequestDetail.middle_name) {
+      licenceHolderName = licenceHolderName.concat(
+        " " + printRequestDetail.middle_name
+      );
+    }
+    if (printRequestDetail.last_name) {
+      licenceHolderName = licenceHolderName.concat(
+        " " + printRequestDetail.last_name
+      );
+    }
+    newItem.licence_holder_name = licenceHolderName;
+    let area_ha_number = "";
+    let legal_description = "";
+    if (JSON.parse(printRequestDetail.parcels)[0]) {
+      area_ha_number = JSON.parse(printRequestDetail.parcels)[0].area
+        ? JSON.parse(printRequestDetail.parcels)[0].area.toString()
+        : "";
+      legal_description = JSON.parse(printRequestDetail.parcels)[0]
+        .legal_description
+        ? JSON.parse(printRequestDetail.parcels)[0].legal_description
+        : "";
+    }
+    newItem.area_ha_number = area_ha_number;
+    newItem.legal_description = legal_description;
+
     const newPRD = this.printRequestDetailRepository.create(newItem);
-    return this.convertParcelsToJson(
-      await this.printRequestDetailRepository.save(newPRD)
-    );
+    return this.printRequestDetailRepository.save(newPRD);
   }
 
   async findAll(): Promise<PrintRequestDetail[]> {
@@ -53,21 +95,26 @@ export class PrintRequestDetailService {
   }
 
   async findByDtid(dtid: number): Promise<PrintRequestDetail[]> {
-    return this.convertParcelsToJson(
-      await this.printRequestDetailRepository.find({
+    try {
+      const prd = await this.printRequestDetailRepository.find({
         where: {
           dtid: dtid,
         },
-      })
-    );
+      });
+      return this.convertParcelsToJson(prd);
+    } catch (err) {
+      console.log(err);
+    }
   }
 
   async findViewByPRDID(prdid: number): Promise<PrintRequestDetailView> {
-    return this.convertParcelsToJson(
-      await this.dataSource.manager.findOneBy(PrintRequestDetailView, {
+    const view = await this.dataSource.manager.findOneBy(
+      PrintRequestDetailView,
+      {
         PRDID: prdid,
-      })
+      }
     );
+    return view;
   }
 
   async remove(dtid: number): Promise<{ deleted: boolean; message?: string }> {

@@ -7,47 +7,26 @@ import { PrintRequestDetail } from "./print_request_detail.entity";
       .createQueryBuilder()
       .select("print_request_detail.id", "PRDID")
       .addSelect("print_request_detail.dtid", "DTID")
-      .addSelect("print_request_detail.tenure_file_number", "TenureFileNumber")
+      .addSelect("print_request_detail.tenure_file_number", "FileNum")
       .addSelect("print_request_detail.organization_unit", "OrganizationUnit")
-      .addSelect("print_request_detail.purpose_name", "PurposeName")
-      .addSelect("print_request_detail.sub_purpose_name", "SubPurposeName")
-      .addSelect("print_request_detail.type_name", "Type_name")
-      .addSelect("print_request_detail.sub_type_name", "SubTypeName")
-      .addSelect("print_request_detail.first_name", "FirstName")
-      .addSelect("print_request_detail.middle_name", "MiddleName")
-      .addSelect("print_request_detail.last_name", "LastName")
+      .addSelect("print_request_detail.purpose_name", "Purpose")
+      .addSelect("print_request_detail.sub_purpose_name", "SubPurpose")
+      .addSelect("print_request_detail.type_name", "TenureType")
+      .addSelect("print_request_detail.sub_type_name", "TenureSubType")
       .addSelect(
-        "print_request_detail.mailing_address_line_1",
-        "MailingAddressLine1"
-      )
-      .addSelect(
-        "print_request_detail.mailing_address_line_2",
-        "MailingAddressLine2"
-      )
-      .addSelect(
-        "print_request_detail.mailing_address_line_3",
-        "MailingAddressLine3"
-      )
+        "print_request_detail.licence_holder_name",
+        "LicenceHolderName"
+      ) // add to entity
+      .addSelect("print_request_detail.mailing_address", "MailingAddress") // add to entity
       .addSelect("print_request_detail.mailing_city", "MailingCity")
       .addSelect(
         "print_request_detail.mailing_province_state_code",
-        "MailingProvinceStateCode"
+        "MailingProv"
       )
-      .addSelect(
-        "print_request_detail.mailing_postal_code",
-        "MailingPostalCode"
-      )
-      .addSelect("print_request_detail.mailing_zip", "MailingZip")
-      .addSelect(
-        "print_request_detail.mailing_country_code",
-        "MailingCountryCode"
-      )
-      .addSelect("print_request_detail.mailing_country", "MailingCountry")
-      .addSelect(
-        "print_request_detail.location_description",
-        "LocationDescription"
-      )
-      .addSelect("print_request_detail.parcels", "Parcels")
+      .addSelect("print_request_detail.mailing_postal_code", "PostCode")
+      .addSelect("print_request_detail.location_description", "Location")
+      .addSelect("print_request_detail.area_ha_number", "TenureArea")
+      .addSelect("print_request_detail.legal_description", "LegalDescription")
       .from(PrintRequestDetail, "print_request_detail"),
 })
 export class PrintRequestDetailView {
@@ -56,43 +35,31 @@ export class PrintRequestDetailView {
   @ViewColumn()
   PRDID: number;
   @ViewColumn()
-  TenureFileNumber: string;
+  FileNum: string;
   @ViewColumn()
   OrganizationUnit: string;
   @ViewColumn()
-  PurposeName: string;
+  Purpose: string;
   @ViewColumn()
-  SubPurposeName: string;
+  SubPurpose: string;
   @ViewColumn()
-  Type_name: string;
+  TenureType: string;
   @ViewColumn()
-  SubTypeName: string;
+  TenureSubType: string;
   @ViewColumn()
-  FirstName: string;
+  LicenceHolderName: string;
   @ViewColumn()
-  MiddleName: string;
-  @ViewColumn()
-  LastName: string;
-  @ViewColumn()
-  MailingAddressLine1: string;
-  @ViewColumn()
-  MailingAddressLine2: string;
-  @ViewColumn()
-  MailingAddressLine3: string;
+  MailingAddress: string;
   @ViewColumn()
   MailingCity: string;
   @ViewColumn()
-  MailingProvinceStateCode: string;
+  MailingProv: string;
   @ViewColumn()
-  MailingPostalCode: string;
+  PostCode: string;
   @ViewColumn()
-  MailingZip: string;
+  TenureArea: string;
   @ViewColumn()
-  MailingCountryCode: string;
+  Location: string;
   @ViewColumn()
-  MailingCountry: string;
-  @ViewColumn()
-  LocationDescription: string;
-  @ViewColumn()
-  Parcels: string;
+  LegalDescription: string;
 }

@@ -13,17 +13,16 @@ export class DocumentTemplateService {
   ) {}
 
   async create(
-    documentTemplate: CreateDocumentTemplateDto
+    documentTemplate: CreateDocumentTemplateDto,
+    file: any
   ): Promise<DocumentTemplate> {
+    const base64File = Buffer.from(file.buffer).toString("base64");
     const newItem = new DocumentTemplate();
     newItem.document_type = documentTemplate.document_type;
-    newItem.template_version = documentTemplate.template_version;
     newItem.template_author = documentTemplate.template_author;
-    newItem.template_creation_date = documentTemplate.template_creation_date;
     newItem.active_flag = documentTemplate.active_flag;
     newItem.mime_type = documentTemplate.mime_type;
     newItem.file_name = documentTemplate.file_name;
-    newItem.the_file = documentTemplate.the_file;
     newItem.comments = documentTemplate.comments;
     newItem.create_userid = documentTemplate.create_userid;
     const existingReports = await this.documentTemplateRepository.findBy({
@@ -40,17 +39,15 @@ export class DocumentTemplateService {
           currentVersion = item.template_version;
         }
       }
-      //   const newVersion =
-      //     currentVersion + 1 > 9
-      //       ? (currentVersion + 1).toString()
-      //       : "0" + (currentVersion + 1).toString();
       newItem.template_version = currentVersion + 1;
+      newItem.the_file = base64File;
       const newTemplate = this.documentTemplateRepository.create(newItem);
       return this.documentTemplateRepository.save(newTemplate);
     }
   }
 
   // updates the updated_by and document_version columns
+  // unused - needs to be updated
   async update(
     templateData: UpdateDocumentTemplateDto
   ): Promise<DocumentTemplate> {

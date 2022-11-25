@@ -31,21 +31,43 @@
       >
         <span class="navbar-toggler-icon"></span>
       </button>
-      <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-        <div class="navbar-nav">
-          <div "adminLinkDiv"><a class="nav-item nav-link" id="adminLink" href="/template-admin">{{displayAdmin}}</a></div>
+      <div
+        class="collapse navbar-collapse"
+        id="navbarNavAltMarkup"
+        style="width:auto"
+      >
+        <div class="navbar-nav" style="width:auto">
+          <div id="adminLinkDiv" style="width:auto"><a
+              class="nav-item nav-link"
+              id="adminLink"
+              href="/template-admin"
+            >{{displayAdmin}}</a></div>
         </div>
       </div>
       <div class="float-right">
         <table>
           <tr>
-            <td class="m-0 p-0" style="font-size:small; color: white" id="navbarFileNumber">File Number: {{message.tenure_file_number}}</td>
+            <td
+              class="col-xs-2 m-0 p-0"
+              style="font-size:14px; font-weight:bold; color: white"
+              id="navbarDTID"
+            ><div class="mr-3">DTID: {{message.dtid}}</div></td>
+            <td
+              class="col-xs-4 m-0 p-0"
+              style="font-size:12px; color: white"
+              id="navbarFileNumber"
+            >Tenure File Number: {{message.tenure_file_number}}</td>
           </tr>
           <tr>
-            <td class="m-0 p-0" style="font-size:small; color: white" id="navbarDTID">DTID: {{message.dtid}}</td>
-          </tr>
-          <tr>
-            <td class="m-0 p-0" style="font-size:x-small; color: white" id="navbarPrimaryContactName">Primary Contact Name: {{primaryContactName}}</td>
+            <td
+              class="col-xs-2 m-0 p-0"
+              style="font-size:small; color: white"
+            ><div class="mr-3"></div></td>
+            <td
+              class="col-xs-4 m-0 p-0"
+              style="font-size:12px; color: white"
+              id="navbarPrimaryContactName"
+            >Primary Contact Name: {{primaryContactName}}</td>
           </tr>
         </table>
       </div>

@@ -1,12 +1,13 @@
 import { Injectable } from "@nestjs/common";
 import { HttpService } from "@nestjs/axios";
-import axios, { AxiosResponse } from "axios";
+import { AxiosResponse } from "axios";
 import { Observable } from "rxjs";
 import { map } from "rxjs/operators";
 import { URLSearchParams } from "url";
 import * as dotenv from "dotenv";
 import * as base64 from "base-64";
 declare const Buffer;
+const axios = require("axios");
 
 dotenv.config();
 let hostname: string;

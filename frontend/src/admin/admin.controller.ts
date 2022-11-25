@@ -5,6 +5,11 @@ import {
   Body,
   UseFilters,
   UseGuards,
+  UploadedFile,
+  UseInterceptors,
+  ParseFilePipe,
+  FileTypeValidator,
+  MaxFileSizeValidator,
 } from "@nestjs/common";
 import { SessionData } from "utils/types";
 import { AxiosRequestConfig } from "axios";
@@ -12,6 +17,8 @@ import { AdminService } from "./admin.service";
 import { AuthenticationFilter } from "src/authentication/authentication.filter";
 import { AuthenticationGuard } from "src/authentication/authentication.guard";
 import { AdminGuard } from "./admin.guard";
+import { FileInterceptor } from "@nestjs/platform-express";
+import { Express } from "express";
 
 let requestUrl: string;
 let requestConfig: AxiosRequestConfig;
@@ -35,20 +42,22 @@ export class AdminController {
   }
 
   @Post("upload-template")
-  async root(
+  @UseInterceptors(FileInterceptor("file"))
+  async uploadTemplate2(
     @Session() session: { data?: SessionData },
-    @Body()
-    data: {
-      the_file: string;
-      comments: string;
-      active_flag: boolean;
-      template_version: string;
-      template_author: string;
-      template_creation_date: Date;
-      mime_type: string;
-      file_name: string;
-      create_userid: string;
-    }
+    @UploadedFile(
+      new ParseFilePipe({
+        validators: [
+          new MaxFileSizeValidator({ maxSize: 5000000 }),
+          new FileTypeValidator({
+            fileType:
+              "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+          }), // checks the mimetype
+        ],
+      })
+    )
+    file: Express.Multer.File,
+    @Body() params: { comments: string; active_flag: boolean }
   ) {
     let isAdmin = false;
     if (
@@ -63,9 +72,28 @@ export class AdminController {
       }
     }
     if (isAdmin) {
-      return this.adminService.uploadTemplate(data);
+      const create_userid = session.data.activeAccount
+        ? session.data.activeAccount.idir_username
+          ? session.data.activeAccount.idir_username
+          : ""
+        : "";
+      const template_author = session.data.activeAccount
+        ? session.data.activeAccount.name
+          ? session.data.activeAccount.name
+          : ""
+        : "";
+      const uploadData = {
+        document_type: "",
+        comments: params.comments,
+        active_flag: params.active_flag,
+        mime_type: file.mimetype,
+        file_name: file.originalname,
+        template_author: template_author,
+        create_userid: create_userid,
+      };
+      return this.adminService.uploadTemplate(uploadData, file);
     } else {
-      return { message: "NO" };
+      return { message: "No Admin Privileges Found" };
     }
   }
 }

@@ -25,9 +25,14 @@ export class AuthenticationGuard implements CanActivate {
     const code = url.searchParams.get("code")
       ? url.searchParams.get("code")
       : null;
-    const token = request.session.data
-      ? request.session.data.access_token
-      : null;
+    let token = null;
+    if (
+      request.session &&
+      request.session.data &&
+      request.session.data.access_token
+    ) {
+      token = request.session.data.access_token;
+    }
 
     let tokenStatus: string;
     let tokenObject: TokenObject;

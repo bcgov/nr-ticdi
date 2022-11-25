@@ -168,25 +168,16 @@
         const uploadForm = document.querySelector(".upload");
         uploadForm.addEventListener('submit', function(e) {
             e.preventDefault();
-            let file = document.getElementById('uploadFile').files[0];
-            const data = JSON.stringify({
-                the_file: fileBase64,
-                comments: 'Land Use Report',
-                active_flag: true,
-                template_version: '1',
-                template_author: 'Mike',
-                template_creation_date: new Date(),
-                mime_type: 'no',
-                file_name: 'landusereport',
-                create_userid: '123'
-            });
+            let f = document.getElementById('uploadFile');
+            var input = document.querySelector('input[type="file"]')
+            var formData = new FormData();
+            formData.append('file', input.files[0])
+            formData.append('comments', 'Land Use Report')
+            formData.append('active_flag', true)
             fetch('/admin/upload-template', {
                 method: 'POST',
+                body: formData,
                 responseType: 'application/json',
-                headers: {
-                'Content-Type': 'application/json',
-                },
-                body: data,
             })
             .then(res => res.json())
             .then(data => {

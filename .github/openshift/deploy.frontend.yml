@@ -150,7 +150,7 @@ objects:
                       name: ttls
                       key: ttls_api_endpoint
                 - name: backend_url
-                  value: http://${NAME}-${ZONE}-${COMPONENT}
+                  value: http://${NAME}-${ZONE}-backend
                 - name: session_path
                   value: '/mnt/sessions'
                 - name: cookie_secret

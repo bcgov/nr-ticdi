@@ -63,6 +63,7 @@ export class TTLSService {
         middle_name: printRequestDetail.tenantAddr.middleName,
         last_name: printRequestDetail.tenantAddr.lastName,
         legal_name: printRequestDetail.tenantAddr.legalName,
+        licence_holder_name: this.getPrimaryContactName(printRequestDetail),
         mailing_address_line_1: printRequestDetail.tenantAddr.addrLine1,
         mailing_address_line_2: printRequestDetail.tenantAddr.addrLine2,
         mailing_address_line_3: printRequestDetail.tenantAddr.addrLine3,
@@ -130,22 +131,28 @@ export class TTLSService {
   }
 
   // returns the individual name and if there is none, then it returns the legal name
-  getPrimaryContactName(ttlsJSON: {
-    first_name: string;
-    middle_name: string;
-    last_name: string;
-    legal_name: string;
+  getPrimaryContactName(prdObject: {
+    tenantAddr: {
+      first_name: string;
+      middle_name: string;
+      last_name: string;
+      legal_name: string;
+    };
   }) {
-    if (ttlsJSON.first_name || ttlsJSON.middle_name || ttlsJSON.last_name) {
+    if (
+      prdObject.tenantAddr.first_name ||
+      prdObject.tenantAddr.middle_name ||
+      prdObject.tenantAddr.last_name
+    ) {
       return (
-        ttlsJSON.first_name +
+        prdObject.tenantAddr.first_name +
         " " +
-        ttlsJSON.middle_name +
+        prdObject.tenantAddr.middle_name +
         " " +
-        ttlsJSON.last_name
+        prdObject.tenantAddr.last_name
       );
-    } else if (ttlsJSON.legal_name) {
-      return ttlsJSON.legal_name;
+    } else if (prdObject.tenantAddr.legal_name) {
+      return prdObject.tenantAddr.legal_name;
     }
     return "";
   }

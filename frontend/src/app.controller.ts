@@ -112,7 +112,8 @@ export class AppController {
         documentTypes.push(entry.comments);
       }
     }
-    const primaryContactName = this.ttlsService.getPrimaryContactName(ttlsJSON);
+    const primaryContactName = ttlsJSON.licence_holder_name;
+    ttlsJSON["parcels"] = JSON.parse(ttlsJSON.parcels);
     const title =
       process.env.ticdi_environment == "DEVELOPMENT"
         ? "DEVELOPMENT - " + PAGE_TITLES.INDEX

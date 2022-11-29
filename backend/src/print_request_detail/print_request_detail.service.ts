@@ -29,6 +29,7 @@ export class PrintRequestDetailService {
     newItem.last_name = printRequestDetail.last_name;
     newItem.legal_name = printRequestDetail.legal_name;
     newItem.licence_holder_name = printRequestDetail.licence_holder_name;
+    newItem.mailing_address = printRequestDetail.mailing_address;
     newItem.mailing_address_line_1 = printRequestDetail.mailing_address_line_1;
     newItem.mailing_address_line_2 = printRequestDetail.mailing_address_line_2;
     newItem.mailing_address_line_3 = printRequestDetail.mailing_address_line_3;
@@ -42,21 +43,6 @@ export class PrintRequestDetailService {
     newItem.location_description = printRequestDetail.location_description;
     newItem.parcels = printRequestDetail.parcels;
     newItem.create_userid = printRequestDetail.create_userid;
-    let mailingAddress = "";
-    if (printRequestDetail.mailing_address_line_1) {
-      mailingAddress = printRequestDetail.mailing_address_line_1;
-    }
-    if (printRequestDetail.mailing_address_line_2) {
-      mailingAddress = mailingAddress.concat(
-        ", " + printRequestDetail.mailing_address_line_2
-      );
-    }
-    if (printRequestDetail.mailing_address_line_3) {
-      mailingAddress = mailingAddress.concat(
-        ", " + printRequestDetail.mailing_address_line_3
-      );
-    }
-    newItem.mailing_address = mailingAddress;
     let area_ha_number = "";
     let legal_description = "";
     if (JSON.parse(printRequestDetail.parcels)[0]) {

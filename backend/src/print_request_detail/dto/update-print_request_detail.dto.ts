@@ -16,6 +16,7 @@ export class UpdatePrintRequestDetailDto extends PickType(
     "last_name",
     "legal_name",
     "licence_holder_name",
+    "mailing_address",
     "mailing_address_line_1",
     "mailing_address_line_2",
     "mailing_address_line_3",

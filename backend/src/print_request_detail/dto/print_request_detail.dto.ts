@@ -11,6 +11,7 @@ export class PrintRequestDetailDto {
   last_name: string;
   legal_name: string;
   licence_holder_name: string;
+  mailing_address: string;
   mailing_address_line_1: string;
   mailing_address_line_2: string;
   mailing_address_line_3: string;

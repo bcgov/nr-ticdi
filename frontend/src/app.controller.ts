@@ -112,9 +112,7 @@ export class AppController {
         documentTypes.push(entry.comments);
       }
     }
-    const primaryContactName = this.ttlsService.getPrimaryContactName(
-      response.interestedParties
-    );
+    const primaryContactName = this.ttlsService.getPrimaryContactName(ttlsJSON);
     const title =
       process.env.ticdi_environment == "DEVELOPMENT"
         ? "DEVELOPMENT - " + PAGE_TITLES.INDEX

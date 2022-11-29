@@ -43,56 +43,8 @@ export class TTLSService {
     if (jdf) {
       const { ...printRequestDetail } = jdf;
 
-      let interestedParty,
-        interestParcels,
-        subPurposeCodes,
-        landUseSubTypeCodes;
-      if (
-        printRequestDetail.interestedParties &&
-        printRequestDetail.interestedParties[0]
-      ) {
-        interestedParty = printRequestDetail.interestedParties[0];
-      } else {
-        console.log("null interestedParty");
-        interestedParty = null;
-      }
-      if (printRequestDetail.interestParcels) {
-        interestParcels = printRequestDetail.interestParcels;
-      } else {
-        interestParcels = null;
-      }
-      if (
-        printRequestDetail.purposeCode &&
-        printRequestDetail.purposeCode.subPurposeCodes &&
-        printRequestDetail.purposeCode.subPurposeCodes[0]
-      ) {
-        subPurposeCodes = printRequestDetail.purposeCode.subPurposeCodes[0];
-      } else {
-        subPurposeCodes = null;
-      }
-      if (
-        printRequestDetail.landUseTypeCode &&
-        printRequestDetail.landUseTypeCode.landUseSubTypeCodes &&
-        printRequestDetail.landUseTypeCode.landUseSubTypeCodes[0]
-      ) {
-        landUseSubTypeCodes =
-          printRequestDetail.landUseTypeCode.landUseSubTypeCodes[0];
-      } else {
-        landUseSubTypeCodes = null;
-      }
-      let individual, orgUnit;
-      if (interestedParty && interestedParty.individual) {
-        individual = interestedParty.individual;
-      } else {
-        individual = null;
-      }
-      if (interestedParty && interestedParty.organization) {
-        orgUnit = interestedParty.organization.legalName;
-      } else {
-        orgUnit = null;
-      }
       const parcels = [];
-      for (let entry of interestParcels) {
+      for (let entry of printRequestDetail.interestParcel) {
         parcels.push({
           area: entry.areaInHectares,
           legal_description: entry.legalDescription,
@@ -100,77 +52,28 @@ export class TTLSService {
       }
 
       const mappedData = {
-        dtid: printRequestDetail.landUseApplicationId,
-        tenure_file_number: parseInt(printRequestDetail.fileNumber),
-        organization_unit: printRequestDetail.businessUnit
-          ? printRequestDetail.businessUnit.name
-          : null,
-        purpose_name: printRequestDetail.purposeCode.description,
-        sub_purpose_name: subPurposeCodes.description
-          ? subPurposeCodes.description
-          : null,
-        type_name: printRequestDetail.landUseTypeCode.description,
-        sub_type_name: landUseSubTypeCodes.description
-          ? landUseSubTypeCodes.description
-          : null,
-        first_name: individual
-          ? individual.firstname
-            ? individual.firstname
-            : null
-          : null,
-        middle_name: individual
-          ? individual.middlename
-            ? individual.middlename
-            : null
-          : null,
-        last_name: individual
-          ? individual.lastname
-            ? individual.lastname
-            : null
-          : null,
-        mailing_address_line_1: interestedParty
-          ? interestedParty.addressLine1
-            ? interestedParty.addressLine1
-            : null
-          : null,
-        mailing_address_line_2: interestedParty
-          ? interestedParty.addressLine2
-            ? interestedParty.addressLine2
-            : null
-          : null,
-        mailing_address_line_3: interestedParty
-          ? interestedParty.addressLine3
-            ? interestedParty.addressLine3
-            : null
-          : null,
-        mailing_city: interestedParty
-          ? interestedParty.city
-            ? interestedParty.city
-            : null
-          : null,
-        mailing_province_state_code: interestedParty
-          ? interestedParty.province
-            ? interestedParty.province
-            : null
-          : null,
-        mailing_postal_code: interestedParty
-          ? interestedParty.postalCode
-            ? interestedParty.postalCode
-            : null
-          : null,
-        mailing_zip: interestedParty
-          ? interestedParty.zipCode
-            ? interestedParty.zipCode
-            : null
-          : null,
-        mailing_country_code: null,
-        mailing_country: interestedParty
-          ? interestedParty.country
-            ? interestedParty.country
-            : null
-          : null,
-        location_description: printRequestDetail.locationDescription,
-        parcels: JSON.stringify(parcels),
+        dtid: printRequestDetail.dtid,
+        tenure_file_number: parseInt(printRequestDetail.fileNum),
+        organization_unit: printRequestDetail.orgUnit,
+        purpose_name: printRequestDetail.purpose,
+        sub_purpose_name: printRequestDetail.subPurpose,
+        type_name: printRequestDetail.type,
+        sub_type_name: printRequestDetail.subType,
+        first_name: printRequestDetail.tenantAddr.firstName,
+        middle_name: printRequestDetail.tenantAddr.middleName,
+        last_name: printRequestDetail.tenantAddr.lastName,
+        legal_name: printRequestDetail.tenantAddr.legalName,
+        mailing_address_line_1: printRequestDetail.tenantAddr.addrLine1,
+        mailing_address_line_2: printRequestDetail.tenantAddr.addrLine2,
+        mailing_address_line_3: printRequestDetail.tenantAddr.addrLine3,
+        mailing_city: printRequestDetail.tenantAddr.city,
+        mailing_province_state_code: printRequestDetail.tenantAddr.regionCd,
+        mailing_postal_code: printRequestDetail.tenantAddr.postalCode,
+        mailing_zip: printRequestDetail.tenantAddr.zipCode,
+        mailing_country_code: printRequestDetail.tenantAddr.countryCd,
+        mailing_country: printRequestDetail.tenantAddr.country,
+        location_description: printRequestDetail.locLand,
+        parcels: parcels ? JSON.stringify(parcels) : "",
       };
 
       return axios
@@ -226,40 +129,30 @@ export class TTLSService {
     return versions;
   }
 
-  getPrimaryContactName(
-    interestedParties: [
-      {
-        primaryContact: boolean;
-        organization: { divisionBranch: any; legalName: string };
-        individual: { firstName: string; lastName: string; middleName: string };
-      }
-    ]
-  ) {
-    for (let entry of interestedParties) {
-      if (entry.primaryContact) {
-        if (entry.individual) {
-          return (
-            entry.individual.firstName +
-            " " +
-            entry.individual.middleName +
-            " " +
-            entry.individual.lastName
-          );
-        } else if (entry.organization) {
-          return entry.organization.legalName;
-        }
-      }
+  // returns the individual name and if there is none, then it returns the legal name
+  getPrimaryContactName(ttlsJSON: {
+    first_name: string;
+    middle_name: string;
+    last_name: string;
+    legal_name: string;
+  }) {
+    if (ttlsJSON.first_name || ttlsJSON.middle_name || ttlsJSON.last_name) {
+      return (
+        ttlsJSON.first_name +
+        " " +
+        ttlsJSON.middle_name +
+        " " +
+        ttlsJSON.last_name
+      );
+    } else if (ttlsJSON.legal_name) {
+      return ttlsJSON.legal_name;
     }
     return "";
   }
 
   callHttp(id: string): Observable<Array<Object>> {
     const bearerToken = this.webade_token;
-    // const bearerToken = process.env.ttls_api_key;
-
-    // const url = process.env.ttls_url + this.id;
-    const url = this.tantalis_api + "landUseApplications/" + id;
-
+    const url = process.env.ttls_url + id;
     return this.http
       .get(url, { headers: { Authorization: "Bearer " + bearerToken } })
       .pipe(
@@ -300,7 +193,7 @@ export class TTLSService {
   async getWebadeToken(): Promise<string> {
     const url =
       this.webade_url +
-      "oauth/token?grant_type=client_credentials&disableDeveloperFilter=true&scope=TTLS.*";
+      "?grant_type=client_credentials&disableDeveloperFilter=true&scope=TTLS.*";
     const authorization = base64.encode(
       this.webade_username + ":" + this.webade_secret
     );

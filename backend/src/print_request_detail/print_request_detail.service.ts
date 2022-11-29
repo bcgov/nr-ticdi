@@ -27,6 +27,7 @@ export class PrintRequestDetailService {
     newItem.first_name = printRequestDetail.first_name;
     newItem.middle_name = printRequestDetail.middle_name;
     newItem.last_name = printRequestDetail.last_name;
+    newItem.legal_name = printRequestDetail.legal_name;
     newItem.mailing_address_line_1 = printRequestDetail.mailing_address_line_1;
     newItem.mailing_address_line_2 = printRequestDetail.mailing_address_line_2;
     newItem.mailing_address_line_3 = printRequestDetail.mailing_address_line_3;

@@ -33,6 +33,8 @@ export class PrintRequestDetail {
   @Column({ nullable: true })
   last_name: string;
   @Column({ nullable: true })
+  legal_name: string;
+  @Column({ nullable: true })
   mailing_address: string;
   @Column({ nullable: true })
   mailing_address_line_1: string;
@@ -81,6 +83,7 @@ export class PrintRequestDetail {
     first_name?: string,
     middle_name?: string,
     last_name?: string,
+    legal_name?: string,
     mailing_address?: string,
     mailing_address_line_1?: string,
     mailing_address_line_2?: string,
@@ -109,6 +112,7 @@ export class PrintRequestDetail {
     this.first_name = first_name || "";
     this.middle_name = middle_name || "";
     this.last_name = last_name || "";
+    this.legal_name = legal_name || "";
     this.mailing_address = mailing_address || "";
     this.mailing_address_line_1 = mailing_address_line_1 || "";
     this.mailing_address_line_2 = mailing_address_line_2 || "";

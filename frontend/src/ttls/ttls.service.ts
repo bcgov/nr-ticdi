@@ -133,26 +133,26 @@ export class TTLSService {
   // returns the individual name and if there is none, then it returns the legal name
   getPrimaryContactName(prdObject: {
     tenantAddr: {
-      first_name: string;
-      middle_name: string;
-      last_name: string;
-      legal_name: string;
+      firstName: string;
+      middleName: string;
+      lastName: string;
+      legalName: string;
     };
   }) {
     if (
-      prdObject.tenantAddr.first_name ||
-      prdObject.tenantAddr.middle_name ||
-      prdObject.tenantAddr.last_name
+      prdObject.tenantAddr.firstName ||
+      prdObject.tenantAddr.middleName ||
+      prdObject.tenantAddr.lastName
     ) {
       return (
-        prdObject.tenantAddr.first_name +
+        prdObject.tenantAddr.firstName +
         " " +
-        prdObject.tenantAddr.middle_name +
+        prdObject.tenantAddr.middleName +
         " " +
-        prdObject.tenantAddr.last_name
+        prdObject.tenantAddr.lastName
       );
-    } else if (prdObject.tenantAddr.legal_name) {
-      return prdObject.tenantAddr.legal_name;
+    } else if (prdObject.tenantAddr.legalName) {
+      return prdObject.tenantAddr.legalName;
     }
     return "";
   }

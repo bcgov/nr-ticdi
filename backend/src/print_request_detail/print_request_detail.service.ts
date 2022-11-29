@@ -28,6 +28,7 @@ export class PrintRequestDetailService {
     newItem.middle_name = printRequestDetail.middle_name;
     newItem.last_name = printRequestDetail.last_name;
     newItem.legal_name = printRequestDetail.legal_name;
+    newItem.licence_holder_name = printRequestDetail.licence_holder_name;
     newItem.mailing_address_line_1 = printRequestDetail.mailing_address_line_1;
     newItem.mailing_address_line_2 = printRequestDetail.mailing_address_line_2;
     newItem.mailing_address_line_3 = printRequestDetail.mailing_address_line_3;
@@ -56,29 +57,6 @@ export class PrintRequestDetailService {
       );
     }
     newItem.mailing_address = mailingAddress;
-    let licenceHolderName = "";
-    if (
-      printRequestDetail.first_name ||
-      printRequestDetail.middle_name ||
-      printRequestDetail.last_name
-    ) {
-      if (printRequestDetail.first_name) {
-        licenceHolderName = printRequestDetail.first_name;
-      }
-      if (printRequestDetail.middle_name) {
-        licenceHolderName = licenceHolderName.concat(
-          " " + printRequestDetail.middle_name
-        );
-      }
-      if (printRequestDetail.last_name) {
-        licenceHolderName = licenceHolderName.concat(
-          " " + printRequestDetail.last_name
-        );
-      }
-    } else if (printRequestDetail.legal_name) {
-      licenceHolderName = printRequestDetail.legal_name;
-    }
-    newItem.licence_holder_name = licenceHolderName;
     let area_ha_number = "";
     let legal_description = "";
     if (JSON.parse(printRequestDetail.parcels)[0]) {

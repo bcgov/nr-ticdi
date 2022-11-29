@@ -63,6 +63,10 @@ export class TTLSService {
         middle_name: printRequestDetail.tenantAddr.middleName,
         last_name: printRequestDetail.tenantAddr.lastName,
         legal_name: printRequestDetail.tenantAddr.legalName,
+        licence_holder_name: this.getPrimaryContactName(
+          printRequestDetail.tenantAddr
+        ),
+        mailing_address: this.getMailingAddress(printRequestDetail.tenantAddr),
         mailing_address_line_1: printRequestDetail.tenantAddr.addrLine1,
         mailing_address_line_2: printRequestDetail.tenantAddr.addrLine2,
         mailing_address_line_3: printRequestDetail.tenantAddr.addrLine3,
@@ -130,24 +134,43 @@ export class TTLSService {
   }
 
   // returns the individual name and if there is none, then it returns the legal name
-  getPrimaryContactName(ttlsJSON: {
-    first_name: string;
-    middle_name: string;
-    last_name: string;
-    legal_name: string;
+  getPrimaryContactName(tenantAddr: {
+    firstName: string;
+    middleName: string;
+    lastName: string;
+    legalName: string;
   }) {
-    if (ttlsJSON.first_name || ttlsJSON.middle_name || ttlsJSON.last_name) {
+    if (tenantAddr.firstName || tenantAddr.middleName || tenantAddr.lastName) {
       return (
-        ttlsJSON.first_name +
+        tenantAddr.firstName +
         " " +
-        ttlsJSON.middle_name +
+        tenantAddr.middleName +
         " " +
-        ttlsJSON.last_name
+        tenantAddr.lastName
       );
-    } else if (ttlsJSON.legal_name) {
-      return ttlsJSON.legal_name;
+    } else if (tenantAddr.legalName) {
+      return tenantAddr.legalName;
     }
     return "";
+  }
+
+  // if there are multiple addresses, concatenate them
+  getMailingAddress(tenantAddr: {
+    addrLine1: string;
+    addrLine2: string;
+    addrLine3: string;
+  }) {
+    let mailingAddress = "";
+    if (tenantAddr.addrLine1) {
+      mailingAddress = tenantAddr.addrLine1;
+    }
+    if (tenantAddr.addrLine2) {
+      mailingAddress = mailingAddress.concat(", " + tenantAddr.addrLine2);
+    }
+    if (tenantAddr.addrLine3) {
+      mailingAddress = mailingAddress.concat(", " + tenantAddr.addrLine3);
+    }
+    return mailingAddress;
   }
 
   callHttp(id: string): Observable<Array<Object>> {

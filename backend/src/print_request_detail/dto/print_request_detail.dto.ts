@@ -9,6 +9,7 @@ export class PrintRequestDetailDto {
   first_name: string;
   middle_name: string;
   last_name: string;
+  legal_name: string;
   mailing_address_line_1: string;
   mailing_address_line_2: string;
   mailing_address_line_3: string;

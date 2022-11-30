@@ -15,6 +15,8 @@ export class PrintRequestDetail {
   @Column({ nullable: true })
   tenure_file_number: string;
   @Column({ nullable: true })
+  incorporation_number: string;
+  @Column({ nullable: true })
   organization_unit: string;
   @Column({ nullable: true })
   purpose_name: string;
@@ -34,6 +36,10 @@ export class PrintRequestDetail {
   last_name: string;
   @Column({ nullable: true })
   legal_name: string;
+  @Column({ nullable: true })
+  email_address: string;
+  @Column({ nullable: true })
+  inspected_date: string;
   @Column({ nullable: true })
   mailing_address: string;
   @Column({ nullable: true })
@@ -74,6 +80,7 @@ export class PrintRequestDetail {
   constructor(
     dtid?: number,
     tenure_file_number?: string,
+    incorporation_number?: string,
     organization_unit?: string,
     purpose_name?: string,
     sub_purpose_name?: string,
@@ -84,6 +91,8 @@ export class PrintRequestDetail {
     middle_name?: string,
     last_name?: string,
     legal_name?: string,
+    email_address?: string,
+    inspected_date?: string,
     mailing_address?: string,
     mailing_address_line_1?: string,
     mailing_address_line_2?: string,
@@ -103,6 +112,7 @@ export class PrintRequestDetail {
   ) {
     this.dtid = dtid || null;
     this.tenure_file_number = tenure_file_number || "";
+    this.incorporation_number = incorporation_number || "";
     this.organization_unit = organization_unit || "";
     this.purpose_name = purpose_name || "";
     this.sub_purpose_name = sub_purpose_name || "";
@@ -113,6 +123,8 @@ export class PrintRequestDetail {
     this.middle_name = middle_name || "";
     this.last_name = last_name || "";
     this.legal_name = legal_name || "";
+    this.email_address = email_address || "";
+    this.inspected_date = inspected_date || "";
     this.mailing_address = mailing_address || "";
     this.mailing_address_line_1 = mailing_address_line_1 || "";
     this.mailing_address_line_2 = mailing_address_line_2 || "";

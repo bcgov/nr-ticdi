@@ -54,6 +54,7 @@ export class TTLSService {
       const mappedData = {
         dtid: printRequestDetail.dtid,
         tenure_file_number: parseInt(printRequestDetail.fileNum),
+        incorporation_number: printRequestDetail.tenantAddr.incorporationNum,
         organization_unit: printRequestDetail.orgUnit,
         purpose_name: printRequestDetail.purpose,
         sub_purpose_name: printRequestDetail.subPurpose,
@@ -66,6 +67,8 @@ export class TTLSService {
         licence_holder_name: this.getPrimaryContactName(
           printRequestDetail.tenantAddr
         ),
+        email_address: printRequestDetail.tenantAddr.emailAddress,
+        inspected_date: printRequestDetail.inspectionDate,
         mailing_address: this.getMailingAddress(printRequestDetail.tenantAddr),
         mailing_address_line_1: printRequestDetail.tenantAddr.addrLine1,
         mailing_address_line_2: printRequestDetail.tenantAddr.addrLine2,

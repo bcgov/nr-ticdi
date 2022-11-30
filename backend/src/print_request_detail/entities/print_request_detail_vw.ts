@@ -16,8 +16,8 @@ import { PrintRequestDetail } from "./print_request_detail.entity";
       .addSelect(
         "print_request_detail.licence_holder_name",
         "LicenceHolderName"
-      ) // add to entity
-      .addSelect("print_request_detail.mailing_address", "MailingAddress") // add to entity
+      )
+      .addSelect("print_request_detail.mailing_address", "MailingAddress")
       .addSelect("print_request_detail.mailing_city", "MailingCity")
       .addSelect(
         "print_request_detail.mailing_province_state_code",
@@ -27,6 +27,12 @@ import { PrintRequestDetail } from "./print_request_detail.entity";
       .addSelect("print_request_detail.location_description", "Location")
       .addSelect("print_request_detail.area_ha_number", "TenureArea")
       .addSelect("print_request_detail.legal_description", "LegalDescription")
+      .addSelect("print_request_detail.email_address", "EmailAddress")
+      .addSelect("print_request_detail.inspected_date", "InspectedDate")
+      .addSelect(
+        "print_request_detail.incorporation_number",
+        "IncorporationNumber"
+      )
       .from(PrintRequestDetail, "print_request_detail"),
 })
 export class PrintRequestDetailView {
@@ -62,4 +68,10 @@ export class PrintRequestDetailView {
   Location: string;
   @ViewColumn()
   LegalDescription: string;
+  @ViewColumn()
+  EmailAddress: string;
+  @ViewColumn()
+  InspectedDate: string;
+  @ViewColumn()
+  IncorporationNumber: string;
 }

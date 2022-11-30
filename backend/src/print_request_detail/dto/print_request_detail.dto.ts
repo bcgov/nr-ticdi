@@ -1,6 +1,7 @@
 export class PrintRequestDetailDto {
   dtid: number;
   tenure_file_number: string;
+  incorporation_number: string;
   organization_unit: string;
   purpose_name: string;
   sub_purpose_name: string;
@@ -11,6 +12,8 @@ export class PrintRequestDetailDto {
   last_name: string;
   legal_name: string;
   licence_holder_name: string;
+  email_address: string;
+  inspected_date: string;
   mailing_address: string;
   mailing_address_line_1: string;
   mailing_address_line_2: string;

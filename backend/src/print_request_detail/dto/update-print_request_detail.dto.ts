@@ -6,6 +6,7 @@ export class UpdatePrintRequestDetailDto extends PickType(
   [
     "dtid",
     "tenure_file_number",
+    "incorporation_number",
     "organization_unit",
     "purpose_name",
     "sub_purpose_name",
@@ -16,6 +17,8 @@ export class UpdatePrintRequestDetailDto extends PickType(
     "last_name",
     "legal_name",
     "licence_holder_name",
+    "email_address",
+    "inspected_date",
     "mailing_address",
     "mailing_address_line_1",
     "mailing_address_line_2",

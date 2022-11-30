@@ -19,6 +19,7 @@ export class PrintRequestDetailService {
     const newItem = new PrintRequestDetail();
     newItem.dtid = printRequestDetail.dtid;
     newItem.tenure_file_number = printRequestDetail.tenure_file_number;
+    newItem.incorporation_number = printRequestDetail.incorporation_number;
     newItem.organization_unit = printRequestDetail.organization_unit;
     newItem.purpose_name = printRequestDetail.purpose_name;
     newItem.sub_purpose_name = printRequestDetail.sub_purpose_name;
@@ -29,6 +30,8 @@ export class PrintRequestDetailService {
     newItem.last_name = printRequestDetail.last_name;
     newItem.legal_name = printRequestDetail.legal_name;
     newItem.licence_holder_name = printRequestDetail.licence_holder_name;
+    newItem.email_address = printRequestDetail.email_address;
+    newItem.inspected_date = printRequestDetail.inspected_date;
     newItem.mailing_address = printRequestDetail.mailing_address;
     newItem.mailing_address_line_1 = printRequestDetail.mailing_address_line_1;
     newItem.mailing_address_line_2 = printRequestDetail.mailing_address_line_2;

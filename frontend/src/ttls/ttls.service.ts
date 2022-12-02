@@ -73,7 +73,7 @@ export class TTLSService {
         mailing_address_line_1: printRequestDetail.tenantAddr.addrLine1,
         mailing_address_line_2: printRequestDetail.tenantAddr.addrLine2,
         mailing_address_line_3: printRequestDetail.tenantAddr.addrLine3,
-        mailing_city: printRequestDetail.tenantAddr.city,
+        mailing_city: printRequestDetail.tenantAddr.city, 
         mailing_province_state_code: printRequestDetail.tenantAddr.regionCd,
         mailing_postal_code: printRequestDetail.tenantAddr.postalCode,
         mailing_zip: printRequestDetail.tenantAddr.zipCode,

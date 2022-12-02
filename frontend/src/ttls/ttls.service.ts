@@ -68,7 +68,7 @@ export class TTLSService {
           printRequestDetail.tenantAddr
         ),
         email_address: printRequestDetail.tenantAddr.emailAddress,
-        inspected_date: printRequestDetail.inspectionDate,
+        inspected_date: printRequestDetail.inspectionDate.toString(),
         mailing_address: this.getMailingAddress(printRequestDetail.tenantAddr),
         mailing_address_line_1: printRequestDetail.tenantAddr.addrLine1,
         mailing_address_line_2: printRequestDetail.tenantAddr.addrLine2,
@@ -174,6 +174,13 @@ export class TTLSService {
       mailingAddress = mailingAddress.concat(", " + tenantAddr.addrLine3);
     }
     return mailingAddress;
+  }
+
+  formatInspectedDate(inspected_date: string) {
+    if (inspected_date.length == 8) {
+      return inspected_date.substring(0,4)+"-"+inspected_date.substring(4,6)+"-"+inspected_date.substring(6,8);
+    }
+    return inspected_date;
   }
 
   callHttp(id: string): Observable<Array<Object>> {

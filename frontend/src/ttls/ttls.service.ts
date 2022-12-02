@@ -68,7 +68,7 @@ export class TTLSService {
           printRequestDetail.tenantAddr
         ),
         email_address: printRequestDetail.tenantAddr.emailAddress,
-        inspected_date: printRequestDetail.inspectionDate.toString(),
+        inspected_date: printRequestDetail.inspectionDate,
         mailing_address: this.getMailingAddress(printRequestDetail.tenantAddr),
         mailing_address_line_1: printRequestDetail.tenantAddr.addrLine1,
         mailing_address_line_2: printRequestDetail.tenantAddr.addrLine2,
@@ -177,8 +177,14 @@ export class TTLSService {
   }
 
   formatInspectedDate(inspected_date: string) {
-    if (inspected_date.length == 8) {
-      return inspected_date.substring(0,4)+"-"+inspected_date.substring(4,6)+"-"+inspected_date.substring(6,8);
+    if (inspected_date && inspected_date.length == 8) {
+      return (
+        inspected_date.substring(0, 4) +
+        "-" +
+        inspected_date.substring(4, 6) +
+        "-" +
+        inspected_date.substring(6, 8)
+      );
     }
     return inspected_date;
   }

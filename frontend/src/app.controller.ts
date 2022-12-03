@@ -98,9 +98,11 @@ export class AppController {
       return res;
     });
     const ttlsJSON = await this.ttlsService.sendToBackend(response);
-    ttlsJSON["inspected_date"] = ttlsJSON.inspected_date
-      ? this.ttlsService.formatInspectedDate(ttlsJSON.inspected_date.toString())
-      : null;
+    if (ttlsJSON.inspected_date) {
+      ttlsJSON["inspected_date"] = this.ttlsService.formatInspectedDate(
+        ttlsJSON.inspected_date.toString()
+      );
+    }
     const versions = await this.ttlsService.getTemplateVersions(
       "Land Use Report"
     );

@@ -144,13 +144,14 @@ export class TTLSService {
     legalName: string;
   }) {
     if (tenantAddr.firstName || tenantAddr.middleName || tenantAddr.lastName) {
-      return (
-        tenantAddr.firstName +
-        " " +
-        tenantAddr.middleName +
-        " " +
-        tenantAddr.lastName
-      );
+      let name = tenantAddr.firstName ? tenantAddr.firstName : "";
+      name = tenantAddr.middleName
+        ? name.concat(" " + tenantAddr.middleName)
+        : name;
+      name = tenantAddr.lastName
+        ? name.concat(" " + tenantAddr.lastName)
+        : name;
+      return name;
     } else if (tenantAddr.legalName) {
       return tenantAddr.legalName;
     }

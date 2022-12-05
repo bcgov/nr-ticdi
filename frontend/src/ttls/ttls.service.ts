@@ -53,7 +53,7 @@ export class TTLSService {
 
       const mappedData = {
         dtid: printRequestDetail.dtid,
-        tenure_file_number: parseInt(printRequestDetail.fileNum),
+        tenure_file_number: printRequestDetail.fileNum,
         incorporation_number: printRequestDetail.tenantAddr.incorporationNum,
         organization_unit: printRequestDetail.orgUnit,
         purpose_name: printRequestDetail.purpose,

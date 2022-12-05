@@ -12,6 +12,7 @@ export class PrintRequestDetailDto {
   last_name: string;
   legal_name: string;
   licence_holder_name: string;
+  contact_agent: string;
   email_address: string;
   inspected_date: string;
   mailing_address: string;
@@ -27,5 +28,5 @@ export class PrintRequestDetailDto {
   location_description: string;
   create_userid: string;
   update_userid: string;
-  parcels: string;
+  tenure: string;
 }

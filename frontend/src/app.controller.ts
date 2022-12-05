@@ -90,46 +90,60 @@ export class AppController {
         }
       }
     }
-    const displayAdmin = isAdmin ? "Template Administration" : "-";
-    await this.ttlsService.setWebadeToken();
-    const response: any = await firstValueFrom(
-      this.ttlsService.callHttp(id)
-    ).then((res) => {
-      return res;
-    });
-    const ttlsJSON = await this.ttlsService.sendToBackend(response);
-    ttlsJSON["inspected_date"] = ttlsJSON.inspected_date
-      ? this.ttlsService.formatInspectedDate(ttlsJSON.inspected_date.toString())
-      : null;
-    const versions = await this.ttlsService.getTemplateVersions(
-      "Land Use Report"
-    );
-    const documentTypes = [];
-    const documents = await lastValueFrom(
-      this.httpService
-        .get(requestUrl, requestConfig)
-        .pipe(map((response) => response.data))
-    );
-    for (let entry of documents) {
-      if (!documentTypes.includes(entry.comments)) {
-        documentTypes.push(entry.comments);
-      }
-    }
-    const primaryContactName = ttlsJSON.licence_holder_name;
-    ttlsJSON["parcels"] = JSON.parse(ttlsJSON.parcels);
     const title =
       process.env.ticdi_environment == "DEVELOPMENT"
         ? "DEVELOPMENT - " + PAGE_TITLES.INDEX
         : PAGE_TITLES.INDEX;
-    return {
-      title: title,
-      primaryContactName: primaryContactName,
-      displayAdmin: displayAdmin,
-      message: ttlsJSON,
-      version: versions,
-      documentTypes: documentTypes,
-      prdid: ttlsJSON.id,
-    };
+    const displayAdmin = isAdmin ? "Template Administration" : "-";
+    await this.ttlsService.setWebadeToken();
+    let ttlsJSON, primaryContactName, versions;
+    let documentTypes = [];
+    try {
+      const response: any = await firstValueFrom(
+        this.ttlsService.callHttp(id)
+      ).then((res) => {
+        return res;
+      });
+      ttlsJSON = await this.ttlsService.sendToBackend(response);
+      if (ttlsJSON.inspected_date) {
+        ttlsJSON["inspected_date"] = this.ttlsService.formatInspectedDate(
+          ttlsJSON.inspected_date.toString()
+        );
+      }
+      versions = await this.ttlsService.getTemplateVersions("Land Use Report");
+      const documents = await lastValueFrom(
+        this.httpService
+          .get(requestUrl, requestConfig)
+          .pipe(map((response) => response.data))
+      );
+      for (let entry of documents) {
+        if (!documentTypes.includes(entry.comments)) {
+          documentTypes.push(entry.comments);
+        }
+      }
+      primaryContactName = ttlsJSON.licence_holder_name;
+      return {
+        title: title,
+        primaryContactName: primaryContactName,
+        displayAdmin: displayAdmin,
+        message: ttlsJSON,
+        version: versions,
+        documentTypes: documentTypes,
+        prdid: ttlsJSON.id,
+      };
+    } catch (err) {
+      console.log(err);
+      return {
+        title: title,
+        primaryContactName: primaryContactName ? primaryContactName : null,
+        displayAdmin: displayAdmin,
+        message: ttlsJSON ? ttlsJSON : null,
+        version: versions ? versions : null,
+        documentTypes: documentTypes ? documentTypes : null,
+        prdid: ttlsJSON ? ttlsJSON.id : null,
+        error: err,
+      };
+    }
   }
 
   @Get("template-admin")

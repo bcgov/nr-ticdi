@@ -30,6 +30,7 @@ export class PrintRequestDetailService {
     newItem.last_name = printRequestDetail.last_name;
     newItem.legal_name = printRequestDetail.legal_name;
     newItem.licence_holder_name = printRequestDetail.licence_holder_name;
+    newItem.contact_agent = printRequestDetail.contact_agent;
     newItem.email_address = printRequestDetail.email_address;
     newItem.inspected_date = printRequestDetail.inspected_date;
     newItem.mailing_address = printRequestDetail.mailing_address;
@@ -44,28 +45,17 @@ export class PrintRequestDetailService {
     newItem.mailing_country_code = printRequestDetail.mailing_country_code;
     newItem.mailing_country = printRequestDetail.mailing_country;
     newItem.location_description = printRequestDetail.location_description;
-    newItem.parcels = printRequestDetail.parcels;
+    newItem.tenure = printRequestDetail.tenure;
     newItem.create_userid = printRequestDetail.create_userid;
-    let area_ha_number = "";
-    let legal_description = "";
-    if (JSON.parse(printRequestDetail.parcels)[0]) {
-      area_ha_number = JSON.parse(printRequestDetail.parcels)[0].area
-        ? JSON.parse(printRequestDetail.parcels)[0].area.toString()
-        : "";
-      legal_description = JSON.parse(printRequestDetail.parcels)[0]
-        .legal_description
-        ? JSON.parse(printRequestDetail.parcels)[0].legal_description
-        : "";
-    }
-    newItem.area_ha_number = area_ha_number;
-    newItem.legal_description = legal_description;
 
     const newPRD = this.printRequestDetailRepository.create(newItem);
-    return this.printRequestDetailRepository.save(newPRD);
+    return this.convertTenureToJson(
+      await this.printRequestDetailRepository.save(newPRD)
+    );
   }
 
   async findAll(): Promise<PrintRequestDetail[]> {
-    return this.convertParcelsToJson(
+    return this.convertTenureToJson(
       await this.printRequestDetailRepository.find()
     );
   }
@@ -77,20 +67,17 @@ export class PrintRequestDetailService {
           dtid: dtid,
         },
       });
-      return this.convertParcelsToJson(prd);
+      return this.convertTenureToJson(prd);
     } catch (err) {
       console.log(err);
     }
   }
 
   async findViewByPRDID(prdid: number): Promise<PrintRequestDetailView> {
-    const view = await this.dataSource.manager.findOneBy(
-      PrintRequestDetailView,
-      {
-        PRDID: prdid,
-      }
-    );
-    return view;
+    let view = await this.dataSource.manager.findOneBy(PrintRequestDetailView, {
+      PRDID: prdid,
+    });
+    return this.convertTenureToJson(view);
   }
 
   async remove(dtid: number): Promise<{ deleted: boolean; message?: string }> {
@@ -102,37 +89,37 @@ export class PrintRequestDetailService {
     }
   }
 
-  // converts the parcels/Parcels from a json string to a json object before returning
-  convertParcelsToJson(prd: any) {
+  // converts the tenure/Tenure from a json string to a json object before returning
+  convertTenureToJson(prd: any) {
     let p;
     if (Array.isArray(prd)) {
-      if (prd[0].parcels) {
+      if (prd[0].tenure) {
         prd = prd.map(function (entry) {
-          if (entry.parcels) {
-            p = JSON.parse(entry.parcels);
-            entry["parcels"] = p;
+          if (entry.tenure) {
+            p = JSON.parse(entry.tenure);
+            entry["tenure"] = p;
             return entry;
           }
         });
         return prd;
-      } else if (prd[0].Parcels) {
+      } else if (prd[0].Tenure) {
         prd = prd.map(function (entry) {
-          if (entry.Parcels) {
-            p = JSON.parse(entry.Parcels);
-            entry["Parcels"] = p;
+          if (entry.Tenure) {
+            p = JSON.parse(entry.Tenure);
+            entry["Tenure"] = p;
             return entry;
           }
         });
         return prd;
       }
     } else {
-      if (prd.parcels) {
-        p = JSON.parse(prd.parcels);
-        prd["parcels"] = p;
+      if (prd.tenure) {
+        p = JSON.parse(prd.tenure);
+        prd["tenure"] = p;
         return prd;
-      } else if (prd.Parcels) {
-        p = JSON.parse(prd.Parcels);
-        prd["Parcels"] = p;
+      } else if (prd.Tenure) {
+        p = JSON.parse(prd.Tenure);
+        prd["Tenure"] = p;
         return prd;
       }
     }

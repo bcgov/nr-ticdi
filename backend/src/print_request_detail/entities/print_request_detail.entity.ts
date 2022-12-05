@@ -29,6 +29,8 @@ export class PrintRequestDetail {
   @Column({ nullable: true })
   licence_holder_name: string;
   @Column({ nullable: true })
+  contact_agent: string;
+  @Column({ nullable: true })
   first_name: string;
   @Column({ nullable: true })
   middle_name: string;
@@ -63,11 +65,7 @@ export class PrintRequestDetail {
   @Column({ nullable: true })
   location_description: string;
   @Column({ nullable: true })
-  parcels: string;
-  @Column({ nullable: true })
-  area_ha_number: string; // from first entry in parcels
-  @Column({ nullable: true })
-  legal_description: string; // from first entry in parcels
+  tenure: string;
   @Column({ nullable: true })
   create_userid: string;
   @Column({ nullable: true })
@@ -87,6 +85,7 @@ export class PrintRequestDetail {
     type_name?: string,
     sub_type_name?: string,
     licence_holder_name?: string,
+    contact_agent?: string,
     first_name?: string,
     middle_name?: string,
     last_name?: string,
@@ -104,9 +103,7 @@ export class PrintRequestDetail {
     mailing_country_code?: string,
     mailing_country?: string,
     location_description?: string,
-    parcels?: string,
-    area_ha_number?: string,
-    legal_description?: string,
+    tenure?: string,
     create_userid?: string,
     update_userid?: string
   ) {
@@ -119,6 +116,7 @@ export class PrintRequestDetail {
     this.type_name = type_name || "";
     this.sub_type_name = sub_type_name || "";
     this.licence_holder_name = licence_holder_name || "";
+    this.contact_agent = contact_agent || "";
     this.first_name = first_name || "";
     this.middle_name = middle_name || "";
     this.last_name = last_name || "";
@@ -136,9 +134,7 @@ export class PrintRequestDetail {
     this.mailing_country_code = mailing_country_code || "";
     this.mailing_country = mailing_country || "";
     this.location_description = location_description || "";
-    this.parcels = parcels || "";
-    this.area_ha_number = area_ha_number || "";
-    this.legal_description = legal_description || "";
+    this.tenure = tenure || "";
     this.create_userid = create_userid || "";
     this.update_userid = update_userid || "";
   }

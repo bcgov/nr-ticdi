@@ -17,6 +17,7 @@ export class CreatePrintRequestDetailDto extends PickType(
     "last_name",
     "legal_name",
     "licence_holder_name",
+    "contact_agent",
     "email_address",
     "inspected_date",
     "mailing_address",
@@ -31,6 +32,6 @@ export class CreatePrintRequestDetailDto extends PickType(
     "mailing_country",
     "location_description",
     "create_userid",
-    "parcels",
+    "tenure",
   ] as const
 ) {}

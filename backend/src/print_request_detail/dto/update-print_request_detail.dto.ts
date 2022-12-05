@@ -17,6 +17,7 @@ export class UpdatePrintRequestDetailDto extends PickType(
     "last_name",
     "legal_name",
     "licence_holder_name",
+    "contact_agent",
     "email_address",
     "inspected_date",
     "mailing_address",
@@ -30,7 +31,7 @@ export class UpdatePrintRequestDetailDto extends PickType(
     "mailing_country_code",
     "mailing_country",
     "location_description",
-    "parcels",
+    "tenure",
     "update_userid",
   ] as const
 ) {}

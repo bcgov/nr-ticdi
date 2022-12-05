@@ -43,11 +43,11 @@ export class TTLSService {
     if (jdf) {
       const { ...printRequestDetail } = jdf;
 
-      const parcels = [];
+      const tenure = [];
       for (let entry of printRequestDetail.interestParcel) {
-        parcels.push({
-          area: entry.areaInHectares,
-          legal_description: entry.legalDescription,
+        tenure.push({
+          Area: entry.areaInHectares,
+          LegalDescription: entry.legalDescription,
         });
       }
 
@@ -64,9 +64,10 @@ export class TTLSService {
         middle_name: printRequestDetail.tenantAddr.middleName,
         last_name: printRequestDetail.tenantAddr.lastName,
         legal_name: printRequestDetail.tenantAddr.legalName,
-        licence_holder_name: this.getPrimaryContactName(
+        licence_holder_name: this.getLicenceHolderName(
           printRequestDetail.tenantAddr
         ),
+        contact_agent: this.getContactAgent(printRequestDetail.tenantAddr),
         email_address: printRequestDetail.tenantAddr.emailAddress,
         inspected_date: printRequestDetail.inspectionDate,
         mailing_address: this.getMailingAddress(printRequestDetail.tenantAddr),
@@ -80,7 +81,7 @@ export class TTLSService {
         mailing_country_code: printRequestDetail.tenantAddr.countryCd,
         mailing_country: printRequestDetail.tenantAddr.country,
         location_description: printRequestDetail.locLand,
-        parcels: parcels ? JSON.stringify(parcels) : "",
+        tenure: tenure ? JSON.stringify(tenure) : "",
       };
 
       return axios
@@ -137,7 +138,7 @@ export class TTLSService {
   }
 
   // returns the individual name and if there is none, then it returns the legal name
-  getPrimaryContactName(tenantAddr: {
+  getLicenceHolderName(tenantAddr: {
     firstName: string;
     middleName: string;
     lastName: string;
@@ -154,6 +155,18 @@ export class TTLSService {
       return name;
     } else if (tenantAddr.legalName) {
       return tenantAddr.legalName;
+    }
+    return "";
+  }
+
+  // returns the individual name and if there is none, then it returns the legal name
+  getContactAgent(tenantAddr: { firstName: string; middleName: string }) {
+    if (tenantAddr.firstName || tenantAddr.middleName) {
+      let name = tenantAddr.firstName ? tenantAddr.firstName : "";
+      name = tenantAddr.middleName
+        ? name.concat(" " + tenantAddr.middleName)
+        : name;
+      return name;
     }
     return "";
   }
@@ -313,6 +326,9 @@ export class TTLSService {
         version: version,
         comments: comments,
       });
+    if (data.InspectionDate) {
+      data["InspectionDate"] = this.formatInspectedDate(data.InspectionDate);
+    }
 
     // log the request
     const document_template_id = documentTemplateObject.data.id;

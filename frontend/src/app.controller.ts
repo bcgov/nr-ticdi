@@ -122,7 +122,15 @@ export class AppController {
         }
       }
       primaryContactName = ttlsJSON.licence_holder_name;
-      ttlsJSON["parcels"] = JSON.parse(ttlsJSON.parcels);
+      return {
+        title: title,
+        primaryContactName: primaryContactName,
+        displayAdmin: displayAdmin,
+        message: ttlsJSON,
+        version: versions,
+        documentTypes: documentTypes,
+        prdid: ttlsJSON.id,
+      };
     } catch (err) {
       console.log(err);
       return {
@@ -132,20 +140,10 @@ export class AppController {
         message: ttlsJSON ? ttlsJSON : null,
         version: versions ? versions : null,
         documentTypes: documentTypes ? documentTypes : null,
-        prdid: ttlsJSON.id,
+        prdid: ttlsJSON ? ttlsJSON.id : null,
         error: err,
       };
     }
-
-    return {
-      title: title,
-      primaryContactName: primaryContactName,
-      displayAdmin: displayAdmin,
-      message: ttlsJSON,
-      version: versions,
-      documentTypes: documentTypes,
-      prdid: ttlsJSON.id,
-    };
   }
 
   @Get("template-admin")

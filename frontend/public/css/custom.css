@@ -137,3 +137,7 @@ input[type="number"] {
   font-family: Verdana, Geneva, sans-serif !important;
   font-size: 1.2rem !important;
 }
+
+.titleSpacing {
+  margin-bottom: 1rem;
+}

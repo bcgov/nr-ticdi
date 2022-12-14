@@ -159,12 +159,19 @@ export class TTLSService {
     return "";
   }
 
-  // returns the individual name and if there is none, then it returns the legal name
-  getContactAgent(tenantAddr: { firstName: string; middleName: string }) {
-    if (tenantAddr.firstName || tenantAddr.middleName) {
+  // returns the individual name
+  getContactAgent(tenantAddr: {
+    firstName: string;
+    middleName: string;
+    lastName: string;
+  }) {
+    if (tenantAddr.firstName || tenantAddr.middleName || tenantAddr.lastName) {
       let name = tenantAddr.firstName ? tenantAddr.firstName : "";
       name = tenantAddr.middleName
         ? name.concat(" " + tenantAddr.middleName)
+        : name;
+      name = tenantAddr.lastName
+        ? name.concat(" " + tenantAddr.lastName)
         : name;
       return name;
     }
@@ -284,7 +291,7 @@ export class TTLSService {
       });
   }
 
-  async generateReportName(tenureFileNumber: number) {
+  async generateReportName(tenureFileNumber: string) {
     const url =
       `${hostname}:${port}/print-request-log/version/` + tenureFileNumber;
     // grab the next version string for the dtid

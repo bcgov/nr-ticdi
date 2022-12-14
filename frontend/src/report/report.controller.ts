@@ -42,7 +42,7 @@ export class ReportController {
   getReportName(
     @Param("tfn") tenureFileNumber: string
   ): Promise<{ reportName: string }> {
-    return this.ttlsService.generateReportName(+tenureFileNumber);
+    return this.ttlsService.generateReportName(tenureFileNumber);
   }
 
   @Post("generateReport")

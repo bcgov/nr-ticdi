@@ -39,28 +39,43 @@
                     <div class="contents" style="display: none;">
                         <div class="form-row">
                             <div class="form-group col-md-5 dataSection dataSection">
-                                <dt>Contact or Agent Name</dt>
-                                <dd>{{primaryContactName}}</dd>
+                                <dt>Contact/Agent Name</dt>
+                                <dd>{{message.contact_agent}}</dd>
                             </div>
-                            <div class="form-group col-md-5 dataSection dataSection">
-                                <dt>Email Address</dt>
-                                <dd>{{ message.email_address }}</dd>
-                            </div>
-                        </div>
-                        <div class="form-row">
                             <div class="form-group col-md-5 dataSection dataSection">
                                 <dt>Organization Unit</dt>
                                 <dd id="orgUnit">{{ message.organization_unit }}</dd>
                             </div>
+                            
+                        </div>
+                        <div class="form-row">
                             <div class="form-group col-md-5 dataSection dataSection">
-                                <dt>Inspected Date</dt>
-                                <dd>{{ message.inspected_date }}</dd>
+                                <dt>Primary Contact Email Address</dt>
+                                <dd>{{ message.email_address }}</dd>
+                            </div>
+                            <div class="form-group col-md-5 dataSection dataSection">
+                                <dt>Primary Contact Phone Number</dt>
+                                <dd>{{ message.phone_number }}</dd>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group col-md-5 dataSection dataSection">
+                                <dt>Contact/Agent Email Address</dt>
+                                <dd>{{ message.contact_email_address }}</dd>
+                            </div>
+                            <div class="form-group col-md-5 dataSection dataSection">
+                                <dt>Contact/Agent Phone Number</dt>
+                                <dd>{{ message.contact_phone_number }}</dd>
                             </div>
                         </div>
                         <div class="form-row">
                             <div class="form-group col-md-5 dataSection dataSection">
                                 <dt>Incorporation Number</dt>
                                 <dd>{{ message.incorporation_number }}</dd>
+                            </div>
+                            <div class="form-group col-md-5 dataSection dataSection">
+                                <dt>Inspected Date</dt>
+                                <dd>{{ message.inspected_date }}</dd>
                             </div>
                         </div>
                     </div>

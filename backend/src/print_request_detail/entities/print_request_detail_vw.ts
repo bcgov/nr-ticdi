@@ -17,7 +17,6 @@ import { PrintRequestDetail } from "./print_request_detail.entity";
         "print_request_detail.licence_holder_name",
         "LicenceHolderName"
       )
-      .addSelect("print_request_detail.contact_agent", "ContactAgent")
       .addSelect("print_request_detail.mailing_address", "MailingAddress")
       .addSelect("print_request_detail.mailing_city", "MailingCity")
       .addSelect(
@@ -25,9 +24,19 @@ import { PrintRequestDetail } from "./print_request_detail.entity";
         "MailingProv"
       )
       .addSelect("print_request_detail.mailing_postal_code", "PostCode")
+      .addSelect("print_request_detail.email_address", "PrimaryContactEmail")
+      .addSelect("print_request_detail.phone_number", "PrimaryContactPhone")
       .addSelect("print_request_detail.location_description", "Location")
       .addSelect("print_request_detail.tenure", "Tenure")
-      .addSelect("print_request_detail.email_address", "Email")
+      .addSelect("print_request_detail.contact_agent", "ContactAgent")
+      .addSelect(
+        "print_request_detail.contact_email_address",
+        "ContactAgentEmail"
+      )
+      .addSelect(
+        "print_request_detail.contact_phone_number",
+        "ContactAgentPhone"
+      )
       .addSelect("print_request_detail.inspected_date", "InspectionDate")
       .addSelect(
         "print_request_detail.incorporation_number",
@@ -55,8 +64,6 @@ export class PrintRequestDetailView {
   @ViewColumn()
   LicenceHolderName: string;
   @ViewColumn()
-  ContactAgent: string;
-  @ViewColumn()
   MailingAddress: string;
   @ViewColumn()
   MailingCity: string;
@@ -65,11 +72,19 @@ export class PrintRequestDetailView {
   @ViewColumn()
   PostCode: string;
   @ViewColumn()
+  ContactAgent: string;
+  @ViewColumn()
+  ContactAgentEmail: string;
+  @ViewColumn()
+  ContactAgentPhone: string;
+  @ViewColumn()
   Tenure: string;
   @ViewColumn()
   Location: string;
   @ViewColumn()
-  Email: string;
+  PrimaryContactEmail: string;
+  @ViewColumn()
+  PrimaryContactPhone: string;
   @ViewColumn()
   InspectionDate: string;
   @ViewColumn()

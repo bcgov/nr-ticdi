@@ -31,6 +31,18 @@ export class PrintRequestDetail {
   @Column({ nullable: true })
   contact_agent: string;
   @Column({ nullable: true })
+  contact_company_name?: string;
+  @Column({ nullable: true })
+  contact_first_name?: string;
+  @Column({ nullable: true })
+  contact_middle_name?: string;
+  @Column({ nullable: true })
+  contact_last_name?: string;
+  @Column({ nullable: true })
+  contact_phone_number?: string;
+  @Column({ nullable: true })
+  contact_email_address?: string;
+  @Column({ nullable: true })
   first_name: string;
   @Column({ nullable: true })
   middle_name: string;
@@ -40,6 +52,8 @@ export class PrintRequestDetail {
   legal_name: string;
   @Column({ nullable: true })
   email_address: string;
+  @Column({ nullable: true })
+  phone_number: string;
   @Column({ nullable: true })
   inspected_date: string;
   @Column({ nullable: true })
@@ -86,11 +100,18 @@ export class PrintRequestDetail {
     sub_type_name?: string,
     licence_holder_name?: string,
     contact_agent?: string,
+    contact_company_name?: string,
+    contact_first_name?: string,
+    contact_middle_name?: string,
+    contact_last_name?: string,
+    contact_phone_number?: string,
+    contact_email_address?: string,
     first_name?: string,
     middle_name?: string,
     last_name?: string,
     legal_name?: string,
     email_address?: string,
+    phone_number?: string,
     inspected_date?: string,
     mailing_address?: string,
     mailing_address_line_1?: string,
@@ -117,11 +138,18 @@ export class PrintRequestDetail {
     this.sub_type_name = sub_type_name || "";
     this.licence_holder_name = licence_holder_name || "";
     this.contact_agent = contact_agent || "";
+    this.contact_company_name = contact_company_name || "";
+    this.contact_first_name = contact_first_name || "";
+    this.contact_middle_name = contact_middle_name || "";
+    this.contact_last_name = contact_last_name || "";
+    this.contact_phone_number = contact_phone_number || "";
+    this.contact_email_address = contact_email_address || "";
     this.first_name = first_name || "";
     this.middle_name = middle_name || "";
     this.last_name = last_name || "";
     this.legal_name = legal_name || "";
     this.email_address = email_address || "";
+    this.phone_number = phone_number || "";
     this.inspected_date = inspected_date || "";
     this.mailing_address = mailing_address || "";
     this.mailing_address_line_1 = mailing_address_line_1 || "";

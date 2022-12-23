@@ -50,7 +50,6 @@ export class TTLSService {
           LegalDescription: entry.legalDescription,
         });
       }
-
       const mappedData = {
         dtid: printRequestDetail.dtid,
         tenure_file_number: printRequestDetail.fileNum,
@@ -67,8 +66,20 @@ export class TTLSService {
         licence_holder_name: this.getLicenceHolderName(
           printRequestDetail.tenantAddr
         ),
-        contact_agent: this.getContactAgent(printRequestDetail.tenantAddr),
         email_address: printRequestDetail.tenantAddr.emailAddress,
+        phone_number: printRequestDetail.tenantAddr.phoneNumber,
+        licence_holder: this.getLicenceHolder(printRequestDetail.tenantAddr),
+        contact_agent: this.getContactAgent(
+          printRequestDetail.contactFirstName,
+          printRequestDetail.contactMiddleName,
+          printRequestDetail.contactLastName
+        ),
+        contact_company_name: printRequestDetail.contactCompanyName,
+        contact_first_name: printRequestDetail.contactFirstName,
+        contact_middle_name: printRequestDetail.contactMiddleName,
+        contact_last_name: printRequestDetail.contactLastName,
+        contact_phone_number: printRequestDetail.contactPhoneNumber,
+        contact_email_address: printRequestDetail.contactEmail,
         inspected_date: printRequestDetail.inspectionDate,
         mailing_address: this.getMailingAddress(printRequestDetail.tenantAddr),
         mailing_address_line_1: printRequestDetail.tenantAddr.addrLine1,
@@ -160,7 +171,7 @@ export class TTLSService {
   }
 
   // returns the individual name
-  getContactAgent(tenantAddr: {
+  getLicenceHolder(tenantAddr: {
     firstName: string;
     middleName: string;
     lastName: string;
@@ -173,6 +184,17 @@ export class TTLSService {
       name = tenantAddr.lastName
         ? name.concat(" " + tenantAddr.lastName)
         : name;
+      return name;
+    }
+    return "";
+  }
+
+  // returns the individual name
+  getContactAgent(firstName: string, middleName: string, lastName: string) {
+    if (firstName || middleName || lastName) {
+      let name = firstName ? firstName : "";
+      name = middleName ? name.concat(" " + middleName) : name;
+      name = lastName ? name.concat(" " + lastName) : name;
       return name;
     }
     return "";

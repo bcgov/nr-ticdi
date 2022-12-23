@@ -31,7 +31,14 @@ export class PrintRequestDetailService {
     newItem.legal_name = printRequestDetail.legal_name;
     newItem.licence_holder_name = printRequestDetail.licence_holder_name;
     newItem.contact_agent = printRequestDetail.contact_agent;
+    newItem.contact_company_name = printRequestDetail.contact_company_name;
+    newItem.contact_first_name = printRequestDetail.contact_first_name;
+    newItem.contact_middle_name = printRequestDetail.contact_middle_name;
+    newItem.contact_last_name = printRequestDetail.contact_last_name;
+    newItem.contact_phone_number = printRequestDetail.contact_phone_number;
+    newItem.contact_email_address = printRequestDetail.contact_email_address;
     newItem.email_address = printRequestDetail.email_address;
+    newItem.phone_number = printRequestDetail.phone_number;
     newItem.inspected_date = printRequestDetail.inspected_date;
     newItem.mailing_address = printRequestDetail.mailing_address;
     newItem.mailing_address_line_1 = printRequestDetail.mailing_address_line_1;

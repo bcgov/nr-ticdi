@@ -67,9 +67,10 @@ export class TTLSService {
           printRequestDetail.tenantAddr
         ),
         email_address: printRequestDetail.tenantAddr.emailAddress,
-        phone_number:
+        phone_number: this.formatPhoneNumber(
           printRequestDetail.tenantAddr.areaCode +
-          printRequestDetail.tenantAddr.phoneNumber,
+            printRequestDetail.tenantAddr.phoneNumber
+        ),
         licence_holder: this.getLicenceHolder(printRequestDetail.tenantAddr),
         contact_agent: this.getContactAgent(
           printRequestDetail.contactFirstName,
@@ -80,7 +81,9 @@ export class TTLSService {
         contact_first_name: printRequestDetail.contactFirstName,
         contact_middle_name: printRequestDetail.contactMiddleName,
         contact_last_name: printRequestDetail.contactLastName,
-        contact_phone_number: printRequestDetail.contactPhoneNumber,
+        contact_phone_number: this.formatPhoneNumber(
+          printRequestDetail.contactPhoneNumber
+        ),
         contact_email_address: printRequestDetail.contactEmail,
         inspected_date: printRequestDetail.inspectionDate,
         mailing_address: this.getMailingAddress(printRequestDetail.tenantAddr),
@@ -156,7 +159,7 @@ export class TTLSService {
     middleName: string;
     lastName: string;
     legalName: string;
-  }) {
+  }): string {
     if (tenantAddr.firstName || tenantAddr.middleName || tenantAddr.lastName) {
       let name = tenantAddr.firstName ? tenantAddr.firstName : "";
       name = tenantAddr.middleName
@@ -177,7 +180,7 @@ export class TTLSService {
     firstName: string;
     middleName: string;
     lastName: string;
-  }) {
+  }): string {
     if (tenantAddr.firstName || tenantAddr.middleName || tenantAddr.lastName) {
       let name = tenantAddr.firstName ? tenantAddr.firstName : "";
       name = tenantAddr.middleName
@@ -192,7 +195,11 @@ export class TTLSService {
   }
 
   // returns the individual name
-  getContactAgent(firstName: string, middleName: string, lastName: string) {
+  getContactAgent(
+    firstName: string,
+    middleName: string,
+    lastName: string
+  ): string {
     if (firstName || middleName || lastName) {
       let name = firstName ? firstName : "";
       name = middleName ? name.concat(" " + middleName) : name;
@@ -207,7 +214,7 @@ export class TTLSService {
     addrLine1: string;
     addrLine2: string;
     addrLine3: string;
-  }) {
+  }): string {
     let mailingAddress = "";
     if (tenantAddr.addrLine1) {
       mailingAddress = tenantAddr.addrLine1;
@@ -221,7 +228,7 @@ export class TTLSService {
     return mailingAddress;
   }
 
-  formatInspectedDate(inspected_date: string) {
+  formatInspectedDate(inspected_date: string): string {
     if (inspected_date && inspected_date.length == 8) {
       return (
         inspected_date.substring(0, 4) +
@@ -232,6 +239,10 @@ export class TTLSService {
       );
     }
     return inspected_date;
+  }
+
+  formatPhoneNumber(phone_number: string): string {
+    return phone_number.replace(/(\d{3})(\d{3})(\d{4})/, "($1)-$2-$3");
   }
 
   callHttp(id: string): Observable<Array<Object>> {

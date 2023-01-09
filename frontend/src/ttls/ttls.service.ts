@@ -242,7 +242,9 @@ export class TTLSService {
   }
 
   formatPhoneNumber(phone_number: string): string {
-    return phone_number.replace(/(\d{3})(\d{3})(\d{4})/, "($1)-$2-$3");
+    return phone_number.length == 10
+      ? phone_number.replace(/(\d{3})(\d{3})(\d{4})/, "($1)-$2-$3")
+      : phone_number;
   }
 
   callHttp(id: string): Observable<Array<Object>> {

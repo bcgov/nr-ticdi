@@ -67,7 +67,9 @@ export class TTLSService {
           printRequestDetail.tenantAddr
         ),
         email_address: printRequestDetail.tenantAddr.emailAddress,
-        phone_number: printRequestDetail.tenantAddr.phoneNumber,
+        phone_number:
+          printRequestDetail.tenantAddr.areaCode +
+          printRequestDetail.tenantAddr.phoneNumber,
         licence_holder: this.getLicenceHolder(printRequestDetail.tenantAddr),
         contact_agent: this.getContactAgent(
           printRequestDetail.contactFirstName,

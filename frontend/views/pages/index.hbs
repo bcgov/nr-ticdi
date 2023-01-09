@@ -55,7 +55,7 @@
                             </div>
                             <div class="form-group col-md-5 dataSection dataSection">
                                 <dt>Primary Contact Phone Number</dt>
-                                <dd>{{ message.phone_number }}</dd>
+                                <dd id="phoneNumber">{{ message.phone_number }}</dd>
                             </div>
                         </div>
                         <div class="form-row">
@@ -65,7 +65,7 @@
                             </div>
                             <div class="form-group col-md-5 dataSection dataSection">
                                 <dt>Contact/Agent Phone Number</dt>
-                                <dd>{{ message.contact_phone_number }}</dd>
+                                <dd id="phoneNumber2">{{ message.contact_phone_number }}</dd>
                             </div>
                         </div>
                         <div class="form-row">
@@ -162,6 +162,17 @@
                     $(this).text($(this).text().substr(0,2000)+"...");
                 }
             })
+
+            if ($("#phoneNumber").text().length == 10) {
+                let phoneNumber = $("#phoneNumber").text();
+                let formattedNumber = phoneNumber.replace(/(\d{3})(\d{3})(\d{4})/, "($1)-$2-$3");
+                $("#phoneNumber").text(formattedNumber);
+            }
+            if ($("#phoneNumber2").text().length == 10) {
+                let phoneNumber = $("#phoneNumber2").text();
+                let formattedNumber = phoneNumber.replace(/(\d{3})(\d{3})(\d{4})/, "($1)-$2-$3");
+                $("#phoneNumber2").text(formattedNumber);
+            }
         })
         $("fieldset legend").click(function() {
             $(this).parent().find(".contents").toggle();

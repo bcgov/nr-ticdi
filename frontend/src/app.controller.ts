@@ -99,11 +99,13 @@ export class AppController {
     let ttlsJSON, primaryContactName, versions;
     let documentTypes = [];
     try {
-      const response: any = await firstValueFrom(
-        this.ttlsService.callHttp(id)
-      ).then((res) => {
-        return res;
-      });
+      const response: any = await firstValueFrom(this.ttlsService.callHttp(id))
+        .then((res) => {
+          return res;
+        })
+        .catch((err) => {
+          console.log(err);
+        });
       ttlsJSON = await this.ttlsService.sendToBackend(response);
       if (ttlsJSON.inspected_date) {
         ttlsJSON["inspected_date"] = this.ttlsService.formatInspectedDate(

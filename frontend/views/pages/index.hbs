@@ -3,7 +3,7 @@
     <main role="main">
       <form>
             <div class="container">
-                <h1>Client</h1>
+                <h1>Preview - Land Use Report (Draft)</h1>
                 <hr />
                 <div class="form-group row">
                     <div class="col-md-2">
@@ -162,6 +162,9 @@
                     $(this).text($(this).text().substr(0,2000)+"...");
                 }
             })
+            if ($("#adminLink").text() == "-") {
+                $("#adminLink").hide();
+            }
         })
         $("fieldset legend").click(function() {
             $(this).parent().find(".contents").toggle();

@@ -68,8 +68,8 @@ export class TTLSService {
         ),
         email_address: printRequestDetail.tenantAddr.emailAddress,
         phone_number: this.formatPhoneNumber(
-          printRequestDetail.tenantAddr.areaCode +
-            printRequestDetail.tenantAddr.phoneNumber
+          printRequestDetail.tenantAddr.phoneNumber,
+          printRequestDetail.tenantAddr.areaCode
         ),
         licence_holder: this.getLicenceHolder(printRequestDetail.tenantAddr),
         contact_agent: this.getContactAgent(
@@ -82,7 +82,8 @@ export class TTLSService {
         contact_middle_name: printRequestDetail.contactMiddleName,
         contact_last_name: printRequestDetail.contactLastName,
         contact_phone_number: this.formatPhoneNumber(
-          printRequestDetail.contactPhoneNumber
+          printRequestDetail.contactPhoneNumber,
+          null
         ),
         contact_email_address: printRequestDetail.contactEmail,
         inspected_date: printRequestDetail.inspectionDate,
@@ -241,10 +242,21 @@ export class TTLSService {
     return inspected_date;
   }
 
-  formatPhoneNumber(phone_number: string): string {
-    return phone_number && phone_number.length == 10
-      ? phone_number.replace(/(\d{3})(\d{3})(\d{4})/, "($1)$2-$3")
-      : phone_number;
+  formatPhoneNumber(phone_number: string, area_code: string): string {
+    if (phone_number && phone_number.length == 10) {
+      return phone_number.replace(/(\d{3})(\d{3})(\d{4})/, "($1)$2-$3");
+    } else if (
+      phone_number &&
+      area_code &&
+      (phone_number + area_code).length == 10
+    ) {
+      return (area_code + phone_number).replace(
+        /(\d{3})(\d{3})(\d{4})/,
+        "($1)$2-$3"
+      );
+    } else {
+      return "";
+    }
   }
 
   callHttp(id: string): Observable<Array<Object>> {

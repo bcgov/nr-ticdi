@@ -1,0 +1,51 @@
+{{#> template}}
+  {{#*inline "content"}}
+    <main role="main">
+        <div class="container">
+            <h1>System Administration</h1>
+            <hr />            
+            <div class="col-md-3">
+                <h3>Manage Users</h3>
+            </div>
+             <div class="form-group row">
+                <div class="col-md-4">
+                    <select id="userList" style="min-width: 200px">
+                        <option value="Mike">Mike</option>
+                        <option value="Bill">Bill</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <button id="manageButton" class="btn btn-primary" onclick="manageUsers()">Manage</button>
+                </div>
+            </div>
+            <hr />   
+            <div class="col-md-3">
+                <h3>Manage Templates</h3>
+            </div>
+            <div class="form-group row">
+                <div class="col-md-4">
+                    <select id="reportTypes" style="min-width: 200px">
+                        {{#each reportTypes}}
+                        <option value="{{this}}">{{this}}</option>
+                        {{/each}}
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <button id="manageButton" class="btn btn-primary" onclick="manageReports()">Manage</button>
+                </div>
+            </div>
+        </div>
+    </main>
+    <script>
+        var dataArray = [];
+        $( document ).ready(function() {})
+        // when the selected option changes, update the table
+        function manageReports() {
+            window.location.href = '/template-admin?report='+$('#reportTypes option:selected').text();
+        }
+        function manageUsers() {
+            console.log("manage users");
+        }
+    </script>
+  {{/inline}}
+{{/template}}

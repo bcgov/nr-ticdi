@@ -57,7 +57,7 @@ export class AppController {
         }
       }
     }
-    const displayAdmin = isAdmin ? "Template Administration" : "-";
+    const displayAdmin = isAdmin ? "Administration" : "-";
     const title =
       process.env.ticdi_environment == "DEVELOPMENT"
         ? "DEVELOPMENT - " + PAGE_TITLES.INDEX
@@ -94,7 +94,7 @@ export class AppController {
       process.env.ticdi_environment == "DEVELOPMENT"
         ? "DEVELOPMENT - " + PAGE_TITLES.INDEX
         : PAGE_TITLES.INDEX;
-    const displayAdmin = isAdmin ? "Template Administration" : "-";
+    const displayAdmin = isAdmin ? "Administration" : "-";
     await this.ttlsService.setWebadeToken();
     let ttlsJSON, primaryContactName, versions;
     let documentTypes = [];
@@ -148,6 +148,48 @@ export class AppController {
     }
   }
 
+  @Get("system-admin")
+  @Render("system-admin")
+  @UseFilters(AuthenticationFilter)
+  @UseGuards(AuthenticationGuard)
+  @UseGuards(AdminGuard)
+  async systemAdminPage(@Session() session: { data?: SessionData }) {
+    let isAdmin = false;
+    if (
+      session.data &&
+      session.data.activeAccount &&
+      session.data.activeAccount.client_roles
+    ) {
+      for (let role of session.data.activeAccount.client_roles) {
+        if (role == "ticdi_admin") {
+          isAdmin = true;
+        }
+      }
+    }
+    const displayAdmin = isAdmin ? "Administration" : "-";
+    const data = await lastValueFrom(
+      this.httpService
+        .get(requestUrl, requestConfig)
+        .pipe(map((response) => response.data))
+    );
+    const documentTypes = ["Land Use Report"];
+    for (let entry of data) {
+      if (!documentTypes.includes(entry.comments)) {
+        documentTypes.push(entry.comments);
+      }
+    }
+    const title =
+      process.env.ticdi_environment == "DEVELOPMENT"
+        ? "DEVELOPMENT - " + PAGE_TITLES.ADMIN
+        : PAGE_TITLES.ADMIN;
+    return {
+      title: title,
+      displayAdmin: displayAdmin,
+      reportTypes: ["Land Use Report", "Notice of Final Review"], // TODO - should populate from database
+      documentTypes: documentTypes,
+    };
+  }
+
   @Get("template-admin")
   @Render("template-admin")
   @UseFilters(AuthenticationFilter)
@@ -166,7 +208,7 @@ export class AppController {
         }
       }
     }
-    const displayAdmin = isAdmin ? "Template Administration" : "-";
+    const displayAdmin = isAdmin ? "Administration" : "-";
     const data = await lastValueFrom(
       this.httpService
         .get(requestUrl, requestConfig)
@@ -180,8 +222,8 @@ export class AppController {
     }
     const title =
       process.env.ticdi_environment == "DEVELOPMENT"
-        ? "DEVELOPMENT - " + PAGE_TITLES.ADMIN
-        : PAGE_TITLES.ADMIN;
+        ? "DEVELOPMENT - " + PAGE_TITLES.MANAGE_TEMPLATES
+        : PAGE_TITLES.MANAGE_TEMPLATES;
     return {
       title: title,
       primaryContactName: "",

@@ -1,4 +1,6 @@
 export const PAGE_TITLES = {
   INDEX: "TICDI",
-  ADMIN: "Template Administration",
+  ADMIN: "System Administration",
+  MANAGE_TEMPLATES: "Manage Templates",
+  MANAGE_USERS: "Manage Users",
 };

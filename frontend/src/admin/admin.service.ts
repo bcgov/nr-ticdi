@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, Param } from "@nestjs/common";
 import * as dotenv from "dotenv";
 import { Express } from "express";
 const axios = require("axios");
@@ -16,6 +16,30 @@ export class AdminService {
       : `http://localhost`;
     // local development backend port is 3001, docker backend port is 3000
     port = process.env.backend_url ? 3000 : 3001;
+  }
+
+  async activateTemplate(data: {
+    id: number;
+    update_userid: string;
+    document_type: string;
+  }): Promise<any> {
+    const url = `${hostname}:${port}/document-template/activate-template`;
+    return axios
+      .post(url, {
+        id: data.id,
+        update_userid: data.update_userid,
+        document_type: data.document_type,
+      })
+      .then((res) => {
+        return res.data;
+      });
+  }
+
+  async downloadTemplate(id: number) {
+    const url = `${hostname}:${port}/document-template/get-one/${id}`;
+    return axios.get(url).then((res) => {
+      return res.data;
+    });
   }
 
   async uploadTemplate(

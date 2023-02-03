@@ -141,3 +141,7 @@ input[type="number"] {
 .titleSpacing {
   margin-bottom: 1rem;
 }
+
+td input[type="checkbox"] {
+  vertical-align: center;
+}

@@ -17,8 +17,6 @@ export class DocumentTemplate {
   @Column()
   template_author: string;
   @Column()
-  template_creation_date: string; // ?
-  @Column()
   active_flag: boolean;
   @Column()
   mime_type: string;
@@ -41,7 +39,6 @@ export class DocumentTemplate {
     document_type?: string,
     template_version?: number,
     template_author?: string,
-    template_creation_date?: string,
     active_flag?: boolean,
     mime_type?: string,
     file_name?: string,
@@ -53,7 +50,6 @@ export class DocumentTemplate {
     this.document_type = document_type || "";
     this.template_version = template_version || null;
     this.template_author = template_author || "";
-    this.template_creation_date = template_creation_date || "";
     this.active_flag = active_flag || false;
     this.mime_type = mime_type || "";
     this.file_name = file_name || "";

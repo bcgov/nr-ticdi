@@ -10,6 +10,8 @@ import {
   ParseFilePipe,
   FileTypeValidator,
   MaxFileSizeValidator,
+  Get,
+  Param,
 } from "@nestjs/common";
 import { SessionData } from "utils/types";
 import { AxiosRequestConfig } from "axios";
@@ -41,6 +43,30 @@ export class AdminController {
     };
   }
 
+  @Get("activate-template/:id/:document_type")
+  async activateTemplate(
+    @Session() session: { data?: SessionData },
+    @Param("id") id,
+    @Param("document_type") document_type
+  ) {
+    const update_userid = session.data.activeAccount
+      ? session.data.activeAccount.idir_username
+        ? session.data.activeAccount.idir_username
+        : ""
+      : "";
+    console.log(id + " " + update_userid + " " + document_type);
+    return this.adminService.activateTemplate({
+      id: id,
+      update_userid: update_userid,
+      document_type: document_type,
+    });
+  }
+
+  @Get("download-template/:id")
+  async downloadTemplate(@Param("id") id) {
+    const docTemplate = await this.adminService.downloadTemplate(id);
+  }
+
   @Post("upload-template")
   @UseInterceptors(FileInterceptor("file"))
   async uploadTemplate2(
@@ -57,7 +83,8 @@ export class AdminController {
       })
     )
     file: Express.Multer.File,
-    @Body() params: { comments: string; active_flag: boolean }
+    @Body()
+    params: { comments: string; active_flag: boolean; template_name: string }
   ) {
     let isAdmin = false;
     if (
@@ -87,10 +114,11 @@ export class AdminController {
         comments: params.comments,
         active_flag: params.active_flag,
         mime_type: file.mimetype,
-        file_name: file.originalname,
+        file_name: params.template_name,
         template_author: template_author,
         create_userid: create_userid,
       };
+      console.log(uploadData);
       return this.adminService.uploadTemplate(uploadData, file);
     } else {
       return { message: "No Admin Privileges Found" };

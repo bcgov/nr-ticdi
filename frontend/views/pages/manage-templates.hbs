@@ -1,0 +1,260 @@
+{{#> template}}
+  {{#*inline "content"}}
+    <main role="main">
+        <div class="container">
+            <h1>Manage Templates</h1>
+            <hr />
+
+            <fieldset class="form-group collapsible">
+                <legend style="cursor: pointer" class='togvis sectionTitle'><i class="fa fa-plus"></i>  <span id="reportTitle"></span></legend>
+                <div class="contents" style="display: none;">
+                    <hr />
+                    <div class="form-row">
+                        <div>
+                            <table id="documentTable">
+                                <thead>
+                                    <th>Doc No.</th>
+                                    <th style="width: 400px">Template Name</th>
+                                    <th>Uploaded Date</th>
+                                    <th>Active</th>
+                                    <th></th>
+                                    <th></th>
+                                </thead>
+                                <tbody id="documentTableBody">
+                                    <tr></tr>
+                                    {{!-- {{#each data}}
+                                    <tr>
+                                        <td>{{this.version}}</td>
+                                        <td>{{this.template_name}}</td>
+                                        <td>{{this.uploaded_date}}</td>
+                                        <td>{{this.active_flag}}</td>
+                                        <td>View</td>
+                                        <td>Remove</td>
+                                    </tr>
+                                    {{/each}} --}}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </fieldset>
+            <div style="display: none">
+                <table id="hiddenTable">
+                </table>
+            </div>
+            <form class="upload">
+                <div class="form-group row">
+                    <div class="col-md-3">
+                        <button type="button" class="btn btn-success" data-toggle="modal" data-target="#uploadModal">Upload New Version</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div id="uploadModal" class="modal fade" role="dialog">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                <div class="modal-header">
+                    <h4 id="uploadTitle" class="modal-title">Upload New Version</h4>
+                    <h4 id="confirmTitle" class="modal-title" style="display:none">Confirm Upload</h4>
+                </div>
+                <div class="modal-body">
+                     <form class="upload">
+                        <div id="uploadBody">
+                            <div class="form-group row">
+                                <div class="col-md-12">
+                                    <input class="form-control-file" id="uploadFile" style="height: auto" type="file" accept=".docx">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-md-12">
+                                    <label for="uploadTemplateName" style="font-weight:bold">Template Name:</label>
+                                    <input id="uploadTemplateName" type="text" class="border border-1 rounded pl-2 ml-2" style="min-width:400px" disabled>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="confirmBody" style="display:none">
+                            <p>Are you sure you would like to upload this template?</p>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="saveButton" class="btn btn-primary" onclick="saveButtonClicked()" disabled>Save</button>
+                    <button type="button" id="cancelButton" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button type="button" id="yesButton" class="btn btn-primary" onclick="uploadTemplate()" style="display:none">Yes</button>
+                    <button type="button" id="noButton" class="btn btn-secondary" data-dismiss="modal" style="display:none">No</button>
+                </div>
+            </div>
+        </div>
+    </main>
+    <script>
+        var dataArray = [];
+        $( document ).ready(function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const reportType = urlParams.get('report');
+            $("#reportTitle").text(reportType);
+            {{#each data}}
+            dataArray.push({
+                document_type: "{{this.document_type}}",
+                template_version: "{{this.template_version}}",
+                template_name: "{{this.template_name}}",
+                uploaded_date: "{{this.uploaded_date}}",
+                active_flag: "{{this.active_flag}}",
+                id: "{{this.id}}"
+            });
+            {{/each}}
+            console.log(dataArray)
+            var t = "";
+            // fill the hidden table with all document templates
+            for (let entry of dataArray) {
+                var tr = "<tr>";
+                tr += `<td><input type="text" value="${entry.template_version}" class="border border-1 rounded pl-2" style="color:gray" readonly></td>`;
+                tr += `<td><input type="text" value="${entry.template_name}" class="border border-1 rounded pl-2" style="color:gray" readonly></td>`;
+                tr += `<td><input type="text" value="${entry.uploaded_date}" class="border border-1 rounded pl-2" style="color:gray" readonly></td>`;
+                tr += entry.active_flag == 'true' ? '<td><input class="form-check-input" type="radio" name="radioActive" checked></td>' : '<td><input class="form-check-input" type="radio" name="radioActive"></td>';
+                tr += `<td><button class="btn btn-info" id='view${entry.id}'>View</td>`;
+                tr += `<td><button class="btn btn-warn" id='remove${entry.id}'>Remove</td>`;
+                tr += "</tr>";
+                t += tr;
+            }
+            $("#hiddenTable tr").remove();
+            table = $("#hiddenTable");
+            table.innerHTML = t;
+
+            // fill the displayed table with instances of the selected option
+            $("#documentTableBody tr").remove();
+            t = ""
+            dataArray.sort((a, b) => {
+                return parseFloat(b.template_version) - parseFloat(a.template_version);
+            })
+            for (let entry of dataArray) {
+                if (reportType == entry.document_type) {
+                   var tr = "<tr>";
+                tr += `<td><input type="text" value="${entry.template_version}" class="border border-1 rounded pl-2" style="color:gray; max-width:80px" readonly></td>`;
+                tr += `<td><input type="text" value="${entry.template_name}" class="border border-1 rounded pl-2" style="color:gray; width:100%" readonly></td>`;
+                tr += `<td><input type="text" value="${entry.uploaded_date}" class="border border-1 rounded pl-2" style="color:gray; max-width:150px" readonly></td>`;
+                tr += entry.active_flag == 'true' ? `<td style='text-align: center;'><input id='radio-${entry.id}' type="radio" name="radioActive" checked></td>` : 
+                    `<td style="text-align: center;"><input id='radio-${entry.id}' type="radio" name="radioActive"></td>`;
+                tr += `<td><button class="btn btn-info" id='view${entry.id}'>View</td>`;
+                tr += `<td><button class="btn btn-warning" id='remove${entry.id}'>Remove</td>`;
+                tr += "</tr>";
+                t += tr;
+                }
+            }
+            document.getElementById("documentTableBody").innerHTML = t;
+
+            $('input[type=radio]').click(function(){
+                const templateId = this.id.replace("radio-", "");
+                const reportType = $("#reportTitle").text();
+                console.log(reportType);
+                fetch(`/admin/activate-template/${templateId}/${encodeURIComponent(reportType)}`, {
+                method: 'GET',
+                responseType: 'application/json',
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.errors) {
+                        alert(data.errors);
+                    }
+                });
+            });
+        })
+    </script>
+    <script>
+        let fileBase64;
+        const streamToText = async (blob) => {
+            const readableStream = await blob.getReader();
+            const chunk = await readableStream.read();
+
+            return new TextDecoder('utf-8').decode(chunk.value);
+        };
+
+        const bufferToText = (buffer) => {
+            const bufferByteLength = buffer.byteLength;
+            const bufferUint8Array = new Uint8Array(buffer, 0, bufferByteLength);
+
+            return new TextDecoder().decode(bufferUint8Array);
+        };
+
+        document.getElementById('uploadFile').addEventListener('change', function(e) {
+            $('#saveButton').prop('disabled', false);
+            $('#uploadTemplateName').prop('disabled', false);
+            let file = document.getElementById('uploadFile').files[0];
+            if (file.name) {
+                $('#uploadTemplateName').val(file.name.replace('.docx',''));
+            }
+
+            (async () => {
+                const fileContent = await file.text();
+                const fileContentStream = await file.stream();
+                const buffer = await file.arrayBuffer();
+                var reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = function () {
+                    fileBase64 = reader.result.split('base64,')[1];
+                };
+                reader.onerror = function (error) {
+                    console.log("Error: ", error);
+                };
+            })();
+        });
+
+        $('#uploadModal').on('hidden.bs.modal', function (e) {
+            $('#confirmTitle').hide();
+            $('#uploadTitle').show();
+            $('#confirmBody').hide();
+            $('#uploadBody').show();
+            $('#yesButton').hide();
+            $('#noButton').hide();
+            $('#saveButton').show();
+            $('#cancelButton').show();
+            var input = document.querySelector('input[type="file"]');
+            input.value = "";
+        })
+
+        function saveButtonClicked() {
+            $('#uploadTitle').hide();
+            $('#confirmTitle').show();
+            $('#uploadBody').hide();
+            $('#confirmBody').show();
+            $('#saveButton').hide();
+            $('#cancelButton').hide();
+            $('#yesButton').show();
+            $('#noButton').show();
+        }
+
+        function uploadTemplate() {
+            let f = document.getElementById('uploadFile');
+            var input = document.querySelector('input[type="file"]')
+            var formData = new FormData();
+            formData.append('file', input.files[0])
+            formData.append('comments', 'Land Use Report') // update this
+            formData.append('active_flag', true)
+            console.log($('#uploadTemplateName').val());
+            formData.append('template_name', $('#uploadTemplateName').val());
+            fetch('/admin/upload-template', {
+                method: 'POST',
+                body: formData,
+                responseType: 'application/json',
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.errors) {
+                    alert(data.errors);
+                } else {
+                    location.reload();
+                }
+            });
+        }
+  </script>
+  <script>
+    $("fieldset legend").click(function() {
+        $(this).parent().find(".contents").toggle();
+        if ($(".fa", this).hasClass("fa-plus")) {
+            $(".fa", this).removeClass("fa-plus").addClass("fa-minus");
+        } else {
+            $(".fa", this).removeClass("fa-minus").addClass("fa-plus");
+        }
+    });
+  </script>
+  {{/inline}}
+{{/template}}

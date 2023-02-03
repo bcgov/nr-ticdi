@@ -11,6 +11,7 @@ import { CreateDocumentTemplateDto } from "./dto/create-document_template.dto";
 import { UpdateDocumentTemplateDto } from "./dto/update-document_template.dto";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { Express } from "express";
+import { Param } from "@nestjs/common/decorators";
 
 @Controller("document-template")
 export class DocumentTemplateController {
@@ -21,9 +22,25 @@ export class DocumentTemplateController {
   async create(
     @UploadedFile()
     file: Express.Multer.File,
-    @Body() params: CreateDocumentTemplateDto
+    @Body() params: CreateDocumentTemplateDto & { active_flag: string }
   ) {
-    return await this.templateService.create(params, file);
+    const params2 = {
+      document_type: params.document_type,
+      template_author: params.template_author,
+      mime_type: params.mime_type,
+      file_name: params.file_name,
+      comments: params.comments,
+      create_userid: params.create_userid,
+      active_flag: params.active_flag == "true" ? true : false,
+    };
+    return await this.templateService.create(params2, file);
+  }
+
+  @Post("activate-template")
+  activateTemplate(
+    @Body() data: { id: number; update_userid: string; document_type: string }
+  ) {
+    return this.templateService.activateTemplate(data);
   }
 
   @Post("update")
@@ -36,8 +53,8 @@ export class DocumentTemplateController {
     return this.templateService.findAll();
   }
 
-  @Post("get-one")
-  findOne(@Body() data: { version: number; comments: string }) {
-    return this.templateService.findOne(data.version, data.comments);
+  @Get("find-one/:id")
+  findOne(@Param() id: number) {
+    return this.templateService.findOne(id);
   }
 }

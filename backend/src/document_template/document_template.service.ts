@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, StreamableFile } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { CreateDocumentTemplateDto } from "./dto/create-document_template.dto";
@@ -13,7 +13,7 @@ export class DocumentTemplateService {
   ) {}
 
   async create(
-    documentTemplate: CreateDocumentTemplateDto,
+    documentTemplate: CreateDocumentTemplateDto & { active_flag: boolean },
     file: any
   ): Promise<DocumentTemplate> {
     const base64File = Buffer.from(file.buffer).toString("base64");
@@ -25,13 +25,20 @@ export class DocumentTemplateService {
     newItem.file_name = documentTemplate.file_name;
     newItem.comments = documentTemplate.comments;
     newItem.create_userid = documentTemplate.create_userid;
+    newItem.the_file = base64File;
+    newItem.template_version = await this.getTemplateVersion(documentTemplate);
+    const newTemplate = this.documentTemplateRepository.create(newItem);
+    return this.documentTemplateRepository.save(newTemplate);
+  }
+
+  async getTemplateVersion(
+    documentTemplate: CreateDocumentTemplateDto & { active_flag: boolean }
+  ): Promise<number> {
     const existingReports = await this.documentTemplateRepository.findBy({
       document_type: documentTemplate.document_type,
     });
     if (!existingReports) {
-      newItem.template_version = 0;
-      const newTemplate = this.documentTemplateRepository.create(newItem);
-      return this.documentTemplateRepository.save(newTemplate);
+      return 0;
     } else {
       let currentVersion = 0;
       for (let item of existingReports) {
@@ -39,11 +46,31 @@ export class DocumentTemplateService {
           currentVersion = item.template_version;
         }
       }
-      newItem.template_version = currentVersion + 1;
-      newItem.the_file = base64File;
-      const newTemplate = this.documentTemplateRepository.create(newItem);
-      return this.documentTemplateRepository.save(newTemplate);
+      return currentVersion + 1;
     }
+  }
+
+  async activateTemplate(data: {
+    id: number;
+    update_userid: string;
+    document_type: string;
+  }): Promise<any> {
+    let allTemplates = await this.documentTemplateRepository.findBy({
+      comments: data.document_type,
+    });
+    console.log(allTemplates.length);
+    for (let entry of allTemplates) {
+      if (entry.active_flag == true) {
+        await this.documentTemplateRepository.update(
+          { id: entry.id },
+          { active_flag: false }
+        );
+      }
+    }
+    return await this.documentTemplateRepository.update(
+      { id: data.id },
+      { active_flag: true }
+    );
   }
 
   // updates the updated_by and document_version columns
@@ -68,8 +95,6 @@ export class DocumentTemplateService {
     templateToUpdate.document_type = templateData.document_type;
     templateToUpdate.template_version = mostRecentTemplate.template_version + 1;
     templateToUpdate.template_author = templateData.template_author;
-    templateToUpdate.template_creation_date =
-      templateData.template_creation_date;
     templateToUpdate.active_flag = templateData.active_flag;
     templateToUpdate.mime_type = templateData.mime_type;
     templateToUpdate.file_name = templateData.file_name;
@@ -82,10 +107,9 @@ export class DocumentTemplateService {
     return this.documentTemplateRepository.find();
   }
 
-  async findOne(version: number, comments: string): Promise<DocumentTemplate> {
-    return this.documentTemplateRepository.findOneBy({
-      template_version: version,
-      comments: comments,
+  async findOne(id: number): Promise<DocumentTemplate> {
+    return this.documentTemplateRepository.findOneByOrFail({
+      id: id,
     });
   }
 }

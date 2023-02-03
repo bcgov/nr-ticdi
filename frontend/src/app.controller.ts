@@ -190,8 +190,8 @@ export class AppController {
     };
   }
 
-  @Get("template-admin")
-  @Render("template-admin")
+  @Get("manage-templates")
+  @Render("manage-templates")
   @UseFilters(AuthenticationFilter)
   @UseGuards(AuthenticationGuard)
   @UseGuards(AdminGuard)
@@ -209,16 +209,22 @@ export class AppController {
       }
     }
     const displayAdmin = isAdmin ? "Administration" : "-";
-    const data = await lastValueFrom(
+    const documentData = await lastValueFrom(
       this.httpService
         .get(requestUrl, requestConfig)
         .pipe(map((response) => response.data))
     );
-    const documentTypes = ["Land Use Report"];
-    for (let entry of data) {
-      if (!documentTypes.includes(entry.comments)) {
-        documentTypes.push(entry.comments);
-      }
+    // console.log(data);
+    let data = [];
+    for (let entry of documentData) {
+      let dataEntry = {};
+      dataEntry["id"] = entry.id;
+      dataEntry["document_type"] = entry.comments;
+      dataEntry["template_version"] = entry.template_version;
+      dataEntry["template_name"] = entry.file_name.replace(".docx", "");
+      dataEntry["uploaded_date"] = entry.create_timestamp.split("T")[0];
+      dataEntry["active_flag"] = entry.active_flag;
+      data.push(dataEntry);
     }
     const title =
       process.env.ticdi_environment == "DEVELOPMENT"
@@ -229,7 +235,6 @@ export class AppController {
       primaryContactName: "",
       displayAdmin: displayAdmin,
       data: data,
-      documentTypes: documentTypes,
     };
   }
 

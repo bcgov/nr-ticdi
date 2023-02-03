@@ -65,6 +65,7 @@ export class AdminController {
   @Get("download-template/:id")
   async downloadTemplate(@Param("id") id) {
     const docTemplate = await this.adminService.downloadTemplate(id);
+    // TODO
   }
 
   @Post("upload-template")

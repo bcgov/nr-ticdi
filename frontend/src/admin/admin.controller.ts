@@ -12,6 +12,8 @@ import {
   MaxFileSizeValidator,
   Get,
   Param,
+  Res,
+  HttpStatus,
 } from "@nestjs/common";
 import { SessionData } from "utils/types";
 import { AxiosRequestConfig } from "axios";
@@ -21,6 +23,7 @@ import { AuthenticationGuard } from "src/authentication/authentication.guard";
 import { AdminGuard } from "./admin.guard";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { Express } from "express";
+import * as stream from "stream";
 
 let requestUrl: string;
 let requestConfig: AxiosRequestConfig;
@@ -54,7 +57,6 @@ export class AdminController {
         ? session.data.activeAccount.idir_username
         : ""
       : "";
-    console.log(id + " " + update_userid + " " + document_type);
     return this.adminService.activateTemplate({
       id: id,
       update_userid: update_userid,
@@ -63,9 +65,26 @@ export class AdminController {
   }
 
   @Get("download-template/:id")
-  async downloadTemplate(@Param("id") id) {
-    const docTemplate = await this.adminService.downloadTemplate(id);
-    // TODO
+  async downloadTemplate(@Param("id") id, @Res() res) {
+    const dtObject = await this.adminService.downloadTemplate(id);
+    const base64Data = dtObject.the_file;
+    const buffer = Buffer.from(base64Data, "base64");
+    const streamableFile = new stream.PassThrough();
+    streamableFile.end(buffer);
+    res.set({
+      "Content-Type":
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      "Content-Disposition": "attachment; filename=file.docx",
+    });
+    streamableFile.pipe(res);
+  }
+
+  @Get("remove-template/:reportType/:id")
+  async removeTemplate(
+    @Param("reportType") reportType: string,
+    @Param("id") id: number
+  ) {
+    return this.adminService.removeTemplate(reportType, id);
   }
 
   @Post("upload-template")
@@ -85,7 +104,11 @@ export class AdminController {
     )
     file: Express.Multer.File,
     @Body()
-    params: { comments: string; active_flag: boolean; template_name: string }
+    params: {
+      document_type: string;
+      active_flag: boolean;
+      template_name: string;
+    }
   ) {
     let isAdmin = false;
     if (
@@ -111,16 +134,15 @@ export class AdminController {
           : ""
         : "";
       const uploadData = {
-        document_type: "",
-        comments: params.comments,
+        document_type: params.document_type,
         active_flag: params.active_flag,
         mime_type: file.mimetype,
         file_name: params.template_name,
         template_author: template_author,
         create_userid: create_userid,
       };
-      console.log(uploadData);
-      return this.adminService.uploadTemplate(uploadData, file);
+      await this.adminService.uploadTemplate(uploadData, file);
+      return { message: "Template uploaded successfully" };
     } else {
       return { message: "No Admin Privileges Found" };
     }

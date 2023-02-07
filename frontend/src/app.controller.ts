@@ -6,6 +6,7 @@ import {
   UseGuards,
   UseFilters,
   Session,
+  Query,
 } from "@nestjs/common";
 import { AppService } from "./app.service";
 import { PAGE_TITLES } from "utils/constants";
@@ -96,8 +97,7 @@ export class AppController {
         : PAGE_TITLES.INDEX;
     const displayAdmin = isAdmin ? "Administration" : "-";
     await this.ttlsService.setWebadeToken();
-    let ttlsJSON, primaryContactName, versions;
-    let documentTypes = [];
+    let ttlsJSON, primaryContactName;
     try {
       const response: any = await firstValueFrom(this.ttlsService.callHttp(id))
         .then((res) => {
@@ -112,25 +112,13 @@ export class AppController {
           ttlsJSON.inspected_date.toString()
         );
       }
-      versions = await this.ttlsService.getTemplateVersions("Land Use Report");
-      const documents = await lastValueFrom(
-        this.httpService
-          .get(requestUrl, requestConfig)
-          .pipe(map((response) => response.data))
-      );
-      for (let entry of documents) {
-        if (!documentTypes.includes(entry.comments)) {
-          documentTypes.push(entry.comments);
-        }
-      }
       primaryContactName = ttlsJSON.licence_holder_name;
       return {
         title: title,
         primaryContactName: primaryContactName,
         displayAdmin: displayAdmin,
         message: ttlsJSON,
-        version: versions,
-        documentTypes: documentTypes,
+        documentTypes: ["Land Use Report", "Notice of Final Review"],
         prdid: ttlsJSON.id,
       };
     } catch (err) {
@@ -140,8 +128,7 @@ export class AppController {
         primaryContactName: primaryContactName ? primaryContactName : null,
         displayAdmin: displayAdmin,
         message: ttlsJSON ? ttlsJSON : null,
-        version: versions ? versions : null,
-        documentTypes: documentTypes ? documentTypes : null,
+        documentTypes: ["Land Use Report", "Notice of Final Review"],
         prdid: ttlsJSON ? ttlsJSON.id : null,
         error: err,
       };
@@ -167,17 +154,6 @@ export class AppController {
       }
     }
     const displayAdmin = isAdmin ? "Administration" : "-";
-    const data = await lastValueFrom(
-      this.httpService
-        .get(requestUrl, requestConfig)
-        .pipe(map((response) => response.data))
-    );
-    const documentTypes = ["Land Use Report"];
-    for (let entry of data) {
-      if (!documentTypes.includes(entry.comments)) {
-        documentTypes.push(entry.comments);
-      }
-    }
     const title =
       process.env.ticdi_environment == "DEVELOPMENT"
         ? "DEVELOPMENT - " + PAGE_TITLES.ADMIN
@@ -186,7 +162,6 @@ export class AppController {
       title: title,
       displayAdmin: displayAdmin,
       reportTypes: ["Land Use Report", "Notice of Final Review"], // TODO - should populate from database
-      documentTypes: documentTypes,
     };
   }
 
@@ -195,7 +170,10 @@ export class AppController {
   @UseFilters(AuthenticationFilter)
   @UseGuards(AuthenticationGuard)
   @UseGuards(AdminGuard)
-  async adminPage(@Session() session: { data?: SessionData }) {
+  async adminPage(
+    @Session() session: { data?: SessionData },
+    @Query("report") documentType
+  ) {
     let isAdmin = false;
     if (
       session.data &&
@@ -211,15 +189,14 @@ export class AppController {
     const displayAdmin = isAdmin ? "Administration" : "-";
     const documentData = await lastValueFrom(
       this.httpService
-        .get(requestUrl, requestConfig)
+        .get(requestUrl + `${encodeURI(documentType)}`, requestConfig)
         .pipe(map((response) => response.data))
     );
-    // console.log(data);
     let data = [];
     for (let entry of documentData) {
       let dataEntry = {};
       dataEntry["id"] = entry.id;
-      dataEntry["document_type"] = entry.comments;
+      dataEntry["document_type"] = entry.document_type;
       dataEntry["template_version"] = entry.template_version;
       dataEntry["template_name"] = entry.file_name.replace(".docx", "");
       dataEntry["uploaded_date"] = entry.create_timestamp.split("T")[0];

@@ -359,12 +359,13 @@ export class TTLSService {
   // generate the Land use Report via CDOGS
   async generateLURReport(
     prdid: number,
-    version: number,
-    comments: string,
+    document_type: string,
     username: string
   ) {
     const url = `${hostname}:${port}/print-request-detail/view/` + prdid;
-    const templateUrl = `${hostname}:${port}/document-template/get-one`;
+    const templateUrl =
+      `${hostname}:${port}/document-template/get-active-report/` +
+      encodeURI(document_type);
     const logUrl = `${hostname}:${port}/print-request-log/`;
     // get the view given the print request detail id
     const data = await axios
@@ -376,18 +377,23 @@ export class TTLSService {
       .then((res) => {
         return res.data;
       });
-    // get the document template, comments refers to the document type (Land Use Report)
-    const documentTemplateObject: { data: { id: number; the_file: string } } =
-      await axios.post(templateUrl, {
-        version: version,
-        comments: comments,
+    // get the document template
+    const documentTemplateObject: { id: number; the_file: string } = await axios
+      .get(templateUrl)
+      .then((res) => {
+        return res.data;
       });
+    console.log("~~~~~");
+    console.log("~~~~~");
+    console.log("~~~~~");
+    // console.log(documentTemplateObject);
+    console.log(documentTemplateObject.id);
     if (data.InspectionDate) {
       data["InspectionDate"] = this.formatInspectedDate(data.InspectionDate);
     }
 
     // log the request
-    const document_template_id = documentTemplateObject.data.id;
+    const document_template_id = documentTemplateObject.id;
     await axios.post(logUrl, {
       document_template_id: document_template_id,
       print_request_detail_id: prdid,
@@ -397,7 +403,7 @@ export class TTLSService {
     });
 
     const cdogsToken = await this.callGetToken();
-    let bufferBase64 = documentTemplateObject.data.the_file;
+    let bufferBase64 = documentTemplateObject.the_file;
     const md = JSON.stringify({
       data,
       formatters:

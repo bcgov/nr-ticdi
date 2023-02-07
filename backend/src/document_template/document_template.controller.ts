@@ -22,7 +22,7 @@ export class DocumentTemplateController {
   async create(
     @UploadedFile()
     file: Express.Multer.File,
-    @Body() params: CreateDocumentTemplateDto & { active_flag: string }
+    @Body() params: CreateDocumentTemplateDto
   ) {
     const params2 = {
       document_type: params.document_type,
@@ -31,9 +31,13 @@ export class DocumentTemplateController {
       file_name: params.file_name,
       comments: params.comments,
       create_userid: params.create_userid,
-      active_flag: params.active_flag == "true" ? true : false,
     };
-    return await this.templateService.create(params2, file);
+    const newTemplate = await this.templateService.create(params2, file);
+    return await this.templateService.checkForActiveTemplates({
+      id: newTemplate.id,
+      update_userid: newTemplate.update_userid,
+      document_type: newTemplate.document_type,
+    });
   }
 
   @Post("activate-template")
@@ -48,13 +52,26 @@ export class DocumentTemplateController {
     return this.templateService.update(data);
   }
 
-  @Get()
-  findAll() {
-    return this.templateService.findAll();
+  @Get("remove/:document_type/:id")
+  remove(
+    @Param("document_type") document_type: string,
+    @Param("id") id: number
+  ): Promise<any> {
+    return this.templateService.remove(document_type, id);
+  }
+
+  @Get(":document_type")
+  findAll(@Param("document_type") document_type: string) {
+    return this.templateService.findAll(document_type);
+  }
+
+  @Get("get-active-report/:document_type")
+  findActiveByDocumentType(@Param("document_type") document_type: string) {
+    return this.templateService.findActiveByDocumentType(document_type);
   }
 
   @Get("find-one/:id")
-  findOne(@Param() id: number) {
+  findOne(@Param("id") id: number) {
     return this.templateService.findOne(id);
   }
 }

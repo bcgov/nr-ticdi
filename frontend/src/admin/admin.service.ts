@@ -1,6 +1,6 @@
-import { Injectable, Param } from "@nestjs/common";
+import { Injectable } from "@nestjs/common";
 import * as dotenv from "dotenv";
-import { Express } from "express";
+import { HttpService } from "@nestjs/axios";
 const axios = require("axios");
 const FormData = require("form-data");
 
@@ -10,7 +10,7 @@ let port: number;
 
 @Injectable()
 export class AdminService {
-  constructor() {
+  constructor(private readonly httpService: HttpService) {
     hostname = process.env.backend_url
       ? process.env.backend_url
       : `http://localhost`;
@@ -36,7 +36,16 @@ export class AdminService {
   }
 
   async downloadTemplate(id: number) {
-    const url = `${hostname}:${port}/document-template/get-one/${id}`;
+    const url = `${hostname}:${port}/document-template/find-one/${id}`;
+    return axios.get(url).then((res) => {
+      return res.data;
+    });
+  }
+
+  async removeTemplate(reportType: string, id: number): Promise<any> {
+    const url = `${hostname}:${port}/document-template/remove/${encodeURI(
+      reportType
+    )}/${id}`;
     return axios.get(url).then((res) => {
       return res.data;
     });
@@ -45,7 +54,6 @@ export class AdminService {
   async uploadTemplate(
     data: {
       document_type: string;
-      comments: string;
       active_flag: boolean;
       mime_type: string;
       file_name: string;
@@ -57,7 +65,6 @@ export class AdminService {
     const url = `${hostname}:${port}/document-template/create`;
     const form: any = new FormData();
     form.append("document_type", data.document_type);
-    form.append("comments", data.comments);
     form.append("active_flag", data.active_flag);
     form.append("mime_type", data.mime_type);
     form.append("file_name", data.file_name);

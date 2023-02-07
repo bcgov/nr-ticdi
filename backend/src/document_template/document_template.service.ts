@@ -1,6 +1,6 @@
-import { Injectable, StreamableFile } from "@nestjs/common";
+import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
+import { Repository, UpdateResult } from "typeorm";
 import { CreateDocumentTemplateDto } from "./dto/create-document_template.dto";
 import { UpdateDocumentTemplateDto } from "./dto/update-document_template.dto";
 import { DocumentTemplate } from "./entities/document_template.entity";
@@ -13,14 +13,13 @@ export class DocumentTemplateService {
   ) {}
 
   async create(
-    documentTemplate: CreateDocumentTemplateDto & { active_flag: boolean },
+    documentTemplate: CreateDocumentTemplateDto,
     file: any
   ): Promise<DocumentTemplate> {
     const base64File = Buffer.from(file.buffer).toString("base64");
     const newItem = new DocumentTemplate();
     newItem.document_type = documentTemplate.document_type;
     newItem.template_author = documentTemplate.template_author;
-    newItem.active_flag = documentTemplate.active_flag;
     newItem.mime_type = documentTemplate.mime_type;
     newItem.file_name = documentTemplate.file_name;
     newItem.comments = documentTemplate.comments;
@@ -32,7 +31,7 @@ export class DocumentTemplateService {
   }
 
   async getTemplateVersion(
-    documentTemplate: CreateDocumentTemplateDto & { active_flag: boolean }
+    documentTemplate: CreateDocumentTemplateDto
   ): Promise<number> {
     const existingReports = await this.documentTemplateRepository.findBy({
       document_type: documentTemplate.document_type,
@@ -56,9 +55,8 @@ export class DocumentTemplateService {
     document_type: string;
   }): Promise<any> {
     let allTemplates = await this.documentTemplateRepository.findBy({
-      comments: data.document_type,
+      document_type: data.document_type,
     });
-    console.log(allTemplates.length);
     for (let entry of allTemplates) {
       if (entry.active_flag == true) {
         await this.documentTemplateRepository.update(
@@ -71,6 +69,51 @@ export class DocumentTemplateService {
       { id: data.id },
       { active_flag: true }
     );
+  }
+
+  async checkForActiveTemplates(data: {
+    id: number;
+    update_userid: string;
+    document_type: string;
+  }): Promise<any> {
+    let allTemplates = await this.documentTemplateRepository.findBy({
+      document_type: data.document_type,
+    });
+    for (let entry of allTemplates) {
+      if (entry.active_flag == true) {
+        return true;
+      }
+    }
+    // if no active templates, make this one active
+    return await this.documentTemplateRepository.update(
+      { id: data.id },
+      { active_flag: true }
+    );
+  }
+
+  async remove(document_type: string, id: number): Promise<any> {
+    // if the removed template was active, activate the highest version template
+    const templateToRemove = await this.findOne(id);
+    await this.documentTemplateRepository.update(
+      { id: id },
+      { is_deleted: true, active_flag: false }
+    );
+    if (templateToRemove.active_flag == true) {
+      const allTemplates = await this.findAll(document_type);
+      if (allTemplates.length != 0) {
+        let newestVersionTemplate: DocumentTemplate;
+        let currentVersion = 0;
+        for (let entry of allTemplates) {
+          if (entry.template_version > currentVersion) {
+            currentVersion = entry.template_version;
+            newestVersionTemplate = entry;
+          }
+        }
+        await this.activateTemplate(newestVersionTemplate);
+        return { id: newestVersionTemplate.id };
+      }
+    }
+    return { id: 0 };
   }
 
   // updates the updated_by and document_version columns
@@ -103,8 +146,19 @@ export class DocumentTemplateService {
     return this.documentTemplateRepository.save(templateToUpdate);
   }
 
-  async findAll(): Promise<DocumentTemplate[]> {
-    return this.documentTemplateRepository.find();
+  async findAll(document_type: string): Promise<DocumentTemplate[]> {
+    return this.documentTemplateRepository.find({
+      where: { is_deleted: false, document_type: document_type },
+    });
+  }
+
+  async findActiveByDocumentType(
+    document_type: string
+  ): Promise<DocumentTemplate> {
+    return this.documentTemplateRepository.findOneBy({
+      document_type: document_type,
+      active_flag: true,
+    });
   }
 
   async findOne(id: number): Promise<DocumentTemplate> {

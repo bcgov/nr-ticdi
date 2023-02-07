@@ -53,7 +53,7 @@ export class ReportController {
   @Header("Content-Disposition", "attachment; filename=landusereport.docx")
   async generateReport(
     @Session() session: { data: SessionData },
-    @Body() data: { prdid: string; version: string; comments: string }
+    @Body() data: { prdid: string; document_type: string }
   ) {
     // this should eventually check permissions and prevent unauthorized users from generating documents
     let idir_username = "";
@@ -66,8 +66,7 @@ export class ReportController {
     return new StreamableFile(
       await this.ttlsService.generateLURReport(
         +data.prdid,
-        +data.version,
-        data.comments,
+        data.document_type,
         idir_username
       )
     );

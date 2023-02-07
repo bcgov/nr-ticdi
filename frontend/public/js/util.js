@@ -16,12 +16,10 @@ async function generateReport() {
     .catch(() => {
       location.reload();
     });
-  const comments = $("#document_type_id option:selected").text();
-  const version = $("#versionSelect option:selected").text();
+  const document_type = $("#document_type_id option:selected").text();
   const data = {
     prdid: prdid,
-    version: version,
-    comments: comments,
+    document_type: document_type,
   };
   fetch(`/report/generateReport`, {
     method: "POST",

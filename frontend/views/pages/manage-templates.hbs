@@ -22,16 +22,6 @@
                                 </thead>
                                 <tbody id="documentTableBody">
                                     <tr></tr>
-                                    {{!-- {{#each data}}
-                                    <tr>
-                                        <td>{{this.version}}</td>
-                                        <td>{{this.template_name}}</td>
-                                        <td>{{this.uploaded_date}}</td>
-                                        <td>{{this.active_flag}}</td>
-                                        <td>View</td>
-                                        <td>Remove</td>
-                                    </tr>
-                                    {{/each}} --}}
                                 </tbody>
                             </table>
                         </div>
@@ -83,6 +73,26 @@
                     <button type="button" id="yesButton" class="btn btn-primary" onclick="uploadTemplate()" style="display:none">Yes</button>
                     <button type="button" id="noButton" class="btn btn-secondary" data-dismiss="modal" style="display:none">No</button>
                 </div>
+                </div>
+            </div>
+        </div>
+        <div id="removeModal" class="modal fade" role="dialog">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                <div class="modal-header">
+                    <h4 id="removeTitle" class="modal-title">Remove Template</h4>
+                </div>
+                <div class="modal-body">
+                    <div>
+                        <p>Are you sure you would like to remove this template?</p>
+                    </div>
+                    <input id="document-template-id" style="display:none" value=""></input>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-dismiss="modal" onclick='removeTemplate()'>Yes</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
+                </div>
+                </div>
             </div>
         </div>
     </main>
@@ -102,40 +112,22 @@
                 id: "{{this.id}}"
             });
             {{/each}}
-            console.log(dataArray)
-            var t = "";
-            // fill the hidden table with all document templates
-            for (let entry of dataArray) {
-                var tr = "<tr>";
-                tr += `<td><input type="text" value="${entry.template_version}" class="border border-1 rounded pl-2" style="color:gray" readonly></td>`;
-                tr += `<td><input type="text" value="${entry.template_name}" class="border border-1 rounded pl-2" style="color:gray" readonly></td>`;
-                tr += `<td><input type="text" value="${entry.uploaded_date}" class="border border-1 rounded pl-2" style="color:gray" readonly></td>`;
-                tr += entry.active_flag == 'true' ? '<td><input class="form-check-input" type="radio" name="radioActive" checked></td>' : '<td><input class="form-check-input" type="radio" name="radioActive"></td>';
-                tr += `<td><button class="btn btn-info" id='view${entry.id}'>View</td>`;
-                tr += `<td><button class="btn btn-warn" id='remove${entry.id}'>Remove</td>`;
-                tr += "</tr>";
-                t += tr;
-            }
-            $("#hiddenTable tr").remove();
-            table = $("#hiddenTable");
-            table.innerHTML = t;
 
-            // fill the displayed table with instances of the selected option
             $("#documentTableBody tr").remove();
-            t = ""
+            var t = ""
             dataArray.sort((a, b) => {
                 return parseFloat(b.template_version) - parseFloat(a.template_version);
             })
             for (let entry of dataArray) {
                 if (reportType == entry.document_type) {
-                   var tr = "<tr>";
+                   var tr = `<tr id="row-${entry.id}">`;
                 tr += `<td><input type="text" value="${entry.template_version}" class="border border-1 rounded pl-2" style="color:gray; max-width:80px" readonly></td>`;
-                tr += `<td><input type="text" value="${entry.template_name}" class="border border-1 rounded pl-2" style="color:gray; width:100%" readonly></td>`;
+                tr += `<td><input type="text" value="${entry.template_name}" class="border border-1 rounded pl-2" id="name-${entry.id}" style="color:gray; width:100%" readonly></td>`;
                 tr += `<td><input type="text" value="${entry.uploaded_date}" class="border border-1 rounded pl-2" style="color:gray; max-width:150px" readonly></td>`;
-                tr += entry.active_flag == 'true' ? `<td style='text-align: center;'><input id='radio-${entry.id}' type="radio" name="radioActive" checked></td>` : 
-                    `<td style="text-align: center;"><input id='radio-${entry.id}' type="radio" name="radioActive"></td>`;
-                tr += `<td><button class="btn btn-info" id='view${entry.id}'>View</td>`;
-                tr += `<td><button class="btn btn-warning" id='remove${entry.id}'>Remove</td>`;
+                tr += entry.active_flag == 'true' ? `<td value="checked" style='text-align: center;'><input id='radio-${entry.id}' type="radio" name="radioActive" checked></td>` : 
+                    `<td value="unchecked" style="text-align: center;"><input id='radio-${entry.id}' type="radio" name="radioActive"></td>`;
+                tr += `<td><button class="btn btn-info" id='view-${entry.id}' onclick="downloadTemplate(${entry.id})">View</td>`;
+                tr += `<td><button class="btn btn-warning remove-template-button" data-id="${entry.id}" data-toggle="modal" data-target="#removeModal">Remove</td>`;
                 tr += "</tr>";
                 t += tr;
                 }
@@ -145,18 +137,56 @@
             $('input[type=radio]').click(function(){
                 const templateId = this.id.replace("radio-", "");
                 const reportType = $("#reportTitle").text();
-                console.log(reportType);
                 fetch(`/admin/activate-template/${templateId}/${encodeURIComponent(reportType)}`, {
-                method: 'GET',
-                responseType: 'application/json',
-                })
+                    method: 'GET',
+                    responseType: 'application/json',
+                    })
                 .then(res => res.json())
                 .then(data => {
                     if (data.errors) {
                         alert(data.errors);
                     }
-                });
+                })
+                .catch(() => location.reload());
+                $('input[type=radio]').parent().html().val('unchecked');
+                $(this).parent().html().val('checked');
             });
+            // used for sorting the radio buttons
+            $.fn.dataTable.ext.order['dom-checkbox'] = function  ( settings, col )
+                {
+                    return this.api().column( col, {order:'index'} ).nodes().map( function ( td, i ) {
+                        return $('input', td).prop('checked') ? '1' : '0';
+                    } );
+                }
+            $('#documentTable').DataTable({
+                "paging": false,
+                "bFilter": false,
+                "columnDefs": [
+                {
+                    targets: [0,1,2],
+                    type: 'string',
+                    render: function(data, type, full, meta) {
+                        if (type === 'filter' || type === 'sort') {
+                            var api = new $.fn.dataTable.Api(meta.settings);
+                            var td = api.cell({row: meta.row, column: meta.col}).node();
+                            data = $('select, input[type="text"]', td).val();
+                        }
+                        return data;
+                    }
+                },
+                {
+                    targets: 3,
+                    orderDataType: "dom-checkbox"
+                },
+                {
+                    targets: [4,5],
+                    orderable: false
+                }]
+            });
+        });
+        $(document).on("click", ".remove-template-button", function () {
+            const documentTemplateId = $(this).data('id');
+            $(".modal-body #document-template-id").val(documentTemplateId);
         })
     </script>
     <script>
@@ -226,10 +256,11 @@
             let f = document.getElementById('uploadFile');
             var input = document.querySelector('input[type="file"]')
             var formData = new FormData();
-            formData.append('file', input.files[0])
-            formData.append('comments', 'Land Use Report') // update this
-            formData.append('active_flag', true)
-            console.log($('#uploadTemplateName').val());
+            const urlParams = new URLSearchParams(window.location.search);
+            const reportType = urlParams.get('report');
+            formData.append('file', input.files[0]);
+            formData.append('document_type', reportType);
+            formData.append('active_flag', false);
             formData.append('template_name', $('#uploadTemplateName').val());
             fetch('/admin/upload-template', {
                 method: 'POST',
@@ -255,6 +286,48 @@
             $(".fa", this).removeClass("fa-minus").addClass("fa-plus");
         }
     });
+  </script>
+  <script>
+    function downloadTemplate(id) {
+        $(":button").prop("disabled", true);
+        const template_name = $(`#name-${id}`).val();
+        fetch(`/admin/download-template/${id}`, {
+            method: "GET",
+        })
+        .then((res) => res.blob())
+        .then((blob) => {
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.style.display = "none";
+            a.href = url;
+            a.download = template_name + ".docx";
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            $(":button").prop("disabled", false);
+        })
+        .catch(() => {
+            $(":button").prop("disabled", false);
+            console.log("Error downloading the template");
+        });
+    }
+
+    function removeTemplate() {
+        const id = $("#document-template-id").val();
+        const urlParams = new URLSearchParams(window.location.search);
+        const reportType = urlParams.get('report');
+        fetch(`/admin/remove-template/${reportType}/${id}`, {
+            method: "GET",
+        })
+        .then((res) => res.json())
+        .then((resJson) => {
+            $(`#row-${id}`).remove();
+            $(`#radio-${resJson.id}`).prop('checked', true);
+        })
+        .catch(() => {
+            console.log("Error removing the template");
+        });
+    }
   </script>
   {{/inline}}
 {{/template}}

@@ -26,19 +26,113 @@
                             </table>
                         </div>
                     </div>
+                    <form class="upload">
+                        <div class="form-group row">
+                            <div class="col-md-3">
+                                <button type="button" class="btn btn-success" data-toggle="modal" data-target="#uploadModal">Upload New Version</button>
+                            </div>
+                        </div>
+                    </form>
                 </div>
             </fieldset>
-            <div style="display: none">
-                <table id="hiddenTable">
-                </table>
-            </div>
-            <form class="upload">
-                <div class="form-group row">
-                    <div class="col-md-3">
-                        <button type="button" class="btn btn-success" data-toggle="modal" data-target="#uploadModal">Upload New Version</button>
+            <fieldset class="form-group collapsible nofr-section">
+                <legend style="cursor: pointer" class='togvis sectionTitle'><i class="fa fa-plus"></i>  Manage NFR Provisions</legend>
+                <div class="contents" style="display: none;">
+                    <hr />
+                    <div class="form-row">
+                        <div>
+                            <table id="provisionTable">
+                                <thead>
+                                    <th style="width: 50px">Type</th>
+                                    <th style="width: 50px">Group</th>
+                                    <th style="width: 50px">Max</th>
+                                    <th style="width: 400px">Provision</th>
+                                    <th style="width: 200px">Free Text</th>
+                                    <th style="width: 200px">Category</th>
+                                    <th style="width: 50px"></th><!-- Radio button column -->
+                                    <th style="width: 50px"></th><!-- Edit column -->
+                                </thead>
+                                <tbody id="provisionTableBody">
+                                    <tr>
+                                        <td><input type="text" style="color:gray;max-width: 50px" value="V" readonly></td>
+                                        <td><input type="text" style="color:gray;max-width: 50px" value="1" readonly></td>
+                                        <td><input type="text" style="color:gray;max-width: 50px" value="" readonly></td>
+                                        <td><input type="text" style="color:gray;width: 100%" value="TEMPLATE VARIABLES - NOFR" readonly></td>
+                                        <td><input type="text" style="color:gray;max-width: 200px" value="" readonly></td>
+                                        <td><input type="text" style="color:gray;max-width: 200px" value="" readonly></td>
+                                        <td><input type="radio" checked></td></td>
+                                        <td><u>Edit</u></td>
+                                    </tr>
+                                    <tr>
+                                        <td><input type="text" style="color:gray;max-width: 50px" value="V" readonly></td>
+                                        <td><input type="text" style="color:gray;max-width: 50px" value="2" readonly></td>
+                                        <td><input type="text" style="color:gray;max-width: 50px" value="" readonly></td>
+                                        <td><input type="text" style="color:gray;width: 100%" value="FEES" readonly></td>
+                                        <td><input type="text" style="color:gray;max-width: 200px" value="" readonly></td>
+                                        <td><input type="text" style="color:gray;max-width: 200px" value="" readonly></td>
+                                        <td><input type="radio"></td></td>
+                                        <td><u>Edit</u></td>
+                                    </tr>
+                                    <tr>
+                                        <td><input type="text" style="color:gray;max-width: 50px" value="O" readonly></td>
+                                        <td><input type="text" style="color:gray;max-width: 50px" value="5" readonly></td>
+                                        <td><input type="text" style="color:gray;max-width: 50px" value="3" readonly></td>
+                                        <td><input type="text" style="color:gray;width: 100%" value="REPLACEMENT STATEMENT" readonly></td>
+                                        <td><input type="text" style="color:gray;max-width: 200px" value="" readonly></td>
+                                        <td><input type="text" style="color:gray;max-width: 200px" value="OFFER PRE" readonly></td>
+                                        <td><input type="radio"></td></td>
+                                        <td><u>Edit</u></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
+                    <form class="provision">
+                        <div class="form-group row">
+                            <div class="col-md-3">
+                                <button type="button" class="btn btn-success">Add a Provision</button>
+                            </div>
+                        </div>
+                    </form>
                 </div>
-            </form>
+            </fieldset>
+            <fieldset class="form-group collapsible nofr-section">
+                <legend style="cursor: pointer" class='togvis sectionTitle'><i class="fa fa-plus"></i>  Manage NFR Variables</legend>
+                <div class="contents" style="display: none;">
+                    <hr />
+                    <div class="form-row">
+                        <div>
+                            <table id="variableTable">
+                                <thead>
+                                    <th style="width: 500px">Variable</th>
+                                    <th></th><!-- Edit column -->
+                                </thead>
+                                <tbody id="variableTableBody">
+                                    <tr>
+                                        <td><input type="text" style="color:gray; min-width: 100%" value="TEMPLATE VARIABLES - NOFR" readonly></td>
+                                        <td><u>Edit</u></td>
+                                    </tr>
+                                    <tr>
+                                        <td><input type="text" style="color:gray; min-width: 100%" value="FEES" readonly></td>
+                                        <td><u>Edit</u></td>
+                                    </tr>
+                                    <tr>
+                                        <td><input type="text" style="color:gray; min-width: 100%" value="REPLACEMENT STATEMENT" readonly></td>
+                                        <td><u>Edit</u></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <form class="variable">
+                        <div class="form-group row">
+                            <div class="col-md-3">
+                                <button type="button" class="btn btn-success">Add a Variable</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </fieldset>
         </div>
         <div id="uploadModal" class="modal fade" role="dialog">
             <div class="modal-dialog modal-lg">
@@ -100,7 +194,11 @@
         var dataArray = [];
         $( document ).ready(function() {
             const urlParams = new URLSearchParams(window.location.search);
-            const reportType = urlParams.get('report');
+            const reportIndex = parseInt(urlParams.get('report'));
+            if (reportIndex != 2) {
+                $(".nofr-section").hide();
+            }
+            const reportType = reportIndex == 1 ? "Land Use Report" : reportIndex == 2 ? "Notice of Final Review" : "";
             $("#reportTitle").text(reportType);
             {{#each data}}
             dataArray.push({
@@ -183,6 +281,52 @@
                     orderable: false
                 }]
             });
+            $('#provisionTable').DataTable({
+                "paging": false,
+                "bFilter": false,
+                "columnDefs": [
+                {
+                    targets: [0,1,2,3,4,5],
+                    type: 'string',
+                    render: function(data, type, full, meta) {
+                        if (type === 'filter' || type === 'sort') {
+                            var api = new $.fn.dataTable.Api(meta.settings);
+                            var td = api.cell({row: meta.row, column: meta.col}).node();
+                            data = $('select, input[type="text"]', td).val();
+                        }
+                        return data;
+                    }
+                },
+                {
+                    targets: 6,
+                    orderDataType: "dom-checkbox"
+                },
+                {
+                    targets: 7,
+                    orderable: false
+                }]
+            });
+            $('#variableTable').DataTable({
+                "paging": false,
+                "bFilter": false,
+                "columnDefs": [
+                {
+                    targets: 0,
+                    type: 'string',
+                    render: function(data, type, full, meta) {
+                        if (type === 'filter' || type === 'sort') {
+                            var api = new $.fn.dataTable.Api(meta.settings);
+                            var td = api.cell({row: meta.row, column: meta.col}).node();
+                            data = $('select, input[type="text"]', td).val();
+                        }
+                        return data;
+                    }
+                },
+                {
+                    targets: 1,
+                    orderable: false
+                }]
+            });
         });
         $(document).on("click", ".remove-template-button", function () {
             const documentTemplateId = $(this).data('id');
@@ -257,7 +401,8 @@
             var input = document.querySelector('input[type="file"]')
             var formData = new FormData();
             const urlParams = new URLSearchParams(window.location.search);
-            const reportType = urlParams.get('report');
+            const reportIndex = parseInt(urlParams.get('report'));
+            const reportType = reportIndex == 1 ? "Land Use Report" : reportIndex == 2 ? "Notice of Final Review" : "";
             formData.append('file', input.files[0]);
             formData.append('document_type', reportType);
             formData.append('active_flag', false);
@@ -315,7 +460,8 @@
     function removeTemplate() {
         const id = $("#document-template-id").val();
         const urlParams = new URLSearchParams(window.location.search);
-        const reportType = urlParams.get('report');
+        const reportIndex = parseInt(urlParams.get('report'));
+        const reportType = reportIndex == 1 ? "Land Use Report" : reportIndex == 2 ? "Notice of Final Review" : "";
         fetch(`/admin/remove-template/${reportType}/${id}`, {
             method: "GET",
         })

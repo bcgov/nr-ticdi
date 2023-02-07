@@ -4,3 +4,5 @@ export const PAGE_TITLES = {
   MANAGE_TEMPLATES: "Manage Templates",
   MANAGE_USERS: "Manage Users",
 };
+
+export const REPORT_TYPES = ["", "Land Use Report", "Notice of Final Review"];

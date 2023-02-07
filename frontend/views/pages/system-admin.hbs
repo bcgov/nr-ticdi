@@ -69,7 +69,7 @@
                 <div class="col-md-4">
                     <select id="reportTypes" style="min-width: 200px" class="border border-1 rounded pl-2 ml-4">
                         {{#each reportTypes}}
-                        <option value="{{this}}">{{this}}</option>
+                        <option value="{{this.reportIndex}}">{{this.reportType}}</option>
                         {{/each}}
                     </select>
                 </div>
@@ -84,7 +84,7 @@
         $( document ).ready(function() {})
         // when the selected option changes, update the table
         function manageReports() {
-            window.location.href = '/manage-templates?report='+$('#reportTypes option:selected').text();
+            window.location.href = '/manage-templates?report='+$('#reportTypes option:selected').val();
         }
         function searchUsers() {
             console.log("search users");

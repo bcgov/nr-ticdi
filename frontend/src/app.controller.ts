@@ -9,7 +9,7 @@ import {
   Query,
 } from "@nestjs/common";
 import { AppService } from "./app.service";
-import { PAGE_TITLES } from "utils/constants";
+import { PAGE_TITLES, REPORT_TYPES } from "utils/constants";
 import { SessionData } from "utils/types";
 import { AuthenticationGuard } from "./authentication/authentication.guard";
 import { AuthenticationFilter } from "./authentication/authentication.filter";
@@ -173,7 +173,10 @@ export class AppController {
         ? session.data.activeAccount.idir_username
         : "",
       displayAdmin: displayAdmin,
-      reportTypes: ["Land Use Report", "Notice of Final Review"], // TODO - should populate from database
+      reportTypes: [
+        { reportType: REPORT_TYPES[1], reportIndex: 1 },
+        { reportType: REPORT_TYPES[2], reportIndex: 2 },
+      ], // TODO - should populate from database
     };
   }
 
@@ -184,9 +187,11 @@ export class AppController {
   @UseGuards(AdminGuard)
   async adminPage(
     @Session() session: { data?: SessionData },
-    @Query("report") documentType
+    @Query("report") reportIndex
   ) {
+    let reportType = REPORT_TYPES[reportIndex];
     let isAdmin = false;
+    let data = [];
     if (
       session.data &&
       session.data.activeAccount &&
@@ -199,21 +204,22 @@ export class AppController {
       }
     }
     const displayAdmin = isAdmin ? "Administration" : "-";
-    const documentData = await lastValueFrom(
-      this.httpService
-        .get(requestUrl + `${encodeURI(documentType)}`, requestConfig)
-        .pipe(map((response) => response.data))
-    );
-    let data = [];
-    for (let entry of documentData) {
-      let dataEntry = {};
-      dataEntry["id"] = entry.id;
-      dataEntry["document_type"] = entry.document_type;
-      dataEntry["template_version"] = entry.template_version;
-      dataEntry["template_name"] = entry.file_name.replace(".docx", "");
-      dataEntry["uploaded_date"] = entry.create_timestamp.split("T")[0];
-      dataEntry["active_flag"] = entry.active_flag;
-      data.push(dataEntry);
+    if (reportType && reportType != "") {
+      const documentData = await lastValueFrom(
+        this.httpService
+          .get(requestUrl + `${encodeURI(reportType)}`, requestConfig)
+          .pipe(map((response) => response.data))
+      );
+      for (let entry of documentData) {
+        let dataEntry = {};
+        dataEntry["id"] = entry.id;
+        dataEntry["document_type"] = entry.document_type;
+        dataEntry["template_version"] = entry.template_version;
+        dataEntry["template_name"] = entry.file_name.replace(".docx", "");
+        dataEntry["uploaded_date"] = entry.create_timestamp.split("T")[0];
+        dataEntry["active_flag"] = entry.active_flag;
+        data.push(dataEntry);
+      }
     }
     const title =
       process.env.ticdi_environment == "DEVELOPMENT"

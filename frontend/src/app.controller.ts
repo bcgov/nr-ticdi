@@ -65,6 +65,9 @@ export class AppController {
         : PAGE_TITLES.INDEX;
     return {
       title: title,
+      idirUsername: session.data.activeAccount
+        ? session.data.activeAccount.idir_username
+        : "",
       primaryContactName: "",
       displayAdmin: displayAdmin,
     };
@@ -115,6 +118,9 @@ export class AppController {
       primaryContactName = ttlsJSON.licence_holder_name;
       return {
         title: title,
+        idirUsername: session.data.activeAccount
+          ? session.data.activeAccount.idir_username
+          : "",
         primaryContactName: primaryContactName,
         displayAdmin: displayAdmin,
         message: ttlsJSON,
@@ -125,6 +131,9 @@ export class AppController {
       console.log(err);
       return {
         title: title,
+        idirUsername: session.data.activeAccount
+          ? session.data.activeAccount.idir_username
+          : "",
         primaryContactName: primaryContactName ? primaryContactName : null,
         displayAdmin: displayAdmin,
         message: ttlsJSON ? ttlsJSON : null,
@@ -160,6 +169,9 @@ export class AppController {
         : PAGE_TITLES.ADMIN;
     return {
       title: title,
+      idirUsername: session.data.activeAccount
+        ? session.data.activeAccount.idir_username
+        : "",
       displayAdmin: displayAdmin,
       reportTypes: ["Land Use Report", "Notice of Final Review"], // TODO - should populate from database
     };
@@ -209,6 +221,9 @@ export class AppController {
         : PAGE_TITLES.MANAGE_TEMPLATES;
     return {
       title: title,
+      idirUsername: session.data.activeAccount
+        ? session.data.activeAccount.idir_username
+        : "",
       primaryContactName: "",
       displayAdmin: displayAdmin,
       data: data,

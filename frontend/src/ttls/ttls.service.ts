@@ -383,10 +383,6 @@ export class TTLSService {
       .then((res) => {
         return res.data;
       });
-    console.log("~~~~~");
-    console.log("~~~~~");
-    console.log("~~~~~");
-    // console.log(documentTemplateObject);
     console.log(documentTemplateObject.id);
     if (data.InspectionDate) {
       data["InspectionDate"] = this.formatInspectedDate(data.InspectionDate);

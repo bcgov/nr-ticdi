@@ -5,4 +5,9 @@ export const PAGE_TITLES = {
   MANAGE_USERS: "Manage Users",
 };
 
+export const TICDI_ROLES = {
+  TICDIUSER: "ticdi_user",
+  TICDIADMIN: "ticdi_admin",
+};
+
 export const REPORT_TYPES = ["", "Land Use Report", "Notice of Final Review"];

@@ -147,4 +147,26 @@ export class AdminController {
       return { message: "No Admin Privileges Found" };
     }
   }
+
+  @Get("search-users/:searchInput")
+  async searchUsers(
+    @Session() session: { data?: SessionData },
+    @Param("searchInput") searchInput
+  ): Promise<any> {
+    console.log(searchInput);
+    return [
+      {
+        name: "Eric Anderson",
+        username: "ERANDERS",
+        role: "TICDIUSER",
+        status: "Active",
+      },
+      {
+        name: "Phil Arctander",
+        username: "PARCTAN",
+        role: "TICDIADMIN",
+        status: "Active",
+      },
+    ];
+  }
 }

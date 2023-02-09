@@ -173,6 +173,20 @@ export class AppController {
         ? session.data.activeAccount.idir_username
         : "",
       displayAdmin: displayAdmin,
+      data: [
+        {
+          name: "Eric Anderson",
+          username: "ERANDERS",
+          role: "TICDIUSER",
+          status: "Active",
+        },
+        {
+          name: "Phil Arctander",
+          username: "PARCTAN",
+          role: "TICDIADMIN",
+          status: "Active",
+        },
+      ],
       reportTypes: [
         { reportType: REPORT_TYPES[1], reportIndex: 1 },
         { reportType: REPORT_TYPES[2], reportIndex: 2 },

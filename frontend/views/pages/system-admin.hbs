@@ -9,41 +9,26 @@
             </div>
             <div class="form-group row">
                 <div class="col-md-5">
-                    <input type="text" class="border border-1 rounded pl-2 ml-4" id="userSearch" placeholder="Enter Last Name or User Name" style="min-width: 350px">
+                    <input type="text" class="border border-1 rounded pl-2 ml-4" id="searchInput" placeholder="Enter Last Name or User Name" style="min-width: 350px">
                 </div>
                 <div class="col-md-3">
-                    <button id="manageButton" class="btn btn-primary" onclick="searchUsers()">Search</button>
+                    <button id="searchButton" class="btn btn-primary" onclick="searchUsers()">Search</button>
                 </div>
             </div>
             <hr />
             <div class="form-group row">
                 <div class="col-md-12">
-                    <table>
+                    <table id="usersTable">
                         <thead>
-                            <th>Name</th>
-                            <th>User Name</th>
+                            <th style="min-width:250px">Name</th>
+                            <th style="min-width:250px">User Name</th>
                             <th>Role</th>
                             <th>Status</th>
                             <th></th>
                             <th></th>
                         </thead>
-                        <tbody>
-                            <tr>
-                                <td><input type="text" class="border border-1 rounded pl-2" value="Eric Anderson" style="color:gray" readonly></td>
-                                <td><input type="text" class="border border-1 rounded pl-2" value="ERANDERS" style="color:gray" readonly></td>
-                                <td><input type="text" class="border border-1 rounded pl-2" value="TICDIUSER" style="color:gray" readonly></td>
-                                <td><input type="text" class="border border-1 rounded pl-2" value="Active" style="color:gray" readonly></td>
-                                <td><a href="#">Edit</a></td>
-                                <td><a href="#">Remove</a></td>
-                            </tr>
-                            <tr>
-                                <td><input type="text" class="border border-1 rounded pl-2" value="Phil Arctander" style="color:gray" readonly></td>
-                                <td><input type="text" class="border border-1 rounded pl-2" value="PARCTAN" style="color:gray" readonly></td>
-                                <td><input type="text" class="border border-1 rounded pl-2" value="TICDIADMIN" style="color:gray" readonly></td>
-                                <td><input type="text" class="border border-1 rounded pl-2" value="Active" style="color:gray" readonly></td>
-                                <td><a href="#">Edit</a></td>
-                                <td><a href="#">Remove</a></td>
-                            </tr>
+                        <tbody id="usersTableBody">
+                            <tr></tr>
                         </tbody>
                     </table>
                 </div>
@@ -54,7 +39,7 @@
                         <button id="exportUserList" class="btn btn-info" onclick="exportUserList()" style="background-color:teal; color:white">Export User List</button>
                     </div>
                     <div class="col-md-2">
-                        <button id="addAUser" class="btn btn-primary" onclick="addAUser()">Add a User</button>
+                        <button id="addAUser" class="btn btn-primary" onclick="addUserButton()">Add a User</button>
                     </div>
                 </div>
             <hr />
@@ -78,16 +63,336 @@
                 </div>
             </div>
         </div>
+        <div id="searchUsersModal" class="modal fade" role="dialog">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title">Search Users</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div id="searchUsersBody">
+                            <div class="form-group row">
+                                <div class="col-md-12">
+                                    <table id="searchUsersTable" style="width: 100%">
+                                        <thead>
+                                            <th style="min-width:250px">Name</th>
+                                            <th style="min-width:250px">User Name</th>
+                                            <th>Role</th>
+                                            <th>Status</th>
+                                            <th></th>
+                                        </thead>
+                                        <tbody id="searchUsersTableBody">
+                                            <tr>
+                                                <td><input value="Name"></td>
+                                                <td><input value="Username"></td>
+                                                <td><input value="Role"></td>
+                                                <td><input value="Status"></td>
+                                                <td><button>Display</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="addUserModal" class="modal fade" role="dialog">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title">Add a User</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div id="addUserBody">
+                            <div class="form-group row">
+                                <div class="col-md-12">
+                                    <!-- various inputs -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" onclick="addUser()" disabled>Save</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="editUserModal" class="modal fade" role="dialog">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title">Edit a User</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div id="editUserBody">
+                            <div class="form-group row mb-0">
+                                <div class="col-md-12 ml-3">
+                                    <label for="editName" style="font-weight:bold">Name</label>
+                                </div>
+                            </div>
+                            <div class="form-group row mb-0">
+                                <div class="col-md-12 ml-3">
+                                    <input id="editName" value="" style="color:gray; width: 100%" readonly>
+                                </div>
+                            </div>
+                            <div class="form-group row mb-0">
+                                <div class="col-md-12 ml-3">
+                                    <label for="editUsername" style="font-weight:bold">Username</label>
+                                </div>
+                            </div>
+                            <div class="form-group row mb-0">
+                                <div class="col-md-12 ml-3">
+                                    <input id="editUsername" value="" style="color:gray; width: 100%" readonly>
+                                </div>
+                            </div>
+                            <div class="form-group row mb-0">
+                                <div class="col-md-12 ml-3">
+                                    <label for="editRole" style="font-weight:bold">Role</label>
+                                </div>
+                            </div>
+                            <div class="form-group row mb-0">
+                                <div class="col-md-12 ml-3">
+                                    <select id="editRoleSelect" style="width: 100%">
+                                        <option value="0"></option>
+                                        <option value="1">TICDIUSER</option>
+                                        <option value="2">TICDIADMIN</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group row mb-0">
+                                <div class="col-md-12 ml-3">
+                                    <label for="editStatus" style="font-weight:bold">Status</label>
+                                </div>
+                            </div>
+                            <div class="form-group row mb-0">
+                                <div class="col-md-12 ml-3">
+                                    <input id="editStatus" value="" style="color:gray; width: 100%" readonly>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" onclick="saveUser()" data-dismiss="modal">Save</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="removeUserModal" class="modal fade" role="dialog">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title">Remove a User</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div id="removeUserBody">
+                            <div class="form-group row">
+                                <div class="col-md-12">
+                                    <p>Are you sure you want to remove this user?</p>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-md-2 ml-3">
+                                    <label for="removeName">Name:</label>
+                                </div>
+                                <div class="col-md-9">
+                                    <input id="removeName" value="" style="color:gray; min-width: 250px" readonly>
+                                </div>
+                                <div class="col-md-2 ml-3">
+                                    <label for="removeUsername">Username:</label>
+                                </div>
+                                <div class="col-md-9">
+                                    <input id="removeUsername" value="" style="color:gray; min-width: 250px" readonly>
+                                </div>
+                                <div class="col-md-2 ml-3">
+                                    <label for="removeRole">Role:</label>
+                                </div>
+                                <div class="col-md-9">
+                                    <input id="removeRole" value="" style="color:gray; width: 120px">
+                                </div>
+                                <div class="col-md-2 ml-3">
+                                    <label for="removeStatus">Status:</label>
+                                </div>
+                                <div class="col-md-9">
+                                    <input id="removeStatus" value="" style="color:gray; width: 120px" readonly>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" onclick="removeUser()" data-dismiss="modal">Yes</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </main>
     <script>
-        var dataArray = [];
-        $( document ).ready(function() {})
+        let dataArray = [];
+        $( document ).ready(function() {
+            {{#each data}}
+            dataArray.push({
+                name: "{{this.name}}",
+                username: "{{this.username}}",
+                role: "{{this.role}}",
+                status: "{{this.status}}",
+            });
+            {{/each}}
+
+            $("#usersTableBody tr").remove();
+            let t = ""
+            dataArray.sort((a, b) => {
+                return a.name.localeCompare(b.name);
+            })
+            for (let entry of dataArray) {
+                    let tr = `<tr id="row-${entry.username}">`;
+                    tr += `<td><input type="text" value="${entry.name}" class="border border-1 rounded pl-2" id="name-${entry.username}" style="color:gray; width:100%" readonly></td>`;
+                    tr += `<td><input type="text" value="${entry.username}" class="border border-1 rounded pl-2" id="username-${entry.username}" style="color:gray; width:100%" readonly></td>`;
+                    tr += `<td><input type="text" value="${entry.role}" class="border border-1 rounded pl-2" id="role-${entry.username}" style="color:gray; max-width:120px" readonly></td>`;
+                    tr += `<td><input type="text" value="${entry.status}" class="border border-1 rounded pl-2" id="status-${entry.username}" style="color:gray; max-width:100px" readonly></td>`;
+                    tr += `<td><a class="edit-user-link" data-id="${entry.username}" href="#">Edit</a></td>`;
+                    tr += `<td><a class="remove-user-link" data-id="${entry.username}" href="#">Remove</a></td>`;
+                    tr += "</tr>";
+                    t += tr;
+            }
+            document.getElementById("usersTableBody").innerHTML = t;
+            const usersTable = $('#usersTable').DataTable({
+                "paging": true,
+                "bFilter": true,
+                "columnDefs": [
+                {
+                    targets: [0,1,2,3],
+                    type: 'string',
+                    render: function(data, type, full, meta) {
+                        if (type === 'filter' || type === 'sort') {
+                            let api = new $.fn.dataTable.Api(meta.settings);
+                            let td = api.cell({row: meta.row, column: meta.col}).node();
+                            data = $('select, input[type="text"]', td).val();
+                        }
+                        return data;
+                    }
+                },
+                {
+                    targets: [4,5],
+                    orderable: false
+                }]
+            });
+            
+            $(document).on("click", ".display-user-button", function () {
+                console.log($(this).data('id'));
+                const userJson = $(this).data('id').toString().json();
+                usersTable.row.add([...userJson]).draw(false);
+            });
+        });
+        $("#searchButton").prop("disabled", true);
+        $("#searchInput").keyup(function() {
+            if ($(this).val().trim().length == 0) {
+            $("#searchButton").prop("disabled", true);
+            } else {
+            $("#searchButton").prop("disabled", false);
+            }
+        });
+        $(document).on("click", ".edit-user-link", function () {
+            const usernameToEdit = $(this).data('id');
+            const name = $(`#name-${usernameToEdit}`).val();
+            const role = $(`#role-${usernameToEdit}`).val();
+            const roleIndex = role == 'TICDIUSER' ? 1 : role == 'TICDIADMIN' ? 2 : 0;
+            const status = $(`#status-${usernameToEdit}`).val();
+            $("#editUserModal #editName").val(name);
+            $("#editUserModal #editUsername").val(usernameToEdit);
+            $("#editUserModal #editRoleSelect").val(roleIndex);
+            $("#editUserModal #editStatus").val(status);
+            $("#editUserModal").modal("show");
+        })
+        $(document).on("click", ".remove-user-link", function () {
+            const usernameToRemove = $(this).data('id');
+            const name = $(`#name-${usernameToRemove}`).val();
+            const role = $(`#role-${usernameToRemove}`).val();
+            const status = $(`#status-${usernameToRemove}`).val();
+            $("#removeUserModal #removeName").val(name);
+            $("#removeUserModal #removeUsername").val(usernameToRemove);
+            $("#removeUserModal #removeRole").val(role);
+            $("#removeUserModal #removeStatus").val(status);
+            $("#removeUserModal").modal("show");
+        });
         // when the selected option changes, update the table
         function manageReports() {
             window.location.href = '/manage-templates?report='+$('#reportTypes option:selected').val();
         }
-        function searchUsers() {
+        async function searchUsers() {
+            const searchParams = $('#searchInput').val();
+            const searchResults = await fetch(`/admin/search-users/${encodeURIComponent(searchParams)}`, {
+                method: 'GET',
+                responseType: 'application/json',
+                })
+            .then(function(res) {return res.json()})
+            .catch((err) => console.log(err));
+            console.log(searchResults);
+            $("#usersTableBody tr").remove();
+            let t = ""
+            searchResults.sort((a, b) => {
+                return a.name.localeCompare(b.name);
+            })
+            for (let entry of searchResults) {
+                let tr = `<tr id="search-row-${entry.username}">`;
+                tr += `<td><input type="text" value="${entry.name}" class="border border-1 rounded pl-2" id="search-name-${entry.username}" style="color:gray; width:100%" readonly></td>`;
+                tr += `<td><input type="text" value="${entry.username}" class="border border-1 rounded pl-2" id="search-username-${entry.username}" style="color:gray; width:100%" readonly></td>`;
+                tr += `<td><input type="text" value="${entry.role}" class="border border-1 rounded pl-2" id="search-role-${entry.username}" style="color:gray; max-width:120px" readonly></td>`;
+                tr += `<td><input type="text" value="${entry.status}" class="border border-1 rounded pl-2" id="search-status-${entry.username}" style="color:gray; max-width:100px" readonly></td>`;
+                tr += `<td><button class="display-user-button" data-id="${JSON.stringify(entry)}">Display</td>`;
+                tr += "</tr>";
+                t += tr;
+            }
+            document.getElementById("searchUsersTableBody").innerHTML = t;
+            $('#searchUsersTable').DataTable({
+                "paging": true,
+                "bFilter": true,
+                "columnDefs": [
+                {
+                    targets: [0,1,2,3],
+                    type: 'string',
+                    render: function(data, type, full, meta) {
+                        if (type === 'filter' || type === 'sort') {
+                            let api = new $.fn.dataTable.Api(meta.settings);
+                            let td = api.cell({row: meta.row, column: meta.col}).node();
+                            data = $('select, input[type="text"]', td).val();
+                        }
+                        return data;
+                    }
+                },
+                {
+                    targets: [4],
+                    orderable: false
+                }]
+            });
+            $('#searchUsersModal').modal('show');
             console.log("search users");
+        }
+        function editUser(username) {
+            $('#editUserModal').modal('show');
+            console.log('edit user');
+        }
+        function saveUser() {
+            console.log("save user");
+        }
+        function removeUser() {
+            console.log("remove user");
+        }
+        function addUserButton() {
+            $('#addUserModal').modal('show');
+            console.log('add user button');
+        }
+        function addUser() {
+            console.log("add user");
+        }
+        function exportUserList() {
+            console.log('export users');
         }
     </script>
   {{/inline}}

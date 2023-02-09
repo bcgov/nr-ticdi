@@ -219,15 +219,15 @@
             for (let entry of dataArray) {
                 if (reportType == entry.document_type) {
                    var tr = `<tr id="row-${entry.id}">`;
-                tr += `<td><input type="text" value="${entry.template_version}" class="border border-1 rounded pl-2" style="color:gray; max-width:80px" readonly></td>`;
-                tr += `<td><input type="text" value="${entry.template_name}" class="border border-1 rounded pl-2" id="name-${entry.id}" style="color:gray; width:100%" readonly></td>`;
-                tr += `<td><input type="text" value="${entry.uploaded_date}" class="border border-1 rounded pl-2" style="color:gray; max-width:150px" readonly></td>`;
-                tr += entry.active_flag == 'true' ? `<td value="checked" style='text-align: center;'><input id='radio-${entry.id}' type="radio" name="radioActive" checked></td>` : 
-                    `<td value="unchecked" style="text-align: center;"><input id='radio-${entry.id}' type="radio" name="radioActive"></td>`;
-                tr += `<td><button class="btn btn-info" id='view-${entry.id}' onclick="downloadTemplate(${entry.id})">View</td>`;
-                tr += `<td><button class="btn btn-warning remove-template-button" data-id="${entry.id}" data-toggle="modal" data-target="#removeModal">Remove</td>`;
-                tr += "</tr>";
-                t += tr;
+                    tr += `<td><input type="text" value="${entry.template_version}" class="border border-1 rounded pl-2" style="color:gray; max-width:80px" readonly></td>`;
+                    tr += `<td><input type="text" value="${entry.template_name}" class="border border-1 rounded pl-2" id="name-${entry.id}" style="color:gray; width:100%" readonly></td>`;
+                    tr += `<td><input type="text" value="${entry.uploaded_date}" class="border border-1 rounded pl-2" style="color:gray; max-width:150px" readonly></td>`;
+                    tr += entry.active_flag == 'true' ? `<td value="checked" style='text-align: center;'><input id='radio-${entry.id}' type="radio" name="radioActive" checked></td>` : 
+                        `<td value="unchecked" style="text-align: center;"><input id='radio-${entry.id}' type="radio" name="radioActive"></td>`;
+                    tr += `<td><button class="btn btn-info" id='view-${entry.id}' onclick="downloadTemplate(${entry.id})">View</td>`;
+                    tr += `<td><button class="btn btn-warning remove-template-button" data-id="${entry.id}" data-toggle="modal" data-target="#removeModal">Remove</td>`;
+                    tr += "</tr>";
+                    t += tr;
                 }
             }
             document.getElementById("documentTableBody").innerHTML = t;
@@ -331,7 +331,7 @@
         $(document).on("click", ".remove-template-button", function () {
             const documentTemplateId = $(this).data('id');
             $(".modal-body #document-template-id").val(documentTemplateId);
-        })
+        });
     </script>
     <script>
         let fileBase64;

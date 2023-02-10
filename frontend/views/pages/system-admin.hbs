@@ -22,10 +22,9 @@
                         <thead>
                             <th style="min-width:250px">Name</th>
                             <th style="min-width:250px">User Name</th>
+                            <th style="min-width:250px">Email</th>
                             <th>Role</th>
-                            <th>Status</th>
-                            <th></th>
-                            <th></th>
+                            <th></th> <!-- remove button -->
                         </thead>
                         <tbody id="usersTableBody">
                             <tr></tr>
@@ -34,12 +33,12 @@
                 </div>
             </div>
             <div class="form-group row">
-                    <div class="col-md-8"></div>
+                    <div class="col-md-7"></div>
                     <div class="col-md-2">
                         <button id="exportUserList" class="btn btn-info" onclick="exportUserList()" style="background-color:teal; color:white">Export User List</button>
                     </div>
-                    <div class="col-md-2">
-                        <button id="addAUser" class="btn btn-primary" onclick="addUserButton()">Add a User</button>
+                    <div class="col-md-3">
+                        <button id="addAdministrator" class="btn btn-primary" onclick="addAdministratorButton()">Add Administrator</button>
                     </div>
                 </div>
             <hr />
@@ -63,14 +62,20 @@
                 </div>
             </div>
         </div>
+        <!--
         <div id="searchUsersModal" class="modal fade" role="dialog">
-            <div class="modal-dialog modal-lg">
+            <div class="modal-dialog modal-xl">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h4 class="modal-title">Search Users</h4>
                     </div>
                     <div class="modal-body">
                         <div id="searchUsersBody">
+                            <div id="searchUsersWarning" class="justify-content-center" style="display: flex">
+                                <div class="alert alert-warning" role="alert">
+                                    That user is already displayed in the table.
+                                </div>
+                            </div>
                             <div class="form-group row">
                                 <div class="col-md-12">
                                     <table id="searchUsersTable" style="width: 100%">
@@ -78,7 +83,6 @@
                                             <th style="min-width:250px">Name</th>
                                             <th style="min-width:250px">User Name</th>
                                             <th>Role</th>
-                                            <th>Status</th>
                                             <th></th>
                                         </thead>
                                         <tbody id="searchUsersTableBody">
@@ -101,28 +105,53 @@
                 </div>
             </div>
         </div>
-        <div id="addUserModal" class="modal fade" role="dialog">
+        -->
+        <div id="addAdministratorModal" class="modal fade" role="dialog">
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h4 class="modal-title">Add a User</h4>
+                        <h4 class="modal-title">Add Administrator</h4>
                     </div>
                     <div class="modal-body">
-                        <div id="addUserBody">
+                        <div id="addAdministratorBody">
                             <div class="form-group row">
                                 <div class="col-md-12">
-                                    <!-- various inputs -->
+                                    <div class="form-group row">
+                                        <div class="col-md-3 ml-3">
+                                            <label for="searchFirstName" style="font-weight:bold">First Name: </label>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <input id="searchFirstName" value="" style="width: 100%">
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <div class="col-md-3 ml-3">
+                                            <label for="searchLastName" style="font-weight:bold">Last Name:</label>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <input id="searchLastName" value="" style="width: 100%">
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <div class="col-md-3 ml-3">
+                                            <label for="searchEmail" style="font-weight:bold">Email:</label>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <input id="searchEmail" value="" style="width: 100%">
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-primary" onclick="addUser()" disabled>Save</button>
+                        <button type="button" class="btn btn-primary" onclick="addAdministrator()">Add Administrator</button>
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
                     </div>
                 </div>
             </div>
         </div>
+        <!--
         <div id="editUserModal" class="modal fade" role="dialog">
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
@@ -184,17 +213,18 @@
                 </div>
             </div>
         </div>
-        <div id="removeUserModal" class="modal fade" role="dialog">
+        -->
+        <div id="removeAdminModal" class="modal fade" role="dialog">
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h4 class="modal-title">Remove a User</h4>
+                        <h4 class="modal-title">Remove Administrator</h4>
                     </div>
                     <div class="modal-body">
-                        <div id="removeUserBody">
+                        <div id="removeAdminBody">
                             <div class="form-group row">
                                 <div class="col-md-12">
-                                    <p>Are you sure you want to remove this user?</p>
+                                    <p>Are you sure you want to remove this administrator?</p>
                                 </div>
                             </div>
                             <div class="form-group row">
@@ -211,22 +241,17 @@
                                     <input id="removeUsername" value="" style="color:gray; min-width: 250px" readonly>
                                 </div>
                                 <div class="col-md-2 ml-3">
-                                    <label for="removeRole">Role:</label>
+                                    <label for="removeEmail">Email:</label>
                                 </div>
                                 <div class="col-md-9">
-                                    <input id="removeRole" value="" style="color:gray; width: 120px">
-                                </div>
-                                <div class="col-md-2 ml-3">
-                                    <label for="removeStatus">Status:</label>
-                                </div>
-                                <div class="col-md-9">
-                                    <input id="removeStatus" value="" style="color:gray; width: 120px" readonly>
+                                    <input id="removeEmail" value="" style="color:gray; min-width: 250px" readonly>
                                 </div>
                             </div>
+                            <input id="removeIdirUsername" value="" style="display: none">
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-primary" onclick="removeUser()" data-dismiss="modal">Yes</button>
+                        <button type="button" class="btn btn-primary remove-admin-finalize" data-dismiss="modal">Yes</button>
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
                     </div>
                 </div>
@@ -235,13 +260,15 @@
     </main>
     <script>
         let dataArray = [];
+        let usersTable, searchUsersTable;
         $( document ).ready(function() {
             {{#each data}}
             dataArray.push({
                 name: "{{this.name}}",
                 username: "{{this.username}}",
+                email: "{{this.email}}",
                 role: "{{this.role}}",
-                status: "{{this.status}}",
+                idirUsername: "{{this.idirUsername}}",
             });
             {{/each}}
 
@@ -254,20 +281,27 @@
                     let tr = `<tr id="row-${entry.username}">`;
                     tr += `<td><input type="text" value="${entry.name}" class="border border-1 rounded pl-2" id="name-${entry.username}" style="color:gray; width:100%" readonly></td>`;
                     tr += `<td><input type="text" value="${entry.username}" class="border border-1 rounded pl-2" id="username-${entry.username}" style="color:gray; width:100%" readonly></td>`;
+                    tr += `<td><input type="text" value="${entry.email}" class="border border-1 rounded pl-2" id="email-${entry.username}" style="color:gray; width:100%" readonly></td>`;
                     tr += `<td><input type="text" value="${entry.role}" class="border border-1 rounded pl-2" id="role-${entry.username}" style="color:gray; max-width:120px" readonly></td>`;
-                    tr += `<td><input type="text" value="${entry.status}" class="border border-1 rounded pl-2" id="status-${entry.username}" style="color:gray; max-width:100px" readonly></td>`;
-                    tr += `<td><a class="edit-user-link" data-id="${entry.username}" href="#">Edit</a></td>`;
-                    tr += `<td><a class="remove-user-link" data-id="${entry.username}" href="#">Remove</a></td>`;
+                    tr += `<td><a class="remove-admin-link" data-id="${entry.username}" href="#">Remove</a></td>`;
+                    tr += `<td><input type="text" id="idir-${entry.username}" value="${entry.idirUsername}" style="display: none"></td>`;
                     tr += "</tr>";
                     t += tr;
             }
             document.getElementById("usersTableBody").innerHTML = t;
-            const usersTable = $('#usersTable').DataTable({
+            usersTable = $('#usersTable').DataTable({
                 "paging": true,
                 "bFilter": true,
+                "columns": [
+                    { data: "name"},
+                    { data: "username"},
+                    { data: "email"},
+                    { data: "role"},
+                    { data: "remove"}
+                ],    
                 "columnDefs": [
                 {
-                    targets: [0,1,2,3],
+                    targets: [0,1,2],
                     type: 'string',
                     render: function(data, type, full, meta) {
                         if (type === 'filter' || type === 'sort') {
@@ -279,117 +313,179 @@
                     }
                 },
                 {
-                    targets: [4,5],
-                    orderable: false
+                    targets: [3,4,5],
+                    orderable: false,
+                    searchable: false
                 }]
             });
-            
-            $(document).on("click", ".display-user-button", function () {
-                console.log($(this).data('id'));
-                const userJson = $(this).data('id').toString().json();
-                usersTable.row.add([...userJson]).draw(false);
-            });
+            //searchUsersTable = $('#searchUsersTable').DataTable({
+            //    "paging": true,
+            //    "bFilter": true,
+            //    "data": {
+            //        "name": "",
+            //        "username": "",
+            //        "role": "",
+            //        "status": "",
+            //        "display": "",
+            //    },
+            //    "columns": [
+            //        { data: "name"},
+            //        { data: "username"},
+            //        { data: "role"},
+            //        { data: "status"},
+            //        { data: "display"},
+            //    ],
+            //    "columnDefs": [
+            //    {
+            //        targets: [0,1,2,3],
+            //        type: 'string',
+            //        render: function(data, type, full, meta) {
+            //            if (type === 'filter' || type === 'sort') {
+            //                let api = new $.fn.dataTable.Api(meta.settings);
+            //                let td = api.cell({row: meta.row, column: meta.col}).node();
+            //                data = $('select, input[type="text"]', td).val();
+            //            }
+            //            return data;
+            //        }
+            //    },
+            //    {
+            //        targets: [4],
+            //        orderable: false
+            //    }]
+            //});
+            // // add the user row to the main page and remove it from the search results
+            //$(document).on("click", ".display-user-button", function () {
+            //    const userJson = $(this).data('id');
+            //    const userRow = getUserRow(userJson);
+            //    usersTable.row.add(userRow).draw(false);
+            //    searchUsersTable.row( $(this).parents('tr') ).remove().draw();
+            //});
         });
         $("#searchButton").prop("disabled", true);
-        $("#searchInput").keyup(function() {
-            if ($(this).val().trim().length == 0) {
-            $("#searchButton").prop("disabled", true);
-            } else {
-            $("#searchButton").prop("disabled", false);
-            }
+        //$("#searchInput").keyup(function() {
+        //    if ($(this).val().trim().length == 0) {
+        //    $("#searchButton").prop("disabled", true);
+        //    } else {
+        //    $("#searchButton").prop("disabled", false);
+        //    }
+        //});
+        //$(document).on("click", ".edit-user-link", function () {
+        //    const usernameToEdit = $(this).data('id');
+        //    const name = $(`#name-${usernameToEdit}`).val();
+        //    const role = $(`#role-${usernameToEdit}`).val();
+        //    const roleIndex = role == 'TICDIUSER' ? 1 : role == 'TICDIADMIN' ? 2 : 0;
+        //    const status = $(`#status-${usernameToEdit}`).val();
+        //    $("#editUserModal #editName").val(name);
+        //    $("#editUserModal #editUsername").val(usernameToEdit);
+        //    $("#editUserModal #editRoleSelect").val(roleIndex);
+        //    $("#editUserModal #editStatus").val(status);
+        //    $("#editUserModal").modal("show");
+        //})
+        $(document).on("click", ".remove-admin-link", function () {
+            const username = $(this).data('id');
+            const name = $(`#name-${username}`).val();
+            console.log("name: "+name)
+            console.log(`querying this: #idir-${username}`)
+            const idirUsername = $(`#idir-${username}`).val();
+            console.log("idirUsername: "+idirUsername)
+            const email = $(`#email-${username}`).val();
+            $("#removeAdminModal #removeName").val(name);
+            $("#removeAdminModal #removeUsername").val(username);
+            $("#removeAdminModal #removeEmail").val(email);
+            $("#removeAdminModal #removeIdirUsername").val(idirUsername);
+            $("#removeAdminModal").modal("show");
         });
-        $(document).on("click", ".edit-user-link", function () {
-            const usernameToEdit = $(this).data('id');
-            const name = $(`#name-${usernameToEdit}`).val();
-            const role = $(`#role-${usernameToEdit}`).val();
-            const roleIndex = role == 'TICDIUSER' ? 1 : role == 'TICDIADMIN' ? 2 : 0;
-            const status = $(`#status-${usernameToEdit}`).val();
-            $("#editUserModal #editName").val(name);
-            $("#editUserModal #editUsername").val(usernameToEdit);
-            $("#editUserModal #editRoleSelect").val(roleIndex);
-            $("#editUserModal #editStatus").val(status);
-            $("#editUserModal").modal("show");
-        })
-        $(document).on("click", ".remove-user-link", function () {
-            const usernameToRemove = $(this).data('id');
-            const name = $(`#name-${usernameToRemove}`).val();
-            const role = $(`#role-${usernameToRemove}`).val();
-            const status = $(`#status-${usernameToRemove}`).val();
-            $("#removeUserModal #removeName").val(name);
-            $("#removeUserModal #removeUsername").val(usernameToRemove);
-            $("#removeUserModal #removeRole").val(role);
-            $("#removeUserModal #removeStatus").val(status);
-            $("#removeUserModal").modal("show");
+        $(document).on("click", ".remove-admin-finalize", function () {
+            const idirUsername = $("#removeIdirUsername").val();
+            console.log(idirUsername);
+            removeAdmin(idirUsername);
+            $("#removeAdminModal").modal("hide");
         });
+        //$('#searchUsersModal').on('hidden.bs.modal', function (e) {
+        //    console.log("clearing modal");
+        //    searchUsersTable.clear();
+        //})
+        //function getUserRow(userJson) {
+        //    $('#searchUsersWarning').hide();
+        //    if ($(`#username-${userJson.username}`).length > 0) {
+        //        $('#searchUsersWarning').show();
+        //        $('#searchUsersWarning').delay(3000).fadeOut(500);
+        //    } else {
+        //        const nameCell = `<input type="text" value="${userJson.name}" class="border border-1 rounded pl-2" id="name-${userJson.username}" style="color:gray; width:100%" readonly>`;
+        //        const usernameCell = `<input type="text" value="${userJson.username}" class="border border-1 rounded pl-2" id="username-${userJson.username}" style="color:gray; width:100%" readonly>`;
+        //        const roleCell = `<input type="text" value="${userJson.role}" class="border border-1 rounded pl-2" id="role-${userJson.username}" style="color:gray; max-width:120px" readonly>`;
+        //        const statusCell = `<input type="text" value="${userJson.status}" class="border border-1 rounded pl-2" id="status-${userJson.username}" style="color:gray; max-width:100px" readonly>`;
+        //        const editCell = `<a class="edit-user-link" data-id="${userJson.username}" href="#">Edit</a>`;
+        //        const removeCell = `<a class="remove-user-link" data-id="${userJson.username}" href="#">Remove</a>`;
+        //        return {
+        //            "name": nameCell,
+        //            "username": usernameCell,
+        //            "role": roleCell,
+        //            "status": statusCell,
+        //            "edit": editCell,
+        //            "remove": removeCell
+        //        };
+        //    }
+        //}
+        //function getSearchUserRow(entry) {
+        //    const nameCell = `<input type="text" value="${entry.name}" class="border border-1 rounded pl-2" id="search-name-${entry.username}" style="color:gray; width:100%" readonly>`;
+        //    const usernameCell = `<input type="text" value="${entry.username}" class="border border-1 rounded pl-2" id="search-username-${entry.username}" style="color:gray; width:100%" readonly>`;
+        //    const roleCell = `<input type="text" value="${entry.role}" class="border border-1 rounded pl-2" id="search-role-${entry.username}" style="color:gray; max-width:120px" readonly>`;
+        //    const statusCell = `<input type="text" value="${entry.status}" class="border border-1 rounded pl-2" id="search-status-${entry.username}" style="color:gray; max-width:100px" readonly>`;
+        //    const displayCell = `<button class="display-user-button btn btn-success" data-id='${JSON.stringify(entry)}'>Display`;
+        //    return {
+        //        "name": nameCell,
+        //        "username": usernameCell,
+        //        "role": roleCell,
+        //        "status": statusCell,
+        //        "display": displayCell,
+        //    };
+        //}
         // when the selected option changes, update the table
         function manageReports() {
             window.location.href = '/manage-templates?report='+$('#reportTypes option:selected').val();
         }
         async function searchUsers() {
-            const searchParams = $('#searchInput').val();
-            const searchResults = await fetch(`/admin/search-users/${encodeURIComponent(searchParams)}`, {
-                method: 'GET',
+            $('#searchUsersWarning').hide();
+            const searchParams = {
+                firstName: $('#searchFirstName').val(),
+                lastName: $('#searchLastName').val(),
+                email: $('#searchEmail').val(),
+            }
+            const searchResults = await fetch(`/admin/search-users`, {
+                method: 'POST',
                 responseType: 'application/json',
+                body: JSON.stringify(searchParams)
                 })
-            .then(function(res) {return res.json()})
-            .catch((err) => console.log(err));
+                .then(function(res) {return res.json()})
+                .catch((err) => console.log(err));
+            console.log("searchResults");
             console.log(searchResults);
-            $("#usersTableBody tr").remove();
-            let t = ""
             searchResults.sort((a, b) => {
                 return a.name.localeCompare(b.name);
-            })
-            for (let entry of searchResults) {
-                let tr = `<tr id="search-row-${entry.username}">`;
-                tr += `<td><input type="text" value="${entry.name}" class="border border-1 rounded pl-2" id="search-name-${entry.username}" style="color:gray; width:100%" readonly></td>`;
-                tr += `<td><input type="text" value="${entry.username}" class="border border-1 rounded pl-2" id="search-username-${entry.username}" style="color:gray; width:100%" readonly></td>`;
-                tr += `<td><input type="text" value="${entry.role}" class="border border-1 rounded pl-2" id="search-role-${entry.username}" style="color:gray; max-width:120px" readonly></td>`;
-                tr += `<td><input type="text" value="${entry.status}" class="border border-1 rounded pl-2" id="search-status-${entry.username}" style="color:gray; max-width:100px" readonly></td>`;
-                tr += `<td><button class="display-user-button" data-id="${JSON.stringify(entry)}">Display</td>`;
-                tr += "</tr>";
-                t += tr;
-            }
-            document.getElementById("searchUsersTableBody").innerHTML = t;
-            $('#searchUsersTable').DataTable({
-                "paging": true,
-                "bFilter": true,
-                "columnDefs": [
-                {
-                    targets: [0,1,2,3],
-                    type: 'string',
-                    render: function(data, type, full, meta) {
-                        if (type === 'filter' || type === 'sort') {
-                            let api = new $.fn.dataTable.Api(meta.settings);
-                            let td = api.cell({row: meta.row, column: meta.col}).node();
-                            data = $('select, input[type="text"]', td).val();
-                        }
-                        return data;
-                    }
-                },
-                {
-                    targets: [4],
-                    orderable: false
-                }]
             });
+            let rows = []
+            for (let entry of searchResults) {
+                rows.push(getSearchUserRow(entry));
+            }
+            searchUsersTable.rows.add(rows).draw();
+            
             $('#searchUsersModal').modal('show');
             console.log("search users");
         }
-        function editUser(username) {
-            $('#editUserModal').modal('show');
-            console.log('edit user');
+        async function removeAdmin(username) {
+            await fetch(`/admin/remove-admin/${username}`, {
+                method: 'GET'
+                })
+                .then((res) => {
+                    // remove row
+                    //usersTable.row
+                })
+                .catch((err) => console.log(err));
         }
-        function saveUser() {
-            console.log("save user");
-        }
-        function removeUser() {
-            console.log("remove user");
-        }
-        function addUserButton() {
-            $('#addUserModal').modal('show');
-            console.log('add user button');
-        }
-        function addUser() {
-            console.log("add user");
+        function addAdministratorButton() {
+            $('#addAdministratorModal').modal('show');
+            console.log("add admin");
         }
         function exportUserList() {
             console.log('export users');

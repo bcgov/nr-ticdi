@@ -13,9 +13,8 @@ import {
   Get,
   Param,
   Res,
-  HttpStatus,
 } from "@nestjs/common";
-import { SessionData } from "utils/types";
+import { SessionData, UserObject } from "utils/types";
 import { AxiosRequestConfig } from "axios";
 import { AdminService } from "./admin.service";
 import { AuthenticationFilter } from "src/authentication/authentication.filter";
@@ -110,63 +109,46 @@ export class AdminController {
       template_name: string;
     }
   ) {
-    let isAdmin = false;
-    if (
-      session.data &&
-      session.data.activeAccount &&
-      session.data.activeAccount.client_roles
-    ) {
-      for (let role of session.data.activeAccount.client_roles) {
-        if (role == "ticdi_admin") {
-          isAdmin = true;
-        }
-      }
-    }
-    if (isAdmin) {
-      const create_userid = session.data.activeAccount
+    const create_userid = session.data.activeAccount
+      ? session.data.activeAccount.idir_username
         ? session.data.activeAccount.idir_username
-          ? session.data.activeAccount.idir_username
-          : ""
-        : "";
-      const template_author = session.data.activeAccount
+        : ""
+      : "";
+    const template_author = session.data.activeAccount
+      ? session.data.activeAccount.name
         ? session.data.activeAccount.name
-          ? session.data.activeAccount.name
-          : ""
-        : "";
-      const uploadData = {
-        document_type: params.document_type,
-        active_flag: params.active_flag,
-        mime_type: file.mimetype,
-        file_name: params.template_name,
-        template_author: template_author,
-        create_userid: create_userid,
-      };
-      await this.adminService.uploadTemplate(uploadData, file);
-      return { message: "Template uploaded successfully" };
-    } else {
-      return { message: "No Admin Privileges Found" };
+        : ""
+      : "";
+    const uploadData = {
+      document_type: params.document_type,
+      active_flag: params.active_flag,
+      mime_type: file.mimetype,
+      file_name: params.template_name,
+      template_author: template_author,
+      create_userid: create_userid,
+    };
+    await this.adminService.uploadTemplate(uploadData, file);
+    return { message: "Template uploaded successfully" };
+  }
+
+  @Post("search-users")
+  searchUsers(
+    @Body() searchInputs: { firstName: string; lastName: string; email: string }
+  ): Promise<UserObject> {
+    try {
+      return this.adminService.searchUsers(
+        searchInputs.firstName,
+        searchInputs.lastName,
+        searchInputs.email
+      );
+    } catch (err) {
+      return err.message;
     }
   }
 
-  @Get("search-users/:searchInput")
-  async searchUsers(
-    @Session() session: { data?: SessionData },
-    @Param("searchInput") searchInput
-  ): Promise<any> {
-    console.log(searchInput);
-    return [
-      {
-        name: "Eric Anderson",
-        username: "ERANDERS",
-        role: "TICDIUSER",
-        status: "Active",
-      },
-      {
-        name: "Phil Arctander",
-        username: "PARCTAN",
-        role: "TICDIADMIN",
-        status: "Active",
-      },
-    ];
+  @Get("remove-admin/:username")
+  removeAdmin(@Param("username") username) {
+    console.log("removing admin");
+    return this.adminService.removeAdmin(username);
   }
 }

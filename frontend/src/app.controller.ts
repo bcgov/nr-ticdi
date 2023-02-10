@@ -9,8 +9,9 @@ import {
   Query,
 } from "@nestjs/common";
 import { AppService } from "./app.service";
+import { AdminService } from "./admin/admin.service";
 import { PAGE_TITLES, REPORT_TYPES } from "utils/constants";
-import { SessionData } from "utils/types";
+import { SessionData, UserObject } from "utils/types";
 import { AuthenticationGuard } from "./authentication/authentication.guard";
 import { AuthenticationFilter } from "./authentication/authentication.filter";
 import { TTLSService } from "./ttls/ttls.service";
@@ -26,6 +27,7 @@ let requestConfig: AxiosRequestConfig;
 export class AppController {
   constructor(
     private readonly appService: AppService,
+    private readonly adminService: AdminService,
     private readonly ttlsService: TTLSService,
     private readonly httpService: HttpService
   ) {
@@ -167,26 +169,14 @@ export class AppController {
       process.env.ticdi_environment == "DEVELOPMENT"
         ? "DEVELOPMENT - " + PAGE_TITLES.ADMIN
         : PAGE_TITLES.ADMIN;
+    const data: UserObject[] = await this.adminService.getAdminUsers();
     return {
       title: title,
       idirUsername: session.data.activeAccount
         ? session.data.activeAccount.idir_username
         : "",
       displayAdmin: displayAdmin,
-      data: [
-        {
-          name: "Eric Anderson",
-          username: "ERANDERS",
-          role: "TICDIUSER",
-          status: "Active",
-        },
-        {
-          name: "Phil Arctander",
-          username: "PARCTAN",
-          role: "TICDIADMIN",
-          status: "Active",
-        },
-      ],
+      data: data,
       reportTypes: [
         { reportType: REPORT_TYPES[1], reportIndex: 1 },
         { reportType: REPORT_TYPES[2], reportIndex: 2 },

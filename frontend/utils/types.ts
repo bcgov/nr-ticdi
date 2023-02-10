@@ -1,12 +1,3 @@
-export type postalCodeJSON = {
-  POSTAL_CODE: string;
-  CITY: string;
-  PROVINCE_ABBR: string;
-  TIME_ZONE: string;
-  LATITUDE: string;
-  LONGITUDE: string;
-};
-
 export type SessionData = {
   access_token: string;
   refresh_token: string;
@@ -15,11 +6,6 @@ export type SessionData = {
 };
 
 export type AccountObject = {
-  // accountStatus: string;
-  // accountType: string;
-  // id: number;
-  // label: string;
-  // type: string;
   name: string;
   idir_username: string;
   client_roles: string[];
@@ -33,26 +19,22 @@ export type TokenObject = {
   error?: any;
 };
 
-export type SearchResultsObject = {
-  siteId: string;
-  city: string;
-  modifiedDate: string;
-  registeredDate: string;
-};
-
-export type SearchResultsJson = {
+export type UserObject = {
+  name: string;
+  username: string;
   email: string;
-  searchInfo: {
-    searchType: string;
-    searchCriteria1: string;
-    searchCriteria2: string;
-    searchCriteria3: string;
-  };
-  searchData: [SearchResultsJsonObject];
+  role: string;
+  idirUsername: string;
 };
 
-export type SearchResultsJsonObject = {
-  siteId: string;
-  city: string;
-  updatedDate: string;
+export type SearchResultsItem = {
+  username: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  attributes: {
+    idir_user_guid: [string];
+    idir_username: [string];
+    display_name: [string];
+  };
 };

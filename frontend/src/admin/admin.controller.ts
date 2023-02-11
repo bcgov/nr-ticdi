@@ -14,7 +14,7 @@ import {
   Param,
   Res,
 } from "@nestjs/common";
-import { SessionData, UserObject } from "utils/types";
+import { ExportDataObject, SessionData, UserObject } from "utils/types";
 import { AxiosRequestConfig } from "axios";
 import { AdminService } from "./admin.service";
 import { AuthenticationFilter } from "src/authentication/authentication.filter";
@@ -131,10 +131,40 @@ export class AdminController {
     return { message: "Template uploaded successfully" };
   }
 
+  /**
+   * Used for an AJAX route to render all admins in a datatable
+   * @returns altered admin object array
+   */
+  @Get("get-admins")
+  getAdmins(): Promise<UserObject[]> {
+    return this.adminService.getAdminUsers();
+  }
+
+  @Get("get-export-data")
+  getExportData(): Promise<ExportDataObject[]> {
+    return this.adminService.getExportData();
+  }
+
+  @Post("add-admin")
+  async addAdmin(
+    @Body() searchInputs: { firstName: string; lastName: string; email: string }
+  ): Promise<{ userObject: UserObject; error: string }> {
+    try {
+      const user = await this.adminService.addAdmin(
+        searchInputs.firstName,
+        searchInputs.lastName,
+        searchInputs.email
+      );
+      return { userObject: user, error: null };
+    } catch (err) {
+      return { userObject: null, error: err.message };
+    }
+  }
+
   @Post("search-users")
   searchUsers(
     @Body() searchInputs: { firstName: string; lastName: string; email: string }
-  ): Promise<UserObject> {
+  ): Promise<UserObject[]> {
     try {
       return this.adminService.searchUsers(
         searchInputs.firstName,
@@ -147,8 +177,7 @@ export class AdminController {
   }
 
   @Get("remove-admin/:username")
-  removeAdmin(@Param("username") username) {
-    console.log("removing admin");
+  removeAdmin(@Param("username") username): Promise<{ message: string }> {
     return this.adminService.removeAdmin(username);
   }
 }

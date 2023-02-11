@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import * as dotenv from "dotenv";
 import { HttpService } from "@nestjs/axios";
-import { SearchResultsItem, UserObject } from "utils/types";
+import { ExportDataObject, SearchResultsItem, UserObject } from "utils/types";
 import { TICDIADMIN } from "utils/constants";
 const axios = require("axios");
 const FormData = require("form-data");
@@ -100,13 +100,31 @@ export class AdminService {
       });
   }
 
-  async searchUsers(
+  /**
+   * Searches for an IDIR user with the given search params and if only one is found
+   * then gives them the ticdi_admin role
+   *
+   * @param firstName
+   * @param lastName
+   * @param email
+   * @returns user object to be displayed in the frontend
+   */
+  async addAdmin(
     firstName: string,
     lastName: string,
     email: string
   ): Promise<UserObject> {
-    const url = `${process.env.users_api_base_url}/${process.env.css_environment}/idir/users?firstName=${firstName}&lastName=${lastName}&email=${email}`;
-    console.log(url);
+    let url = `${process.env.users_api_base_url}/${process.env.css_environment}/idir/users?`;
+    if (firstName.length >= 2) {
+      url += `firstName=${firstName}`;
+    }
+    if (lastName.length >= 2) {
+      url += `&lastName=${lastName}`;
+    }
+    if (email.length >= 2) {
+      url += `&email=${email}`;
+    }
+    const addAdminUrl = `${process.env.users_api_base_url}/integrations/${process.env.integration_id}/${process.env.css_environment}/user-role-mappings`;
     const bearerToken = await this.getToken();
     const searchData: SearchResultsItem[] = await axios
       .get(url, {
@@ -116,24 +134,77 @@ export class AdminService {
         return res.data.data;
       })
       .catch((err) => console.log(err.response.data));
-    console.log("~~~~");
     if (searchData.length > 1) {
-      console.log("more than one user found");
-      throw new Error("Multiple Users Found");
+      throw new Error("More than one user was found");
     } else if (searchData.length == 0) {
-      console.log("no users found");
-      throw new Error("No Users Found");
+      throw new Error("No users were found");
     }
-    console.log(searchData);
-    console.log("~~~~");
-    const userObject = this.formatSearchData(searchData);
-    return userObject[0];
+    const userObject: UserObject = this.formatSearchData(searchData)[0];
+    await axios
+      .post(
+        addAdminUrl,
+        {
+          roleName: "ticdi_admin",
+          username: userObject.idirUsername + "@idir",
+          operation: "add",
+        },
+        { headers: { Authorization: "Bearer " + bearerToken } }
+      )
+      .then((res) => {
+        return res.data;
+      })
+      .catch((err) => {
+        console.log(err);
+        throw new Error("Failed to add admin role");
+      });
+    return userObject;
   }
 
+  /**
+   * Searches for IDIR users by some combination of their
+   * first name, last name, and email
+   *
+   * @param firstName
+   * @param lastName
+   * @param email
+   * @returns a list of users found using the search parameters
+   */
+  async searchUsers(
+    firstName: string,
+    lastName: string,
+    email: string
+  ): Promise<UserObject[]> {
+    let url = `${process.env.users_api_base_url}/${process.env.css_environment}/idir/users?`;
+    if (firstName.length >= 2) {
+      url += `firstName=${firstName}`;
+    }
+    if (lastName.length >= 2) {
+      url += `&lastName=${lastName}`;
+    }
+    if (email.length >= 2) {
+      url += `&email=${email}`;
+    }
+    const bearerToken = await this.getToken();
+    const searchData: SearchResultsItem[] = await axios
+      .get(url, {
+        headers: { Authorization: "Bearer " + bearerToken },
+      })
+      .then((res) => {
+        return res.data.data;
+      })
+      .catch((err) => console.log(err.response.data));
+    const userObject = this.formatSearchData(searchData);
+    return userObject;
+  }
+
+  /**
+   * Gets a list of all ticdi_admin users
+   *
+   * @returns all ticdi_admin users
+   */
   async getAdminUsers(): Promise<UserObject[]> {
     const bearerToken = await this.getToken();
     const url = `${process.env.users_api_base_url}/integrations/${process.env.integration_id}/${process.env.css_environment}/roles/ticdi_admin/users`;
-    //await this.searchUsers("Michael", "Tennant", "mtennant@salussystems.com");
     const data: SearchResultsItem[] = await axios
       .get(url, {
         headers: { Authorization: "Bearer " + bearerToken },
@@ -146,10 +217,31 @@ export class AdminService {
     return this.formatSearchData(data);
   }
 
+  async getExportData(): Promise<ExportDataObject[]> {
+    const bearerToken = await this.getToken();
+    const url = `${process.env.users_api_base_url}/integrations/${process.env.integration_id}/${process.env.css_environment}/roles/ticdi_admin/users`;
+    const data: SearchResultsItem[] = await axios
+      .get(url, {
+        headers: { Authorization: "Bearer " + bearerToken },
+      })
+      .then((res) => {
+        return res.data.data;
+      })
+      .catch((err) => console.log(err.response.data));
+
+    return this.formatExportData(data);
+  }
+
+  /**
+   * Removes the ticdi_admin role from an IDIR user
+   *
+   * @param username
+   * @returns null
+   */
   async removeAdmin(username: string) {
     const ticdiAdminRole = "ticdi_admin";
     const bearerToken = await this.getToken();
-    const url = `${process.env.users_api_base_url}/integrations/${process.env.integration_id}/${process.env.css_environment}/users/${username}/roles/${ticdiAdminRole}`;
+    const url = `${process.env.users_api_base_url}/integrations/${process.env.integration_id}/${process.env.css_environment}/users/${username}@idir/roles/${ticdiAdminRole}`;
     const res = await axios
       .delete(url, {
         headers: { Authorization: "Bearer " + bearerToken },
@@ -157,14 +249,18 @@ export class AdminService {
       .then((res) => {
         return res;
       })
-      .catch((err) => console.log(err.response.data));
-    console.log(res);
-    return "removed";
+      .catch((err) => {
+        console.log(err.response.data);
+        return { message: "Failed to remove admin privileges" };
+      });
+    return { message: "success" };
   }
 
+  /**
+   * @param data
+   * @returns formatted user data for displaying on the frontend
+   */
   formatSearchData(data: SearchResultsItem[]): UserObject[] {
-    console.log("formatting");
-    console.log(data);
     let userObjectArray = [];
     for (let entry of data) {
       const firstName = entry.firstName ? entry.firstName : "";
@@ -173,17 +269,55 @@ export class AdminService {
         ? entry.attributes.idir_username[0]
         : "";
       const email = entry.email ? entry.email : "";
-      const idirUsername = entry.username ? entry.username : "";
+      const idirUsername = entry.username
+        ? entry.username.replace("@idir", "")
+        : "";
       const userObject: UserObject = {
         name: firstName + " " + lastName,
         username: username,
         email: email,
         role: TICDIADMIN,
+        remove: "Remove",
         idirUsername: idirUsername,
       };
       userObjectArray.push(userObject);
     }
 
     return userObjectArray;
+  }
+
+  /**
+   * @param data
+   * @returns formatted admin user data for exporting to csv
+   */
+  formatExportData(data: SearchResultsItem[]): ExportDataObject[] {
+    let exportDataObjectArray = [];
+    for (let entry of data) {
+      let firstName = entry.firstName ? entry.firstName : "";
+      let lastName = entry.lastName ? entry.lastName : "";
+      let username = entry.username ? entry.username : "";
+      let email = entry.email ? entry.email : "";
+      let idir_user_guid = entry.attributes.idir_user_guid[0]
+        ? entry.attributes.idir_user_guid[0]
+        : "";
+      let idir_username = entry.attributes.idir_username[0]
+        ? entry.attributes.idir_username[0]
+        : "";
+      let display_name = entry.attributes.display_name[0]
+        ? entry.attributes.display_name[0]
+        : "";
+      const exportDataObject: ExportDataObject = {
+        firstName: '"' + firstName + '"',
+        lastName: '"' + lastName + '"',
+        username: '"' + username + '"',
+        email: '"' + email + '"',
+        idir_user_guid: '"' + idir_user_guid + '"',
+        idir_username: '"' + idir_username + '"',
+        display_name: '"' + display_name + '"',
+      };
+      exportDataObjectArray.push(exportDataObject);
+    }
+
+    return exportDataObjectArray;
   }
 }

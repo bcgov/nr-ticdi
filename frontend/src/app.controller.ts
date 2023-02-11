@@ -169,18 +169,16 @@ export class AppController {
       process.env.ticdi_environment == "DEVELOPMENT"
         ? "DEVELOPMENT - " + PAGE_TITLES.ADMIN
         : PAGE_TITLES.ADMIN;
-    const data: UserObject[] = await this.adminService.getAdminUsers();
     return {
       title: title,
       idirUsername: session.data.activeAccount
         ? session.data.activeAccount.idir_username
         : "",
       displayAdmin: displayAdmin,
-      data: data,
       reportTypes: [
         { reportType: REPORT_TYPES[1], reportIndex: 1 },
         { reportType: REPORT_TYPES[2], reportIndex: 2 },
-      ], // TODO - should populate from database
+      ],
     };
   }
 

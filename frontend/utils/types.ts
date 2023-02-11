@@ -24,7 +24,18 @@ export type UserObject = {
   username: string;
   email: string;
   role: string;
+  remove: string;
   idirUsername: string;
+};
+
+export type ExportDataObject = {
+  firstName: string;
+  lastName: string;
+  username: string;
+  email: string;
+  idir_user_guid: string;
+  idir_username: string;
+  display_name: string;
 };
 
 export type SearchResultsItem = {

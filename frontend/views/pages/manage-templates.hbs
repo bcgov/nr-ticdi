@@ -246,8 +246,6 @@
                     }
                 })
                 .catch(() => location.reload());
-                $('input[type=radio]').parent().html().val('unchecked');
-                $(this).parent().html().val('checked');
             });
             // used for sorting the radio buttons
             $.fn.dataTable.ext.order['dom-checkbox'] = function  ( settings, col )

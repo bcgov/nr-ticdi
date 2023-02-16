@@ -12,6 +12,8 @@ import { UpdateDocumentTemplateDto } from "./dto/update-document_template.dto";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { Express } from "express";
 import { Param } from "@nestjs/common/decorators";
+import { DocumentTemplate } from "./entities/document_template.entity";
+import { TrimmedDocumentTemplate } from "../../utils/types";
 
 @Controller("document-template")
 export class DocumentTemplateController {
@@ -23,7 +25,7 @@ export class DocumentTemplateController {
     @UploadedFile()
     file: Express.Multer.File,
     @Body() params: CreateDocumentTemplateDto
-  ) {
+  ): Promise<any> {
     const params2 = {
       document_type: params.document_type,
       template_author: params.template_author,
@@ -43,12 +45,12 @@ export class DocumentTemplateController {
   @Post("activate-template")
   activateTemplate(
     @Body() data: { id: number; update_userid: string; document_type: string }
-  ) {
+  ): Promise<any> {
     return this.templateService.activateTemplate(data);
   }
 
   @Post("update")
-  update(@Body() data: UpdateDocumentTemplateDto) {
+  update(@Body() data: UpdateDocumentTemplateDto): Promise<DocumentTemplate> {
     return this.templateService.update(data);
   }
 
@@ -56,22 +58,29 @@ export class DocumentTemplateController {
   remove(
     @Param("document_type") document_type: string,
     @Param("id") id: number
-  ): Promise<any> {
+  ): Promise<{ id: number }> {
     return this.templateService.remove(document_type, id);
   }
 
   @Get(":document_type")
-  findAll(@Param("document_type") document_type: string) {
-    return this.templateService.findAll(document_type);
+  async findAll(
+    @Param("document_type") document_type: string
+  ): Promise<TrimmedDocumentTemplate[]> {
+    let documents: DocumentTemplate[] = await this.templateService.findAll(
+      document_type
+    );
+    return documents.map(({ the_file, ...rest }) => rest);
   }
 
   @Get("get-active-report/:document_type")
-  findActiveByDocumentType(@Param("document_type") document_type: string) {
+  findActiveByDocumentType(
+    @Param("document_type") document_type: string
+  ): Promise<DocumentTemplate> {
     return this.templateService.findActiveByDocumentType(document_type);
   }
 
   @Get("find-one/:id")
-  findOne(@Param("id") id: number) {
+  findOne(@Param("id") id: number): Promise<DocumentTemplate> {
     return this.templateService.findOne(id);
   }
 }

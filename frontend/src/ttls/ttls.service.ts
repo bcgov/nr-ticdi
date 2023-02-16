@@ -356,7 +356,14 @@ export class TTLSService {
     return { reportName: "LUR_" + tenureFileNumber + "_" + version };
   }
 
-  // generate the Land use Report via CDOGS
+  /**
+   * Generates the Land use Report using CDOGS
+   *
+   * @param prdid
+   * @param document_type
+   * @param username
+   * @returns
+   */
   async generateLURReport(
     prdid: number,
     document_type: string,
@@ -377,16 +384,15 @@ export class TTLSService {
       .then((res) => {
         return res.data;
       });
+    if (data.InspectionDate) {
+      data["InspectionDate"] = this.formatInspectedDate(data.InspectionDate);
+    }
     // get the document template
     const documentTemplateObject: { id: number; the_file: string } = await axios
       .get(templateUrl)
       .then((res) => {
         return res.data;
       });
-    console.log(documentTemplateObject.id);
-    if (data.InspectionDate) {
-      data["InspectionDate"] = this.formatInspectedDate(data.InspectionDate);
-    }
 
     // log the request
     const document_template_id = documentTemplateObject.id;
@@ -408,7 +414,83 @@ export class TTLSService {
         cacheReport: false,
         convertTo: "docx",
         overwrite: true,
-        reportName: "test-report",
+        reportName: "lur-report",
+      },
+      template: {
+        content: `${bufferBase64}`,
+        encodingType: "base64",
+        fileType: "docx",
+      },
+    });
+
+    const conf = {
+      method: "post",
+      url: process.env.cdogs_url,
+      headers: {
+        Authorization: `Bearer ${cdogsToken}`,
+        "Content-Type": "application/json",
+      },
+      responseType: "arraybuffer",
+      data: md,
+    };
+    const ax = require("axios");
+    const response = await ax(conf).catch((error) => {
+      console.log(error.response);
+    });
+    return response.data;
+  }
+
+  async generateNFRReport(
+    prdid: number,
+    templateId: number,
+    variables: any,
+    username: string
+  ) {
+    const url = `${hostname}:${port}/nfr-entity/view/${prdid}`;
+    const templateUrl = `${hostname}:${port}/document-template/find-one/${templateId}`;
+    const logUrl = `${hostname}:${port}/print-request-log/`;
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO get the view for specified prdid from the new NFR entity
+    const data = await axios
+      .get(url, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      })
+      .then((res) => {
+        return res.data;
+      });
+    if (data.InspectionDate) {
+      data["InspectionDate"] = this.formatInspectedDate(data.InspectionDate);
+    }
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // get the document template
+    const documentTemplateObject: { id: number; the_file: string } = await axios
+      .get(templateUrl)
+      .then((res) => {
+        return res.data;
+      });
+
+    // log the request
+    await axios.post(logUrl, {
+      document_template_id: templateId,
+      print_request_detail_id: prdid,
+      dtid: data.DTID,
+      request_app_user: username,
+      request_json: JSON.stringify(data),
+    });
+
+    const cdogsToken = await this.callGetToken();
+    let bufferBase64 = documentTemplateObject.the_file;
+    const md = JSON.stringify({
+      data,
+      formatters:
+        '{"myFormatter":"_function_myFormatter|function(data) { return data.slice(1); }","myOtherFormatter":"_function_myOtherFormatter|function(data) {return data.slice(2);}"}',
+      options: {
+        cacheReport: false,
+        convertTo: "docx",
+        overwrite: true,
+        reportName: "nfr-report",
       },
       template: {
         content: `${bufferBase64}`,

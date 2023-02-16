@@ -147,14 +147,10 @@ export class AdminController {
 
   @Post("add-admin")
   async addAdmin(
-    @Body() searchInputs: { firstName: string; lastName: string; email: string }
+    @Body() searchInputs: { idirUsername: string }
   ): Promise<{ userObject: UserObject; error: string }> {
     try {
-      const user = await this.adminService.addAdmin(
-        searchInputs.firstName,
-        searchInputs.lastName,
-        searchInputs.email
-      );
+      const user = await this.adminService.addAdmin(searchInputs.idirUsername);
       return { userObject: user, error: null };
     } catch (err) {
       return { userObject: null, error: err.message };
@@ -162,22 +158,34 @@ export class AdminController {
   }
 
   @Post("search-users")
-  searchUsers(
-    @Body() searchInputs: { firstName: string; lastName: string; email: string }
-  ): Promise<UserObject[]> {
+  async searchUsers(
+    @Body() searchInputs: { email: string }
+  ): Promise<{
+    userObject: {
+      firstName: string;
+      lastName: string;
+      username: string;
+      idirUsername: string;
+    };
+    error: string;
+  }> {
     try {
-      return this.adminService.searchUsers(
-        searchInputs.firstName,
-        searchInputs.lastName,
-        searchInputs.email
-      );
+      const user = await this.adminService.searchUsers(searchInputs.email);
+      return { userObject: user, error: null };
     } catch (err) {
-      return err.message;
+      return { userObject: null, error: err.message };
     }
   }
 
   @Get("remove-admin/:username")
-  removeAdmin(@Param("username") username): Promise<{ message: string }> {
+  removeAdmin(
+    @Param("username") username: string
+  ): Promise<{ message: string }> {
     return this.adminService.removeAdmin(username);
+  }
+
+  @Get("templates/:reportId")
+  getTemplates(@Param("reportId") reportId: number): Promise<any> {
+    return this.adminService.getTemplates(reportId);
   }
 }

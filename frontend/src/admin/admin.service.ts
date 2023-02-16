@@ -2,7 +2,7 @@ import { Injectable } from "@nestjs/common";
 import * as dotenv from "dotenv";
 import { HttpService } from "@nestjs/axios";
 import { ExportDataObject, SearchResultsItem, UserObject } from "utils/types";
-import { TICDIADMIN } from "utils/constants";
+import { REPORT_TYPES } from "utils/constants";
 const axios = require("axios");
 const FormData = require("form-data");
 
@@ -101,6 +101,75 @@ export class AdminService {
   }
 
   /**
+   * Used by the Add Administrator search button
+   * Searches for an IDIR user by their email and checks
+   * that they aren't already a TICDI admin
+   *
+   * @param email
+   * @returns a list of users found using the search parameters
+   */
+  async searchUsers(email: string): Promise<{
+    firstName: string;
+    lastName: string;
+    username: string;
+    idirUsername: string;
+  }> {
+    const url = `${process.env.users_api_base_url}/${process.env.css_environment}/idir/users?&email=${email}`;
+    const bearerToken = await this.getToken();
+    const searchData: SearchResultsItem[] = await axios
+      .get(url, {
+        headers: { Authorization: "Bearer " + bearerToken },
+      })
+      .then((res) => {
+        return res.data.data;
+      })
+      .catch((err) => {
+        console.log(err.response.data);
+        throw new Error("No users found");
+      });
+    const firstName = searchData[0].firstName ? searchData[0].firstName : "";
+    const lastName = searchData[0].lastName ? searchData[0].lastName : "";
+    const username = searchData[0].attributes
+      ? searchData[0].attributes.idir_username[0]
+        ? searchData[0].attributes.idir_username[0]
+        : ""
+      : "";
+    const idirUsername = searchData[0].attributes
+      ? searchData[0].attributes.idir_user_guid[0]
+        ? searchData[0].attributes.idir_user_guid[0]
+        : ""
+      : "";
+    const userObject = {
+      firstName: firstName,
+      lastName: lastName,
+      username: username,
+      idirUsername: idirUsername,
+    };
+    const roleUrl = `${process.env.users_api_base_url}/integrations/${process.env.integration_id}/${process.env.css_environment}/users/${idirUsername}@idir/roles`;
+    const roles = await axios
+      .get(roleUrl, {
+        headers: { Authorization: "Bearer " + bearerToken },
+      })
+      .then((res) => {
+        return res.data;
+      })
+      .catch((err) => {
+        console.log(err.response.data);
+        throw new Error("There was an issue checking that user's roles");
+      });
+    let isAdmin: boolean = false;
+    for (let entry of roles.data) {
+      if (entry && entry.name == "ticdi_admin") {
+        isAdmin = true;
+      }
+    }
+    if (isAdmin) {
+      throw new Error("That user is already a TICDI admin");
+    }
+    return userObject;
+  }
+
+  /**
    * Searches for an IDIR user with the given search params and if only one is found
    * then gives them the ticdi_admin role
    *
@@ -109,21 +178,8 @@ export class AdminService {
    * @param email
    * @returns user object to be displayed in the frontend
    */
-  async addAdmin(
-    firstName: string,
-    lastName: string,
-    email: string
-  ): Promise<UserObject> {
-    let url = `${process.env.users_api_base_url}/${process.env.css_environment}/idir/users?`;
-    if (firstName.length >= 2) {
-      url += `firstName=${firstName}`;
-    }
-    if (lastName.length >= 2) {
-      url += `&lastName=${lastName}`;
-    }
-    if (email.length >= 2) {
-      url += `&email=${email}`;
-    }
+  async addAdmin(idirUsername: string): Promise<UserObject> {
+    const url = `${process.env.users_api_base_url}/${process.env.css_environment}/idir/users?&guid=${idirUsername}`;
     const addAdminUrl = `${process.env.users_api_base_url}/integrations/${process.env.integration_id}/${process.env.css_environment}/user-role-mappings`;
     const bearerToken = await this.getToken();
     const searchData: SearchResultsItem[] = await axios
@@ -157,43 +213,6 @@ export class AdminService {
         console.log(err);
         throw new Error("Failed to add admin role");
       });
-    return userObject;
-  }
-
-  /**
-   * Searches for IDIR users by some combination of their
-   * first name, last name, and email
-   *
-   * @param firstName
-   * @param lastName
-   * @param email
-   * @returns a list of users found using the search parameters
-   */
-  async searchUsers(
-    firstName: string,
-    lastName: string,
-    email: string
-  ): Promise<UserObject[]> {
-    let url = `${process.env.users_api_base_url}/${process.env.css_environment}/idir/users?`;
-    if (firstName.length >= 2) {
-      url += `firstName=${firstName}`;
-    }
-    if (lastName.length >= 2) {
-      url += `&lastName=${lastName}`;
-    }
-    if (email.length >= 2) {
-      url += `&email=${email}`;
-    }
-    const bearerToken = await this.getToken();
-    const searchData: SearchResultsItem[] = await axios
-      .get(url, {
-        headers: { Authorization: "Bearer " + bearerToken },
-      })
-      .then((res) => {
-        return res.data.data;
-      })
-      .catch((err) => console.log(err.response.data));
-    const userObject = this.formatSearchData(searchData);
     return userObject;
   }
 
@@ -256,6 +275,40 @@ export class AdminService {
     return { message: "success" };
   }
 
+  async getTemplates(reportId: number) {
+    const documentType =
+      reportId == 1 || reportId == 2 ? REPORT_TYPES[reportId] : "none";
+    const url = `${hostname}:${port}/document-template/${encodeURI(
+      documentType
+    )}`;
+    const data = await axios
+      .get(url)
+      .then((res) => {
+        return res.data;
+      })
+      .catch((err) => console.log(err.response.data));
+    let documents: {
+      version: number;
+      file_name: string;
+      updated_date: string;
+      status: string;
+      active: boolean;
+      template_id: number;
+    }[] = [];
+    for (let entry of data) {
+      const document = {
+        version: entry.template_version,
+        file_name: entry.file_name,
+        updated_date: entry.update_timestamp.split("T")[0],
+        status: "???",
+        active: entry.active_flag,
+        template_id: entry.id,
+      };
+      documents.push(document);
+    }
+    return documents;
+  }
+
   /**
    * @param data
    * @returns formatted user data for displaying on the frontend
@@ -276,7 +329,6 @@ export class AdminService {
         name: firstName + " " + lastName,
         username: username,
         email: email,
-        role: TICDIADMIN,
         remove: "Remove",
         idirUsername: idirUsername,
       };

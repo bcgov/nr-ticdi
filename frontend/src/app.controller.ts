@@ -75,7 +75,7 @@ export class AppController {
     };
   }
 
-  @Get("dtid/:id/:docname")
+  @Get("lur/:id/:docname")
   @UseFilters(AuthenticationFilter)
   @UseGuards(AuthenticationGuard)
   @Render("index")
@@ -140,6 +140,92 @@ export class AppController {
         displayAdmin: displayAdmin,
         message: ttlsJSON ? ttlsJSON : null,
         documentTypes: ["Land Use Report", "Notice of Final Review"],
+        prdid: ttlsJSON ? ttlsJSON.id : null,
+        error: err,
+      };
+    }
+  }
+
+  @Get("nfr/:id/:docname")
+  @UseFilters(AuthenticationFilter)
+  @UseGuards(AuthenticationGuard)
+  @Render("nfr")
+  async findNofr(
+    @Session() session: { data?: SessionData },
+    @Param("id") id,
+    @Param("docname") docname: string
+  ) {
+    let isAdmin = false;
+    if (
+      session.data &&
+      session.data.activeAccount &&
+      session.data.activeAccount.client_roles
+    ) {
+      for (let role of session.data.activeAccount.client_roles) {
+        if (role == "ticdi_admin") {
+          isAdmin = true;
+        }
+      }
+    }
+    const title =
+      process.env.ticdi_environment == "DEVELOPMENT"
+        ? "DEVELOPMENT - " + PAGE_TITLES.NOFR
+        : PAGE_TITLES.NOFR;
+    const displayAdmin = isAdmin ? "Administration" : "-";
+    await this.ttlsService.setWebadeToken();
+    let ttlsJSON, primaryContactName;
+    try {
+      const response: any = await firstValueFrom(this.ttlsService.callHttp(id))
+        .then((res) => {
+          return res;
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+      ttlsJSON = await this.ttlsService.sendToBackend(response);
+      if (ttlsJSON.inspected_date) {
+        ttlsJSON["inspected_date"] = this.ttlsService.formatInspectedDate(
+          ttlsJSON.inspected_date.toString()
+        );
+      }
+      primaryContactName = ttlsJSON.licence_holder_name;
+      ttlsJSON["groups"] = [1, 2];
+      ttlsJSON["interested_parties"] = [
+        {
+          first_name: "asdf",
+          middle_name: "fdsa",
+          last_name: "1234",
+          address: "123 fake street",
+        },
+        {
+          first_name: "uiop",
+          middle_name: "poiu",
+          last_name: "4321",
+          address: "555 fghj road",
+        },
+      ];
+      return {
+        title: title,
+        idirUsername: session.data.activeAccount
+          ? session.data.activeAccount.idir_username
+          : "",
+        primaryContactName: primaryContactName,
+        displayAdmin: displayAdmin,
+        message: ttlsJSON,
+        documentTypes: ["Notice of Final Review 1", "Notice of Final Review 2"],
+        prdid: ttlsJSON.id,
+      };
+    } catch (err) {
+      console.log(err);
+      return {
+        title: title,
+        idirUsername: session.data.activeAccount
+          ? session.data.activeAccount.idir_username
+          : "",
+        primaryContactName: primaryContactName ? primaryContactName : null,
+        displayAdmin: displayAdmin,
+        message: ttlsJSON ? ttlsJSON : null,
+        documentTypes: ["Notice of Final Review 1", "Notice of Final Review 2"],
         prdid: ttlsJSON ? ttlsJSON.id : null,
         error: err,
       };
@@ -235,6 +321,38 @@ export class AppController {
       primaryContactName: "",
       displayAdmin: displayAdmin,
       data: data,
+    };
+  }
+
+  @Get("search")
+  @Render("search")
+  @UseFilters(AuthenticationFilter)
+  @UseGuards(AuthenticationGuard)
+  @UseGuards(AdminGuard)
+  async searchPage(@Session() session: { data?: SessionData }) {
+    let isAdmin = false;
+    if (
+      session.data &&
+      session.data.activeAccount &&
+      session.data.activeAccount.client_roles
+    ) {
+      for (let role of session.data.activeAccount.client_roles) {
+        if (role == "ticdi_admin") {
+          isAdmin = true;
+        }
+      }
+    }
+    const displayAdmin = isAdmin ? "Administration" : "-";
+    const title =
+      process.env.ticdi_environment == "DEVELOPMENT"
+        ? "DEVELOPMENT - " + PAGE_TITLES.SEARCH
+        : PAGE_TITLES.SEARCH;
+    return {
+      title: title,
+      idirUsername: session.data.activeAccount
+        ? session.data.activeAccount.idir_username
+        : "",
+      displayAdmin: displayAdmin,
     };
   }
 

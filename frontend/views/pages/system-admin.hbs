@@ -4,18 +4,18 @@
         <div class="container">
             <h1>System Administration</h1>
             <hr />            
-            <div class="col-md-3">
-                <h3>Manage Users</h3>
+            <div class="col-md-6">
+                <h3>List of TICDI Administrators</h3>
             </div>
-            <div class="form-group row">
+            {{!-- <div class="form-group row">
                 <div class="col-md-5">
                     <input type="text" class="border border-1 rounded pl-2 ml-4" id="searchInput" placeholder="Enter Last Name or User Name" style="min-width: 350px">
                 </div>
                 <div class="col-md-3">
                     <button id="searchButton" class="btn btn-primary" onclick="searchUsers()">Search</button>
                 </div>
-            </div>
-            <hr />
+            </div> --}}
+            {{!-- <hr /> --}}
             <div class="form-group row">
                 <div class="col-md-12">
                     <table id="usersTable">
@@ -23,9 +23,8 @@
                             <th style="min-width:250px">Name</th>
                             <th style="min-width:250px">User Name</th>
                             <th style="min-width:250px">Email</th>
-                            <th style="min-width:120px">Role</th>
                             <th style="min-width:80px"></th> <!-- remove button -->
-                            <th style="display:none"></th> <!-- remove button -->
+                            <th style="display:none"></th> <!-- id -->
                         </thead>
                         <tbody id="usersTableBody"><tr></tr></tbody>
                     </table>
@@ -44,7 +43,7 @@
             <div class="col-md-3">
                 <h3>Manage Templates</h3>
             </div>
-            <hr />
+            {{!-- <hr /> --}}
             <div class="col-md-3">
                 <h4>Select a Template:</h4>
             </div>
@@ -69,38 +68,89 @@
                     </div>
                     <div class="modal-body">
                         <div id="addAdministratorBody">
-                            <div class="form-group row">
-                                <div class="col-md-3 ml-3">
-                                    <label for="searchFirstName" style="font-weight:bold">First Name: </label>
-                                </div>
-                                <div class="col-md-6">
-                                    <input id="searchFirstName" value="" style="width: 100%">
-                                </div>
-                            </div>
-                            <div class="form-group row">
-                                <div class="col-md-3 ml-3">
-                                    <label for="searchLastName" style="font-weight:bold">Last Name:</label>
-                                </div>
-                                <div class="col-md-6">
-                                    <input id="searchLastName" value="" style="width: 100%">
-                                </div>
-                            </div>
-                            <div class="form-group row">
-                                <div class="col-md-3 ml-3">
+                            <div class="form-group row mb-0">
+                                <div class="col-md-6 ml-3">
                                     <label for="searchEmail" style="font-weight:bold">Email:</label>
                                 </div>
-                                <div class="col-md-6">
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-md-10 ml-3">
                                     <input id="searchEmail" value="" style="width: 100%">
+                                </div>
+                                <div class="col-md-1 ml-3">
+                                    <button id="searchUsersButton" class="btn btn-success" onclick="searchUsers()">Search</button>
+                                </div>
+                            </div>
+                            <div class="form-group row mb-0">
+                                <div class="col-md-6 ml-3">
+                                    <label for="searchSurname" style="font-weight:bold">Surname:</label>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-md-10 ml-3">
+                                    <input id="searchSurname" value="" style="width: 100%" readonly disabled>
+                                </div>
+                            </div>
+                            <div class="form-group row mb-0">
+                                <div class="col-md-6 ml-3">
+                                    <label for="searchGivenName" style="font-weight:bold">Given Name 1:</label>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-md-10 ml-3">
+                                    <input id="searchGivenName" value="" style="width: 100%" readonly disabled>
+                                </div>
+                            </div>
+                            <div class="form-group row mb-0">
+                                <div class="col-md-3 ml-3">
+                                    <label for="searchUsername" style="font-weight:bold">Username: </label>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-md-10 ml-3">
+                                    <input id="searchUsername" value="" style="width: 100%" readonly disabled>
+                                </div>
+                            </div>
+                            <div class="form-group row mb-0">
+                                <div class="col-md-6 ml-3">
+                                    <label for="searchRole" style="font-weight:bold">Role:</label>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-md-10 ml-3">
+                                    <select id="searchRole" style="width: 100%" readonly disabled>
+                                        <option>TICDIADMIN</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group row mb-0">
+                                <div class="col-md-6 ml-3">
+                                    <label style="font-weight:bold">Status:</label>
+                                </div>
+                            </div>
+                            <div class="form-group row mb-0">
+                                <div class="col-md-1"></div>
+                                <div class="col-md-6">
+                                    <label for="searchStatusActive">Active:</label>
+                                    <input id="searchStatusActive" type="radio" name="adminStatus" checked disabled>
+                                </div>
+                            </div>
+                            <div class="form-group row mb-0">
+                                <div class="col-md-1"></div>
+                                <div class="col-md-6">
+                                    <label for="searchStatusInactive">Inactive:</label>
+                                    <input id="searchStatusInactive" type="radio" name="adminStatus" disabled>
                                 </div>
                             </div>
                             <div class="text-center">
                                 <div class="alert alert-danger modal-alert" style="display:none;"></div>
                             </div>
                         </div>
+                        <input id="searchIdirUsername" style="display:none" value="">
                     </div>
-                    <div class="modal-footer">
-                        <button id="addAdminButton" type="button" class="btn btn-primary" onclick="addAdmin()">Add Administrator</button>
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <div class="modal-footer d-flex justify-content-between">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                        <button id="addAdminButton" type="button" class="btn btn-primary" onclick="addAdmin()" disabled>Add Administrator</button>
                     </div>
                 </div>
             </div>
@@ -123,19 +173,19 @@
                                     <label for="removeName">Name:</label>
                                 </div>
                                 <div class="col-md-9">
-                                    <input id="removeName" value="" style="color:gray; min-width: 250px" readonly>
+                                    <input id="removeName" value="" style="color:gray; min-width: 270px" readonly>
                                 </div>
                                 <div class="col-md-2 ml-3">
                                     <label for="removeUsername">Username:</label>
                                 </div>
                                 <div class="col-md-9">
-                                    <input id="removeUsername" value="" style="color:gray; min-width: 250px" readonly>
+                                    <input id="removeUsername" value="" style="color:gray; min-width: 270px" readonly>
                                 </div>
                                 <div class="col-md-2 ml-3">
                                     <label for="removeEmail">Email:</label>
                                 </div>
                                 <div class="col-md-9">
-                                    <input id="removeEmail" value="" style="color:gray; min-width: 250px" readonly>
+                                    <input id="removeEmail" value="" style="color:gray; min-width: 270px" readonly>
                                 </div>
                             </div>
                             <input id="removeIdirUsername" value="" style="display: none">
@@ -163,16 +213,15 @@
                     { data: "name"},
                     { data: "username"},
                     { data: "email"},
-                    { data: "role"},
                     { data: "remove"},
                     { data: "idirUsername"}
                 ],
                 "columnDefs": [
                     {
-                        "targets": [0, 1, 2, 3, 4, 5],
+                        "targets": [0, 1, 2, 3, 4],
                         "render": function (data, type, row, meta) {
                         if (type === 'display') {
-                            var columnTypes = ["name", "username", "email", "role", "remove", "idirUsername"];
+                            var columnTypes = ["name", "username", "email", "remove", "idirUsername"];
                             var columnType = columnTypes[meta.col];
                             var username = row["username"];
                             var idirUsername = row["idirUsername"];
@@ -190,13 +239,13 @@
                         }
                     },
                     {
-                        "targets": [3, 4, 5],
+                        "targets": [3, 4],
                         "orderable": false,
                         "searchable": false,
                     },
                     {
-                        "targets": 5,
-                        "visiable": "false"
+                        "targets": 4,
+                        "visable": "false"
                     }
                 ],
                 "createdRow": function (row, data, dataIndex) {
@@ -207,7 +256,15 @@
                 ]
             });
         });
-        $("#searchButton").prop("disabled", true);
+        $('#addAdministratorModal').on('hidden.bs.modal', function () {
+            $('#searchEmail').val('');
+            $('#searchSurname').val('');
+            $('#searchGivenName').val('');
+            $('#searchUsername').val('');
+            $('#searchIdirUsername').val('');
+            const addAdminButton = document.getElementById('addAdminButton');
+            addAdminButton.disabled = true;
+        });
         $(document).on("click", ".remove-admin-link", function () {
             const username = $(this).data('id');
             const name = $(`#name-${username}`).val();
@@ -227,14 +284,50 @@
         function manageReports() {
             window.location.href = '/manage-templates?report='+$('#reportTypes option:selected').val();
         }
+        async function searchUsers() {
+            const button = document.getElementById('searchUsersButton');
+            const button2 = document.getElementById('addAdminButton');
+            button.disabled = true;
+            button2.disabled = true;
+            button.innerHTML = '<div class="lds-ring"><div></div><div></div><div></div><div></div></div>';
+            const searchParams = {
+                email: $('#searchEmail').val(),
+            }
+            const result = await fetch(`/admin/search-users`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json',},
+                body: JSON.stringify(searchParams)
+                })
+                .then((res) => res.json())
+                .then((resJson) => {
+                    button.innerHTML = 'Search';
+                    button.disabled = false;
+                    button2.disabled = $('#searchIdirUsername').val().length > 0 ? false : true;
+                    return resJson;
+                })
+                .catch((err) => {
+                    button.innerHTML = 'Search';
+                    button.disabled = false;
+                    button2.disabled = $('#searchIdirUsername').val().length > 0 ? false : true;
+                    console.log(err);
+                });
+            if (!result.error) {
+                const adminObject = result.userObject;
+                $('#searchSurname').val(adminObject.lastName);
+                $('#searchGivenName').val(adminObject.firstName);
+                $('#searchUsername').val(adminObject.username);
+                $('#searchIdirUsername').val(adminObject.idirUsername);
+                button2.disabled = false;
+            } else {
+                displayModalAlert(result.error);
+            }
+        }
         async function addAdmin() {
             const button = document.getElementById('addAdminButton');
             button.disabled = true;
             button.innerHTML = '<div class="lds-ring"><div></div><div></div><div></div><div></div></div>';
             const searchParams = {
-                firstName: $('#searchFirstName').val(),
-                lastName: $('#searchLastName').val(),
-                email: $('#searchEmail').val(),
+                idirUsername: $('#searchIdirUsername').val(),
             }
             const result = await fetch(`/admin/add-admin`, {
                 method: 'POST',
@@ -258,7 +351,6 @@
                     name: adminObject.name, 
                     username: adminObject.username, 
                     email: adminObject.email,
-                    role: adminObject.role, 
                     remove: adminObject.remove, 
                     idirUsername: adminObject.idirUsername})
                     .draw();

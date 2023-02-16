@@ -91,7 +91,7 @@ export class DocumentTemplateService {
     );
   }
 
-  async remove(document_type: string, id: number): Promise<any> {
+  async remove(document_type: string, id: number): Promise<{ id: number }> {
     // if the removed template was active, activate the highest version template
     const templateToRemove = await this.findOne(id);
     await this.documentTemplateRepository.update(

@@ -23,7 +23,6 @@ export type UserObject = {
   name: string;
   username: string;
   email: string;
-  role: string;
   remove: string;
   idirUsername: string;
 };

@@ -1,0 +1,243 @@
+{{#> template}}
+  {{#*inline "content"}}
+    <main role="main">
+      <form>
+            <div class="container">
+                <h1>Preview - Notice of Final Review</h1>
+                <hr />
+                <div class="form-group row">
+                    <div class="col-md-2">
+                        <p class="sectionTitle">Select an NFR Variant</p>
+                    </div>
+                    <div class="col-md-3">
+                        <select class="form-control" id="document_type_id">
+                            {{#each documentTypes}}
+                            <option value="{{this}}">{{this}}</option>
+                            {{/each}}
+                        </select>
+                    </div>
+                </div>
+                <hr>
+
+                <div class="titleSpacing dataSection"><b>DTID:</b> {{message.dtid}}</div>
+                <div class="titleSpacing dataSection"><b>Tenure File Number:</b> {{message.tenure_file_number}}</div>
+                <div class="titleSpacing dataSection"><b>Primary Contact Name:</b> {{primaryContactName}}</div>
+                
+                <fieldset class="form-group collapsible">
+                    <legend style="cursor: pointer" class='togvis sectionTitle'><i class="fa fa-plus"></i>  Disposition Transaction ID Details</legend>
+                    <div class="contents" style="display: none;">
+                        <div class="form-row">
+                            <div class="form-group col-md-5 dataSection dataSection">
+                                <dt>Organization Unit</dt>
+                                <dd id="orgUnit">{{ message.organization_unit }}</dd>
+                            </div>
+                            <div class="form-group col-md-5 dataSection dataSection">
+                                <dt>Primary Contact Email Address</dt>
+                                <dd>{{ message.email_address }}</dd>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group col-md-5 dataSection dataSection">
+                                <dt>Incorporation Number</dt>
+                                <dd id="orgUnit">{{ message.incorporation_number }}</dd>
+                            </div>
+                            <div class="form-group col-md-5 dataSection dataSection">
+                                <dt>Primary Contact Phone Number</dt>
+                                <dd id="phoneNumber">{{ message.phone_number }}</dd>
+                            </div>
+                        </div>
+                    </div>
+                </fieldset>
+                <fieldset class="form-group collapsible">
+                    <legend style="cursor: pointer" class='togvis sectionTitle'><i class="fa fa-plus"></i>  Tenure Details</legend>
+                    <div class="contents" style="display: none;">
+                        <div class="form-row">
+                            <div class="form-group col-md-5 dataSection">
+                                <dt>Type</dt>
+                                <dd id="type">{{ message.type_name }}</dd>
+                            </div>
+                            <div class="form-group col-md-5 dataSection">
+                                <dt>Subtype</dt>
+                                <dd id="subType">{{message.sub_type_name}}</dd>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group col-md-5 dataSection">
+                                <dt>Purpose</dt>
+                                <dd id="purpose">{{ message.purpose_name }}</dd>
+                            </div>
+                            <div class="form-group col-md-5 dataSection">
+                                <dt>Subpurpose</dt>
+                                <dd id="subPurpose">{{message.sub_purpose_name}}</dd>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group col-md-5 dataSection">
+                                <dt>Mailing Address</dt>
+                                <dd id="address">{{message.mailing_address_line_1}}</dd>
+                                <dd id="address">{{message.mailing_address_line_2}}</dd>
+                                <dd id="address">{{message.mailing_address_line_3}}</dd>
+                                <dd id="cityProv">{{message.mailing_city}}</dd>
+                                <dd id="postalCode">{{message.mailing_province_state_code}}, {{message.mailing_postal_code}}</dd>
+                                <dd id="county">{{message.mailing_country}}</dd>
+                            </div>
+                            <div class="form-group col-md-5 dataSection">
+                                <dt>Location of Land</dt>
+                                <dd id="locLand">{{message.location_description}}</dd>
+                            </div>
+                        </div>
+                    </div>
+                </fieldset>
+                <fieldset class="form-group collapsible">
+                    <legend style="cursor: pointer" class='togvis sectionTitle'><i class="fa fa-plus"></i>  Interested Parties</legend>
+                    <div class="contents" style="display: none;">
+                        {{#each message.interested_parties}}
+                        <div class="form-row">
+                            <div class="form-group col-md-2 dataSection">
+                                <dt>First Name</dt>
+                                <dd id="firstName">{{ this.first_name }}</dd>
+                            </div>
+                            <div class="form-group col-md-2">
+                                <dt>Middle Name</dt>
+                                <dd id="middleName">{{this.middle_name}}</dd>
+                            </div>
+                            <div class="form-group col-md-2">
+                                <dt>Last Name</dt>
+                                <dd id="lastName">{{this.last_name}}</dd>
+                            </div>
+                            <div class="form-group col-md-3">
+                                <dt>Address</dt>
+                                <dd id="address">{{this.address}}</dd>
+                            </div>
+                        </div>
+                        {{/each}}
+                    </div>
+                </fieldset>
+                <fieldset class="form-group collapsible">
+                    <legend style="cursor: pointer" class='togvis sectionTitle'><i class="fa fa-plus"></i>  Provisions      Select A Group:
+                    <select id="group_id">{{#each message.groups}}<option value="{{this}}">{{this}}{{/each}}</option></select>     <span id="maxNum">Max for this Group is 3</span></legend>
+                    <div class="contents" style="display: none;">
+                        <table id="provisionTable"></table>
+                    </div>
+                </fieldset>
+                <fieldset class="form-group collapsible">
+                    <legend style="cursor: pointer" class='togvis sectionTitle'><i class="fa fa-plus"></i>  Variables</legend>
+                    <div class="contents" style="display: none;">
+                        <table id="variableTable"></table>
+                    </div>
+                    <div class="form-group row">
+                        
+                    </div>
+                </fieldset>
+                <div class="form-group row">
+                    <div class="col-md-4">
+                        <button id="nextGroup" class="btn btn-success">Save for Later</button>
+                    </div>
+                    <div class="col-md-4">
+                        <button type="button" class="btn btn-primary" onclick="generateReport()" id="genReport">Create</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+        <input type="hidden" id="prdid"></input>
+        <input type="hidden" id="tfn"></input>
+    </main>
+    <script>       
+        $( document ).ready(function() {
+            console.log({{message.err}});
+            $("#prdid").text("{{this.prdid}}");
+            $("#tfn").text("{{message.tenure_file_number}}");
+
+            $(".dataSection dd").each(function(){
+                if ($(this).text() == "" || $(this).text() == "TBD") {
+                    $(this).text(" ");
+                    $(this).css("border", "solid 1px orange");
+                }
+            })
+
+            $(".legalDesc").each(function(){
+                if ($(this).text().length > 2000) {
+                    $(this).text($(this).text().substr(0,2000)+"...");
+                }
+            })
+            if ($("#adminLink").text() == "-") {
+                $("#adminLink").hide();
+            }
+            $('#provisionTable').DataTable({
+                "paging": false,
+                "bFilter": false,
+                "columns": [
+                    { data: "type"},
+                    { data: "provision"},
+                    { data: "freeText"},
+                    { data: "category"},
+                    { data: "select"},
+                ],
+                "columnDefs": [
+                {
+                    "targets": [0, 1, 2, 3, 4],
+                    "render": function (data, type, row, meta) {
+                        if (type === 'display') {
+                            var columnTypes = ["type", "provision", "freeText", "category", "select"];
+                            var columnType = columnTypes[meta.col];
+                            var select = row["select"];
+
+                            if (columnType === "select") {
+                                return "<input type='radio' data-id='provision-" + select + "'>";
+                            } else {
+                                return "<input type='text' id='" + columnType + "-" + select + "' value='" + data + "' readonly style='color: gray; width: 100%;' />";
+                            }
+                        } else {
+                            return data;
+                        }
+                    },
+                },
+                {
+                    targets: 4,
+                    orderDataType: "dom-checkbox"
+                }]
+            });
+            $('#variableTable').DataTable({
+                "paging": false,
+                "bFilter": false,
+                "columns": [
+                    { data: "type"},
+                    { data: "provision"},
+                    { data: "select"},
+                ],
+                "columnDefs": [
+                {
+                    "targets": [0, 1, 2],
+                    "render": function (data, type, row, meta) {
+                        if (type === 'display') {
+                            var columnTypes = ["documentVariableName", "enterText", "select"];
+                            var columnType = columnTypes[meta.col];
+                            var select = row["select"];
+
+                            if (columnType === "select") {
+                                return "<input type='radio' data-id='variable-" + select + "'>";
+                            } else {
+                                return "<input type='text' id='" + columnType + "-" + select + "' value='" + data + "' readonly style='color: gray; width: 100%;' />";
+                            }
+                        } else {
+                            return data;
+                        }
+                    },
+                },
+                {
+                    targets: 2,
+                    orderDataType: "dom-checkbox"
+                }]
+            });
+        })
+        $("fieldset legend").click(function() {
+            $(this).parent().find(".contents").toggle();
+            if ($(".fa", this).hasClass("fa-plus")) {
+                $(".fa", this).removeClass("fa-plus").addClass("fa-minus");
+            } else {
+                $(".fa", this).removeClass("fa-minus").addClass("fa-plus");
+            }
+        });
+    </script>
+  {{/inline}}
+{{/template}}

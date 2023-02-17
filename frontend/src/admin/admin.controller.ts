@@ -158,9 +158,7 @@ export class AdminController {
   }
 
   @Post("search-users")
-  async searchUsers(
-    @Body() searchInputs: { email: string }
-  ): Promise<{
+  async searchUsers(@Body() searchInputs: { email: string }): Promise<{
     userObject: {
       firstName: string;
       lastName: string;
@@ -187,5 +185,11 @@ export class AdminController {
   @Get("templates/:reportId")
   getTemplates(@Param("reportId") reportId: number): Promise<any> {
     return this.adminService.getTemplates(reportId);
+  }
+
+  @Get("search-nfr-templates")
+  getNFRTemplates(): Promise<any> {
+    console.log("admin controller");
+    return this.adminService.getNFRTemplates();
   }
 }

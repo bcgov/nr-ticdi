@@ -340,6 +340,14 @@ export class TTLSService {
       });
   }
 
+  /**
+   * Generates a LUR report name using tenure file number
+   * and a version number. The version number is incremented
+   * each time someone generates a LUR report.
+   *
+   * @param tenureFileNumber
+   * @returns
+   */
   async generateReportName(tenureFileNumber: string) {
     const url =
       `${hostname}:${port}/print-request-log/version/` + tenureFileNumber;

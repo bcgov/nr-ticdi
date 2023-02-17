@@ -7,6 +7,7 @@ import {
   UseFilters,
   Session,
   Query,
+  Res,
 } from "@nestjs/common";
 import { AppService } from "./app.service";
 import { AdminService } from "./admin/admin.service";
@@ -75,6 +76,29 @@ export class AppController {
     };
   }
 
+  /**
+   * Redirects to the LUR report page
+   *
+   * @param res
+   * @param id
+   * @param docname
+   * @returns
+   */
+  @Get("dtid/:id/:docname")
+  @UseFilters(AuthenticationFilter)
+  @UseGuards(AuthenticationGuard)
+  redirect(@Res() res, @Param("id") id: string, @Param("docname") docname) {
+    return res.redirect(`/lur/${id}/${docname}`);
+  }
+
+  /**
+   * Renders the LUR report page
+   *
+   * @param session
+   * @param id
+   * @param docname
+   * @returns
+   */
   @Get("lur/:id/:docname")
   @UseFilters(AuthenticationFilter)
   @UseGuards(AuthenticationGuard)
@@ -109,7 +133,9 @@ export class AppController {
           return res;
         })
         .catch((err) => {
+          console.log("callHttp failed");
           console.log(err);
+          console.log(err.response.data);
         });
       ttlsJSON = await this.ttlsService.sendToBackend(response);
       if (ttlsJSON.inspected_date) {
@@ -146,6 +172,14 @@ export class AppController {
     }
   }
 
+  /**
+   * Renders the NFR report page
+   *
+   * @param session
+   * @param id
+   * @param docname
+   * @returns
+   */
   @Get("nfr/:id/:docname")
   @UseFilters(AuthenticationFilter)
   @UseGuards(AuthenticationGuard)

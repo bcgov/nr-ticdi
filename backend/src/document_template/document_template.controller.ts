@@ -83,4 +83,10 @@ export class DocumentTemplateController {
   findOne(@Param("id") id: number): Promise<DocumentTemplate> {
     return this.templateService.findOne(id);
   }
+
+  @Post("nfr-template-info")
+  async getTemplatesInfoByIds(@Body() ids: number[]): Promise<any[]> {
+    console.log(ids);
+    return this.templateService.getTemplatesInfoByIds(ids);
+  }
 }

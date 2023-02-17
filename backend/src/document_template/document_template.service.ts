@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Repository, UpdateResult } from "typeorm";
+import { In, Repository, UpdateResult } from "typeorm";
 import { CreateDocumentTemplateDto } from "./dto/create-document_template.dto";
 import { UpdateDocumentTemplateDto } from "./dto/update-document_template.dto";
 import { DocumentTemplate } from "./entities/document_template.entity";
@@ -89,6 +89,27 @@ export class DocumentTemplateService {
       { id: data.id },
       { active_flag: true }
     );
+  }
+
+  async getTemplatesInfoByIds(ids: number[]): Promise<any[]> {
+    const templates = await this.documentTemplateRepository.findBy({
+      id: In(ids),
+    });
+
+    const result = [];
+
+    for (const template of templates) {
+      const trimmedEntry = {
+        id: template.id,
+        file_name: template.file_name,
+        active_flag: template.active_flag,
+        is_deleted: template.is_deleted,
+        template_version: template.template_version,
+      };
+      result.push(trimmedEntry);
+    }
+
+    return result;
   }
 
   async remove(document_type: string, id: number): Promise<{ id: number }> {

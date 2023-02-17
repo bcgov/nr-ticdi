@@ -38,7 +38,7 @@
                 "paging": false,
                 "bFilter": false,
                 "ajax": {
-                    "url": "admin/templates/2",
+                    "url": "admin/search-nfr-templates",
                     "dataSrc": ""
                 },
                 "columns": [
@@ -47,23 +47,24 @@
                     { data: "updated_date"},
                     { data: "status"},
                     { data: "active"},
-                    { data: "template_id" }
+                    { data: "nfr_id" }
                 ],
                 "columnDefs": [
                 {
                     "targets": [0, 1, 2, 3, 4, 5],
                     "render": function (data, type, row, meta) {
                     if (type === 'display') {
-                        var columnTypes = ["version", "file_name", "updated_date", "status", "active", "template_id"];
+                        var columnTypes = ["version", "file_name", "updated_date", "status", "active", "nfr_id"];
                         var columnType = columnTypes[meta.col];
-                        var template_id = row["template_id"];
+                        var nfr_id = row["nfr_id"];
+                        const checked = meta.row === 0 ? 'checked' : '';
 
                         if (columnType === "active") {
-                            return data == true ? "<input type='radio' id='" + columnType + "-" + template_id + "' name='radioActive' checked>" : "<input type='radio' id='" + columnType + "-" + template_id + "' name='radioActive'>";
-                        } else if (columnType === "template_id") {
-                            return "<input type='hidden' id='" + columnType + "-" + template_id + "' value='" + data + "' />";
+                            return `<input type='radio' id='" + columnType + "-" + nfr_id + "' name='radioActive' ${checked}>`;
+                        } else if (columnType === "nfr_id") {
+                            return "<input type='hidden' id='" + columnType + "-" + nfr_id + "' value='" + data + "' />";
                         } else {
-                            return "<input type='text' id='" + columnType + "-" + template_id + "' value='" + data + "' readonly style='color: gray; width: 100%;' />";
+                            return "<input type='text' id='" + columnType + "-" + nfr_id + "' value='" + data + "' readonly style='color: gray; width: 100%;' />";
                         }
                     } else {
                         return data;
@@ -79,7 +80,7 @@
                     orderable: false
                 }],
                 "createdRow": function (row, data, dataIndex) {
-                    $(row).attr("id", "row-" + data["template_id"]);
+                    $(row).attr("id", "row-" + data["nfr_id"]);
                 },
                 "order": [
                     [0, "asc"]
@@ -107,7 +108,7 @@
             const seconds = date.getSeconds().toString().padStart(2, "0");
             return `${year}-${month}-${day}_${hours}-${minutes}-${seconds}`;
         }
-        function searchRecords() {
+        async function searchRecords() {
             $("#searchButton").prop("disabled", true);
             console.log("searchRecords:");
             const dtid = $('#searchInput').val();

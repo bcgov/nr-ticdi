@@ -22,9 +22,18 @@ export class NFRDataController {
     return this.nfrDataService.findAll();
   }
 
-  @Get(":dtid")
-  findByDtid(@Param("dtid") dtid: string) {
-    return this.nfrDataService.findByDtid(+dtid);
+  @Get(":nfrDataId")
+  findById(@Param("nfrDataId") nfrDataId: number) {
+    if (nfrDataId && nfrDataId != 0) {
+      return this.nfrDataService.findByNfrDataId(nfrDataId);
+    } else {
+      return null;
+    }
+  }
+
+  @Get("dtid/:dtid")
+  findByDtid(@Param("dtid") dtid: number) {
+    return this.nfrDataService.findByDtid(dtid);
   }
 
   @Get("view/:nfrDataId")

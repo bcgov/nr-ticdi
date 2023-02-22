@@ -10,7 +10,7 @@
                         <p class="sectionTitle">Select an NFR Variant</p>
                     </div>
                     <div class="col-md-3">
-                        <select class="form-control" id="document_type_id">
+                        <select class="form-control" id="documentVariantId">
                             {{#each documentTypes}}
                             <option value="{{this}}">{{this}}</option>
                             {{/each}}
@@ -20,8 +20,8 @@
                 <hr>
 
                 <div class="titleSpacing dataSection"><b>DTID:</b> {{message.dtid}}</div>
-                <div class="titleSpacing dataSection"><b>Tenure File Number:</b> {{message.tenure_file_number}}</div>
-                <div class="titleSpacing dataSection"><b>Primary Contact Name:</b> {{primaryContactName}}</div>
+                <div class="titleSpacing dataSection"><b>Tenure File Number:</b> {{message.db_file_number}}</div>
+                <div class="titleSpacing dataSection"><b>Primary Contact Name:</b> {{message.db_name_bcal_contact}}</div>
                 
                 <fieldset class="form-group collapsible">
                     <legend style="cursor: pointer" class='togvis sectionTitle'><i class="fa fa-plus"></i>  Disposition Transaction ID Details</legend>
@@ -146,7 +146,7 @@
         $( document ).ready(function() {
             console.log({{message.err}});
             $("#prdid").text("{{this.prdid}}");
-            $("#tfn").text("{{message.tenure_file_number}}");
+            $("#tfn").text("{{message.db_file_number}}");
 
             $(".dataSection dd").each(function(){
                 if ($(this).text() == "" || $(this).text() == "TBD") {

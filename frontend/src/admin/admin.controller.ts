@@ -189,7 +189,24 @@ export class AdminController {
 
   @Get("search-nfr-templates")
   getNFRTemplates(): Promise<any> {
-    console.log("admin controller");
     return this.adminService.getNFRTemplates();
+  }
+
+  @Get("open-document/:nfr_id")
+  setSessionDocument(
+    @Session() session: { data?: SessionData },
+    @Param("nfr_id") nfrId: number
+  ): void {
+    session.data.selected_document = { nfr_id: nfrId };
+  }
+
+  @Get("get-templates/:document_type")
+  getDocumentTemplates(@Param("document_type") documentType: string): any {
+    return this.adminService.getDocumentTemplates(documentType);
+  }
+
+  @Get("nfr-provisions")
+  getNFRProvisions(): any {
+    return this.adminService.getNFRProvisions();
   }
 }

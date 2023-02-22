@@ -13,16 +13,15 @@
                         <div>
                             <table id="documentTable">
                                 <thead>
-                                    <th>Doc No.</th>
-                                    <th style="width: 400px">Template Name</th>
-                                    <th>Uploaded Date</th>
-                                    <th>Active</th>
-                                    <th></th>
-                                    <th></th>
+                                    <th style="min-width:50px">Doc No.</th>
+                                    <th style="min-width: 400px">Template Name</th>
+                                    <th style="min-width: 120px">Uploaded Date</th>
+                                    <th style="">Active</th>
+                                    <th></th> <!-- view -->
+                                    <th></th> <!-- remove -->
+                                    <th></th> <!-- id -->
                                 </thead>
-                                <tbody id="documentTableBody">
-                                    <tr></tr>
-                                </tbody>
+                                <tbody id="documentTableBody"></tbody>
                             </table>
                         </div>
                     </div>
@@ -43,14 +42,16 @@
                         <div>
                             <table id="provisionTable">
                                 <thead>
-                                    <th style="width: 50px">Type</th>
-                                    <th style="width: 50px">Group</th>
-                                    <th style="width: 50px">Max</th>
-                                    <th style="width: 400px">Provision</th>
-                                    <th style="width: 200px">Free Text</th>
-                                    <th style="width: 200px">Category</th>
-                                    <th style="width: 50px"></th><!-- Radio button column -->
-                                    <th style="width: 50px"></th><!-- Edit column -->
+                                    <th>Type</th>
+                                    <th>Group</th>
+                                    <th>Max</th>
+                                    <th style="min-width: 300px">Provision</th>
+                                    <th style="min-width: 150px">Free Text</th>
+                                    <th style="min-width: 150px">Category</th>
+                                    <th>Active</th><!-- Active column -->
+                                    <th></th><!-- Edit column -->
+                                    <th></th><!-- id column -->
+                                    <th></th><!-- dtid column -->
                                 </thead>
                                 <tbody id="provisionTableBody">
                                     <tr>
@@ -200,37 +201,6 @@
             }
             const reportType = reportIndex == 1 ? "Land Use Report" : reportIndex == 2 ? "Notice of Final Review" : "";
             $("#reportTitle").text(reportType);
-            {{#each data}}
-            dataArray.push({
-                document_type: "{{this.document_type}}",
-                template_version: "{{this.template_version}}",
-                template_name: "{{this.template_name}}",
-                uploaded_date: "{{this.uploaded_date}}",
-                active_flag: "{{this.active_flag}}",
-                id: "{{this.id}}"
-            });
-            {{/each}}
-
-            $("#documentTableBody tr").remove();
-            var t = ""
-            dataArray.sort((a, b) => {
-                return parseFloat(b.template_version) - parseFloat(a.template_version);
-            })
-            for (let entry of dataArray) {
-                if (reportType == entry.document_type) {
-                   var tr = `<tr id="row-${entry.id}">`;
-                    tr += `<td><input type="text" value="${entry.template_version}" class="border border-1 rounded pl-2" style="color:gray; max-width:80px" readonly></td>`;
-                    tr += `<td><input type="text" value="${entry.template_name}" class="border border-1 rounded pl-2" id="name-${entry.id}" style="color:gray; width:100%" readonly></td>`;
-                    tr += `<td><input type="text" value="${entry.uploaded_date}" class="border border-1 rounded pl-2" style="color:gray; max-width:150px" readonly></td>`;
-                    tr += entry.active_flag == 'true' ? `<td value="checked" style='text-align: center;'><input id='radio-${entry.id}' type="radio" name="radioActive" checked></td>` : 
-                        `<td value="unchecked" style="text-align: center;"><input id='radio-${entry.id}' type="radio" name="radioActive"></td>`;
-                    tr += `<td><button class="btn btn-info" id='view-${entry.id}' onclick="downloadTemplate(${entry.id})">View</td>`;
-                    tr += `<td><button class="btn btn-warning remove-template-button" data-id="${entry.id}" data-toggle="modal" data-target="#removeModal">Remove</td>`;
-                    tr += "</tr>";
-                    t += tr;
-                }
-            }
-            document.getElementById("documentTableBody").innerHTML = t;
 
             $('input[type=radio]').click(function(){
                 const templateId = this.id.replace("radio-", "");
@@ -255,76 +225,139 @@
                     } );
                 }
             $('#documentTable').DataTable({
-                "paging": false,
-                "bFilter": false,
+                "ajax": {
+                    "url": `admin/get-templates/${encodeURIComponent(reportType)}`,
+                    "dataSrc": ""
+                },
+                "paging": true,
+                "bFilter": true,
+                "columns": [
+                    { data: "template_version"},
+                    { data: "file_name"},
+                    { data: "update_timestamp"},
+                    { data: "active_flag"},
+                    { data: "view"},
+                    { data: "remove"},
+                    { data: "id"}
+                ],
                 "columnDefs": [
-                {
-                    targets: [0,1,2],
-                    type: 'string',
-                    render: function(data, type, full, meta) {
-                        if (type === 'filter' || type === 'sort') {
-                            var api = new $.fn.dataTable.Api(meta.settings);
-                            var td = api.cell({row: meta.row, column: meta.col}).node();
-                            data = $('select, input[type="text"]', td).val();
+                    {
+                        "targets": [0, 1, 2, 3, 4, 5, 6],
+                        "render": function (data, type, row, meta) {
+                        if (type === 'display') {
+                            var columnTypes = ["template_version", "file_name", "update_timestamp", "active_flag", "view", "remove", "id"];
+                            var columnType = columnTypes[meta.col];
+                            var id = row["id"];
+                            const checked = meta.row === 0 ? 'checked' : '';
+
+                            if (columnType === "active_flag") {
+                                return `<input type='radio' id='active-${id}' data-id='${id}' name='radioActive' ${checked}>`;
+                            } else if (columnType === "remove") {
+                                return `<button class='btn btn-warning remove-template-button' data-id='${id}' data-toggle='modal' data-target='#removeModal'>Remove`;
+                            } else if (columnType === "view") {
+                                return `<button class='btn btn-info' id='view-${id}' onclick='downloadTemplate(${id})'>View`;
+                            } else if (columnType === "id") {
+                                return `<input type='hidden' id='template_id-${id}' value='${data}' />`;
+                            } else {
+                                return `<input type='text' id='${columnType}-${id}' value='${data}' readonly style='color: gray; width: 100%;' />`;
+                            }
+                        } else {
+                            return data;
                         }
-                        return data;
-                    }
-                },
-                {
-                    targets: 3,
-                    orderDataType: "dom-checkbox"
-                },
-                {
-                    targets: [4,5],
-                    orderable: false
-                }]
-            });
-            $('#provisionTable').DataTable({
-                "paging": false,
-                "bFilter": false,
-                "columnDefs": [
-                {
-                    targets: [0,1,2,3,4,5],
-                    type: 'string',
-                    render: function(data, type, full, meta) {
-                        if (type === 'filter' || type === 'sort') {
-                            var api = new $.fn.dataTable.Api(meta.settings);
-                            var td = api.cell({row: meta.row, column: meta.col}).node();
-                            data = $('select, input[type="text"]', td).val();
                         }
-                        return data;
-                    }
+                    },
+                    {
+                        "targets": [3],
+                        "className": 'text-center'
+                    },
+                    {
+                        "targets": [4, 5, 6],
+                        "orderable": false,
+                        "searchable": false,
+                    },
+                ],
+                "createdRow": function (row, data, dataIndex) {
+                    $(row).attr("id", "row-" + data["id"]);
                 },
-                {
-                    targets: 6,
-                    orderDataType: "dom-checkbox"
-                },
-                {
-                    targets: 7,
-                    orderable: false
-                }]
+                "order": [
+                    [0, "asc"]
+                ]
             });
-            $('#variableTable').DataTable({
-                "paging": false,
-                "bFilter": false,
-                "columnDefs": [
-                {
-                    targets: 0,
-                    type: 'string',
-                    render: function(data, type, full, meta) {
-                        if (type === 'filter' || type === 'sort') {
-                            var api = new $.fn.dataTable.Api(meta.settings);
-                            var td = api.cell({row: meta.row, column: meta.col}).node();
-                            data = $('select, input[type="text"]', td).val();
+            if (reportIndex == 2) {
+                $('#provisionTable').DataTable({
+                    "ajax": {
+                        "url": 'admin/nfr-provisions',
+                        "dataSrc": ""
+                    }, 
+                    "paging": false,
+                    "bFilter": false,
+                    "columns": [
+                        {data: "type"},
+                        {data: "provision_group"},
+                        {data: "max"},
+                        {data: "provision"},
+                        {data: "free_text"},
+                        {data: "category"},
+                        {data: "active_flag"},
+                        {data: "edit"},
+                        {data: "id"},
+                        {data: "dtid"},
+                    ],
+                    "columnDefs": [
+                    {
+                        "targets": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+                        "render": function (data, type, row, meta) {
+                            if (type === 'display') {
+                                var columnTypes = ["type", "provision_group", "max", "provision", "free_text", "category", "active_flag", "edit", "id", "dtid", ];
+                                var columnType = columnTypes[meta.col];
+                                var id = row["id"];
+                                const checked = meta.row === 0 ? 'checked' : '';
+
+                                if (columnType === "active_flag") {
+                                    return `<input type='checkbox' id='active-${id}' data-id='${id}' name='radioActive' ${checked}>`;
+                                } else if (columnType === "id" || columnType === "dtid") {
+                                    return `<input type='hidden' id='${columnType}-${id}' value='${data}' />`;
+                                } else if (columnType === "edit") {
+                                    return `<a href="#" data-id="${id}">Edit</a>`
+                                } else {
+                                    return `<input type='text' id='${columnType}-${id}' value='${data}' readonly style='color: gray; width: 100%;' />`;
+                                }
+                            } else {
+                                return data;
+                            }
                         }
-                        return data;
-                    }
-                },
-                {
-                    targets: 1,
-                    orderable: false
-                }]
-            });
+                    },
+                    {
+                        "targets": [6],
+                        "className": 'text-center'
+                    },
+                    {
+                        targets: [7, 8, 9],
+                        orderable: false
+                    }]
+                });
+                $('#variableTable').DataTable({
+                    "paging": false,
+                    "bFilter": false,
+                    "columnDefs": [
+                    {
+                        targets: 0,
+                        type: 'string',
+                        render: function(data, type, full, meta) {
+                            if (type === 'filter' || type === 'sort') {
+                                var api = new $.fn.dataTable.Api(meta.settings);
+                                var td = api.cell({row: meta.row, column: meta.col}).node();
+                                data = $('select, input[type="text"]', td).val();
+                            }
+                            return data;
+                        }
+                    },
+                    {
+                        targets: 1,
+                        orderable: false
+                    }]
+                });
+            }
         });
         $(document).on("click", ".remove-template-button", function () {
             const documentTemplateId = $(this).data('id');

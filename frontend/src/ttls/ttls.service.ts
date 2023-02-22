@@ -454,7 +454,7 @@ export class TTLSService {
     variables: any,
     username: string
   ) {
-    const url = `${hostname}:${port}/nfr-entity/view/${prdid}`;
+    const url = `${hostname}:${port}/nfr-data/view/${prdid}`;
     const templateUrl = `${hostname}:${port}/document-template/find-one/${templateId}`;
     const logUrl = `${hostname}:${port}/print-request-log/`;
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -522,5 +522,20 @@ export class TTLSService {
       console.log(error.response);
     });
     return response.data;
+  }
+
+  async getNfrData(nfrDataId: number): Promise<any> {
+    const url = `${hostname}:${port}/nfr-data/${nfrDataId}`;
+    const data = await axios
+      .get(url, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      })
+      .then((res) => {
+        return res.data;
+      });
+    console.log(data);
+    return data;
   }
 }

@@ -277,7 +277,7 @@ export class AdminService {
 
   async getTemplates(reportId: number) {
     const documentType =
-      reportId == 1 || reportId == 2 ? REPORT_TYPES[reportId] : "none";
+      reportId == 1 || reportId == 2 ? REPORT_TYPES[reportId - 1] : "none";
     const url = `${hostname}:${port}/document-template/${encodeURI(
       documentType
     )}`;
@@ -310,7 +310,6 @@ export class AdminService {
   }
 
   async getNFRTemplates() {
-    console.log("admin service");
     const nfrDataUrl = `${hostname}:${port}/nfr-data`;
     const templateUrl = `${hostname}:${port}/document-template/nfr-template-info`;
     const nfrData = await axios
@@ -364,9 +363,73 @@ export class AdminService {
         j++;
       }
     }
-    console.log(combinedArray);
 
     return combinedArray;
+  }
+
+  async getDocumentTemplates(documentType: string): Promise<any> {
+    const returnItems = [
+      "id",
+      "template_version",
+      "file_name",
+      "uploaded_date",
+      "active_flag",
+      "update_timestamp",
+    ];
+    const url = `${hostname}:${port}/document-template/${encodeURI(
+      documentType
+    )}`;
+    const documentTemplateObjects = await axios
+      .get(url)
+      .then((res) => {
+        return res.data;
+      })
+      .catch((err) => console.log(err.response.data));
+    return documentTemplateObjects.map((obj) =>
+      Object.keys(obj)
+        .filter((key) => returnItems.includes(key))
+        .reduce(
+          (acc, key) => {
+            key == "update_timestamp"
+              ? (acc[key] = obj[key].split("T")[0])
+              : (acc[key] = obj[key]);
+            return acc;
+          },
+          { view: "view", remove: "remove" }
+        )
+    );
+  }
+
+  async getNFRProvisions(): Promise<any> {
+    const returnItems = [
+      "id",
+      "dtid",
+      "type",
+      "provision_group",
+      "max",
+      "provision",
+      "free_text",
+      "category",
+      "active_flag",
+    ];
+    const url = `${hostname}:${port}/nfr-provision`;
+    const nfrProvisions = await axios
+      .get(url)
+      .then((res) => {
+        return res.data;
+      })
+      .catch((err) => console.log(err.response.data));
+    return nfrProvisions.map((obj) =>
+      Object.keys(obj)
+        .filter((key) => returnItems.includes(key))
+        .reduce(
+          (acc, key) => {
+            acc[key] = obj[key];
+            return acc;
+          },
+          { edit: "edit" }
+        )
+    );
   }
 
   /**

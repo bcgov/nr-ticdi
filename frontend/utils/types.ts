@@ -3,6 +3,9 @@ export type SessionData = {
   refresh_token: string;
   accounts: AccountObject[];
   activeAccount: AccountObject;
+  selected_document: {
+    nfr_id: number;
+  }
 };
 
 export type AccountObject = {

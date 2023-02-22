@@ -11,7 +11,7 @@ import {
 } from "@nestjs/common";
 import { AppService } from "./app.service";
 import { AdminService } from "./admin/admin.service";
-import { PAGE_TITLES, REPORT_TYPES } from "utils/constants";
+import { NFR_VARIANTS, PAGE_TITLES, REPORT_TYPES } from "utils/constants";
 import { SessionData, UserObject } from "utils/types";
 import { AuthenticationGuard } from "./authentication/authentication.guard";
 import { AuthenticationFilter } from "./authentication/authentication.filter";
@@ -88,7 +88,7 @@ export class AppController {
   @UseFilters(AuthenticationFilter)
   @UseGuards(AuthenticationGuard)
   redirect(@Res() res, @Param("id") id: string, @Param("docname") docname) {
-    return res.redirect(`/lur/${id}/${docname}`);
+    return res.redirect(`/lur/dtid/${id}`);
   }
 
   /**
@@ -99,7 +99,7 @@ export class AppController {
    * @param docname
    * @returns
    */
-  @Get("lur/:id/:docname")
+  @Get("lur/dtid/:id")
   @UseFilters(AuthenticationFilter)
   @UseGuards(AuthenticationGuard)
   @Render("index")
@@ -172,6 +172,64 @@ export class AppController {
     }
   }
 
+  @Get("nfr")
+  @UseFilters(AuthenticationFilter)
+  @UseGuards(AuthenticationGuard)
+  @Render("nfr")
+  async displayNofr(@Session() session: { data?: SessionData }) {
+    const nfrDataId = session.data.selected_document
+      ? session.data.selected_document.nfr_id
+      : 0;
+    let isAdmin = false;
+    if (
+      session.data &&
+      session.data.activeAccount &&
+      session.data.activeAccount.client_roles
+    ) {
+      for (let role of session.data.activeAccount.client_roles) {
+        if (role == "ticdi_admin") {
+          isAdmin = true;
+        }
+      }
+    }
+    const title =
+      process.env.ticdi_environment == "DEVELOPMENT"
+        ? "DEVELOPMENT - " + PAGE_TITLES.NOFR
+        : PAGE_TITLES.NOFR;
+    const displayAdmin = isAdmin ? "Administration" : "-";
+    const data = await this.ttlsService.getNfrData(nfrDataId);
+    let primaryContactName;
+    try {
+      return {
+        title: title,
+        idirUsername: session.data.activeAccount
+          ? session.data.activeAccount.idir_username
+          : "",
+        primaryContactName: primaryContactName,
+        displayAdmin: displayAdmin,
+        message: data,
+        documentTypes: NFR_VARIANTS,
+        nfr_id: data.id,
+        template_id: data.template_id,
+      };
+    } catch (err) {
+      console.log(err);
+      return {
+        title: title,
+        idirUsername: session.data.activeAccount
+          ? session.data.activeAccount.idir_username
+          : "",
+        primaryContactName: primaryContactName ? primaryContactName : null,
+        displayAdmin: displayAdmin,
+        message: data ? data : null,
+        documentTypes: NFR_VARIANTS,
+        nfr_id: data ? data.id : null,
+        template_id: data.template_id,
+        error: err,
+      };
+    }
+  }
+
   /**
    * Renders the NFR report page
    *
@@ -180,15 +238,11 @@ export class AppController {
    * @param docname
    * @returns
    */
-  @Get("nfr/:id/:docname")
+  @Get("nfr/dtid/:id")
   @UseFilters(AuthenticationFilter)
   @UseGuards(AuthenticationGuard)
   @Render("nfr")
-  async findNofr(
-    @Session() session: { data?: SessionData },
-    @Param("id") id,
-    @Param("docname") docname: string
-  ) {
+  async findNofr(@Session() session: { data?: SessionData }, @Param("id") id) {
     let isAdmin = false;
     if (
       session.data &&
@@ -246,7 +300,7 @@ export class AppController {
         primaryContactName: primaryContactName,
         displayAdmin: displayAdmin,
         message: ttlsJSON,
-        documentTypes: ["Notice of Final Review 1", "Notice of Final Review 2"],
+        documentTypes: NFR_VARIANTS,
         prdid: ttlsJSON.id,
       };
     } catch (err) {
@@ -259,7 +313,7 @@ export class AppController {
         primaryContactName: primaryContactName ? primaryContactName : null,
         displayAdmin: displayAdmin,
         message: ttlsJSON ? ttlsJSON : null,
-        documentTypes: ["Notice of Final Review 1", "Notice of Final Review 2"],
+        documentTypes: NFR_VARIANTS,
         prdid: ttlsJSON ? ttlsJSON.id : null,
         error: err,
       };
@@ -296,8 +350,8 @@ export class AppController {
         : "",
       displayAdmin: displayAdmin,
       reportTypes: [
-        { reportType: REPORT_TYPES[1], reportIndex: 1 },
-        { reportType: REPORT_TYPES[2], reportIndex: 2 },
+        { reportType: REPORT_TYPES[0], reportIndex: 1 },
+        { reportType: REPORT_TYPES[1], reportIndex: 2 },
       ],
     };
   }
@@ -311,9 +365,7 @@ export class AppController {
     @Session() session: { data?: SessionData },
     @Query("report") reportIndex
   ) {
-    let reportType = REPORT_TYPES[reportIndex];
     let isAdmin = false;
-    let data = [];
     if (
       session.data &&
       session.data.activeAccount &&
@@ -326,23 +378,6 @@ export class AppController {
       }
     }
     const displayAdmin = isAdmin ? "Administration" : "-";
-    if (reportType && reportType != "") {
-      const documentData = await lastValueFrom(
-        this.httpService
-          .get(requestUrl + `${encodeURI(reportType)}`, requestConfig)
-          .pipe(map((response) => response.data))
-      );
-      for (let entry of documentData) {
-        let dataEntry = {};
-        dataEntry["id"] = entry.id;
-        dataEntry["document_type"] = entry.document_type;
-        dataEntry["template_version"] = entry.template_version;
-        dataEntry["template_name"] = entry.file_name.replace(".docx", "");
-        dataEntry["uploaded_date"] = entry.create_timestamp.split("T")[0];
-        dataEntry["active_flag"] = entry.active_flag;
-        data.push(dataEntry);
-      }
-    }
     const title =
       process.env.ticdi_environment == "DEVELOPMENT"
         ? "DEVELOPMENT - " + PAGE_TITLES.MANAGE_TEMPLATES
@@ -354,7 +389,6 @@ export class AppController {
         : "",
       primaryContactName: "",
       displayAdmin: displayAdmin,
-      data: data,
     };
   }
 

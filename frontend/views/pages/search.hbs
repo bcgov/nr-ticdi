@@ -1,10 +1,10 @@
 {{#> template}}
   {{#*inline "content"}}
     <main role="main">
-        <div class="container">
+        <div class="container container-fluid">
             <h2>{{title}}</h2>
             <hr />
-            <div class="form-row">
+            <div class="row">
                 <div class="col-md-4">
                     <input class="mt-1" type="text" id="searchInput" style="width: 100%">
                 </div>
@@ -12,14 +12,14 @@
                     <button class="btn btn-success ml-4" id="searchButton" onclick="searchRecords()">Search</button>
                 </div>
             </div>
-            <div class="form-row">
+            <div class="row">
                 <div>
                     <table id="documentTable">
                         <thead>
-                            <th style="max-width: 50px">Doc No.</th>
+                            <th style="min-width: 50px">Doc No.</th>
                             <th style="min-width: 300px">Template Name</th>
                             <th style="max-width: 120px">Uploaded Date</th>
-                            <th style="max-width: 80px">Status</th>
+                            <th style="min-width: 80px">Status</th>
                             <th>Active</th>
                             <th></th>
                         </thead>
@@ -27,6 +27,11 @@
                             <tr></tr>
                         </tbody>
                     </table>
+                </div>
+            </div>
+            <div class="row justify-content-end">
+                <div class="col-md-5">
+                    <button type="button" class="btn btn-success" onclick="openDocument()">Open</button>
                 </div>
             </div>
         </div>
@@ -60,7 +65,7 @@
                         const checked = meta.row === 0 ? 'checked' : '';
 
                         if (columnType === "active") {
-                            return `<input type='radio' id='" + columnType + "-" + nfr_id + "' name='radioActive' ${checked}>`;
+                            return "<input type='radio' id='" + columnType + "-" + nfr_id + `' data-id='` + nfr_id + `' name='radioActive' ${checked}>`;
                         } else if (columnType === "nfr_id") {
                             return "<input type='hidden' id='" + columnType + "-" + nfr_id + "' value='" + data + "' />";
                         } else {
@@ -73,7 +78,8 @@
                 },
                 {
                     targets: 4,
-                    orderDataType: "dom-checkbox"
+                    orderDataType: "dom-checkbox",
+                    className: 'text-center'
                 },
                 {
                     targets: [4,5],
@@ -139,6 +145,13 @@
                 .catch(() => {
                     $("#searchButton").prop("disabled", false);
                 });
+        }
+        async function openDocument() {
+            const nfr_id = $('input[name="radioActive"]:checked').data('id');
+            await fetch(`/admin/open-document/${nfr_id}`, {
+                method: 'GET'
+            }).then(() => window.location.href = '/nfr')
+            .catch((err) => console.log(err));
         }
     </script>
   {{/inline}}

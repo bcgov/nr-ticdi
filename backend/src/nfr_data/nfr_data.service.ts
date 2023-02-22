@@ -21,15 +21,29 @@ export class NFRDataService {
     return await this.nfrDataRepository.find();
   }
 
-  async findByDtid(dtid: number): Promise<NFRData[]> {
+  async findByNfrDataId(nfrDataId: number): Promise<NFRData> {
     try {
-      return this.nfrDataRepository.find({
-        where: {
-          dtid: dtid,
-        },
+      return this.nfrDataRepository.findOneBy({
+        id: nfrDataId,
       });
     } catch (err) {
       console.log(err);
+      return null;
+    }
+  }
+
+  async findByDtid(dtid: number): Promise<NFRData[]> {
+    try {
+      return dtid != null
+        ? this.nfrDataRepository.find({
+            where: {
+              dtid: dtid,
+            },
+          })
+        : null;
+    } catch (err) {
+      console.log(err);
+      return null;
     }
   }
 

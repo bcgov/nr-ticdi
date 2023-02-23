@@ -432,6 +432,20 @@ export class AdminService {
     );
   }
 
+  async enableProvision(id: number): Promise<any> {
+    const url = `${hostname}:${port}/nfr-provision/enable/${id}`;
+    return await axios.get(url).then((res) => {
+      return res.data;
+    });
+  }
+
+  async disableProvision(id: number): Promise<any> {
+    const url = `${hostname}:${port}/nfr-provision/disable/${id}`;
+    return await axios.get(url).then((res) => {
+      return res.data;
+    });
+  }
+
   /**
    * @param data
    * @returns formatted user data for displaying on the frontend

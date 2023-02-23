@@ -209,4 +209,14 @@ export class AdminController {
   getNFRProvisions(): any {
     return this.adminService.getNFRProvisions();
   }
+
+  @Get("enable-provision/:provisionId")
+  enableProvision(@Param("provisionId") id: number): any {
+    return this.adminService.enableProvision(id);
+  }
+
+  @Get("disable-provision/:provisionId")
+  disableProvision(@Param("provisionId") id: number): any {
+    return this.adminService.disableProvision(id);
+  }
 }

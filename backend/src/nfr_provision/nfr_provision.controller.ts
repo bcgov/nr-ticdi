@@ -36,6 +36,16 @@ export class NFRProvisionController {
     return this.nfrProvisionService.findByDtid(dtid);
   }
 
+  @Get("enable/:id")
+  enableProvision(@Param("id") id: number) {
+    return this.nfrProvisionService.enable(id)
+  }
+
+  @Get("disable/:id")
+  disableProvision(@Param("id") id: number) {
+    return this.nfrProvisionService.disable(id)
+  }
+
   @Delete(":dtid")
   remove(@Param("dtid") dtid: string) {
     return this.nfrProvisionService.remove(+dtid);

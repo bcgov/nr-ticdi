@@ -190,6 +190,57 @@
                 </div>
             </div>
         </div>
+        <div class="modal fade" id="editProvisionModal" tabindex="-1" role="dialog" aria-labelledby="editProvisionModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="editProvisionModalLabel">Edit Provision</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="editProvisionForm">
+                        <div class="form-group">
+                            <label for="editProvisionType">Type</label>
+                            <select class="form-control" id="editProvisionType" name="type">
+                                <option value="O">O</option>
+                                <option value="V">V</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="editProvisionGroup">Group</label>
+                            <select class="form-control" id="editProvisionGroup" name="provisionGroup">
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="editProvisionMax">Max</label>
+                            <input type="number" class="form-control" id="editProvisionMax" name="max">
+                        </div>
+                        <div class="form-group">
+                            <label for="editProvisionText">Provision</label>
+                            <input type="text" class="form-control" id="editProvisionText" name="provision">
+                        </div>
+                        <div class="form-group">
+                            <label for="editProvisionFreeText">Free Text</label>
+                            <input type="text" class="form-control" id="editProvisionFreeText" name="freeText">
+                        </div>
+                        <div class="form-group">
+                            <label for="editProvisionCategory">Category</label>
+                            <input type="text" class="form-control" id="editProvisionCategory" name="type">
+                        </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-primary" id="saveProvisionBtn" onclick="updateProvision()">Save</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </main>
     <script>
         var dataArray = [];
@@ -305,16 +356,18 @@
                     ],
                     "columnDefs": [
                     {
-                        "targets": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
-                        "render": function (data, type, row, meta) {
+                        targets: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+                        render: function (data, type, row, meta) {
                             if (type === 'display') {
                                 var columnTypes = ["type", "provision_group", "max", "provision", "free_text", "category", "active_flag", "edit", "id", "dtid", ];
                                 var columnType = columnTypes[meta.col];
                                 var id = row["id"];
-                                const checked = meta.row === 0 ? 'checked' : '';
+                                var group = row["provision_group"];
+                                var max = row["max"];
 
                                 if (columnType === "active_flag") {
-                                    return `<input type='checkbox' id='active-${id}' data-id='${id}' name='radioActive' ${checked}>`;
+                                    const checked = data === true ? 'checked' : '';
+                                    return `<input type='checkbox' id='active-${id}' data-id='${id}' data-group='${group}' data-max='${max}' name='radioActive' ${checked}>`;
                                 } else if (columnType === "id" || columnType === "dtid") {
                                     return `<input type='hidden' id='${columnType}-${id}' value='${data}' />`;
                                 } else if (columnType === "edit") {
@@ -328,13 +381,50 @@
                         }
                     },
                     {
-                        "targets": [6],
-                        "className": 'text-center'
+                        targets: [6],
+                        className: 'text-center',
+                        orderDataType: 'dom-checkbox'
                     },
                     {
                         targets: [7, 8, 9],
                         orderable: false
-                    }]
+                    }],
+                    "drawCallback": function (settings) {
+                        // add event listeners to the provision checkboxes
+                        const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+                        if (checkboxes.length > 0) {
+                            checkboxes.forEach(checkbox => {
+                                checkbox.addEventListener('click', function() {
+                                    const group = checkbox.dataset.group;
+                                    const max = checkbox.dataset.max;
+                                    const active = document.querySelectorAll(`input[type="checkbox"][data-group="${group}"]:checked`).length;
+                                    if (active >= max) {
+                                        document.querySelectorAll(`input[type="checkbox"][data-group="${group}"]:not(:checked)`).forEach(checkbox => {
+                                            checkbox.disabled = true;
+                                        });
+                                    } else {
+                                        document.querySelectorAll(`input[type="checkbox"][data-group="${group}"]:not(:checked)`).forEach(checkbox => {
+                                            checkbox.disabled = false;
+                                        });
+                                    }
+                                    
+                                    if (checkbox.checked) {
+                                        fetch(`admin/enable-provision/${checkbox.dataset.id}`);
+                                    } else {
+                                        fetch(`admin/disable-provision/${checkbox.dataset.id}`);
+                                    }
+                                });
+                                const g = checkbox.dataset.group;
+                                const m = checkbox.dataset.max;
+                                const a = document.querySelectorAll(`input[type="checkbox"][data-group="${g}"]:checked`).length;
+                                if (a >= m) {
+                                    document.querySelectorAll(`input[type="checkbox"][data-group="${g}"]:not(:checked)`).forEach(checkbox => {
+                                        checkbox.disabled = true;
+                                    });
+                                }
+                            });
+                        }
+                    }
                 });
                 $('#variableTable').DataTable({
                     "paging": false,
@@ -355,9 +445,10 @@
                     {
                         targets: 1,
                         orderable: false
-                    }]
+                    }],
                 });
             }
+
         });
         $(document).on("click", ".remove-template-button", function () {
             const documentTemplateId = $(this).data('id');

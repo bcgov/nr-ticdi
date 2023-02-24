@@ -19,7 +19,7 @@ export class NFRProvision {
   @Column({ nullable: true })
   max: number;
   @Column({ nullable: true })
-  provision: string;
+  provision_text: string;
   @Column({ nullable: true })
   free_text: string;
   @Column({ nullable: true })
@@ -40,6 +40,7 @@ export class NFRProvision {
     type?: string,
     provision_group?: number,
     max?: number,
+    provision_text?: string,
     free_text?: string,
     category?: string,
     active_flag?: boolean,
@@ -50,6 +51,7 @@ export class NFRProvision {
     this.type = type || "";
     this.provision_group = provision_group || null;
     this.max = max || null;
+    this.provision_text = provision_text || "";
     this.free_text = free_text || "";
     this.category = category || "";
     this.active_flag = active_flag || false;

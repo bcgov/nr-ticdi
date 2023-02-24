@@ -9,12 +9,16 @@ export class NFRProvisionController {
   @Post()
   async create(
     @Body()
-    data: {
-      nfrProvision: CreateNFRProvisionDto;
-    }
+    nfrProvision: CreateNFRProvisionDto
   ) {
-    let nfrProvision = data.nfrProvision;
     return this.nfrProvisionService.create(nfrProvision);
+  }
+
+  @Post("update")
+  async update(@Body() nfrProvision: CreateNFRProvisionDto & { id: number }) {
+    const id = nfrProvision.id;
+    delete nfrProvision["id"];
+    return this.nfrProvisionService.update(id, nfrProvision);
   }
 
   @Get()
@@ -38,12 +42,18 @@ export class NFRProvisionController {
 
   @Get("enable/:id")
   enableProvision(@Param("id") id: number) {
-    return this.nfrProvisionService.enable(id)
+    return this.nfrProvisionService.enable(id);
   }
 
   @Get("disable/:id")
   disableProvision(@Param("id") id: number) {
-    return this.nfrProvisionService.disable(id)
+    return this.nfrProvisionService.disable(id);
+  }
+
+  // nestjs gets upset when there is no parameter, id is unused
+  @Get("get-group-max/:id")
+  getGroupMax(@Param("id") id: number) {
+    return this.nfrProvisionService.getGroupMax();
   }
 
   @Delete(":dtid")

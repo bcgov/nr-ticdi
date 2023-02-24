@@ -407,7 +407,7 @@ export class AdminService {
       "type",
       "provision_group",
       "max",
-      "provision",
+      "provision_text",
       "free_text",
       "category",
       "active_flag",
@@ -444,6 +444,52 @@ export class AdminService {
     return await axios.get(url).then((res) => {
       return res.data;
     });
+  }
+
+  async getGroupMax(): Promise<any> {
+    const url = `${hostname}:${port}/nfr-provision/get-group-max/1`;
+    return await axios.get(url).then((res) => {
+      return res.data;
+    });
+  }
+
+  async addProvision(
+    provisionParams: {
+      type: string;
+      provision_group: number;
+      max: number;
+      provision: string;
+      freeText: string;
+      category: string;
+    },
+    create_userid: string
+  ) {
+    const url = `${hostname}:${port}/nfr-provision`;
+    return await axios
+      .post(url, { ...provisionParams, create_userid })
+      .then((res) => {
+        return res.data;
+      });
+  }
+
+  async updateProvision(
+    provisionParams: {
+      id: number;
+      type: string;
+      provision_group: number;
+      max: number;
+      provision: string;
+      freeText: string;
+      category: string;
+    },
+    update_userid: string
+  ) {
+    const url = `${hostname}:${port}/nfr-provision/update`;
+    return await axios
+      .post(url, { ...provisionParams, update_userid })
+      .then((res) => {
+        return res.data;
+      });
   }
 
   /**

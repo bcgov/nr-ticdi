@@ -219,4 +219,44 @@ export class AdminController {
   disableProvision(@Param("provisionId") id: number): any {
     return this.adminService.disableProvision(id);
   }
+
+  @Get("get-group-max")
+  getGroupMax() {
+    return this.adminService.getGroupMax();
+  }
+
+  @Post("add-provision")
+  addProvision(
+    @Body()
+    provisionParams: {
+      type: string;
+      provision_group: number;
+      max: number;
+      provision: string;
+      freeText: string;
+      category: string;
+    },
+    @Session() session: { data?: SessionData }
+  ) {
+    const create_userid = session.data.activeAccount.idir_username;
+    return this.adminService.addProvision(provisionParams, create_userid);
+  }
+
+  @Post("update-provision")
+  updateProvision(
+    @Body()
+    provisionParams: {
+      id: number;
+      type: string;
+      provision_group: number;
+      max: number;
+      provision: string;
+      freeText: string;
+      category: string;
+    },
+    @Session() session: { data?: SessionData }
+  ) {
+    const update_userid = session.data.activeAccount.idir_username;
+    return this.adminService.updateProvision(provisionParams, update_userid);
+  }
 }

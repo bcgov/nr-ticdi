@@ -195,7 +195,7 @@
                             </div>
                             <div class="form-group">
                                 <label for="editProvisionFreeText">Free Text</label>
-                                <input type="text" class="form-control" id="editProvisionFreeText" name="freeText">
+                                <input type="text" class="form-control" id="editProvisionFreeText" name="free_text">
                             </div>
                             <div class="form-group">
                                 <label for="editProvisionCategory">Category</label>
@@ -254,7 +254,7 @@
                             </div>
                             <div class="form-group">
                                 <label for="addProvisionFreeText">Free Text</label>
-                                <input type="text" class="form-control" id="addProvisionFreeText" name="freeText">
+                                <input type="text" class="form-control" id="addProvisionFreeText" name="free_text">
                             </div>
                             <div class="form-group">
                                 <label for="addProvisionCategory">Category</label>
@@ -638,14 +638,11 @@
                     }).then((res) => res.json()).then(() => {
                         groupMaxTable.ajax.reload();
                         provisionTable.ajax.reload();
-                        $('#addProvisionModal').modal('toggle');
                     });
+                    $('#addProvisionModal').modal('toggle');
                 } else {
                     $('#groupConfirmation').text(provision_group);
-                    $('#addProvisionDiv').hide();
-                    $('#addProvisionFooter').hide();
-                    $('#addProvisionConfirmationDiv').show();
-                    $('#addProvisionConfirmationFooter').show();
+                    showAddConfirm();
                 }
             } else {
                 fetch('admin/add-provision', {
@@ -658,8 +655,8 @@
                 }).then((res) => res.json()).then(() => {
                     groupMaxTable.ajax.reload();
                     provisionTable.ajax.reload();
-                    $('#addProvisionModal').modal('toggle');
                 });
+                $('#addProvisionModal').modal('toggle');
             }
         }
         function confirmAddProvision() {
@@ -667,7 +664,7 @@
             const provision_group = $('#addProvisionGroup').val();
             const max = $('#addProvisionMax').val();
             const provision_text = $('#addProvisionText').val();
-            const freeText = $('#addProvisionFreeText').val();
+            const free_text = $('#addProvisionFreeText').val();
             const category = $('#addProvisionCategory').val();
             const data = JSON.stringify( { type: type, provision_group: provision_group, max: max, provision_text: provision_text, free_text: free_text, category: category } );
             fetch('admin/add-provision', {
@@ -684,10 +681,7 @@
             });
         }
         function addProvisionGoBack() {
-            $('#addProvisionConfirmationDiv').hide();
-            $('#addProvisionConfirmationFooter').hide();
-            $('#addProvisionDiv').show();
-            $('#addProvisionFooter').show();
+            hideAddConfirm();
         }
         // make sure add provision integer inputs only accept integers positive integers
         $('#addProvisionMax').on('input', function() {
@@ -713,7 +707,20 @@
         });
         $('#addProvisionModal').on('hidden.bs.modal', function () {
             $(this).find('input').val('');
+            hideAddConfirm();
         });
+        function hideAddConfirm() {
+            $('#addProvisionDiv').show();
+            $('#addProvisionFooter').show();
+            $('#addProvisionConfirmationDiv').hide();
+            $('#addProvisionConfirmationFooter').hide();
+        }
+        function showAddConfirm() {
+            $('#addProvisionDiv').hide();
+            $('#addProvisionFooter').hide();
+            $('#addProvisionConfirmationDiv').show();
+            $('#addProvisionConfirmationFooter').show();
+        }
 
         /*********************************
         * Edit Provision Modal logic *
@@ -772,10 +779,7 @@
                     });
                 } else {
                     $('#groupConfirmation').text(provision_group);
-                    $('#editProvisionDiv').hide();
-                    $('#editProvisionFooter').hide();
-                    $('#editProvisionConfirmationDiv').show();
-                    $('#editProvisionConfirmationFooter').show();
+                    showEditConfirm();
                 }
             } else {
                 fetch('admin/update-provision', {
@@ -788,8 +792,8 @@
                 }).then((res) => res.json()).then(() => {
                     groupMaxTable.ajax.reload();
                     provisionTable.ajax.reload();
-                    $('#editProvisionModal').modal('toggle');
                 });
+                $('#editProvisionModal').modal('toggle');
             }
         }
         function confirmEditProvision() {
@@ -798,7 +802,7 @@
             const provision_group = $('#editProvisionGroup').val();
             const max = $('#editProvisionMax').val();
             const provision_text = $('#editProvisionText').val();
-            const freeText = $('#editProvisionFreeText').val();
+            const free_text = $('#editProvisionFreeText').val();
             const category = $('#editProvisionCategory').val();
             const data = JSON.stringify( { id: id, type: type, provision_group: provision_group, max: max, provision_text: provision_text, free_text: free_text, category: category } );
             fetch('admin/update-provision', {
@@ -811,14 +815,12 @@
             }).then((res) => res.json()).then(() => {
                 groupMaxTable.ajax.reload();
                 provisionTable.ajax.reload();
-                $('#editProvisionModal').modal('toggle');
             });
+            $('#editProvisionModal').modal('toggle');
+            hideEditConfirm();
         }
         function editProvisionGoBack() {
-            $('#editProvisionConfirmationDiv').hide();
-            $('#editProvisionConfirmationFooter').hide();
-            $('#editProvisionDiv').show();
-            $('#editProvisionFooter').show();
+            hideEditConfirm();
         }
         // make sure add provision integer inputs only accept integers positive integers
         $('#editProvisionMax').on('input', function() {
@@ -844,7 +846,20 @@
         });
         $('#editProvisionModal').on('hidden.bs.modal', function () {
             $(this).find('input').val('');
+            hideEditConfirm();
         });
+        function hideEditConfirm() {
+            $('#editProvisionDiv').show();
+            $('#editProvisionFooter').show();
+            $('#editProvisionConfirmationDiv').hide();
+            $('#editProvisionConfirmationFooter').hide();
+        }
+        function showEditConfirm() {
+            $('#editProvisionDiv').hide();
+            $('#editProvisionFooter').hide();
+            $('#editProvisionConfirmationDiv').show();
+            $('#editProvisionConfirmationFooter').show();
+        }
         
         /***********************
         * File Upload logic *

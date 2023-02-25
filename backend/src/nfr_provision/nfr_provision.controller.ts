@@ -50,10 +50,25 @@ export class NFRProvisionController {
     return this.nfrProvisionService.disable(id);
   }
 
+  @Get("select/:id")
+  selectProvision(@Param("id") id: number) {
+    return this.nfrProvisionService.select(id);
+  }
+
+  @Get("disable/:id")
+  deselectProvision(@Param("id") id: number) {
+    return this.nfrProvisionService.deselect(id);
+  }
+
   // nestjs gets upset when there is no parameter, id is unused
   @Get("get-group-max/:id")
   getGroupMax(@Param("id") id: number) {
     return this.nfrProvisionService.getGroupMax();
+  }
+
+  @Get("get-group-max/dtid/:dtid")
+  getGroupMaxByDTID(@Param("dtid") dtid: number) {
+    return this.nfrProvisionService.getGroupMaxByDTID(dtid);
   }
 
   @Delete(":dtid")

@@ -68,22 +68,10 @@ export class NFRProvisionService {
   }
 
   async enable(id: number): Promise<any> {
-    const provisionToEnable = await this.nfrProvisionRepository.findOneBy({
-      id: id,
+    await this.nfrProvisionRepository.update(id, {
+      active_flag: true,
     });
-    const numberActiveSameGroup =
-      await this.nfrProvisionRepository.findAndCountBy({
-        provision_group: provisionToEnable.provision_group,
-        active_flag: true,
-      })[1];
-    if (numberActiveSameGroup >= provisionToEnable.max) {
-      return { message: "Provision group is already at maximum." };
-    } else {
-      await this.nfrProvisionRepository.update(id, {
-        active_flag: true,
-      });
-      return { message: "Provision Enabled" };
-    }
+    return { message: "Provision Enabled" };
   }
 
   async disable(id: number): Promise<any> {
@@ -93,9 +81,55 @@ export class NFRProvisionService {
     return { message: "Provision Disabled" };
   }
 
+  async select(id: number): Promise<any> {
+    const provisionToSelect = await this.nfrProvisionRepository.findOneBy({
+      id: id,
+    });
+    const numberSelectedSameGroup =
+      await this.nfrProvisionRepository.findAndCountBy({
+        provision_group: provisionToSelect.provision_group,
+        select: true,
+      })[1];
+    if (numberSelectedSameGroup >= provisionToSelect.max) {
+      return { message: "Provision group is already at maximum." };
+    } else {
+      await this.nfrProvisionRepository.update(id, {
+        select: true,
+      });
+      return { message: "Provision Selected" };
+    }
+  }
+
+  async deselect(id: number): Promise<any> {
+    await this.nfrProvisionRepository.update(id, {
+      select: false,
+    });
+    return { message: "Provision Deselected" };
+  }
+
   async getGroupMax(): Promise<any> {
     const provisions = await this.nfrProvisionRepository.find({
       select: ["provision_group", "max"],
+    });
+    const result = provisions.map(({ provision_group, max }) => ({
+      provision_group,
+      max,
+    }));
+    const uniqueResult = result
+      .filter(
+        (value, index, self) =>
+          self.findIndex(
+            (item) => item.provision_group === value.provision_group
+          ) === index
+      )
+      .sort((a, b) => a.provision_group - b.provision_group);
+    return uniqueResult;
+  }
+
+  async getGroupMaxByDTID(dtid: number): Promise<any> {
+    const provisions = await this.nfrProvisionRepository.find({
+      select: ["provision_group", "max"],
+      where: { dtid: dtid },
     });
     const result = provisions.map(({ provision_group, max }) => ({
       provision_group,

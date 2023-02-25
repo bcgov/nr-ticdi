@@ -427,34 +427,13 @@
                         const checkboxes = document.querySelectorAll('input[type="checkbox"]');
                         if (checkboxes.length > 0) {
                             checkboxes.forEach(checkbox => {
-                                checkbox.addEventListener('click', function() {
-                                    const group = checkbox.dataset.group;
-                                    const max = checkbox.dataset.max;
-                                    const active = document.querySelectorAll(`input[type="checkbox"][data-group="${group}"]:checked`).length;
-                                    if (active >= max) {
-                                        document.querySelectorAll(`input[type="checkbox"][data-group="${group}"]:not(:checked)`).forEach(checkbox => {
-                                            checkbox.disabled = true;
-                                        });
-                                    } else {
-                                        document.querySelectorAll(`input[type="checkbox"][data-group="${group}"]:not(:checked)`).forEach(checkbox => {
-                                            checkbox.disabled = false;
-                                        });
-                                    }
-                                    
+                                checkbox.addEventListener('click', function() {                                    
                                     if (checkbox.checked) {
                                         fetch(`admin/enable-provision/${checkbox.dataset.id}`);
                                     } else {
                                         fetch(`admin/disable-provision/${checkbox.dataset.id}`);
                                     }
                                 });
-                                const g = checkbox.dataset.group;
-                                const m = checkbox.dataset.max;
-                                const a = document.querySelectorAll(`input[type="checkbox"][data-group="${g}"]:checked`).length;
-                                if (a >= m) {
-                                    document.querySelectorAll(`input[type="checkbox"][data-group="${g}"]:not(:checked)`).forEach(checkbox => {
-                                        checkbox.disabled = true;
-                                    });
-                                }
                             });
                         }
                     },

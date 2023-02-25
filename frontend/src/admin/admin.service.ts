@@ -432,6 +432,37 @@ export class AdminService {
     );
   }
 
+  async getNFRProvisionsByDTID(dtid: number): Promise<any> {
+    const returnItems = [
+      "type",
+      "provision_text",
+      "free_text",
+      "category",
+      "select",
+      "provision_group",
+      "max",
+      "id",
+    ];
+    const url = `${hostname}:${port}/nfr-provision/dtid/${dtid}`;
+    const nfrProvisions = await axios
+      .get(url)
+      .then((res) => {
+        return res.data;
+      })
+      .catch((err) => console.log(err.response.data));
+    return nfrProvisions.map((obj) =>
+      Object.keys(obj)
+        .filter((key) => returnItems.includes(key))
+        .reduce(
+          (acc, key) => {
+            acc[key] = obj[key];
+            return acc;
+          },
+          { select: "select" }
+        )
+    );
+  }
+
   async enableProvision(id: number): Promise<any> {
     const url = `${hostname}:${port}/nfr-provision/enable/${id}`;
     return await axios.get(url).then((res) => {
@@ -446,8 +477,29 @@ export class AdminService {
     });
   }
 
+  async selectProvision(id: number): Promise<any> {
+    const url = `${hostname}:${port}/nfr-provision/select/${id}`;
+    return await axios.get(url).then((res) => {
+      return res.data;
+    });
+  }
+
+  async deselectProvision(id: number): Promise<any> {
+    const url = `${hostname}:${port}/nfr-provision/deselect/${id}`;
+    return await axios.get(url).then((res) => {
+      return res.data;
+    });
+  }
+
   async getGroupMax(): Promise<any> {
     const url = `${hostname}:${port}/nfr-provision/get-group-max/1`;
+    return await axios.get(url).then((res) => {
+      return res.data;
+    });
+  }
+
+  async getGroupMaxByDTID(dtid: number): Promise<any> {
+    const url = `${hostname}:${port}/nfr-provision/get-group-max/dtid/${dtid}`;
     return await axios.get(url).then((res) => {
       return res.data;
     });

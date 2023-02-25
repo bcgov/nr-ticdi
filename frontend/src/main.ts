@@ -16,6 +16,9 @@ async function bootstrap() {
   hbs.registerPartials(join(__dirname, "..", "views/partials"));
   hbs.registerPartials(join(__dirname, "..", "views/layout"));
   app.setViewEngine("hbs");
+  hbs.registerHelper("json", function (context) {
+    return JSON.stringify(context);
+  });
 
   let sessionOptions: expressSession.SessionOptions;
   sessionOptions = {

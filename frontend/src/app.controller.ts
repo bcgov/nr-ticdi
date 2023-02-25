@@ -261,6 +261,7 @@ export class AppController {
         : PAGE_TITLES.NOFR;
     const displayAdmin = isAdmin ? "Administration" : "-";
     await this.ttlsService.setWebadeToken();
+    const groupMaxJsonArray = await this.adminService.getGroupMaxByDTID(id);
     let ttlsJSON, primaryContactName;
     try {
       const response: any = await firstValueFrom(this.ttlsService.callHttp(id))
@@ -277,7 +278,6 @@ export class AppController {
         );
       }
       primaryContactName = ttlsJSON.licence_holder_name;
-      ttlsJSON["groups"] = [1, 2];
       ttlsJSON["interested_parties"] = [
         {
           first_name: "asdf",
@@ -300,6 +300,7 @@ export class AppController {
         primaryContactName: primaryContactName,
         displayAdmin: displayAdmin,
         message: ttlsJSON,
+        groupMaxJsonArray: groupMaxJsonArray,
         documentTypes: NFR_VARIANTS,
         prdid: ttlsJSON.id,
       };
@@ -313,6 +314,7 @@ export class AppController {
         primaryContactName: primaryContactName ? primaryContactName : null,
         displayAdmin: displayAdmin,
         message: ttlsJSON ? ttlsJSON : null,
+        groupMaxJsonArray: groupMaxJsonArray,
         documentTypes: NFR_VARIANTS,
         prdid: ttlsJSON ? ttlsJSON.id : null,
         error: err,

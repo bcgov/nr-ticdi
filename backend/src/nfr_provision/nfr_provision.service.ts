@@ -109,12 +109,15 @@ export class NFRProvisionService {
 
   async getGroupMax(): Promise<any> {
     const provisions = await this.nfrProvisionRepository.find({
-      select: ["provision_group", "max"],
+      select: ["provision_group", "max", "provision_group_text"],
     });
-    const result = provisions.map(({ provision_group, max }) => ({
-      provision_group,
-      max,
-    }));
+    const result = provisions.map(
+      ({ provision_group, max, provision_group_text }) => ({
+        provision_group,
+        max,
+        provision_group_text,
+      })
+    );
     const uniqueResult = result
       .filter(
         (value, index, self) =>
@@ -128,13 +131,16 @@ export class NFRProvisionService {
 
   async getGroupMaxByDTID(dtid: number): Promise<any> {
     const provisions = await this.nfrProvisionRepository.find({
-      select: ["provision_group", "max"],
+      select: ["provision_group", "max", "provision_group_text"],
       where: { dtid: dtid },
     });
-    const result = provisions.map(({ provision_group, max }) => ({
-      provision_group,
-      max,
-    }));
+    const result = provisions.map(
+      ({ provision_group, max, provision_group_text }) => ({
+        provision_group,
+        max,
+        provision_group_text,
+      })
+    );
     const uniqueResult = result.filter(
       (value, index, self) =>
         self.findIndex(

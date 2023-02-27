@@ -17,6 +17,8 @@ export class NFRProvision {
   @Column({ nullable: true })
   provision_group: number;
   @Column({ nullable: true })
+  provision_group_text: string;
+  @Column({ nullable: true })
   max: number;
   @Column({ nullable: true })
   provision_text: string;
@@ -41,6 +43,7 @@ export class NFRProvision {
     dtid?: number,
     type?: string,
     provision_group?: number,
+    provision_group_text?: string,
     max?: number,
     provision_text?: string,
     free_text?: string,
@@ -53,6 +56,7 @@ export class NFRProvision {
     this.dtid = dtid || null;
     this.type = type || "";
     this.provision_group = provision_group || null;
+    this.provision_group_text = provision_group_text || "";
     this.max = max || null;
     this.provision_text = provision_text || "";
     this.free_text = free_text || "";

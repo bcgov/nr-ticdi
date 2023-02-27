@@ -494,7 +494,7 @@
         *******************/
         function downloadTemplate(id) {
             $(":button").prop("disabled", true);
-            const template_name = $(`#name-${id}`).val();
+            const template_name = $(`#file_name-${id}`).val();
             fetch(`/admin/download-template/${id}`, {
                 method: "GET",
             })

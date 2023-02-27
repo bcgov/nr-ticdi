@@ -167,22 +167,20 @@ export class DocumentTemplateService {
     return this.documentTemplateRepository.save(templateToUpdate);
   }
 
-  async findAll(document_type: string): Promise<DocumentTemplate[]> {
+  findAll(document_type: string): Promise<DocumentTemplate[]> {
     return this.documentTemplateRepository.find({
       where: { is_deleted: false, document_type: document_type },
     });
   }
 
-  async findActiveByDocumentType(
-    document_type: string
-  ): Promise<DocumentTemplate> {
+  findActiveByDocumentType(document_type: string): Promise<DocumentTemplate> {
     return this.documentTemplateRepository.findOneBy({
       document_type: document_type,
       active_flag: true,
     });
   }
 
-  async findOne(id: number): Promise<DocumentTemplate> {
+  findOne(id: number): Promise<DocumentTemplate> {
     return this.documentTemplateRepository.findOneByOrFail({
       id: id,
     });

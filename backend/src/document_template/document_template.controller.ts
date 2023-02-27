@@ -85,8 +85,7 @@ export class DocumentTemplateController {
   }
 
   @Post("nfr-template-info")
-  async getTemplatesInfoByIds(@Body() ids: number[]): Promise<any[]> {
-    console.log(ids);
+  getTemplatesInfoByIds(@Body() ids: number[]): Promise<any[]> {
     return this.templateService.getTemplatesInfoByIds(ids);
   }
 }

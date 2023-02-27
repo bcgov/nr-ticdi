@@ -55,7 +55,7 @@ export class NFRProvisionController {
     return this.nfrProvisionService.select(id);
   }
 
-  @Get("disable/:id")
+  @Get("deselect/:id")
   deselectProvision(@Param("id") id: number) {
     return this.nfrProvisionService.deselect(id);
   }

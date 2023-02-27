@@ -130,6 +130,19 @@
                                 <th style="display: none"></th>
                             </thead>
                         </table>
+                        <br>
+                        <h5>Selected Provisions</h5>
+                        <table id="selectedProvisionsTable" style="width:100%">
+                            <thead>
+                                <th>Type</th>
+                                <th>Group</th>
+                                <th style="min-width: 300px">Provision</th>
+                                <th style="min-width: 150px">Free Text</th>
+                                <th style="min-width: 150px">Category</th>
+                                <th style="display: none"></th>
+                                <th style="display: none"></th>
+                            </thead>
+                        </table>
                     </div>
                 </fieldset>
                 <fieldset class="form-group collapsible">
@@ -156,6 +169,7 @@
         </form>
         <input type="hidden" id="prdid"></input>
         <input type="hidden" id="tfn"></input>
+
     </main>
     <script>
         const groupMaxJsonArray = {{{json groupMaxJsonArray}}};
@@ -194,6 +208,56 @@
                 ],
                 "order": [0, 'asc']
             });
+
+            selectedProvisionsTable = $('#selectedProvisionsTable').DataTable({
+                "ajax": {
+                    "url": `${window.location.origin}/admin/nfr-provisions/${dtid}`,
+                    "dataSrc": "",
+                }, 
+                "paging": false,
+                "bFilter": false,
+                "columns": [
+                    { data: "type"},
+                    { data: "provision_group" },
+                    { data: "provision_text"},
+                    { data: "free_text"},
+                    { data: "category"},
+                    { data: "max" },
+                    { data: "id" }
+                ],
+                "columnDefs": [
+                {
+                    "targets": [0, 1, 2, 3, 4, 5, 6],
+                    "render": function (data, type, row, meta) {
+                        if (type === 'display') {
+                            var columnTypes = ["type", "provision_group", "provision_text", "free_text", "category", "max", "id"];
+                            var columnType = columnTypes[meta.col];
+                            var id = row["id"];
+                            var group = row["group"];
+                            var max = row["max"];
+
+                            if (columnType === "max" || columnType === "id" ) {
+                                return `<input type='hidden' value='${data}' />`;
+                            } else {
+                                return `<input type='text' value='${data}' readonly style='color: gray; width: 100%;' />`;
+                            }
+                        } else {
+                            return data;
+                        }
+                    },
+                },
+                {
+                    targets: [5, 6],
+                    orderable: false,
+                }],
+                "order": [[1, 'asc']],
+                "rowCallback": function(row, data) {
+                    if (data.select === false) {
+                        $(row).hide();
+                    }
+                }
+            });
+
             provisionTable = $('#provisionTable').DataTable({
                 "ajax": {
                     "url": `${window.location.origin}/admin/nfr-provisions/${dtid}`,
@@ -219,7 +283,7 @@
                             var columnTypes = ["type", "provision_text", "free_text", "category", "select", "provision_group", "max", "id"];
                             var columnType = columnTypes[meta.col];
                             var id = row["id"];
-                            var group = row["group"];
+                            var group = row["provision_group"];
                             var max = row["max"];
 
                             if (columnType === "select") {
@@ -264,9 +328,10 @@
                                     }
                                     
                                     if (checkbox.checked) {
-                                        fetch(`admin/select-provision/${checkbox.dataset.id}`);
+                                        fetch(`${window.location.origin}/admin/select-provision/${checkbox.dataset.id}`).then((res) => selectedProvisionsTable.ajax.reload().draw());
+                                        
                                     } else {
-                                        fetch(`admin/deselect-provision/${checkbox.dataset.id}`);
+                                        fetch(`${window.location.origin}/admin/deselect-provision/${checkbox.dataset.id}`).then((res) => selectedProvisionsTable.ajax.reload().draw());;
                                     }
                                 });
                                 const g = checkbox.dataset.group;
@@ -282,6 +347,7 @@
                     },
                     order: [[1, 'asc']]
             });
+            
             $('#variableTable').DataTable({
                 "paging": false,
                 "bFilter": false,

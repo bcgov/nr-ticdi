@@ -507,8 +507,10 @@ export class AdminService {
 
   async addProvision(
     provisionParams: {
+      dtid: number;
       type: string;
       provision_group: number;
+      provision_group_text: string;
       max: number;
       provision: string;
       freeText: string;
@@ -527,8 +529,10 @@ export class AdminService {
   async updateProvision(
     provisionParams: {
       id: number;
+      dtid: number;
       type: string;
       provision_group: number;
+      provision_group_text: string;
       max: number;
       provision: string;
       freeText: string;

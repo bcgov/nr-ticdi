@@ -18,7 +18,8 @@ export class NFRProvisionService {
     const newProvision = this.nfrProvisionRepository.create(nfrProvision);
     await this.updateGroupMaximums(
       nfrProvision.provision_group,
-      nfrProvision.max
+      nfrProvision.max,
+      nfrProvision.provision_group_text
     );
     return this.nfrProvisionRepository.save(newProvision);
   }
@@ -32,7 +33,8 @@ export class NFRProvisionService {
     const updatedProvision = this.nfrProvisionRepository.create(nfrProvision);
     await this.updateGroupMaximums(
       nfrProvision.provision_group,
-      nfrProvision.max
+      nfrProvision.max,
+      nfrProvision.provision_group_text
     );
     return this.nfrProvisionRepository.update(id, updatedProvision);
   }
@@ -58,6 +60,7 @@ export class NFRProvisionService {
         ? this.nfrProvisionRepository.find({
             where: {
               dtid: dtid,
+              active_flag: true,
             },
           })
         : null;
@@ -159,17 +162,29 @@ export class NFRProvisionService {
     }
   }
 
-  async updateGroupMaximums(provision_group: number, max: number) {
+  async updateGroupMaximums(
+    provision_group: number,
+    max: number,
+    provision_group_text: string
+  ) {
     const sameGroupProvisions = await this.nfrProvisionRepository.findBy({
       provision_group: provision_group,
     });
-    if (sameGroupProvisions.length > 0 && sameGroupProvisions[0].max != max) {
+    if (
+      sameGroupProvisions.length > 0 &&
+      (sameGroupProvisions[0].max != max ||
+        sameGroupProvisions[0].provision_group_text != provision_group_text)
+    ) {
       const idList = sameGroupProvisions.map((obj) => obj.id);
       await this.nfrProvisionRepository.update(
         {
           id: In(idList),
         },
-        { max: max, active_flag: false }
+        {
+          max: max,
+          provision_group_text: provision_group_text,
+          select: false,
+        }
       );
     }
   }

@@ -249,8 +249,10 @@ export class AdminController {
   addProvision(
     @Body()
     provisionParams: {
+      dtid: number;
       type: string;
       provision_group: number;
+      provision_group_text: string;
       max: number;
       provision: string;
       freeText: string;
@@ -267,8 +269,10 @@ export class AdminController {
     @Body()
     provisionParams: {
       id: number;
+      dtid: number;
       type: string;
       provision_group: number;
+      provision_group_text: string;
       max: number;
       provision: string;
       freeText: string;

@@ -175,6 +175,10 @@
                         <div id="editProvisionDiv">
                             <form id="editProvisionForm">
                             <div class="form-group">
+                                <label for="editProvisionDTID">DTID</label>
+                                <input type="number" class="form-control" id="editProvisionDTID" name="dtid" pattern="[0-9]+">
+                            </div>
+                            <div class="form-group">
                                 <label for="editProvisionType">Type</label>
                                 <select class="form-control" id="editProvisionType" name="type">
                                     <option value="O">O</option>
@@ -183,7 +187,11 @@
                             </div>
                             <div class="form-group">
                                 <label for="editProvisionGroup">Group</label>
-                                <input type="number" class="form-control" id="editProvisionGroup" name="max" pattern="[0-9]+">
+                                <input type="number" class="form-control" id="editProvisionGroup" name="provision_group" pattern="[0-9]+">
+                            </div>
+                            <div class="form-group">
+                                <label for="editProvisionGroupText">Group Description</label>
+                                <input type="text" class="form-control" id="editProvisionGroupText" name="provision_group">
                             </div>
                             <div class="form-group">
                                 <label for="editProvisionMax">Max</label>
@@ -204,7 +212,7 @@
                             </form>
                         </div>
                         <div id="editProvisionConfirmationDiv" style="display: none">
-                            <p>This will change the maximum number of provisions for group <span id="groupConfirmation"></span>.</p>
+                            <p id="editGroupConfirmationText"></p>
                         </div>
                         <div id="editProvisionId" value="" style="display: none"></div>
                     </div>
@@ -234,6 +242,10 @@
                         <div id="addProvisionDiv">
                             <form id="addProvisionForm">
                             <div class="form-group">
+                                <label for="addProvisionDTID">DTID</label>
+                                <input type="number" class="form-control" id="addProvisionDTID" name="dtid" pattern="[0-9]+">
+                            </div>
+                            <div class="form-group">
                                 <label for="addProvisionType">Type</label>
                                 <select class="form-control" id="addProvisionType" name="type">
                                     <option value="O">O</option>
@@ -242,7 +254,11 @@
                             </div>
                             <div class="form-group">
                                 <label for="addProvisionGroup">Group</label>
-                                <input type="number" class="form-control" id="addProvisionGroup" name="max" pattern="[0-9]+">
+                                <input type="number" class="form-control" id="addProvisionGroup" name="provision_group" pattern="[0-9]+">
+                            </div>
+                            <div class="form-group">
+                                <label for="addProvisionGroup">Group Description</label>
+                                <input type="text" class="form-control" id="addProvisionGroupText" name="provision_group_text" >
                             </div>
                             <div class="form-group">
                                 <label for="addProvisionMax">Max</label>
@@ -263,7 +279,7 @@
                             </form>
                         </div>
                         <div id="addProvisionConfirmationDiv" style="display: none">
-                            <p>This will change the maximum number of provisions for group <span id="groupConfirmation"></span>.</p>
+                            <p id="addGroupConfirmationText"></p>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -364,7 +380,8 @@
                     },
                     "columns": [
                         { data: "provision_group",  title: "Group"},
-                        { data: "max",  title: "Max"}
+                        { data: "max",  title: "Max"},
+                        { data: "provision_group_text",  title: "Group Description"}
                     ],
                     "order": [0, 'asc']
                 });
@@ -594,19 +611,22 @@
         * Add Provision Modal logic *
         ********************************/
         function addProvision() {
+            const dtid = $('#addProvisionDTID').val();
             const type = $('#addProvisionType').find(":selected").val();
             const provision_group = $('#addProvisionGroup').val();
             const max = $('#addProvisionMax').val();
+            const provision_group_text = $('#addProvisionGroupText').val();
             const provision_text = $('#addProvisionText').val();
             const free_text = $('#addProvisionFreeText').val();
             const category = $('#addProvisionCategory').val();
-            const data = JSON.stringify( { type: type, provision_group: provision_group, max: max, provision_text: provision_text, free_text: free_text, category: category } );
+            const data = JSON.stringify( { dtid: dtid, type: type, provision_group: provision_group, max: max, provision_text: provision_text, provision_group_text: provision_group_text, free_text: free_text, category: category } );
             const matchingRow = $('#groupMaxTable').find("tr td:first-child").filter(function() {
                 return $(this).text() === provision_group;
             }).closest("tr");
             if (matchingRow.length) {
                 const maxCellValue = matchingRow.find("td:eq(1)").text();
-                if (maxCellValue === max) {
+                const groupTextCellValue = matchingRow.find("td:eq(2)").text();
+                if (maxCellValue === max && groupTextCellValue == provision_group_text) {
                     fetch('admin/add-provision', {
                         method: 'POST',
                         headers: {
@@ -620,7 +640,13 @@
                     });
                     $('#addProvisionModal').modal('toggle');
                 } else {
-                    $('#groupConfirmation').text(provision_group);
+                    if (maxCellValue != max && groupTextCellValue != provision_group_text) {
+                        $('#addGroupConfirmationText').text(`This will change the maximum number of provisions and description for group ${provision_group}.`);
+                    } else if (maxCellValue != max) {
+                        $('#addGroupConfirmationText').text(`This will change the maximum number of provisions for group ${provision_group}.`);
+                    } else {
+                        $('#addGroupConfirmationText').text(`This will change the description for group ${provision_group}.`);
+                    }
                     showAddConfirm();
                 }
             } else {
@@ -639,13 +665,15 @@
             }
         }
         function confirmAddProvision() {
+            const dtid = $('#addProvisionDTID').val();
             const type = $('#addProvisionType').find(":selected").val();
             const provision_group = $('#addProvisionGroup').val();
+            const provision_group_text = $('#addProvisionGroupText').val();
             const max = $('#addProvisionMax').val();
             const provision_text = $('#addProvisionText').val();
             const free_text = $('#addProvisionFreeText').val();
             const category = $('#addProvisionCategory').val();
-            const data = JSON.stringify( { type: type, provision_group: provision_group, max: max, provision_text: provision_text, free_text: free_text, category: category } );
+            const data = JSON.stringify( { dtid: dtid, type: type, provision_group: provision_group, provision_group_text: provision_group_text, max: max, provision_text: provision_text, free_text: free_text, category: category } );
             fetch('admin/add-provision', {
                 method: 'POST',
                 headers: {
@@ -679,7 +707,9 @@
             }).closest("tr");
             if (matchingRow.length) {
                 const maxCellValue = matchingRow.find("td:eq(1)").text();
+                const groupTextCellValue = matchingRow.find("td:eq(2)").text();
                 $("#addProvisionMax").val(maxCellValue);
+                $("#addProvisionGroupText").val(groupTextCellValue);
             } else {
                 $("#addProvisionMax").val("");
             }
@@ -706,12 +736,20 @@
         *********************************/
         function openEditModal() {
             const provisionId = $(this).data("id");
+            const dtid = $(`#dtid-${provisionId}`).val();
             const type = $(`#type-${provisionId}`).val();
             const provision_group = $(`#provision_group-${provisionId}`).val();
             const max = $(`#max-${provisionId}`).val();
             const provision_text = $(`#provision_text-${provisionId}`).val();
             const free_text = $(`#free_text-${provisionId}`).val();
             const category = $(`#category-${provisionId}`).val();
+            let provision_group_text = '';
+            const matchingRow = $('#groupMaxTable').find("tr td:first-child").filter(function() {
+                return $(this).text() === provision_group;
+            }).closest("tr");
+            if (matchingRow.length) {
+                provision_group_text = matchingRow.find("td:eq(2)").text();
+            }
 
             $('#editProvisionId').val(provisionId);
             const editProvisionType = document.getElementById('editProvisionType');
@@ -722,7 +760,9 @@
                     break;
                 }
             }
+            $('#editProvisionDTID').val(dtid);
             $('#editProvisionGroup').val(provision_group);
+            $('#editProvisionGroupText').val(provision_group_text);
             $('#editProvisionMax').val(max);
             $('#editProvisionText').val(provision_text);
             $('#editProvisionFreeText').val(free_text);
@@ -731,19 +771,22 @@
         }
         function editProvision() {
             const id = $('#editProvisionId').val();
+            const dtid = $('#editProvisionDTID').val();
             const type = $('#editProvisionType').find(":selected").val();
             const provision_group = $('#editProvisionGroup').val();
+            const provision_group_text = $('#editProvisionGroupText').val();
             const max = $('#editProvisionMax').val();
             const provision_text = $('#editProvisionText').val();
             const free_text = $('#editProvisionFreeText').val();
             const category = $('#editProvisionCategory').val();
-            const data = JSON.stringify( { id: id, type: type, provision_group: provision_group, max: max, provision_text: provision_text, free_text: free_text, category: category } );
+            const data = JSON.stringify( { id: id, dtid: dtid, type: type, provision_group: provision_group, provision_group_text: provision_group_text, max: max, provision_text: provision_text, free_text: free_text, category: category } );
             const matchingRow = $('#groupMaxTable').find("tr td:first-child").filter(function() {
                 return $(this).text() === provision_group;
             }).closest("tr");
             if (matchingRow.length) {
                 const maxCellValue = matchingRow.find("td:eq(1)").text();
-                if (maxCellValue === max) {
+                const groupTextCellValue = matchingRow.find("td:eq(2)").text();
+                if (maxCellValue === max && provision_group_text == groupTextCellValue) {
                     fetch('admin/update-provision', {
                         method: 'POST',
                         headers: {
@@ -757,7 +800,13 @@
                         $('#editProvisionModal').modal('toggle');
                     });
                 } else {
-                    $('#groupConfirmation').text(provision_group);
+                    if (maxCellValue != max && groupTextCellValue != provision_group_text) {
+                        $('#editGroupConfirmationText').text(`This will change the maximum number of provisions and description for group ${provision_group}.`);
+                    } else if (maxCellValue != max) {
+                        $('#editGroupConfirmationText').text(`This will change the maximum number of provisions for group ${provision_group}.`);
+                    } else {
+                        $('#editGroupConfirmationText').text(`This will change the description for group ${provision_group}.`);
+                    }
                     showEditConfirm();
                 }
             } else {
@@ -777,13 +826,15 @@
         }
         function confirmEditProvision() {
             const id = $('#editProvisionId').val();
+            const dtid = $('#editProvisionDTID').val();
             const type = $('#editProvisionType').find(":selected").val();
             const provision_group = $('#editProvisionGroup').val();
+            const provision_group_text = $('#editProvisionGroupText').val();
             const max = $('#editProvisionMax').val();
             const provision_text = $('#editProvisionText').val();
             const free_text = $('#editProvisionFreeText').val();
             const category = $('#editProvisionCategory').val();
-            const data = JSON.stringify( { id: id, type: type, provision_group: provision_group, max: max, provision_text: provision_text, free_text: free_text, category: category } );
+            const data = JSON.stringify( { id: id, dtid: dtid, type: type, provision_group: provision_group, provision_group_text: provision_group_text, max: max, provision_text: provision_text, free_text: free_text, category: category } );
             fetch('admin/update-provision', {
                 method: 'POST',
                 headers: {
@@ -818,7 +869,9 @@
             }).closest("tr");
             if (matchingRow.length) {
                 const maxCellValue = matchingRow.find("td:eq(1)").text();
+                const groupTextCellValue = matchingRow.find("td:eq(2)").text();
                 $("#editProvisionMax").val(maxCellValue);
+                $("#editProvisionGroupText").val(groupTextCellValue);
             } else {
                 $("#editProvisionMax").val("");
             }

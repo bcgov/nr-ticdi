@@ -77,6 +77,8 @@ export class ReportController {
     );
   }
 
+  // TODO generate-nfr-report
+
   @UseGuards(AdminGuard)
   @Post("generate-specific-report")
   async generateSpecificReport(

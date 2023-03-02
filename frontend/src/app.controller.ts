@@ -11,15 +11,22 @@ import {
 } from "@nestjs/common";
 import { AppService } from "./app.service";
 import { AdminService } from "./admin/admin.service";
-import { NFR_VARIANTS, PAGE_TITLES, REPORT_TYPES } from "utils/constants";
-import { SessionData, UserObject } from "utils/types";
+import {
+  NFR_VARIANTS,
+  NFR_VARIANTS_ARRAY,
+  PAGE_TITLES,
+  REPORT_TYPES,
+} from "utils/constants";
+import { SessionData } from "utils/types";
 import { AuthenticationGuard } from "./authentication/authentication.guard";
 import { AuthenticationFilter } from "./authentication/authentication.filter";
 import { TTLSService } from "./ttls/ttls.service";
 import { AdminGuard } from "./admin/admin.guard";
 import { AxiosRequestConfig } from "axios";
-import { firstValueFrom, lastValueFrom, map } from "rxjs";
+import { firstValueFrom } from "rxjs";
 import { HttpService } from "@nestjs/axios";
+import { Req } from "@nestjs/common/decorators/http/route-params.decorator";
+import { Request, Response } from "express";
 
 let requestUrl: string;
 let requestConfig: AxiosRequestConfig;
@@ -106,69 +113,78 @@ export class AppController {
   async findOne(
     @Session() session: { data?: SessionData },
     @Param("id") id,
-    @Param("docname") docname: string
+    @Req() request: Request,
+    @Res() response: Response
   ) {
-    let isAdmin = false;
-    if (
-      session.data &&
-      session.data.activeAccount &&
-      session.data.activeAccount.client_roles
-    ) {
-      for (let role of session.data.activeAccount.client_roles) {
-        if (role == "ticdi_admin") {
-          isAdmin = true;
+    const hasParams = request.originalUrl.includes("?session_state");
+    if (hasParams) {
+      const urlWithoutParams = request.path;
+      response.redirect(301, urlWithoutParams);
+    } else {
+      let isAdmin = false;
+      if (
+        session.data &&
+        session.data.activeAccount &&
+        session.data.activeAccount.client_roles
+      ) {
+        for (let role of session.data.activeAccount.client_roles) {
+          if (role == "ticdi_admin") {
+            isAdmin = true;
+          }
         }
       }
-    }
-    const title =
-      process.env.ticdi_environment == "DEVELOPMENT"
-        ? "DEVELOPMENT - " + PAGE_TITLES.INDEX
-        : PAGE_TITLES.INDEX;
-    const displayAdmin = isAdmin ? "Administration" : "-";
-    await this.ttlsService.setWebadeToken();
-    let ttlsJSON, primaryContactName;
-    try {
-      const response: any = await firstValueFrom(this.ttlsService.callHttp(id))
-        .then((res) => {
-          return res;
-        })
-        .catch((err) => {
-          console.log("callHttp failed");
-          console.log(err);
-          console.log(err.response.data);
-        });
-      ttlsJSON = await this.ttlsService.sendToBackend(response);
-      if (ttlsJSON.inspected_date) {
-        ttlsJSON["inspected_date"] = this.ttlsService.formatInspectedDate(
-          ttlsJSON.inspected_date.toString()
-        );
+      const title =
+        process.env.ticdi_environment == "DEVELOPMENT"
+          ? "DEVELOPMENT - " + PAGE_TITLES.INDEX
+          : PAGE_TITLES.INDEX;
+      const displayAdmin = isAdmin ? "Administration" : "-";
+      await this.ttlsService.setWebadeToken();
+      let ttlsJSON, primaryContactName;
+      try {
+        const response: any = await firstValueFrom(
+          this.ttlsService.callHttp(id)
+        )
+          .then((res) => {
+            return res;
+          })
+          .catch((err) => {
+            console.log("callHttp failed");
+            console.log(err);
+            console.log(err.response.data);
+          });
+        ttlsJSON = await this.ttlsService.sendToBackend(response);
+        if (ttlsJSON.inspected_date) {
+          ttlsJSON["inspected_date"] = this.ttlsService.formatInspectedDate(
+            ttlsJSON.inspected_date.toString()
+          );
+        }
+        primaryContactName = ttlsJSON.licence_holder_name;
+        return {
+          title: title,
+          idirUsername: session.data.activeAccount
+            ? session.data.activeAccount.idir_username
+            : "",
+          primaryContactName: primaryContactName,
+          displayAdmin: displayAdmin,
+          message: ttlsJSON,
+          documentTypes: ["Land Use Report", "Notice of Final Review"],
+          prdid: ttlsJSON.id,
+        };
+      } catch (err) {
+        console.log(err);
+        return {
+          title: title,
+          idirUsername: session.data.activeAccount
+            ? session.data.activeAccount.idir_username
+            : "",
+          primaryContactName: primaryContactName ? primaryContactName : null,
+          displayAdmin: displayAdmin,
+          message: ttlsJSON ? ttlsJSON : null,
+          documentTypes: ["Land Use Report", "Notice of Final Review"],
+          prdid: ttlsJSON ? ttlsJSON.id : null,
+          error: err,
+        };
       }
-      primaryContactName = ttlsJSON.licence_holder_name;
-      return {
-        title: title,
-        idirUsername: session.data.activeAccount
-          ? session.data.activeAccount.idir_username
-          : "",
-        primaryContactName: primaryContactName,
-        displayAdmin: displayAdmin,
-        message: ttlsJSON,
-        documentTypes: ["Land Use Report", "Notice of Final Review"],
-        prdid: ttlsJSON.id,
-      };
-    } catch (err) {
-      console.log(err);
-      return {
-        title: title,
-        idirUsername: session.data.activeAccount
-          ? session.data.activeAccount.idir_username
-          : "",
-        primaryContactName: primaryContactName ? primaryContactName : null,
-        displayAdmin: displayAdmin,
-        message: ttlsJSON ? ttlsJSON : null,
-        documentTypes: ["Land Use Report", "Notice of Final Review"],
-        prdid: ttlsJSON ? ttlsJSON.id : null,
-        error: err,
-      };
     }
   }
 
@@ -208,7 +224,7 @@ export class AppController {
         primaryContactName: primaryContactName,
         displayAdmin: displayAdmin,
         message: data,
-        documentTypes: NFR_VARIANTS,
+        documentTypes: NFR_VARIANTS_ARRAY,
         nfr_id: data.id,
         template_id: data.template_id,
       };
@@ -222,7 +238,7 @@ export class AppController {
         primaryContactName: primaryContactName ? primaryContactName : null,
         displayAdmin: displayAdmin,
         message: data ? data : null,
-        documentTypes: NFR_VARIANTS,
+        documentTypes: NFR_VARIANTS_ARRAY,
         nfr_id: data ? data.id : null,
         template_id: data.template_id,
         error: err,
@@ -238,87 +254,126 @@ export class AppController {
    * @param docname
    * @returns
    */
-  @Get("nfr/dtid/:id")
+  @Get("nfr/dtid/:id/:variant")
   @UseFilters(AuthenticationFilter)
   @UseGuards(AuthenticationGuard)
   @Render("nfr")
-  async findNofr(@Session() session: { data?: SessionData }, @Param("id") id) {
-    let isAdmin = false;
-    if (
-      session.data &&
-      session.data.activeAccount &&
-      session.data.activeAccount.client_roles
-    ) {
-      for (let role of session.data.activeAccount.client_roles) {
-        if (role == "ticdi_admin") {
-          isAdmin = true;
+  async findNofr(
+    @Session() session: { data?: SessionData },
+    @Param("id") id: number,
+    @Param("variant") variant: string,
+    @Req() req: Request,
+    @Res() res: Response
+  ) {
+    console.log(variant);
+    const hasParams = req.originalUrl.includes("?session_state");
+    if (hasParams) {
+      const urlWithoutParams = req.path;
+      res.redirect(301, urlWithoutParams);
+    } else {
+      let isAdmin = false;
+      if (
+        session.data &&
+        session.data.activeAccount &&
+        session.data.activeAccount.client_roles
+      ) {
+        for (let role of session.data.activeAccount.client_roles) {
+          if (role == "ticdi_admin") {
+            isAdmin = true;
+          }
         }
       }
-    }
-    const title =
-      process.env.ticdi_environment == "DEVELOPMENT"
-        ? "DEVELOPMENT - " + PAGE_TITLES.NOFR
-        : PAGE_TITLES.NOFR;
-    const displayAdmin = isAdmin ? "Administration" : "-";
-    await this.ttlsService.setWebadeToken();
-    const groupMaxJsonArray = await this.adminService.getGroupMaxByDTID(id);
-    let ttlsJSON, primaryContactName;
-    try {
-      const response: any = await firstValueFrom(this.ttlsService.callHttp(id))
-        .then((res) => {
-          return res;
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-      ttlsJSON = await this.ttlsService.sendToBackend(response);
-      if (ttlsJSON.inspected_date) {
-        ttlsJSON["inspected_date"] = this.ttlsService.formatInspectedDate(
-          ttlsJSON.inspected_date.toString()
-        );
+      const title =
+        process.env.ticdi_environment == "DEVELOPMENT"
+          ? "DEVELOPMENT - " + PAGE_TITLES.NOFR
+          : PAGE_TITLES.NOFR;
+      const displayAdmin = isAdmin ? "Administration" : "-";
+      await this.ttlsService.setWebadeToken();
+      const groupMaxJsonArray = await this.adminService.getGroupMaxByDTID(id);
+      let ttlsJSON, primaryContactName;
+      try {
+        const response: any = await firstValueFrom(
+          this.ttlsService.callHttp(id)
+        )
+          .then((res) => {
+            return res;
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+        ttlsJSON = await this.ttlsService.sendToBackend(response);
+        if (ttlsJSON.inspected_date) {
+          ttlsJSON["inspected_date"] = this.ttlsService.formatInspectedDate(
+            ttlsJSON.inspected_date.toString()
+          );
+        }
+        primaryContactName = ttlsJSON.licence_holder_name;
+        ttlsJSON["interested_parties"] = [
+          {
+            first_name: "asdf",
+            middle_name: "fdsa",
+            last_name: "1234",
+            address: "123 fake street",
+          },
+          {
+            first_name: "uiop",
+            middle_name: "poiu",
+            last_name: "4321",
+            address: "555 fghj road",
+          },
+        ];
+        let selectedVariant = 0;
+        switch (variant) {
+          case NFR_VARIANTS.delayed: {
+            selectedVariant = 0;
+            break;
+          }
+          case NFR_VARIANTS.default: {
+            selectedVariant = 1;
+            break;
+          }
+          case NFR_VARIANTS.no_fees: {
+            selectedVariant = 2;
+            break;
+          }
+          case NFR_VARIANTS.survey_required: {
+            selectedVariant = 3;
+            break;
+          }
+          case NFR_VARIANTS.to_obtain_survey: {
+            selectedVariant = 4;
+            break;
+          }
+        }
+        return {
+          title: title,
+          idirUsername: session.data.activeAccount
+            ? session.data.activeAccount.idir_username
+            : "",
+          primaryContactName: primaryContactName,
+          displayAdmin: displayAdmin,
+          message: ttlsJSON,
+          groupMaxJsonArray: groupMaxJsonArray,
+          documentTypes: NFR_VARIANTS_ARRAY,
+          selectedVariant: selectedVariant,
+          prdid: ttlsJSON.id,
+        };
+      } catch (err) {
+        console.log(err);
+        return {
+          title: title,
+          idirUsername: session.data.activeAccount
+            ? session.data.activeAccount.idir_username
+            : "",
+          primaryContactName: primaryContactName ? primaryContactName : null,
+          displayAdmin: displayAdmin,
+          message: ttlsJSON ? ttlsJSON : null,
+          groupMaxJsonArray: groupMaxJsonArray,
+          documentTypes: NFR_VARIANTS_ARRAY,
+          prdid: ttlsJSON ? ttlsJSON.id : null,
+          error: err,
+        };
       }
-      primaryContactName = ttlsJSON.licence_holder_name;
-      ttlsJSON["interested_parties"] = [
-        {
-          first_name: "asdf",
-          middle_name: "fdsa",
-          last_name: "1234",
-          address: "123 fake street",
-        },
-        {
-          first_name: "uiop",
-          middle_name: "poiu",
-          last_name: "4321",
-          address: "555 fghj road",
-        },
-      ];
-      return {
-        title: title,
-        idirUsername: session.data.activeAccount
-          ? session.data.activeAccount.idir_username
-          : "",
-        primaryContactName: primaryContactName,
-        displayAdmin: displayAdmin,
-        message: ttlsJSON,
-        groupMaxJsonArray: groupMaxJsonArray,
-        documentTypes: NFR_VARIANTS,
-        prdid: ttlsJSON.id,
-      };
-    } catch (err) {
-      console.log(err);
-      return {
-        title: title,
-        idirUsername: session.data.activeAccount
-          ? session.data.activeAccount.idir_username
-          : "",
-        primaryContactName: primaryContactName ? primaryContactName : null,
-        displayAdmin: displayAdmin,
-        message: ttlsJSON ? ttlsJSON : null,
-        groupMaxJsonArray: groupMaxJsonArray,
-        documentTypes: NFR_VARIANTS,
-        prdid: ttlsJSON ? ttlsJSON.id : null,
-        error: err,
-      };
     }
   }
 
@@ -434,5 +489,16 @@ export class AppController {
   @Get()
   getHello2(): string {
     return this.appService.getHello();
+  }
+
+  @Get("/404")
+  @Render("404")
+  @UseFilters(AuthenticationFilter)
+  @UseGuards(AuthenticationGuard)
+  notFound() {
+    return {
+      title: "404 Not Found",
+      message: "Sorry, the page you are looking for does not exist.",
+    };
   }
 }

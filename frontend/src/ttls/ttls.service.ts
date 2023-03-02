@@ -259,7 +259,7 @@ export class TTLSService {
     }
   }
 
-  callHttp(id: string): Observable<Array<Object>> {
+  callHttp(id: number): Observable<Array<Object>> {
     const bearerToken = this.webade_token;
     const url = process.env.ttls_url + id;
     return this.http

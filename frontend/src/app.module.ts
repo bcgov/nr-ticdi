@@ -9,6 +9,8 @@ import { HttpModule } from "@nestjs/axios";
 import { AdminController } from "./admin/admin.controller";
 import { AdminModule } from "./admin/admin.module";
 import { ReportModule } from "./report/report.module";
+import { HttpExceptionFilter } from "./authentication/http-exception.filter";
+import { APP_FILTER } from "@nestjs/core";
 
 @Module({
   imports: [
@@ -22,6 +24,13 @@ import { ReportModule } from "./report/report.module";
     }),
   ],
   controllers: [AppController, AdminController],
-  providers: [AppService, TTLSService],
+  providers: [
+    AppService,
+    TTLSService,
+    {
+      provide: APP_FILTER,
+      useClass: HttpExceptionFilter,
+    },
+  ],
 })
 export class AppModule {}

@@ -170,12 +170,12 @@
         <input type="hidden" id="prdid" value="{{this.prdid}}">
         <input type="hidden" id="tfn" value="{{message.db_file_number}}">
         <input type="hidden" id="groupMaxJson">
-        <input type="hidden" id="dtid">
 
     </main>
     <script>
         $('#groupMaxJson').val(JSON.stringify('{{{json groupMaxJsonArray}}}'));
         $('#dtid').val({{ message.dtid }});
+        $('#documentVariantId').prop("selectedIndex", {{selectedVariant}});
         console.log({{message.err}});
     </script>
     <script src="/js/nfr.js"></script>

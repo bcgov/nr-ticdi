@@ -51,7 +51,6 @@
                                     <th>Active</th><!-- Active column -->
                                     <th></th><!-- Edit column -->
                                     <th></th><!-- id column -->
-                                    <th></th><!-- dtid column -->
                                 </thead>
                                 <tbody id="provisionTableBody"></tbody>
                             </table>
@@ -175,10 +174,6 @@
                         <div id="editProvisionDiv">
                             <form id="editProvisionForm">
                             <div class="form-group">
-                                <label for="editProvisionDTID">DTID</label>
-                                <input type="number" class="form-control" id="editProvisionDTID" name="dtid" pattern="[0-9]+">
-                            </div>
-                            <div class="form-group">
                                 <label for="editProvisionType">Type</label>
                                 <select class="form-control" id="editProvisionType" name="type">
                                     <option value="O">O</option>
@@ -241,10 +236,6 @@
                     <div class="modal-body">
                         <div id="addProvisionDiv">
                             <form id="addProvisionForm">
-                            <div class="form-group">
-                                <label for="addProvisionDTID">DTID</label>
-                                <input type="number" class="form-control" id="addProvisionDTID" name="dtid" pattern="[0-9]+">
-                            </div>
                             <div class="form-group">
                                 <label for="addProvisionType">Type</label>
                                 <select class="form-control" id="addProvisionType" name="type">

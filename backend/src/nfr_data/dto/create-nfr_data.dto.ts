@@ -3,6 +3,7 @@ import { NFRDataDto } from "./nfr_data.dto";
 
 export class CreateNFRDataDto extends PickType(NFRDataDto, [
   "dtid",
+  "variant_name",
   "template_id",
   "status",
   "db_address_regional_office",

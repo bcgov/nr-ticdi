@@ -176,6 +176,10 @@
         $('#groupMaxJson').val(JSON.stringify('{{{json groupMaxJsonArray}}}'));
         $('#dtid').val({{ message.dtid }});
         $('#documentVariantId').prop("selectedIndex", {{selectedVariant}});
+        const currentUrl = window.location.pathname;
+        const variantName = currentUrl.split('/').pop();
+        console.log(variantName);
+        $('#variantName').val(variantName)
         console.log({{message.err}});
     </script>
     <script src="/js/nfr.js"></script>

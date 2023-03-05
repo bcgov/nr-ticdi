@@ -1,5 +1,6 @@
 export class NFRDataDto {
   dtid?: number;
+  variant_name?: string;
   template_id?: number;
   status?: string;
   db_address_regional_office?: string;

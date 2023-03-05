@@ -261,11 +261,11 @@ export class AppController {
   async findNofr(
     @Session() session: { data?: SessionData },
     @Param("id") id: number,
-    @Param("variant") variant: string,
+    @Param("variant") variantName: string,
     @Req() req: Request,
     @Res() res: Response
   ) {
-    console.log(variant);
+    console.log(variantName);
     const hasParams = req.originalUrl.includes("?session_state");
     if (hasParams) {
       const urlWithoutParams = req.path;
@@ -289,7 +289,11 @@ export class AppController {
           : PAGE_TITLES.NOFR;
       const displayAdmin = isAdmin ? "Administration" : "-";
       await this.ttlsService.setWebadeToken();
-      const groupMaxJsonArray = await this.adminService.getGroupMaxByDTID(id);
+      console.log("getting groupmax");
+      const groupMaxJsonArray = await this.adminService.getGroupMaxByVariant(
+        variantName
+      );
+      console.log(groupMaxJsonArray);
       let ttlsJSON, primaryContactName;
       try {
         const response: any = await firstValueFrom(
@@ -323,7 +327,7 @@ export class AppController {
           },
         ];
         let selectedVariant = 0;
-        switch (variant) {
+        switch (variantName) {
           case NFR_VARIANTS.delayed: {
             selectedVariant = 0;
             break;
@@ -495,10 +499,24 @@ export class AppController {
   @Render("404")
   @UseFilters(AuthenticationFilter)
   @UseGuards(AuthenticationGuard)
-  notFound() {
+  notFound(@Session() session: { data?: SessionData }) {
+    let isAdmin = false;
+    if (
+      session.data &&
+      session.data.activeAccount &&
+      session.data.activeAccount.client_roles
+    ) {
+      for (let role of session.data.activeAccount.client_roles) {
+        if (role == "ticdi_admin") {
+          isAdmin = true;
+        }
+      }
+    }
+    const displayAdmin = isAdmin ? "Administration" : "-";
     return {
       title: "404 Not Found",
       message: "Sorry, the page you are looking for does not exist.",
+      displayAdmin: displayAdmin,
     };
   }
 }

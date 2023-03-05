@@ -10,12 +10,22 @@ export class NFRDataController {
   async create(
     @Body()
     data: {
-      nfrData: CreateNFRDataDto;
+      nfrData: CreateNFRDataDto & { enabled_provisions: number[] };
     }
   ) {
     let nfrData = data.nfrData;
     return this.nfrDataService.create(nfrData);
   }
+
+  // @Get("select-provision/:nfrDataId/:provisionId")
+  // selectProvision(@Param('nfrDataId') nfrDataId: number, @Param('provisionId') provisionId: number) {
+  //   return this.nfrDataService.select(nfrDataId, provisionId);
+  // }
+
+  // @Get("deselect-provision/:nfrDataId/:provisionId")
+  // deselectProvision(@Param('nfrDataId') nfrDataId: number, @Param('provisionId') provisionId: number) {
+  //   return this.nfrDataService.deselect(nfrDataId, provisionId);
+  // }
 
   @Get()
   findAll() {

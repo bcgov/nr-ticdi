@@ -25,7 +25,7 @@ $(document).ready(function () {
   }
   groupMaxTable = $("#groupMaxTable").DataTable({
     ajax: {
-      url: `${window.location.origin}/admin/get-group-max/${dtid}`,
+      url: `${window.location.origin}/admin/get-group-max/${variantName}`,
       dataSrc: "",
     },
     columns: [
@@ -38,7 +38,9 @@ $(document).ready(function () {
 
   selectedProvisionsTable = $("#selectedProvisionsTable").DataTable({
     ajax: {
-      url: `${window.location.origin}/admin/nfr-provisions/${dtid}`,
+      url: `${window.location.origin}/admin/nfr-provisions/${encodeURI(
+        variantName
+      )}`,
       dataSrc: "",
     },
     paging: false,
@@ -96,7 +98,9 @@ $(document).ready(function () {
 
   provisionTable = $("#provisionTable").DataTable({
     ajax: {
-      url: `${window.location.origin}/admin/nfr-provisions/${dtid}`,
+      url: `${window.location.origin}/admin/nfr-provisions/${encodeURI(
+        variantName
+      )}`,
       dataSrc: "",
     },
     paging: false,

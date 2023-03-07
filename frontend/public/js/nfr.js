@@ -1,13 +1,17 @@
-const dtid = $("#dtid").val();
+const dtid = +$("#dtid").text();
 const groupMaxJsonInput = document.getElementById("groupMaxJson");
 let groupMaxJsonArray = JSON.parse(groupMaxJsonInput.value);
 groupMaxJsonArray = JSON.parse(groupMaxJsonArray);
-const defaultGroup = groupMaxJsonArray.reduce((acc, curr) =>
-  acc.provision_group < curr.provision_group ? acc : curr
-).provision_group;
+let defaultGroup = 0;
+if (Array.isArray(groupMaxJsonArray) && groupMaxJsonArray.length > 0) {
+  defaultGroup = groupMaxJsonArray.reduce((acc, curr) =>
+    acc.provision_group < curr.provision_group ? acc : curr
+  ).provision_group;
+}
 let groupMaxTable;
 let provisionTable;
-$(document).ready(function () {
+$(document).ready(async function () {
+  const nfrDataId = $("#nfrDataId").val();
   $(".dataSection dd").each(function () {
     if ($(this).text() == "" || $(this).text() == "TBD") {
       $(this).text(" ");
@@ -25,7 +29,7 @@ $(document).ready(function () {
   }
   groupMaxTable = $("#groupMaxTable").DataTable({
     ajax: {
-      url: `${window.location.origin}/admin/get-group-max/${variantName}`,
+      url: `${window.location.origin}/report/get-group-max/${variantName}`,
       dataSrc: "",
     },
     columns: [
@@ -35,16 +39,23 @@ $(document).ready(function () {
     ],
     order: [0, "asc"],
   });
+  let selectedProvisionsUrl = `${
+    window.location.origin
+  }/report/nfr-provisions/${encodeURI(variantName)}`;
+  console.log("nfrDataId: " + nfrDataId);
+  console.log(nfrDataId != "");
+  selectedProvisionsUrl += nfrDataId != "" ? `/${nfrDataId}` : "/-1";
 
   selectedProvisionsTable = $("#selectedProvisionsTable").DataTable({
     ajax: {
-      url: `${window.location.origin}/admin/nfr-provisions/${encodeURI(
-        variantName
-      )}`,
+      url: selectedProvisionsUrl,
       dataSrc: "",
     },
     paging: false,
     bFilter: false,
+    rowId: function (data) {
+      return `selected-provision-row-${data.id}`;
+    },
     columns: [
       { data: "type" },
       { data: "provision_group" },
@@ -67,6 +78,7 @@ $(document).ready(function () {
               "category",
               "max",
               "id",
+              "select",
             ];
             var columnType = columnTypes[meta.col];
             var id = row["id"];
@@ -98,9 +110,9 @@ $(document).ready(function () {
 
   provisionTable = $("#provisionTable").DataTable({
     ajax: {
-      url: `${window.location.origin}/admin/nfr-provisions/${encodeURI(
+      url: `${window.location.origin}/report/nfr-provisions/${encodeURI(
         variantName
-      )}`,
+      )}/-1`,
       dataSrc: "",
     },
     paging: false,
@@ -136,8 +148,9 @@ $(document).ready(function () {
             var max = row["max"];
 
             if (columnType === "select") {
-              const checked = data === true ? "checked" : "";
-              return `<input type='checkbox' id='active-${id}' data-id='${id}' data-group='${group}' data-max='${max}' ${checked}>`;
+              const checked =
+                preloadEnabledProvisions.includes(id) === true ? "checked" : "";
+              return `<input type='checkbox' class='provisionSelect' id='active-${id}' data-id='${id}' data-group='${group}' data-max='${max}' ${checked}>`;
             } else if (
               columnType === "max" ||
               columnType === "provision_group" ||
@@ -170,6 +183,7 @@ $(document).ready(function () {
           checkbox.addEventListener("click", function () {
             const group = checkbox.dataset.group;
             const max = checkbox.dataset.max;
+            const id = checkbox.dataset.id;
             const active = document.querySelectorAll(
               `input[type="checkbox"][data-group="${group}"]:checked`
             ).length;
@@ -190,15 +204,10 @@ $(document).ready(function () {
                   checkbox.disabled = false;
                 });
             }
-
             if (checkbox.checked) {
-              fetch(
-                `${window.location.origin}/admin/select-provision/${checkbox.dataset.id}`
-              ).then((res) => selectedProvisionsTable.ajax.reload().draw());
+              $(`#selected-provision-row-${id}`).show();
             } else {
-              fetch(
-                `${window.location.origin}/admin/deselect-provision/${checkbox.dataset.id}`
-              ).then((res) => selectedProvisionsTable.ajax.reload().draw());
+              $(`#selected-provision-row-${id}`).hide();
             }
           });
           const g = checkbox.dataset.group;
@@ -279,18 +288,20 @@ $("#group-select").on("change", function () {
 });
 function filterRows() {
   const selectedGroup = $("#group-select").val();
-  const groupMax = groupMaxJsonArray.find(
-    (element) => element.provision_group == selectedGroup
-  ).max;
-  $("#maxGroupNum").text(groupMax);
-  provisionTable.rows().every(function () {
-    const provisionGroup = this.data().provision_group;
-    if (selectedGroup == "" || provisionGroup == selectedGroup) {
-      $(this.node()).show();
-    } else {
-      $(this.node()).hide();
-    }
-  });
+  if (Array.isArray(groupMaxJsonArray) && groupMaxJsonArray.length > 0) {
+    const groupMax = groupMaxJsonArray.find(
+      (element) => element.provision_group == selectedGroup
+    ).max;
+    $("#maxGroupNum").text(groupMax);
+    provisionTable.rows().every(function () {
+      const provisionGroup = this.data().provision_group;
+      if (selectedGroup == "" || provisionGroup == selectedGroup) {
+        $(this.node()).show();
+      } else {
+        $(this.node()).hide();
+      }
+    });
+  }
 }
 $("#provisionLegend").click(function () {
   filterRows();
@@ -304,3 +315,26 @@ $("fieldset legend").click(function () {
     $(".fa", this).removeClass("fa-minus").addClass("fa-plus");
   }
 });
+
+function saveForLater() {
+  // get the provisions that the user has selected
+  let enabledProvisions = [];
+  $("#provisionTable")
+    .find(".provisionSelect:checked")
+    .each(function () {
+      enabledProvisions.push($(this).data("id"));
+    });
+  const data = {
+    dtid: dtid,
+    variant_name: decodeURI(variantName),
+    status: "In Progress",
+    enabled_provisions: enabledProvisions,
+  };
+  fetch(`${window.location.origin}/report/save-nfr`, {
+    method: "POST",
+    body: JSON.stringify(data),
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+}

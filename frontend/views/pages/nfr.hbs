@@ -156,7 +156,7 @@
                 </fieldset>
                 <div class="form-group row">
                     <div class="col-md-4">
-                        <button id="nextGroup" class="btn btn-success">Save for Later</button>
+                        <button id="saveNfr" class="btn btn-success" onclick="saveForLater()">Save for Later</button>
                     </div>
                     <div class="col-md-4">
                         <button type="button" class="btn btn-primary" onclick="generateReport()" id="genReport">Create</button>
@@ -169,17 +169,22 @@
         </form>
         <input type="hidden" id="prdid" value="{{this.prdid}}">
         <input type="hidden" id="tfn" value="{{message.db_file_number}}">
+        <input type="hidden" id="nfrDataId" value="{{this.nfrDataId}}">
         <input type="hidden" id="groupMaxJson">
 
     </main>
     <script>
         $('#groupMaxJson').val(JSON.stringify('{{{json groupMaxJsonArray}}}'));
-        $('#dtid').val({{ message.dtid }});
-        $('#documentVariantId').prop("selectedIndex", {{selectedVariant}});
+        $('#documentVariantId').prop("selectedIndex", {{ selectedVariant }});
+        $('#documentVariantId').prop("disabled", true);
+        const isNFRSearch = !window.location.href.includes("nfr/dtid");
         const currentUrl = window.location.pathname;
-        const variantName = currentUrl.split('/').pop();
-        console.log(variantName);
-        $('#variantName').val(variantName)
+        const preloadEnabledProvisions = [{{enabledProvisionList}}];
+        let variantName = $('#documentVariantId').val();
+        if (!isNFRSearch) {
+            $('#documentVariantId').prop("disabled", false);
+        }
+        $('#variantName').val(variantName);
         console.log({{message.err}});
     </script>
     <script src="/js/nfr.js"></script>

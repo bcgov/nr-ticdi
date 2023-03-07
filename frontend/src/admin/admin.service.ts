@@ -363,6 +363,7 @@ export class AdminService {
         j++;
       }
     }
+    console.log(combinedArray);
 
     return combinedArray;
   }
@@ -432,48 +433,6 @@ export class AdminService {
     );
   }
 
-  async getNFRProvisionsByVariant(variantName: string): Promise<any> {
-    const returnItems = [
-      "type",
-      "provision_text",
-      "free_text",
-      "category",
-      "select",
-      "nfr_data_provisions",
-      "provision_group",
-      "id",
-    ];
-    const url = `${hostname}:${port}/nfr-provision/variant/${variantName}`;
-    const nfrProvisions = await axios
-      .get(url)
-      .then((res) => {
-        return res.data;
-      })
-      .catch((err) => console.log(err.response.data));
-    console.log(nfrProvisions);
-    const reduced = nfrProvisions.map((obj) =>
-      Object.keys(obj)
-        .filter((key) => returnItems.includes(key))
-        .reduce(
-          (acc, key) => {
-            acc[key] = obj[key];
-            return acc;
-          },
-          { select: "select" }
-        )
-    );
-    return reduced.map((obj) => {
-      const groupObj = obj.provision_group;
-      const nfrDataProvisions = obj.nfr_data_provisions;
-      console.log(nfrDataProvisions);
-      delete obj["provision_group"];
-      delete obj["nfr_data_provisions"];
-      obj["max"] = groupObj.max;
-      obj["provision_group"] = groupObj.provision_group;
-      return obj;
-    });
-  }
-
   async enableProvision(id: number): Promise<any> {
     const url = `${hostname}:${port}/nfr-provision/enable/${id}`;
     return await axios.get(url).then((res) => {
@@ -488,29 +447,8 @@ export class AdminService {
     });
   }
 
-  // async selectProvision(id: number): Promise<any> {
-  //   const url = `${hostname}:${port}/nfr-provision/select/${id}`;
-  //   return await axios.get(url).then((res) => {
-  //     return res.data;
-  //   });
-  // }
-
-  // async deselectProvision(id: number): Promise<any> {
-  //   const url = `${hostname}:${port}/nfr-provision/deselect/${id}`;
-  //   return await axios.get(url).then((res) => {
-  //     return res.data;
-  //   });
-  // }
-
   async getGroupMax(): Promise<any> {
     const url = `${hostname}:${port}/nfr-provision/get-group-max/1`;
-    return await axios.get(url).then((res) => {
-      return res.data;
-    });
-  }
-
-  async getGroupMaxByVariant(variantName: string): Promise<any> {
-    const url = `${hostname}:${port}/nfr-provision/get-group-max/variant/${variantName}`;
     return await axios.get(url).then((res) => {
       return res.data;
     });

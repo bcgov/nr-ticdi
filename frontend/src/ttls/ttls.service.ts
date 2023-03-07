@@ -524,19 +524,4 @@ export class TTLSService {
     });
     return response.data;
   }
-
-  async getNfrData(nfrDataId: number): Promise<any> {
-    const url = `${hostname}:${port}/nfr-data/${nfrDataId}`;
-    const data = await axios
-      .get(url, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      })
-      .then((res) => {
-        return res.data;
-      });
-    console.log(data);
-    return data;
-  }
 }

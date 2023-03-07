@@ -27,6 +27,7 @@ import { firstValueFrom } from "rxjs";
 import { HttpService } from "@nestjs/axios";
 import { Req } from "@nestjs/common/decorators/http/route-params.decorator";
 import { Request, Response } from "express";
+import { ReportService } from "./report/report.service";
 
 let requestUrl: string;
 let requestConfig: AxiosRequestConfig;
@@ -36,6 +37,7 @@ export class AppController {
   constructor(
     private readonly appService: AppService,
     private readonly adminService: AdminService,
+    private readonly reportService: ReportService,
     private readonly ttlsService: TTLSService,
     private readonly httpService: HttpService
   ) {
@@ -188,6 +190,12 @@ export class AppController {
     }
   }
 
+  /**
+   * This page is used with the search page.
+   *
+   * @param session
+   * @returns
+   */
   @Get("nfr")
   @UseFilters(AuthenticationFilter)
   @UseGuards(AuthenticationGuard)
@@ -213,9 +221,66 @@ export class AppController {
         ? "DEVELOPMENT - " + PAGE_TITLES.NOFR
         : PAGE_TITLES.NOFR;
     const displayAdmin = isAdmin ? "Administration" : "-";
-    const data = await this.ttlsService.getNfrData(nfrDataId);
-    let primaryContactName;
+    const nfrData = await this.reportService.getNfrData(nfrDataId);
+    const groupMaxJsonArray = await this.reportService.getGroupMaxByVariant(
+      nfrData.variant_name
+    );
+    let ttlsJSON, primaryContactName;
     try {
+      await this.ttlsService.setWebadeToken();
+      const response: any = await firstValueFrom(
+        this.ttlsService.callHttp(nfrData.dtid)
+      )
+        .then((res) => {
+          return res;
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+      ttlsJSON = await this.ttlsService.sendToBackend(response);
+      if (ttlsJSON.inspected_date) {
+        ttlsJSON["inspected_date"] = this.ttlsService.formatInspectedDate(
+          ttlsJSON.inspected_date.toString()
+        );
+      }
+      primaryContactName = ttlsJSON.licence_holder_name;
+      ttlsJSON["interested_parties"] = [
+        {
+          first_name: "asdf",
+          middle_name: "fdsa",
+          last_name: "1234",
+          address: "123 fake street",
+        },
+        {
+          first_name: "uiop",
+          middle_name: "poiu",
+          last_name: "4321",
+          address: "555 fghj road",
+        },
+      ];
+      let selectedVariant = 0;
+      switch (nfrData.variant_name) {
+        case NFR_VARIANTS.default: {
+          selectedVariant = 0;
+          break;
+        }
+        case NFR_VARIANTS.delayed: {
+          selectedVariant = 1;
+          break;
+        }
+        case NFR_VARIANTS.no_fees: {
+          selectedVariant = 2;
+          break;
+        }
+        case NFR_VARIANTS.survey_required: {
+          selectedVariant = 3;
+          break;
+        }
+        case NFR_VARIANTS.to_obtain_survey: {
+          selectedVariant = 4;
+          break;
+        }
+      }
       return {
         title: title,
         idirUsername: session.data.activeAccount
@@ -223,10 +288,15 @@ export class AppController {
           : "",
         primaryContactName: primaryContactName,
         displayAdmin: displayAdmin,
-        message: data,
+        message: ttlsJSON,
+        groupMaxJsonArray: groupMaxJsonArray,
         documentTypes: NFR_VARIANTS_ARRAY,
-        nfr_id: data.id,
-        template_id: data.template_id,
+        nfrDataId: nfrData.id,
+        template_id: nfrData.template_id,
+        variant_name: nfrData.variant_name,
+        selectedVariant: selectedVariant,
+        enabledProvisionList: nfrData.enabled_provisions,
+        prdid: ttlsJSON.id,
       };
     } catch (err) {
       console.log(err);
@@ -237,10 +307,15 @@ export class AppController {
           : "",
         primaryContactName: primaryContactName ? primaryContactName : null,
         displayAdmin: displayAdmin,
-        message: data ? data : null,
+        message: ttlsJSON ? ttlsJSON : null,
+        groupMaxJsonArray: groupMaxJsonArray ? groupMaxJsonArray : null,
         documentTypes: NFR_VARIANTS_ARRAY,
-        nfr_id: data ? data.id : null,
-        template_id: data.template_id,
+        nfrDataId: nfrData ? nfrData.id : null,
+        template_id: nfrData ? nfrData.template_id : null,
+        variant_name: nfrData ? nfrData.variant_name : null,
+        selectedVariant: 0,
+        enabledProvisionList: [],
+        prdid: ttlsJSON ? ttlsJSON.id : null,
         error: err,
       };
     }
@@ -265,7 +340,6 @@ export class AppController {
     @Req() req: Request,
     @Res() res: Response
   ) {
-    console.log(variantName);
     const hasParams = req.originalUrl.includes("?session_state");
     if (hasParams) {
       const urlWithoutParams = req.path;
@@ -288,14 +362,12 @@ export class AppController {
           ? "DEVELOPMENT - " + PAGE_TITLES.NOFR
           : PAGE_TITLES.NOFR;
       const displayAdmin = isAdmin ? "Administration" : "-";
-      await this.ttlsService.setWebadeToken();
-      console.log("getting groupmax");
-      const groupMaxJsonArray = await this.adminService.getGroupMaxByVariant(
+      const groupMaxJsonArray = await this.reportService.getGroupMaxByVariant(
         variantName
       );
-      console.log(groupMaxJsonArray);
       let ttlsJSON, primaryContactName;
       try {
+        await this.ttlsService.setWebadeToken();
         const response: any = await firstValueFrom(
           this.ttlsService.callHttp(id)
         )
@@ -493,6 +565,15 @@ export class AppController {
   @Get()
   getHello2(): string {
     return this.appService.getHello();
+  }
+
+  @Get("/nfr/dtid/:dtid")
+  @Render("nfr")
+  @UseFilters(AuthenticationFilter)
+  @UseGuards(AuthenticationGuard)
+  redirectNFR(@Res() res: Response, @Param("dtid") dtid: number) {
+    res.redirect(`/nfr/dtid/${dtid}/${encodeURI(NFR_VARIANTS.default)}`);
+    return {};
   }
 
   @Get("/404")

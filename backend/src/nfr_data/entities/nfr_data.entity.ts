@@ -2,11 +2,9 @@ import {
   Column,
   CreateDateColumn,
   Entity,
-  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from "typeorm";
-import { NFRDataProvision } from "./nfr_data_provision.entity";
 
 @Entity()
 export class NFRData {
@@ -18,12 +16,10 @@ export class NFRData {
   variant_name: string;
   @Column({ nullable: true })
   template_id: number;
-  @OneToMany(
-    () => NFRDataProvision,
-    (nfr_data_provision) => nfr_data_provision.nfr_data,
-    { nullable: true }
-  )
-  nfr_data_provisions: NFRDataProvision[];
+  @Column({ nullable: true })
+  status: string;
+  @Column("int", { array: true, nullable: true })
+  enabled_provisions: number[];
   @Column({ nullable: true })
   create_userid: string;
   @Column({ nullable: true })
@@ -37,14 +33,16 @@ export class NFRData {
     dtid?: number,
     variant_name?: string,
     template_id?: number,
-    nfr_data_provisions?: NFRDataProvision[],
+    status?: string,
+    enabled_provisions?: number[],
     create_userid?: string,
     update_userid?: string
   ) {
     this.dtid = dtid || null;
     this.variant_name = variant_name || "";
     this.template_id = template_id || null;
-    this.nfr_data_provisions = nfr_data_provisions || null;
+    this.status = status || "";
+    this.enabled_provisions = enabled_provisions || [];
     this.create_userid = create_userid || "";
     this.update_userid = update_userid || "";
   }

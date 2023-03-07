@@ -24,7 +24,6 @@ export class NFRProvisionService {
     delete nfrProvision["provision_group"];
     delete nfrProvision["provision_group_text"];
     nfrProvision.max = Math.floor(nfrProvision.max);
-    console.log(nfrProvision);
     await this.updateGroupMaximums(
       provision_group,
       nfrProvision.max,
@@ -53,7 +52,6 @@ export class NFRProvisionService {
     id: number,
     nfrProvision: UpdateNFRProvisionDto
   ): Promise<UpdateResult> {
-    console.log(nfrProvision);
     const provision_group = Math.floor(nfrProvision.provision_group);
     const provision_group_text = nfrProvision.provision_group_text;
     delete nfrProvision["provision_group"];
@@ -70,7 +68,6 @@ export class NFRProvisionService {
     const updatedProvision = this.nfrProvisionRepository.create({
       ...nfrProvision,
       provision_group: nfrProvisionGroup,
-      nfr_data_provisions: null,
     });
     return this.nfrProvisionRepository.update(id, updatedProvision);
   }
@@ -111,7 +108,7 @@ export class NFRProvisionService {
       }
       const provisions = await this.nfrProvisionRepository.find({
         where: { provision_variant: variant },
-        relations: ["provision_group", "nfr_data_provisions"],
+        relations: ["provision_group"],
       });
       return provisions;
     } catch (err) {
@@ -138,7 +135,6 @@ export class NFRProvisionService {
     const nfrProvisions = await this.nfrProvisionRepository.find({
       relations: ["provision_group"],
     });
-    console.log(nfrProvisions);
     let nfrProvisionGroups: NFRProvisionGroup[] = [];
     nfrProvisions.forEach((nfrProvision) => {
       nfrProvisionGroups.push(nfrProvision.provision_group);
@@ -154,14 +150,11 @@ export class NFRProvisionService {
 
   async getGroupMaxByVariant(variantName: string): Promise<any> {
     try {
-      console.log("here");
-      console.log(variantName);
       const variant = await this.nfrProvisionVariantRepository.findOne({
         where: {
           variant_name: variantName,
         },
       });
-      console.log(variant);
       if (!variant) {
         return [];
       }
@@ -169,7 +162,6 @@ export class NFRProvisionService {
         where: { provision_variant: variant },
         relations: ["provision_group"],
       });
-      console.log(provisions);
       let nfrProvisionGroups: NFRProvisionGroup[] = [];
       provisions.forEach((nfrProvision) => {
         nfrProvisionGroups.push(nfrProvision.provision_group);

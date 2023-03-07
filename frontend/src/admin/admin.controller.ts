@@ -210,11 +210,6 @@ export class AdminController {
     return this.adminService.getNFRProvisions();
   }
 
-  @Get("nfr-provisions/:variant")
-  getNFRProvisionsByDTID(@Param("variant") variantName: string): any {
-    return this.adminService.getNFRProvisionsByVariant(variantName);
-  }
-
   @Get("enable-provision/:provisionId")
   enableProvision(@Param("provisionId") id: number): any {
     return this.adminService.enableProvision(id);
@@ -225,24 +220,9 @@ export class AdminController {
     return this.adminService.disableProvision(id);
   }
 
-  // @Get("select-provision/:provisionId")
-  // selectProvision(@Param("provisionId") id: number): any {
-  //   return this.adminService.selectProvision(id);
-  // }
-
-  // @Get("deselect-provision/:provisionId")
-  // deselectProvision(@Param("provisionId") id: number): any {
-  //   return this.adminService.deselectProvision(id);
-  // }
-
   @Get("get-group-max")
   getGroupMax() {
     return this.adminService.getGroupMax();
-  }
-
-  @Get("get-group-max/:variant")
-  getGroupMaxByVariant(@Param("variant") variantName: string) {
-    return this.adminService.getGroupMaxByVariant(variantName);
   }
 
   @Post("add-provision")

@@ -116,7 +116,6 @@
         }
         async function searchRecords() {
             $("#searchButton").prop("disabled", true);
-            console.log("searchRecords:");
             const dtid = $('#searchInput').val();
             const template_id = $('input[name="radioActive"]:checked').attr('id').replace("active-", "");
             const searchParams = {
@@ -124,7 +123,6 @@
                 document_type: 2,
                 template_id: template_id
             }
-            console.log(searchParams);
             const result = await fetch(`/report/generate-specific-report`, {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json',},

@@ -90,4 +90,49 @@ export class ReportController {
     //   await this.reportService.generateSpecificReport()
     // );
   }
+
+  @Get("get-group-max/:variant")
+  getGroupMaxByVariant(@Param("variant") variantName: string) {
+    return this.reportService.getGroupMaxByVariant(variantName);
+  }
+
+  @Get("nfr-provisions/:variant/:nfrId")
+  getNFRProvisionsByVariant(
+    @Param("variant") variantName: string,
+    @Param("nfrId") nfrId: number
+  ): any {
+    return this.reportService.getNFRProvisionsByVariant(variantName, nfrId);
+  }
+
+  @Get("enabled-provisions/:nfrDataId")
+  getEnabledProvisions(@Param("nfrDataId") nfrDataId: number) {
+    return this.reportService.getEnabledProvisions(nfrDataId);
+  }
+
+  @Post("save-nfr")
+  saveNFR(
+    @Session() session: { data: SessionData },
+    @Body()
+    nfrData: {
+      dtid: number;
+      variant_name: string;
+      status: string;
+      enabled_provisions: number[];
+    }
+  ) {
+    let idir_username = "";
+    if (session.data.activeAccount) {
+      idir_username = session.data.activeAccount.idir_username;
+      console.log("active account found");
+    } else {
+      console.log("no active account found");
+    }
+    return this.reportService.saveNFR(
+      nfrData.dtid,
+      nfrData.variant_name,
+      nfrData.status,
+      nfrData.enabled_provisions,
+      idir_username
+    );
+  }
 }

@@ -1,4 +1,3 @@
-import { NFRDataProvision } from "src/nfr_data/entities/nfr_data_provision.entity";
 import {
   Column,
   CreateDateColumn,
@@ -6,7 +5,6 @@ import {
   JoinTable,
   ManyToMany,
   ManyToOne,
-  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from "typeorm";
@@ -43,13 +41,6 @@ export class NFRProvision {
   @ManyToMany(() => NFRProvisionVariant, { nullable: true, cascade: true })
   @JoinTable()
   provision_variant: NFRProvisionVariant[];
-  @OneToMany(
-    () => NFRDataProvision,
-    (nfr_data_provision) => nfr_data_provision.nfr_provision,
-    { nullable: true }
-  )
-  @JoinTable()
-  nfr_data_provisions: NFRDataProvision[];
 
   constructor(
     type?: string,
@@ -60,8 +51,7 @@ export class NFRProvision {
     create_userid?: string,
     update_userid?: string,
     provision_group?: NFRProvisionGroup,
-    provision_variant?: NFRProvisionVariant[],
-    nfr_data_provisions?: NFRDataProvision[]
+    provision_variant?: NFRProvisionVariant[]
   ) {
     this.type = type || "";
     this.provision_text = provision_text || "";
@@ -72,6 +62,5 @@ export class NFRProvision {
     this.update_userid = update_userid || "";
     this.provision_group = provision_group || null;
     this.provision_variant = provision_variant;
-    this.nfr_data_provisions = nfr_data_provisions;
   }
 }

@@ -10,22 +10,11 @@ export class NFRDataController {
   async create(
     @Body()
     data: {
-      nfrData: CreateNFRDataDto & { enabled_provisions: number[] };
+      body: CreateNFRDataDto;
     }
   ) {
-    let nfrData = data.nfrData;
-    return this.nfrDataService.create(nfrData);
+    return this.nfrDataService.create(data.body);
   }
-
-  // @Get("select-provision/:nfrDataId/:provisionId")
-  // selectProvision(@Param('nfrDataId') nfrDataId: number, @Param('provisionId') provisionId: number) {
-  //   return this.nfrDataService.select(nfrDataId, provisionId);
-  // }
-
-  // @Get("deselect-provision/:nfrDataId/:provisionId")
-  // deselectProvision(@Param('nfrDataId') nfrDataId: number, @Param('provisionId') provisionId: number) {
-  //   return this.nfrDataService.deselect(nfrDataId, provisionId);
-  // }
 
   @Get()
   findAll() {
@@ -49,6 +38,11 @@ export class NFRDataController {
   @Get("view/:nfrDataId")
   findViewByPRDID(@Param("nfrDataId") nfrDataId: string) {
     return this.nfrDataService.findViewByNFRDataId(+nfrDataId);
+  }
+
+  @Get("get-enabled-provisions/:id")
+  getEnabledProvisions(@Param("id") id) {
+    return this.nfrDataService.getEnabledProvisions(id);
   }
 
   @Delete(":dtid")

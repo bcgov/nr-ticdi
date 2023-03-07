@@ -5,7 +5,7 @@ export type SessionData = {
   activeAccount: AccountObject;
   selected_document: {
     nfr_id: number;
-  }
+  };
 };
 
 export type AccountObject = {

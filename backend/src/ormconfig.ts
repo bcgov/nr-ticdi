@@ -1,0 +1,33 @@
+import { TypeOrmModuleOptions } from "@nestjs/typeorm";
+import { PrintRequestDetail } from "./print_request_detail/entities/print_request_detail.entity";
+import { PrintRequestLog } from "./print_request_log/entities/print_request_log.entity";
+import { DocumentTemplate } from "./document_template/entities/document_template.entity";
+import { PrintRequestDetailView } from "./print_request_detail/entities/print_request_detail_vw";
+import { NFRData } from "./nfr_data/entities/nfr_data.entity";
+import { NFRDataLog } from "./nfr_data_log/entities/nfr_data_log.entity";
+import { NFRProvision } from "./nfr_provision/entities/nfr_provision.entity";
+import { NFRProvisionGroup } from "./nfr_provision/entities/nfr_provision_group.entity";
+import { NFRProvisionVariant } from "./nfr_provision/entities/nfr_provision_variant.entity";
+
+const config: TypeOrmModuleOptions = {
+  type: "postgres",
+  host: process.env.POSTGRESQL_HOST || "localhost",
+  port: 5432,
+  database: process.env.POSTGRESQL_DATABASE || "postgres",
+  username: process.env.POSTGRESQL_USER || "postgres",
+  password: process.env.POSTGRESQL_PASSWORD,
+  entities: [
+    PrintRequestDetail,
+    PrintRequestLog,
+    NFRData,
+    NFRDataLog,
+    NFRProvision,
+    NFRProvisionGroup,
+    NFRProvisionVariant,
+    DocumentTemplate,
+    PrintRequestDetailView,
+  ],
+  synchronize: true,
+};
+
+export default config;

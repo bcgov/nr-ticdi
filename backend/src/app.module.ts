@@ -17,6 +17,9 @@ import { NFRDataLog } from "./nfr_data_log/entities/nfr_data_log.entity";
 import { NFRDataLogModule } from "./nfr_data_log/nfr_data_log.module";
 import { NFRProvision } from "./nfr_provision/entities/nfr_provision.entity";
 import { NFRProvisionModule } from "./nfr_provision/nfr_provision.module";
+import { NFRProvisionGroup } from "./nfr_provision/entities/nfr_provision_group.entity";
+import { NFRProvisionVariant } from "./nfr_provision/entities/nfr_provision_variant.entity";
+import config from "./ormconfig";
 
 console.log("Var check - POSTGRESQL_HOST", process.env.POSTGRESQL_HOST);
 console.log("Var check - POSTGRESQL_DATABASE", process.env.POSTGRESQL_DATABASE);
@@ -30,25 +33,7 @@ if (process.env.POSTGRESQL_PASSWORD != null) {
 @Module({
   imports: [
     ConfigModule.forRoot(),
-    TypeOrmModule.forRoot({
-      type: "postgres",
-      host: process.env.POSTGRESQL_HOST || "localhost",
-      port: 5432,
-      database: process.env.POSTGRESQL_DATABASE || "postgres",
-      username: process.env.POSTGRESQL_USER || "postgres",
-      password: process.env.POSTGRESQL_PASSWORD,
-      entities: [
-        PrintRequestDetail,
-        PrintRequestLog,
-        NFRData,
-        NFRDataLog,
-        NFRProvision,
-        DocumentTemplate,
-        PrintRequestDetailView,
-      ],
-      autoLoadEntities: true, // Auto load all entities regiestered by typeorm forFeature method.
-      synchronize: true, // This changes the DB schema to match changes to entities, which we might not want.
-    }),
+    TypeOrmModule.forRoot(config),
     DocumentTemplateModule,
     PrintRequestDetailModule,
     NFRDataModule,

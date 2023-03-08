@@ -274,6 +274,10 @@ $(document).ready(async function () {
     ],
   });
 });
+// Don't reload the page when Save For Later button is clicked
+document.querySelector("#saveNfr").addEventListener("click", function (event) {
+  event.preventDefault();
+});
 // event listener for the Select A Group dropdown
 $("#group-select").on("change", function () {
   const selectedGroup = $(this).val();

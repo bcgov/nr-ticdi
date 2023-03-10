@@ -9,287 +9,284 @@ if (Array.isArray(groupMaxJsonArray) && groupMaxJsonArray.length > 0) {
   ).provision_group;
 }
 let groupMaxTable;
-let provisionTable;
-$(document).ready(async function () {
-  const nfrDataId = $("#nfrDataId").val();
-  $(".dataSection dd").each(function () {
-    if ($(this).text() == "" || $(this).text() == "TBD") {
-      $(this).text(" ");
-      $(this).css("border", "solid 1px orange");
-    }
-  });
+let provisionTable, variableTable, selectedProvisionsTable;
 
-  $(".legalDesc").each(function () {
-    if ($(this).text().length > 2000) {
-      $(this).text($(this).text().substr(0, 2000) + "...");
-    }
-  });
-  if ($("#adminLink").text() == "-") {
-    $("#adminLink").hide();
+const nfrDataId = $("#nfrDataId").val();
+$(".dataSection dd").each(function () {
+  if ($(this).text() == "" || $(this).text() == "TBD") {
+    $(this).text(" ");
+    $(this).css("border", "solid 1px orange");
   }
-  groupMaxTable = $("#groupMaxTable").DataTable({
-    ajax: {
-      url: `${window.location.origin}/report/get-group-max/${variantName}`,
-      dataSrc: "",
-    },
-    columns: [
-      { data: "provision_group", title: "Group" },
-      { data: "max", title: "Max" },
-      { data: "provision_group_text", title: "Group Text" },
-    ],
-    order: [0, "asc"],
-  });
-  let selectedProvisionsUrl = `${
-    window.location.origin
-  }/report/nfr-provisions/${encodeURI(variantName)}`;
-  console.log("nfrDataId: " + nfrDataId);
-  console.log(nfrDataId != "");
-  selectedProvisionsUrl += nfrDataId != "" ? `/${nfrDataId}` : "/-1";
+});
 
-  selectedProvisionsTable = $("#selectedProvisionsTable").DataTable({
-    ajax: {
-      url: selectedProvisionsUrl,
-      dataSrc: "",
-    },
-    paging: false,
-    bFilter: false,
-    rowId: function (data) {
-      return `selected-provision-row-${data.id}`;
-    },
-    columns: [
-      { data: "type" },
-      { data: "provision_group" },
-      { data: "provision_name" },
-      { data: "free_text" },
-      { data: "category" },
-      { data: "max" },
-      { data: "id" },
-    ],
-    columnDefs: [
-      {
-        targets: [0, 1, 2, 3, 4, 5, 6],
-        render: function (data, type, row, meta) {
-          if (type === "display") {
-            var columnTypes = [
-              "type",
-              "provision_group",
-              "provision_name",
-              "free_text",
-              "category",
-              "max",
-              "id",
-              "select",
-            ];
-            var columnType = columnTypes[meta.col];
-            var id = row["id"];
-            var group = row["group"];
-            var max = row["max"];
+$(".legalDesc").each(function () {
+  if ($(this).text().length > 2000) {
+    $(this).text($(this).text().substr(0, 2000) + "...");
+  }
+});
+if ($("#adminLink").text() == "-") {
+  $("#adminLink").hide();
+}
+groupMaxTable = $("#groupMaxTable").DataTable({
+  ajax: {
+    url: `${window.location.origin}/report/get-group-max/${variantName}`,
+    dataSrc: "",
+  },
+  columns: [
+    { data: "provision_group", title: "Group" },
+    { data: "max", title: "Max" },
+    { data: "provision_group_text", title: "Group Text" },
+  ],
+  order: [0, "asc"],
+});
+let selectedProvisionsUrl = `${
+  window.location.origin
+}/report/nfr-provisions/${encodeURI(variantName)}`;
+console.log("nfrDataId: " + nfrDataId);
+console.log(nfrDataId != "");
+selectedProvisionsUrl += nfrDataId != "" ? `/${nfrDataId}` : "/-1";
 
-            if (columnType === "max" || columnType === "id") {
-              return `<input type='hidden' value='${data}' />`;
-            } else {
-              return `<input type='text' value='${data}' readonly style='color: gray; width: 100%;' />`;
-            }
+selectedProvisionsTable = $("#selectedProvisionsTable").DataTable({
+  ajax: {
+    url: selectedProvisionsUrl,
+    dataSrc: "",
+  },
+  paging: false,
+  info: false,
+  bFilter: false,
+  rowId: function (data) {
+    return `selected-provision-row-${data.id}`;
+  },
+  columns: [
+    { data: "type" },
+    { data: "provision_group" },
+    { data: "provision_name" },
+    { data: "free_text" },
+    { data: "category" },
+    { data: "max" },
+    { data: "id" },
+  ],
+  columnDefs: [
+    {
+      targets: [0, 1, 2, 3, 4, 5, 6],
+      render: function (data, type, row, meta) {
+        if (type === "display") {
+          var columnTypes = [
+            "type",
+            "provision_group",
+            "provision_name",
+            "free_text",
+            "category",
+            "max",
+            "id",
+            "select",
+          ];
+          var columnType = columnTypes[meta.col];
+          var id = row["id"];
+          var group = row["group"];
+          var max = row["max"];
+
+          if (columnType === "max" || columnType === "id") {
+            return `<input type='hidden' value='${data}' />`;
+          } else if (columnType === "free_text") {
+            return `<input type='text' value='${data}' id='${columnType}-${id}' style='width: 100%;' />`;
           } else {
-            return data;
+            return `<input type='text' value='${data}' readonly style='color: gray; width: 100%;' />`;
           }
-        },
+        } else {
+          return data;
+        }
       },
-      {
-        targets: [5, 6],
-        orderable: false,
-      },
-    ],
-    order: [[1, "asc"]],
-    rowCallback: function (row, data) {
-      if (data.select === false) {
-        $(row).hide();
-      }
     },
-  });
-
-  provisionTable = $("#provisionTable").DataTable({
-    ajax: {
-      url: `${window.location.origin}/report/nfr-provisions/${encodeURI(
-        variantName
-      )}/-1`,
-      dataSrc: "",
+    {
+      targets: [5, 6],
+      orderable: false,
     },
-    paging: false,
-    bFilter: false,
-    columns: [
-      { data: "type" },
-      { data: "provision_name" },
-      { data: "free_text" },
-      { data: "category" },
-      { data: "select" },
-      { data: "provision_group" },
-      { data: "max" },
-      { data: "id" },
-    ],
-    columnDefs: [
-      {
-        targets: [0, 1, 2, 3, 4, 5, 6, 7],
-        render: function (data, type, row, meta) {
-          if (type === "display") {
-            var columnTypes = [
-              "type",
-              "provision_name",
-              "free_text",
-              "category",
-              "select",
-              "provision_group",
-              "max",
-              "id",
-            ];
-            var columnType = columnTypes[meta.col];
-            var id = row["id"];
-            var group = row["provision_group"];
-            var max = row["max"];
+  ],
+  order: [[1, "asc"]],
+  rowCallback: function (row, data) {
+    if (data.select === false) {
+      $(row).hide();
+    }
+  },
+});
 
-            if (columnType === "select") {
-              const checked =
-                preloadEnabledProvisions.includes(id) === true ? "checked" : "";
-              return `<input type='checkbox' class='provisionSelect' id='active-${id}' data-id='${id}' data-group='${group}' data-max='${max}' ${checked}>`;
-            } else if (
-              columnType === "max" ||
-              columnType === "provision_group" ||
-              columnType === "id"
-            ) {
-              return `<input type='hidden' id='${columnType}-${id}' value='${data}' />`;
-            } else {
-              return `<input type='text' id='${columnType}-${id}' value='${data}' readonly style='color: gray; width: 100%;' />`;
-            }
+provisionTable = $("#provisionTable").DataTable({
+  ajax: {
+    url: `${window.location.origin}/report/nfr-provisions/${encodeURI(
+      variantName
+    )}/-1`,
+    dataSrc: "",
+  },
+  paging: false,
+  info: false,
+  bFilter: false,
+  columns: [
+    { data: "type" },
+    { data: "provision_name" },
+    { data: "free_text" },
+    { data: "category" },
+    { data: "select" },
+    { data: "provision_group" },
+    { data: "max" },
+    { data: "id" },
+  ],
+  columnDefs: [
+    {
+      targets: [0, 1, 2, 3, 4, 5, 6, 7],
+      render: function (data, type, row, meta) {
+        if (type === "display") {
+          var columnTypes = [
+            "type",
+            "provision_name",
+            "free_text",
+            "category",
+            "select",
+            "provision_group",
+            "max",
+            "id",
+          ];
+          var columnType = columnTypes[meta.col];
+          var id = row["id"];
+          var group = row["provision_group"];
+          var max = row["max"];
+
+          if (columnType === "select") {
+            const checked =
+              preloadEnabledProvisions.includes(id) === true ? "checked" : "";
+            return `<input type='checkbox' class='provisionSelect' id='active-${id}' data-id='${id}' data-group='${group}' data-max='${max}' ${checked}>`;
+          } else if (
+            columnType === "max" ||
+            columnType === "provision_group" ||
+            columnType === "id"
+          ) {
+            return `<input type='hidden' id='${columnType}-${id}' value='${data}' />`;
           } else {
-            return data;
+            return `<input type='text' id='${columnType}-${id}' value='${data}' readonly style='color: gray; width: 100%;' />`;
           }
-        },
+        } else {
+          return data;
+        }
       },
-      {
-        targets: 4,
-        className: "text-center",
-        orderDataType: "dom-checkbox",
-      },
-      {
-        targets: [5, 6, 7],
-        orderable: false,
-      },
-    ],
-    drawCallback: function (settings) {
-      // add event listeners to the provision checkboxes
-      const checkboxes = document.querySelectorAll('input[type="checkbox"]');
-      if (checkboxes.length > 0) {
-        checkboxes.forEach((checkbox) => {
-          checkbox.addEventListener("click", function () {
-            const group = checkbox.dataset.group;
-            const max = checkbox.dataset.max;
-            const id = checkbox.dataset.id;
-            const active = document.querySelectorAll(
-              `input[type="checkbox"][data-group="${group}"]:checked`
-            ).length;
-            if (active >= max) {
-              document
-                .querySelectorAll(
-                  `input[type="checkbox"][data-group="${group}"]:not(:checked)`
-                )
-                .forEach((checkbox) => {
-                  checkbox.disabled = true;
-                });
-            } else {
-              document
-                .querySelectorAll(
-                  `input[type="checkbox"][data-group="${group}"]:not(:checked)`
-                )
-                .forEach((checkbox) => {
-                  checkbox.disabled = false;
-                });
-            }
-            if (checkbox.checked) {
-              $(`#selected-provision-row-${id}`).show();
-              const variableRows = document.querySelectorAll(
-                `.variable-provision-row-${id}`
-              );
-              variableRows.forEach((variableRow) => {
-                variableRow.show();
-              });
-            } else {
-              $(`#selected-provision-row-${id}`).hide();
-              const variableRows = document.querySelectorAll(
-                `.variable-provision-row-${id}`
-              );
-              variableRows.forEach((variableRow) => {
-                variableRow.hide();
-              });
-            }
-          });
-          const g = checkbox.dataset.group;
-          const m = checkbox.dataset.max;
-          const a = document.querySelectorAll(
-            `input[type="checkbox"][data-group="${g}"]:checked`
+    },
+    {
+      targets: 4,
+      className: "text-center",
+      orderDataType: "dom-checkbox",
+    },
+    {
+      targets: [5, 6, 7],
+      orderable: false,
+    },
+  ],
+  drawCallback: function (settings) {
+    // add event listeners to the provision checkboxes
+    const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+    if (checkboxes.length > 0) {
+      checkboxes.forEach((checkbox) => {
+        checkbox.addEventListener("click", function () {
+          const group = checkbox.dataset.group;
+          const max = checkbox.dataset.max;
+          const id = checkbox.dataset.id;
+          const active = document.querySelectorAll(
+            `input[type="checkbox"][data-group="${group}"]:checked`
           ).length;
-          if (a >= m) {
+          if (active >= max) {
             document
               .querySelectorAll(
-                `input[type="checkbox"][data-group="${g}"]:not(:checked)`
+                `input[type="checkbox"][data-group="${group}"]:not(:checked)`
               )
               .forEach((checkbox) => {
                 checkbox.disabled = true;
               });
+          } else {
+            document
+              .querySelectorAll(
+                `input[type="checkbox"][data-group="${group}"]:not(:checked)`
+              )
+              .forEach((checkbox) => {
+                checkbox.disabled = false;
+              });
+          }
+          if (checkbox.checked) {
+            $(`#selected-provision-row-${id}`).show();
+            $(`.variable-provision-row-${id}`).show();
+          } else {
+            $(`#selected-provision-row-${id}`).hide();
+            $(`.variable-provision-row-${id}`).show();
           }
         });
-      }
-    },
-    order: [[1, "asc"]],
-  });
+        const g = checkbox.dataset.group;
+        const m = checkbox.dataset.max;
+        const a = document.querySelectorAll(
+          `input[type="checkbox"][data-group="${g}"]:checked`
+        ).length;
+        if (a >= m) {
+          document
+            .querySelectorAll(
+              `input[type="checkbox"][data-group="${g}"]:not(:checked)`
+            )
+            .forEach((checkbox) => {
+              checkbox.disabled = true;
+            });
+        }
+      });
+    }
+  },
+  order: [[1, "asc"]],
+});
 
-  $("#variableTable").DataTable({
-    ajax: {
-      url: `${
-        window.location.origin
-      }/report/get-provision-variables/${encodeURI(variantName)}`,
-      dataSrc: "",
-    },
-    paging: false,
-    bFilter: false,
-    columns: [
-      { data: "variable_name" },
-      { data: "variable_value" },
-      { data: "id" },
-      { data: "provisionId" },
-    ],
-    columnDefs: [
-      {
-        targets: [0, 1, 2, 3],
-        render: function (data, type, row, meta) {
-          if (type === "display") {
-            var columnTypes = [
-              "variable_name",
-              "variable_value",
-              "id",
-              "provisionId",
-            ];
-            var columnType = columnTypes[meta.col];
-            var id = row["id"];
-            var provisionId = row["provisionId"];
+variableTable = $("#variableTable").DataTable({
+  ajax: {
+    url: `${window.location.origin}/report/get-provision-variables/${encodeURI(
+      variantName
+    )}`,
+    dataSrc: "",
+  },
+  paging: false,
+  info: false,
+  bFilter: false,
+  columns: [
+    { data: "variable_name" },
+    { data: "variable_value" },
+    { data: "id" },
+    { data: "provisionId" },
+  ],
+  columnDefs: [
+    {
+      targets: [0, 1, 2, 3],
+      render: function (data, type, row, meta) {
+        if (type === "display") {
+          var columnTypes = [
+            "variable_name",
+            "variable_value",
+            "id",
+            "provisionId",
+          ];
+          var columnType = columnTypes[meta.col];
+          var id = row["id"];
+          var provisionId = row["provisionId"];
 
-            if (columnType === "id") {
-              return `<input type='text' id='variable-${data}' data-id='${data}' hidden>`;
-            } else if (columnType === "provisionId") {
-              return `<input type='text' id='variable_${columnType}-${id}' data-id='${data}' hidden>`;
-            } else {
-              return `<input type='text' id='${columnType}-${id}' value='${data}' readonly style='color: gray; width: 100%;' />`;
-            }
+          if (columnType === "id") {
+            return `<input type='text' id='variable-${data}' data-id='${data}' hidden>`;
+          } else if (columnType === "provisionId") {
+            return `<input type='text' id='variable_${columnType}-${id}' data-id='${data}' hidden>`;
+          } else if (columnType === "variable_value") {
+            return `<input type='text' id='${columnType}-${id}' value='${data}' style='width: 100%;' />`;
           } else {
-            return data;
+            return `<input type='text' id='${columnType}-${id}' value='${data}' readonly style='color: gray; width: 100%;' />`;
           }
-        },
+        } else {
+          return data;
+        }
       },
-    ],
-    rowCallback: function (row, data, index) {
-      $(row).addClass(`variable-provision-row-${data.provisionId}`);
     },
-    order: [[0, "asc"]],
-  });
+  ],
+  rowCallback: function (row, data, index) {
+    $(row).addClass(`variable-provision-row-${data.provisionId}`);
+    $(row).hide();
+  },
+  order: [[0, "asc"]],
 });
 // Don't reload the page when Save For Later button is clicked
 document.querySelector("#saveNfr").addEventListener("click", function (event) {

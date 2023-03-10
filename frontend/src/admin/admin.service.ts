@@ -408,7 +408,7 @@ export class AdminService {
       "type",
       "provision_group",
       "max",
-      "provision_text",
+      "provision_name",
       "free_text",
       "category",
       "active_flag",
@@ -491,6 +491,7 @@ export class AdminService {
     return await axios
       .post(url, { ...provisionParams, update_userid })
       .then((res) => {
+        console.log("updated");
         return res.data;
       });
   }

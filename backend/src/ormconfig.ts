@@ -7,6 +7,7 @@ import { NFRData } from "./nfr_data/entities/nfr_data.entity";
 import { NFRDataLog } from "./nfr_data_log/entities/nfr_data_log.entity";
 import { NFRProvision } from "./nfr_provision/entities/nfr_provision.entity";
 import { NFRProvisionGroup } from "./nfr_provision/entities/nfr_provision_group.entity";
+import { NFRProvisionVariable } from "./nfr_provision/entities/nfr_provision_variable.entity";
 import { NFRProvisionVariant } from "./nfr_provision/entities/nfr_provision_variant.entity";
 
 const config: TypeOrmModuleOptions = {
@@ -23,6 +24,7 @@ const config: TypeOrmModuleOptions = {
     NFRDataLog,
     NFRProvision,
     NFRProvisionGroup,
+    NFRProvisionVariable,
     NFRProvisionVariant,
     DocumentTemplate,
     PrintRequestDetailView,

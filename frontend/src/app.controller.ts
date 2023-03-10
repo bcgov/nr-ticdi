@@ -400,11 +400,11 @@ export class AppController {
         ];
         let selectedVariant = 0;
         switch (variantName) {
-          case NFR_VARIANTS.delayed: {
+          case NFR_VARIANTS.default: {
             selectedVariant = 0;
             break;
           }
-          case NFR_VARIANTS.default: {
+          case NFR_VARIANTS.delayed: {
             selectedVariant = 1;
             break;
           }

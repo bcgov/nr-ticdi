@@ -59,7 +59,7 @@ $(document).ready(async function () {
     columns: [
       { data: "type" },
       { data: "provision_group" },
-      { data: "provision_text" },
+      { data: "provision_name" },
       { data: "free_text" },
       { data: "category" },
       { data: "max" },
@@ -73,7 +73,7 @@ $(document).ready(async function () {
             var columnTypes = [
               "type",
               "provision_group",
-              "provision_text",
+              "provision_name",
               "free_text",
               "category",
               "max",
@@ -119,7 +119,7 @@ $(document).ready(async function () {
     bFilter: false,
     columns: [
       { data: "type" },
-      { data: "provision_text" },
+      { data: "provision_name" },
       { data: "free_text" },
       { data: "category" },
       { data: "select" },
@@ -134,7 +134,7 @@ $(document).ready(async function () {
           if (type === "display") {
             var columnTypes = [
               "type",
-              "provision_text",
+              "provision_name",
               "free_text",
               "category",
               "select",
@@ -206,8 +206,20 @@ $(document).ready(async function () {
             }
             if (checkbox.checked) {
               $(`#selected-provision-row-${id}`).show();
+              const variableRows = document.querySelectorAll(
+                `.variable-provision-row-${id}`
+              );
+              variableRows.forEach((variableRow) => {
+                variableRow.show();
+              });
             } else {
               $(`#selected-provision-row-${id}`).hide();
+              const variableRows = document.querySelectorAll(
+                `.variable-provision-row-${id}`
+              );
+              variableRows.forEach((variableRow) => {
+                variableRow.hide();
+              });
             }
           });
           const g = checkbox.dataset.group;
@@ -231,47 +243,52 @@ $(document).ready(async function () {
   });
 
   $("#variableTable").DataTable({
+    ajax: {
+      url: `${
+        window.location.origin
+      }/report/get-provision-variables/${encodeURI(variantName)}`,
+      dataSrc: "",
+    },
     paging: false,
     bFilter: false,
-    columns: [{ data: "type" }, { data: "provision" }, { data: "selectedVar" }],
+    columns: [
+      { data: "variable_name" },
+      { data: "variable_value" },
+      { data: "id" },
+      { data: "provisionId" },
+    ],
     columnDefs: [
       {
-        targets: [0, 1, 2],
+        targets: [0, 1, 2, 3],
         render: function (data, type, row, meta) {
           if (type === "display") {
             var columnTypes = [
-              "documentVariableName",
-              "enterText",
-              "selectedVar",
+              "variable_name",
+              "variable_value",
+              "id",
+              "provisionId",
             ];
             var columnType = columnTypes[meta.col];
-            var selectedVar = row["selectedVar"];
+            var id = row["id"];
+            var provisionId = row["provisionId"];
 
-            if (columnType === "selectedVar") {
-              return (
-                "<input type='radio' data-id='variable-" + selectedVar + "'>"
-              );
+            if (columnType === "id") {
+              return `<input type='text' id='variable-${data}' data-id='${data}' hidden>`;
+            } else if (columnType === "provisionId") {
+              return `<input type='text' id='variable_${columnType}-${id}' data-id='${data}' hidden>`;
             } else {
-              return (
-                "<input type='text' id='" +
-                columnType +
-                "-" +
-                selectedVar +
-                "' value='" +
-                data +
-                "' readonly style='color: gray; width: 100%;' />"
-              );
+              return `<input type='text' id='${columnType}-${id}' value='${data}' readonly style='color: gray; width: 100%;' />`;
             }
           } else {
             return data;
           }
         },
       },
-      {
-        targets: 2,
-        orderDataType: "dom-checkbox",
-      },
     ],
+    rowCallback: function (row, data, index) {
+      $(row).addClass(`variable-provision-row-${data.provisionId}`);
+    },
+    order: [[0, "asc"]],
   });
 });
 // Don't reload the page when Save For Later button is clicked

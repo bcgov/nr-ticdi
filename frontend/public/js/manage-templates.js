@@ -110,7 +110,7 @@ $(document).ready(function () {
         { data: "type" },
         { data: "provision_group" },
         { data: "max" },
-        { data: "provision_text" },
+        { data: "provision_name" },
         { data: "free_text" },
         { data: "category" },
         { data: "active_flag" },
@@ -126,7 +126,7 @@ $(document).ready(function () {
                 "type",
                 "provision_group",
                 "max",
-                "provision_text",
+                "provision_name",
                 "free_text",
                 "category",
                 "active_flag",
@@ -352,14 +352,14 @@ function addProvision() {
   const provision_group = $("#addProvisionGroup").val();
   const max = $("#addProvisionMax").val();
   const provision_group_text = $("#addProvisionGroupText").val();
-  const provision_text = $("#addProvisionText").val();
+  const provision_name = $("#addProvisionName").val();
   const free_text = $("#addProvisionFreeText").val();
   const category = $("#addProvisionCategory").val();
   const data = JSON.stringify({
     type: type,
     provision_group: provision_group,
     max: max,
-    provision_text: provision_text,
+    provision_name: provision_name,
     provision_group_text: provision_group_text,
     free_text: free_text,
     category: category,
@@ -426,7 +426,7 @@ function confirmAddProvision() {
   const provision_group = $("#addProvisionGroup").val();
   const provision_group_text = $("#addProvisionGroupText").val();
   const max = $("#addProvisionMax").val();
-  const provision_text = $("#addProvisionText").val();
+  const provision_name = $("#addProvisionName").val();
   const free_text = $("#addProvisionFreeText").val();
   const category = $("#addProvisionCategory").val();
   const data = JSON.stringify({
@@ -434,7 +434,7 @@ function confirmAddProvision() {
     provision_group: provision_group,
     provision_group_text: provision_group_text,
     max: max,
-    provision_text: provision_text,
+    provision_name: provision_name,
     free_text: free_text,
     category: category,
   });
@@ -508,7 +508,7 @@ function openEditModal() {
   const type = $(`#type-${provisionId}`).val();
   const provision_group = $(`#provision_group-${provisionId}`).val();
   const max = $(`#max-${provisionId}`).val();
-  const provision_text = $(`#provision_text-${provisionId}`).val();
+  const provision_name = $(`#provision_name-${provisionId}`).val();
   const free_text = $(`#free_text-${provisionId}`).val();
   const category = $(`#category-${provisionId}`).val();
   let provision_group_text = "";
@@ -534,7 +534,7 @@ function openEditModal() {
   $("#editProvisionGroup").val(provision_group);
   $("#editProvisionGroupText").val(provision_group_text);
   $("#editProvisionMax").val(max);
-  $("#editProvisionText").val(provision_text);
+  $("#editProvisionName").val(provision_name);
   $("#editProvisionFreeText").val(free_text);
   $("#editProvisionCategory").val(category);
   $("#editProvisionModal").modal("toggle");
@@ -545,7 +545,7 @@ function editProvision() {
   const provision_group = $("#editProvisionGroup").val();
   const provision_group_text = $("#editProvisionGroupText").val();
   const max = $("#editProvisionMax").val();
-  const provision_text = $("#editProvisionText").val();
+  const provision_name = $("#editProvisionName").val();
   const free_text = $("#editProvisionFreeText").val();
   const category = $("#editProvisionCategory").val();
   const data = JSON.stringify({
@@ -554,7 +554,7 @@ function editProvision() {
     provision_group: provision_group,
     provision_group_text: provision_group_text,
     max: max,
-    provision_text: provision_text,
+    provision_name: provision_name,
     free_text: free_text,
     category: category,
   });
@@ -621,7 +621,7 @@ function confirmEditProvision() {
   const provision_group = $("#editProvisionGroup").val();
   const provision_group_text = $("#editProvisionGroupText").val();
   const max = $("#editProvisionMax").val();
-  const provision_text = $("#editProvisionText").val();
+  const provision_name = $("#editProvisionName").val();
   const free_text = $("#editProvisionFreeText").val();
   const category = $("#editProvisionCategory").val();
   const data = JSON.stringify({
@@ -630,7 +630,7 @@ function confirmEditProvision() {
     provision_group: provision_group,
     provision_group_text: provision_group_text,
     max: max,
-    provision_text: provision_text,
+    provision_name: provision_name,
     free_text: free_text,
     category: category,
   });

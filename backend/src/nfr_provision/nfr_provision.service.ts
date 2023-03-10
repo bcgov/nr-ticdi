@@ -1,11 +1,12 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Repository, UpdateResult } from "typeorm";
+import { In, Repository, UpdateResult } from "typeorm";
 import { CreateNFRProvisionDto } from "./dto/create-nfr_provision.dto";
 import { NFRProvision } from "./entities/nfr_provision.entity";
 import { UpdateNFRProvisionDto } from "./dto/update-nfr_provision.dto";
 import { NFRProvisionGroup } from "./entities/nfr_provision_group.entity";
 import { NFRProvisionVariant } from "./entities/nfr_provision_variant.entity";
+import { NFRProvisionVariable } from "./entities/nfr_provision_variable.entity";
 
 @Injectable()
 export class NFRProvisionService {
@@ -15,7 +16,9 @@ export class NFRProvisionService {
     @InjectRepository(NFRProvisionGroup)
     private nfrProvisionGroupRepository: Repository<NFRProvisionGroup>,
     @InjectRepository(NFRProvisionVariant)
-    private nfrProvisionVariantRepository: Repository<NFRProvisionVariant>
+    private nfrProvisionVariantRepository: Repository<NFRProvisionVariant>,
+    @InjectRepository(NFRProvisionVariable)
+    private nfrProvisionVariableRepository: Repository<NFRProvisionVariable>
   ) {}
 
   async create(nfrProvision: CreateNFRProvisionDto): Promise<NFRProvision> {
@@ -177,6 +180,30 @@ export class NFRProvisionService {
       console.log(err);
       return null;
     }
+  }
+
+  async getVariablesByVariant(variantName: string): Promise<any> {
+    const variant = await this.nfrProvisionVariantRepository.findOne({
+      where: {
+        variant_name: variantName,
+      },
+    });
+    if (!variant) {
+      return [];
+    }
+    const provisions = await this.nfrProvisionRepository.find({
+      where: { provision_variant: variant },
+      relations: ["provision_variables"],
+    });
+
+    const provisionVariables: NFRProvisionVariable[] = [];
+    provisions.forEach((provision) => {
+      provision.provision_variables.forEach((variable) => {
+        variable["provisionId"] = provision.id;
+        provisionVariables.push(variable);
+      });
+    });
+    return provisionVariables;
   }
 
   async remove(id: number): Promise<{ deleted: boolean; message?: string }> {

@@ -96,6 +96,11 @@ export class ReportController {
     return this.reportService.getGroupMaxByVariant(variantName);
   }
 
+  @Get("get-provision-variables/:variant")
+  getVariablesByVariant(@Param("variant") variantName: string) {
+    return this.reportService.getVariablesByVariant(variantName);
+  }
+
   @Get("nfr-provisions/:variant/:nfrId")
   getNFRProvisionsByVariant(
     @Param("variant") variantName: string,

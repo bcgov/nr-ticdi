@@ -23,7 +23,7 @@ export class ReportService {
   ): Promise<any> {
     const returnItems = [
       "type",
-      "provision_text",
+      "provision_name",
       "free_text",
       "category",
       "provision_group",
@@ -73,6 +73,13 @@ export class ReportService {
 
   async getGroupMaxByVariant(variantName: string): Promise<any> {
     const url = `${hostname}:${port}/nfr-provision/get-group-max/variant/${variantName}`;
+    return await axios.get(url).then((res) => {
+      return res.data;
+    });
+  }
+
+  async getVariablesByVariant(variantName: string): Promise<any> {
+    const url = `${hostname}:${port}/nfr-provision/get-provision-variables/variant/${variantName}`;
     return await axios.get(url).then((res) => {
       return res.data;
     });

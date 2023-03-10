@@ -61,6 +61,11 @@ export class NFRProvisionController {
     return this.nfrProvisionService.getGroupMaxByVariant(variantName);
   }
 
+  @Get("get-provision-variables/variant/:variant")
+  getVariablesByVariant(@Param("variant") variantName: string) {
+    return this.nfrProvisionService.getVariablesByVariant(variantName);
+  }
+
   @Delete(":id")
   remove(@Param("id") id: number) {
     return this.nfrProvisionService.remove(id);

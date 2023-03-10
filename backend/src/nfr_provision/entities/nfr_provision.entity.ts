@@ -5,11 +5,13 @@ import {
   JoinTable,
   ManyToMany,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from "typeorm";
 import { NFRProvisionGroup } from "./nfr_provision_group.entity";
 import { NFRProvisionVariant } from "./nfr_provision_variant.entity";
+import { NFRProvisionVariable } from "./nfr_provision_variable.entity";
 
 @Entity()
 export class NFRProvision {
@@ -18,13 +20,15 @@ export class NFRProvision {
   @Column({ nullable: true })
   type: string;
   @Column({ nullable: true })
-  provision_text: string;
+  provision_name: string;
   @Column({ nullable: true })
   free_text: string;
   @Column({ nullable: true })
   category: string;
   @Column({ nullable: true })
   active_flag: boolean;
+  @Column({ nullable: true })
+  mandatory: boolean;
   @Column({ nullable: true })
   create_userid: string;
   @Column({ nullable: true })
@@ -38,26 +42,37 @@ export class NFRProvision {
     (provisionGroup) => provisionGroup.provisions
   )
   provision_group: NFRProvisionGroup;
+  @OneToMany(
+    () => NFRProvisionVariable,
+    (provisionVariable) => provisionVariable.provision,
+    {
+      nullable: true,
+      cascade: true,
+    }
+  )
+  provision_variables: NFRProvisionVariable[];
   @ManyToMany(() => NFRProvisionVariant, { nullable: true, cascade: true })
   @JoinTable()
   provision_variant: NFRProvisionVariant[];
 
   constructor(
     type?: string,
-    provision_text?: string,
+    provision_name?: string,
     free_text?: string,
     category?: string,
     active_flag?: boolean,
+    mandatory?: boolean,
     create_userid?: string,
     update_userid?: string,
     provision_group?: NFRProvisionGroup,
     provision_variant?: NFRProvisionVariant[]
   ) {
     this.type = type || "";
-    this.provision_text = provision_text || "";
+    this.provision_name = provision_name || "";
     this.free_text = free_text || "";
     this.category = category || "";
     this.active_flag = active_flag;
+    this.mandatory = mandatory;
     this.create_userid = create_userid || "";
     this.update_userid = update_userid || "";
     this.provision_group = provision_group || null;

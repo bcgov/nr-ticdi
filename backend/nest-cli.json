@@ -3,7 +3,7 @@
   "sourceRoot": "src",
   "compilerOptions": {
     "assets": [
-      { "include": "../utils/db", "outDir": "dist/utils" }
+      { "include": "../utils/db", "outDir": "dist/src/utils" }
     ]
   }
 }

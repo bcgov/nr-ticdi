@@ -36,7 +36,7 @@ export class NFRProvisionController {
   }
 
   @Get("variant/:variant")
-  findByDtid(@Param("variant") variantName: string) {
+  findProvisionsByVariant(@Param("variant") variantName: string) {
     return this.nfrProvisionService.findProvisionsByVariant(variantName);
   }
 
@@ -64,6 +64,13 @@ export class NFRProvisionController {
   @Get("get-provision-variables/variant/:variant")
   getVariablesByVariant(@Param("variant") variantName: string) {
     return this.nfrProvisionService.getVariablesByVariant(variantName);
+  }
+
+  @Get("get-mandatory-provisions/variant/:variant")
+  getMandatoryProvisionsByVariant(@Param("variant") variantName: string) {
+    return this.nfrProvisionService.getMandatoryProvisionsByVariant(
+      variantName
+    );
   }
 
   @Delete(":id")

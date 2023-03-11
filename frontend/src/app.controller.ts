@@ -36,10 +36,8 @@ let requestConfig: AxiosRequestConfig;
 export class AppController {
   constructor(
     private readonly appService: AppService,
-    private readonly adminService: AdminService,
     private readonly reportService: ReportService,
-    private readonly ttlsService: TTLSService,
-    private readonly httpService: HttpService
+    private readonly ttlsService: TTLSService
   ) {
     const hostname = process.env.backend_url
       ? process.env.backend_url
@@ -365,6 +363,8 @@ export class AppController {
       const groupMaxJsonArray = await this.reportService.getGroupMaxByVariant(
         variantName
       );
+      const mandatoryProvisionIds =
+        await this.reportService.getMandatoryProvisionsByVariant(variantName);
       let ttlsJSON, primaryContactName;
       try {
         await this.ttlsService.setWebadeToken();
@@ -377,25 +377,20 @@ export class AppController {
           .catch((err) => {
             console.log(err);
           });
-        ttlsJSON = await this.ttlsService.sendToBackend(response);
-        if (ttlsJSON.inspected_date) {
-          ttlsJSON["inspected_date"] = this.ttlsService.formatInspectedDate(
-            ttlsJSON.inspected_date.toString()
-          );
-        }
-        primaryContactName = ttlsJSON.licence_holder_name;
-        ttlsJSON["interested_parties"] = [
+        ttlsJSON = await this.ttlsService.formatNFRData(response);
+        primaryContactName = ttlsJSON.licenceHolderName;
+        ttlsJSON["interestedParties"] = [
           {
-            first_name: "asdf",
-            middle_name: "fdsa",
-            last_name: "1234",
+            firstName: "First",
+            middleName: "Middle",
+            lastName: "Last",
             address: "123 fake street",
           },
           {
-            first_name: "uiop",
-            middle_name: "poiu",
-            last_name: "4321",
-            address: "555 fghj road",
+            firstName: "First2",
+            middleName: "Middle2",
+            lastName: "Last2",
+            address: "346 Miron Drive",
           },
         ];
         let selectedVariant = 0;
@@ -432,6 +427,7 @@ export class AppController {
           groupMaxJsonArray: groupMaxJsonArray,
           documentTypes: NFR_VARIANTS_ARRAY,
           selectedVariant: selectedVariant,
+          enabledProvisionList: mandatoryProvisionIds,
           prdid: ttlsJSON.id,
         };
       } catch (err) {
@@ -447,6 +443,7 @@ export class AppController {
           groupMaxJsonArray: groupMaxJsonArray,
           documentTypes: NFR_VARIANTS_ARRAY,
           prdid: ttlsJSON ? ttlsJSON.id : null,
+          enabledProvisionList: [],
           error: err,
         };
       }

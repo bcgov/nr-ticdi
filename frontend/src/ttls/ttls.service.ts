@@ -37,6 +37,58 @@ export class TTLSService {
     this.webade_token = await this.getWebadeToken();
   }
 
+  formatNFRData(ttlsData: any): any {
+    const mappedData = {
+      dtid: ttlsData.dtid,
+      fileNum: ttlsData.fileNum,
+      incorporationNum: ttlsData.tenantAddr[0].incorporationNum,
+      orgUnit: ttlsData.orgUnit,
+      purpose: ttlsData.purpose,
+      subPurpose: ttlsData.subPurpose,
+      type: ttlsData.type,
+      subType: ttlsData.subType,
+      firstName: ttlsData.tenantAddr[0].firstName,
+      middleName: ttlsData.tenantAddr[0].middleName,
+      lastName: ttlsData.tenantAddr[0].lastName,
+      legalName: ttlsData.tenantAddr[0].legalName,
+      licenceHolderName: this.getLicenceHolderName(ttlsData.tenantAddr),
+      emailAddress: ttlsData.tenantAddr[0].emailAddress,
+      phoneNumber: this.formatPhoneNumber(
+        ttlsData.tenantAddr[0].phoneNumber,
+        ttlsData.tenantAddr[0].areaCode
+      ),
+      licenceHolder: this.getLicenceHolder(ttlsData.tenantAddr),
+      contactAgent: this.getContactAgent(
+        ttlsData.contactFirstName,
+        ttlsData.contactMiddleName,
+        ttlsData.contactLastName
+      ),
+      contactCompanyName: ttlsData.contactCompanyName,
+      contactFirstName: ttlsData.contactFirstName,
+      contactMiddleName: ttlsData.contactMiddleName,
+      contactLastName: ttlsData.contactLastName,
+      contactPhoneNumber: this.formatPhoneNumber(
+        ttlsData.contactPhoneNumber,
+        null
+      ),
+      contactEmail: ttlsData.contactEmail,
+      inspectionDate: ttlsData.inspectionDate,
+      mailingAddress: this.getMailingAddress(ttlsData.tenantAddr),
+      addrLine1: ttlsData.tenantAddr[0].addrLine1,
+      addrLine2: ttlsData.tenantAddr[0].addrLine2,
+      addrLine3: ttlsData.tenantAddr[0].addrLine3,
+      city: ttlsData.tenantAddr[0].city,
+      regionCd: ttlsData.tenantAddr[0].regionCd,
+      postalCode: ttlsData.tenantAddr[0].postalCode,
+      provAndPostalCode: this.getProvAndPostalCode(ttlsData.tenantAddr[0]),
+      zipCode: ttlsData.tenantAddr[0].zipCode,
+      countryCd: ttlsData.tenantAddr[0].countryCd,
+      country: ttlsData.tenantAddr[0].country,
+      locLand: ttlsData.locLand,
+    };
+    return mappedData;
+  }
+
   // sends json data to the backend to be inserted into the database
   async sendToBackend(jdf: any): Promise<any> {
     const url = `${hostname}:${port}/print-request-detail`;
@@ -229,6 +281,19 @@ export class TTLSService {
     return mailingAddress;
   }
 
+  getProvAndPostalCode(tenantAddr: {
+    provAbbr: string;
+    postalCode: string;
+  }): string {
+    if (tenantAddr.provAbbr && tenantAddr.postalCode) {
+      return tenantAddr.provAbbr + ", " + tenantAddr.postalCode;
+    } else if (tenantAddr.provAbbr) {
+      return tenantAddr.provAbbr;
+    } else {
+      return tenantAddr.postalCode;
+    }
+  }
+
   formatInspectedDate(inspected_date: string): string {
     if (inspected_date && inspected_date.length == 8) {
       return (
@@ -338,114 +403,6 @@ export class TTLSService {
         console.log(error.config);
         console.log(error);
       });
-  }
-
-  /**
-   * Generates a LUR report name using tenure file number
-   * and a version number. The version number is incremented
-   * each time someone generates a LUR report.
-   *
-   * @param tenureFileNumber
-   * @returns
-   */
-  async generateReportName(tenureFileNumber: string) {
-    const url =
-      `${hostname}:${port}/print-request-log/version/` + tenureFileNumber;
-    // grab the next version string for the dtid
-    const version = await axios
-      .get(url, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      })
-      .then((res) => {
-        return res.data;
-      });
-    return { reportName: "LUR_" + tenureFileNumber + "_" + version };
-  }
-
-  /**
-   * Generates the Land use Report using CDOGS
-   *
-   * @param prdid
-   * @param document_type
-   * @param username
-   * @returns
-   */
-  async generateLURReport(
-    prdid: number,
-    document_type: string,
-    username: string
-  ) {
-    const url = `${hostname}:${port}/print-request-detail/view/` + prdid;
-    const templateUrl =
-      `${hostname}:${port}/document-template/get-active-report/` +
-      encodeURI(document_type);
-    const logUrl = `${hostname}:${port}/print-request-log/`;
-    // get the view given the print request detail id
-    const data = await axios
-      .get(url, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      })
-      .then((res) => {
-        return res.data;
-      });
-    if (data.InspectionDate) {
-      data["InspectionDate"] = this.formatInspectedDate(data.InspectionDate);
-    }
-    // get the document template
-    const documentTemplateObject: { id: number; the_file: string } = await axios
-      .get(templateUrl)
-      .then((res) => {
-        return res.data;
-      });
-
-    // log the request
-    const document_template_id = documentTemplateObject.id;
-    await axios.post(logUrl, {
-      document_template_id: document_template_id,
-      print_request_detail_id: prdid,
-      dtid: data.DTID,
-      request_app_user: username,
-      request_json: JSON.stringify(data),
-    });
-
-    const cdogsToken = await this.callGetToken();
-    let bufferBase64 = documentTemplateObject.the_file;
-    const md = JSON.stringify({
-      data,
-      formatters:
-        '{"myFormatter":"_function_myFormatter|function(data) { return data.slice(1); }","myOtherFormatter":"_function_myOtherFormatter|function(data) {return data.slice(2);}"}',
-      options: {
-        cacheReport: false,
-        convertTo: "docx",
-        overwrite: true,
-        reportName: "lur-report",
-      },
-      template: {
-        content: `${bufferBase64}`,
-        encodingType: "base64",
-        fileType: "docx",
-      },
-    });
-
-    const conf = {
-      method: "post",
-      url: process.env.cdogs_url,
-      headers: {
-        Authorization: `Bearer ${cdogsToken}`,
-        "Content-Type": "application/json",
-      },
-      responseType: "arraybuffer",
-      data: md,
-    };
-    const ax = require("axios");
-    const response = await ax(conf).catch((error) => {
-      console.log(error.response);
-    });
-    return response.data;
   }
 
   // TODO

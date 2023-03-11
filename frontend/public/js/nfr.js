@@ -42,74 +42,6 @@ groupMaxTable = $("#groupMaxTable").DataTable({
 let selectedProvisionsUrl = `${
   window.location.origin
 }/report/nfr-provisions/${encodeURI(variantName)}`;
-console.log("nfrDataId: " + nfrDataId);
-console.log(nfrDataId != "");
-selectedProvisionsUrl += nfrDataId != "" ? `/${nfrDataId}` : "/-1";
-
-selectedProvisionsTable = $("#selectedProvisionsTable").DataTable({
-  ajax: {
-    url: selectedProvisionsUrl,
-    dataSrc: "",
-  },
-  paging: false,
-  info: false,
-  bFilter: false,
-  rowId: function (data) {
-    return `selected-provision-row-${data.id}`;
-  },
-  columns: [
-    { data: "type" },
-    { data: "provision_group" },
-    { data: "provision_name" },
-    { data: "free_text" },
-    { data: "category" },
-    { data: "max" },
-    { data: "id" },
-  ],
-  columnDefs: [
-    {
-      targets: [0, 1, 2, 3, 4, 5, 6],
-      render: function (data, type, row, meta) {
-        if (type === "display") {
-          var columnTypes = [
-            "type",
-            "provision_group",
-            "provision_name",
-            "free_text",
-            "category",
-            "max",
-            "id",
-            "select",
-          ];
-          var columnType = columnTypes[meta.col];
-          var id = row["id"];
-          var group = row["group"];
-          var max = row["max"];
-
-          if (columnType === "max" || columnType === "id") {
-            return `<input type='hidden' value='${data}' />`;
-          } else if (columnType === "free_text") {
-            return `<input type='text' value='${data}' id='${columnType}-${id}' style='width: 100%;' />`;
-          } else {
-            return `<input type='text' value='${data}' readonly style='color: gray; width: 100%;' />`;
-          }
-        } else {
-          return data;
-        }
-      },
-    },
-    {
-      targets: [5, 6],
-      orderable: false,
-    },
-  ],
-  order: [[1, "asc"]],
-  rowCallback: function (row, data) {
-    if (data.select === false) {
-      $(row).hide();
-    }
-  },
-});
 
 provisionTable = $("#provisionTable").DataTable({
   ajax: {
@@ -162,7 +94,7 @@ provisionTable = $("#provisionTable").DataTable({
           ) {
             return `<input type='hidden' id='${columnType}-${id}' value='${data}' />`;
           } else {
-            return `<input type='text' id='${columnType}-${id}' value='${data}' readonly style='color: gray; width: 100%;' />`;
+            return `<input type='text' id='${columnType}-${id}' value='${data}' tabIndex='-1' readonly style='color: gray; width: 100%;' />`;
           }
         } else {
           return data;
@@ -179,6 +111,12 @@ provisionTable = $("#provisionTable").DataTable({
       orderable: false,
     },
   ],
+  rowCallback: function (row, data, index) {
+    $(row).attr("data-id", data.id);
+    if (!preloadEnabledProvisions.includes(data.id)) {
+      $(row).hide();
+    }
+  },
   drawCallback: function (settings) {
     // add event listeners to the provision checkboxes
     const checkboxes = document.querySelectorAll('input[type="checkbox"]');
@@ -213,7 +151,7 @@ provisionTable = $("#provisionTable").DataTable({
             $(`.variable-provision-row-${id}`).show();
           } else {
             $(`#selected-provision-row-${id}`).hide();
-            $(`.variable-provision-row-${id}`).show();
+            $(`.variable-provision-row-${id}`).hide();
           }
         });
         const g = checkbox.dataset.group;
@@ -234,6 +172,70 @@ provisionTable = $("#provisionTable").DataTable({
     }
   },
   order: [[1, "asc"]],
+});
+
+selectedProvisionsUrl += nfrDataId != "" ? `/${nfrDataId}` : "/-1";
+selectedProvisionsTable = $("#selectedProvisionsTable").DataTable({
+  ajax: {
+    url: selectedProvisionsUrl,
+    dataSrc: "",
+  },
+  paging: false,
+  info: false,
+  bFilter: false,
+  rowId: function (data) {
+    return `selected-provision-row-${data.id}`;
+  },
+  columns: [
+    { data: "type" },
+    { data: "provision_group" },
+    { data: "provision_name" },
+    { data: "free_text" },
+    { data: "category" },
+    { data: "max" },
+    { data: "id" },
+  ],
+  columnDefs: [
+    {
+      targets: [0, 1, 2, 3, 4, 5, 6],
+      render: function (data, type, row, meta) {
+        if (type === "display") {
+          var columnTypes = [
+            "type",
+            "provision_group",
+            "provision_name",
+            "free_text",
+            "category",
+            "max",
+            "id",
+          ];
+          var columnType = columnTypes[meta.col];
+          var id = row["id"];
+
+          if (columnType === "max" || columnType === "id") {
+            return `<input type='hidden' value='${data}' />`;
+          } else if (columnType === "free_text") {
+            return `<input type='text' value='${data}' class='${columnType}' style='width: 100%;' />`;
+          } else {
+            return `<input type='text' value='${data}' class='${columnType}' tabIndex='-1' readonly style='color: gray; width: 100%;' />`;
+          }
+        } else {
+          return data;
+        }
+      },
+    },
+    {
+      targets: [5, 6],
+      orderable: false,
+    },
+  ],
+  order: [[1, "asc"]],
+  rowCallback: function (row, data) {
+    $(row).attr("data-id", data.id);
+    if (!preloadEnabledProvisions.includes(data.id)) {
+      $(row).hide();
+    }
+  },
 });
 
 variableTable = $("#variableTable").DataTable({
@@ -265,16 +267,15 @@ variableTable = $("#variableTable").DataTable({
           ];
           var columnType = columnTypes[meta.col];
           var id = row["id"];
-          var provisionId = row["provisionId"];
 
           if (columnType === "id") {
-            return `<input type='text' id='variable-${data}' data-id='${data}' hidden>`;
+            return `<input type='text' data-id='${data}' hidden>`;
           } else if (columnType === "provisionId") {
-            return `<input type='text' id='variable_${columnType}-${id}' data-id='${data}' hidden>`;
+            return `<input type='text' data-id='${data}' hidden>`;
           } else if (columnType === "variable_value") {
-            return `<input type='text' id='${columnType}-${id}' value='${data}' style='width: 100%;' />`;
+            return `<input type='text' class='${columnType}' value='${data}' style='width: 100%;' />`;
           } else {
-            return `<input type='text' id='${columnType}-${id}' value='${data}' readonly style='color: gray; width: 100%;' />`;
+            return `<input type='text' class='${columnType}' value='${data}' tabIndex='-1' readonly style='color: gray; width: 100%;' />`;
           }
         } else {
           return data;
@@ -284,14 +285,20 @@ variableTable = $("#variableTable").DataTable({
   ],
   rowCallback: function (row, data, index) {
     $(row).addClass(`variable-provision-row-${data.provisionId}`);
-    $(row).hide();
+    $(row).attr("data-id", data.provisionId);
+    $(row).attr("data-variable_id", data.id);
+    if (!preloadEnabledProvisions.includes(data.provisionId)) {
+      $(row).hide();
+    }
   },
   order: [[0, "asc"]],
 });
+
 // Don't reload the page when Save For Later button is clicked
 document.querySelector("#saveNfr").addEventListener("click", function (event) {
   event.preventDefault();
 });
+
 // event listener for the Select A Group dropdown
 $("#group-select").on("change", function () {
   const selectedGroup = $(this).val();
@@ -304,6 +311,7 @@ $("#group-select").on("change", function () {
     }
   });
 });
+
 function filterRows() {
   const selectedGroup = $("#group-select").val();
   if (Array.isArray(groupMaxJsonArray) && groupMaxJsonArray.length > 0) {
@@ -321,9 +329,11 @@ function filterRows() {
     });
   }
 }
+
 $("#provisionLegend").click(function () {
   filterRows();
 });
+
 // collapsible sections
 $("fieldset legend").click(function () {
   $(this).parent().find(".contents").toggle();
@@ -355,4 +365,121 @@ function saveForLater() {
       "Content-Type": "application/json",
     },
   });
+}
+
+async function generateNFRReport() {
+  const tenureFileNumber = $("#tfn").text();
+  const dtid = $("#dtid").text();
+  $("#genReport").prop("disabled", true);
+  const reportName = await fetch(
+    `/report/get-nfr-report-name/${tenureFileNumber}`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      responseType: "application/json",
+    }
+  )
+    .then((res) => res.json())
+    .then((resJson) => {
+      return resJson.reportName;
+    })
+    .catch(() => {
+      location.reload();
+    });
+
+  const provisionIds = getEnabledProvisionIds();
+  const provisionJson = getProvisionJson(provisionIds);
+  const variableJson = getVariableJson(provisionIds);
+  const data = {
+    dtid: dtid,
+    variantName: variantName,
+    provisionJson: provisionJson,
+    variableJson: variableJson,
+  };
+  fetch(`/report/generate-nfr-report`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    responseType: "application/json",
+    body: JSON.stringify(data),
+  })
+    .then((res) => res.blob())
+    .then((blob) => {
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.style.display = "none";
+      a.href = url;
+      a.download = reportName + ".docx";
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      $("#genReport").prop("disabled", false);
+    })
+    .catch(() => {
+      location.reload();
+      $("#genReport").prop("disabled", false);
+    });
+}
+
+function getEnabledProvisionIds() {
+  let provisionIds = [];
+  $("#provisionTable")
+    .find(".provisionSelect:checked")
+    .each(function () {
+      provisionIds.push($(this).data("id"));
+    });
+  return provisionIds;
+}
+
+function getProvisionJson(provisionIds) {
+  var data = [];
+  $("#selectedProvisionsTable tbody tr").each(function () {
+    var row = $(this);
+    var provision_id = parseInt(row.attr("data-id"));
+
+    // Only include rows with provisionId in the list
+    if (provisionIds.includes(provision_id)) {
+      var provision_name = row.find(".provision_name").val();
+      var provision_group = row.find(".provision_group").val();
+      var free_text = row.find(".free_text").val();
+
+      var rowData = {
+        provision_id: provision_id,
+        provision_group: provision_group,
+        provision_name: provision_name,
+        free_text: free_text,
+      };
+
+      data.push(rowData);
+    }
+  });
+  return data;
+}
+
+function getVariableJson(provisionIds) {
+  var data = [];
+  $("#variableTable tbody tr").each(function () {
+    var row = $(this);
+    var provision_id = parseInt(row.attr("data-id"));
+
+    // Only include rows with provisionId in the list
+    if (provisionIds.includes(provision_id)) {
+      var variable_name = row.find(".variable_name").val();
+      var variable_value = row.find(".variable_value").val();
+      var variable_id = row.data("variable_id");
+
+      var rowData = {
+        provision_id: provision_id,
+        variable_id: variable_id,
+        variable_name: variable_name,
+        variable_value: variable_value,
+      };
+
+      data.push(rowData);
+    }
+  });
+  return data;
 }

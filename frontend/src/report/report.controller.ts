@@ -10,7 +10,7 @@ import {
   UseGuards,
   UseFilters,
 } from "@nestjs/common";
-import { SessionData } from "utils/types";
+import { ProvisionJSON, SessionData, VariableJSON } from "utils/types";
 import { TTLSService } from "../ttls/ttls.service";
 import { AxiosRequestConfig } from "axios";
 import { AuthenticationFilter } from "src/authentication/authentication.filter";
@@ -47,7 +47,14 @@ export class ReportController {
   getReportName(
     @Param("tfn") tenureFileNumber: string
   ): Promise<{ reportName: string }> {
-    return this.ttlsService.generateReportName(tenureFileNumber);
+    return this.reportService.generateReportName(tenureFileNumber);
+  }
+
+  @Get("get-nfr-report-name/:tfn")
+  getNFRReportName(
+    @Param("tfn") tenureFileNumber: string
+  ): Promise<{ reportName: string }> {
+    return this.reportService.generateNFRReportName(tenureFileNumber);
   }
 
   @Post("generate-lur-report")
@@ -69,10 +76,44 @@ export class ReportController {
       console.log("no active account found");
     }
     return new StreamableFile(
-      await this.ttlsService.generateLURReport(
+      await this.reportService.generateLURReport(
         +data.prdid,
         data.document_type,
         idir_username
+      )
+    );
+  }
+
+  @Post("generate-nfr-report")
+  @Header(
+    "Content-Type",
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+  )
+  @Header("Content-Disposition", "attachment; filename=landusereport.docx")
+  async generateNFRReport(
+    @Session() session: { data: SessionData },
+    @Body()
+    data: {
+      dtid: number;
+      variantName: string;
+      variableJson: VariableJSON[];
+      provisionJson: ProvisionJSON[];
+    }
+  ) {
+    // this should eventually check permissions and prevent unauthorized users from generating documents
+    let idir_username = "";
+    if (session.data.activeAccount) {
+      idir_username = session.data.activeAccount.idir_username;
+      console.log("active account found");
+    } else {
+      console.log("no active account found");
+    }
+    return new StreamableFile(
+      await this.reportService.generateNFRReport(
+        data.dtid,
+        data.variantName,
+        data.variableJson,
+        data.provisionJson
       )
     );
   }

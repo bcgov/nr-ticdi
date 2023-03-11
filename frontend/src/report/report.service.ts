@@ -1,6 +1,10 @@
 import { HttpService } from "@nestjs/axios";
 import { Injectable } from "@nestjs/common";
 import * as dotenv from "dotenv";
+import { firstValueFrom } from "rxjs";
+import { TTLSService } from "src/ttls/ttls.service";
+import { numberWords } from "utils/constants";
+import { ProvisionJSON, VariableJSON } from "utils/types";
 const axios = require("axios");
 
 dotenv.config();
@@ -9,12 +13,253 @@ let port: number;
 
 @Injectable()
 export class ReportService {
-  constructor(private readonly httpService: HttpService) {
+  constructor(
+    private readonly httpService: HttpService,
+    private readonly ttlsService: TTLSService
+  ) {
     hostname = process.env.backend_url
       ? process.env.backend_url
       : `http://localhost`;
     // local development backend port is 3001, docker backend port is 3000
     port = process.env.backend_url ? 3000 : 3001;
+  }
+
+  /**
+   * Generates a LUR report name using tenure file number
+   * and a version number. The version number is incremented
+   * each time someone generates a LUR report.
+   *
+   * @param tenureFileNumber
+   * @returns
+   */
+  async generateReportName(tenureFileNumber: string) {
+    const url =
+      `${hostname}:${port}/print-request-log/version/` + tenureFileNumber;
+    // grab the next version string for the dtid
+    const version = await axios
+      .get(url, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      })
+      .then((res) => {
+        return res.data;
+      });
+    return { reportName: "LUR_" + tenureFileNumber + "_" + version };
+  }
+
+  /**
+   * Generates the Land use Report using CDOGS
+   *
+   * @param prdid
+   * @param document_type
+   * @param username
+   * @returns
+   */
+  async generateLURReport(
+    prdid: number,
+    document_type: string,
+    username: string
+  ) {
+    const url = `${hostname}:${port}/print-request-detail/view/` + prdid;
+    const templateUrl = `${hostname}:${port}/document-template/get-active-report/1`;
+    const logUrl = `${hostname}:${port}/print-request-log/`;
+    // get the view given the print request detail id
+    const data = await axios
+      .get(url, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      })
+      .then((res) => {
+        return res.data;
+      });
+    if (data.InspectionDate) {
+      data["InspectionDate"] = this.ttlsService.formatInspectedDate(
+        data.InspectionDate
+      );
+    }
+    // get the document template
+    const documentTemplateObject: { id: number; the_file: string } = await axios
+      .get(templateUrl)
+      .then((res) => {
+        return res.data;
+      });
+
+    // log the request
+    const document_template_id = documentTemplateObject.id;
+    await axios.post(logUrl, {
+      document_template_id: document_template_id,
+      print_request_detail_id: prdid,
+      dtid: data.DTID,
+      request_app_user: username,
+      request_json: JSON.stringify(data),
+    });
+
+    const cdogsToken = await this.ttlsService.callGetToken();
+    let bufferBase64 = documentTemplateObject.the_file;
+    const md = JSON.stringify({
+      data,
+      formatters:
+        '{"myFormatter":"_function_myFormatter|function(data) { return data.slice(1); }","myOtherFormatter":"_function_myOtherFormatter|function(data) {return data.slice(2);}"}',
+      options: {
+        cacheReport: false,
+        convertTo: "docx",
+        overwrite: true,
+        reportName: "lur-report",
+      },
+      template: {
+        content: `${bufferBase64}`,
+        encodingType: "base64",
+        fileType: "docx",
+      },
+    });
+
+    const conf = {
+      method: "post",
+      url: process.env.cdogs_url,
+      headers: {
+        Authorization: `Bearer ${cdogsToken}`,
+        "Content-Type": "application/json",
+      },
+      responseType: "arraybuffer",
+      data: md,
+    };
+    const ax = require("axios");
+    const response = await ax(conf).catch((error) => {
+      console.log(error.response);
+    });
+    return response.data;
+  }
+
+  /**
+   * Generates a LUR report name using tenure file number
+   * and a version number. The version number is incremented
+   * each time someone generates a LUR report.
+   *
+   * @param tenureFileNumber
+   * @returns
+   */
+  async generateNFRReportName(tenureFileNumber: string) {
+    const url = `${hostname}:${port}/nfr-data-log/version/` + tenureFileNumber;
+    // grab the next version string for the dtid
+    // const version = await axios
+    //   .get(url, {
+    //     headers: {
+    //       "Content-Type": "application/json",
+    //     },
+    //   })
+    //   .then((res) => {
+    //     return res.data;
+    //   });
+    const version = 1;
+    return { reportName: "NFR_" + tenureFileNumber + "_" + version };
+  }
+
+  async generateNFRReport(
+    dtid: number,
+    variantName: string,
+    variableJson: VariableJSON[],
+    provisionJson: ProvisionJSON[]
+  ) {
+    const templateUrl = `${hostname}:${port}/document-template/get-active-report/2`;
+    await this.ttlsService.setWebadeToken();
+    const rawData: any = await firstValueFrom(this.ttlsService.callHttp(dtid))
+      .then((res) => {
+        return res;
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+    const ttlsData = {
+      DB_Address_Regional_Office: `${rawData.regOfficeStreet},\r\n ${rawData.regOfficeCity},\r\n ${rawData.regOfficeProv},\r\n ${rawData.regOfficePostalCode}`,
+      DB_Name_BCAL_Contact: this.ttlsService.getContactAgent(
+        rawData.contactFirstName,
+        rawData.contactMiddleName,
+        rawData.contactLastName
+      ),
+      DB_File_Number: rawData.fileNum,
+      DB_Address_Mailing_Tenant: `${rawData.tenantAddr[0].legalName},\r\n ${rawData.tenantAddr[0].addrLine1},\r\n ${rawData.tenantAddr[0].city}, ${rawData.tenantAddr[0].provAbbr},\r\n ${rawData.tenantAddr[0].postalCode},\r\n`,
+      DB_Tenure_Type: rawData.type,
+      DB_Legal_Description: rawData.interestParcel[0].legalDescription,
+      DB_Fee_Payable_Type: rawData.feePayableType,
+      DB_Fee_Payable_Amount_GST: rawData.feePayableAmountGst,
+      DB_Fee_Payable_Amount: rawData.feePayableAmount,
+      DB_FP_Asterisk: "*",
+      DB_Total_GST_Amount: (rawData.gstRate / 100) * rawData.feePayableAmount,
+      DB_Total_Monies_Payable:
+        (rawData.gstRate / 100) * rawData.feePayableAmount +
+        rawData.feePayableAmount,
+      DB_Address_Line_Regional_Office: `${rawData.regOfficeStreet},\r\n ${rawData.regOfficeCity},\r\n ${rawData.regOfficeProv},\r\n ${rawData.regOfficePostalCode}`,
+    }; // parse out the rawData, variableJson, and provisionJson into something useable
+    // get the document template
+    const documentTemplateObject: { id: number; the_file: string } = await axios
+      .get(templateUrl)
+      .then((res) => {
+        return res.data;
+      });
+    const variables = {};
+    variableJson.forEach(({ variable_name, variable_value }) => {
+      const newVariableName = variable_name
+        .replace(/_/g, " ")
+        .toLowerCase()
+        .replace(/\b\w/g, (match) => match.toUpperCase())
+        .replace(/\s/g, "_")
+        .replace(/^(\w)/, (match) => match.toUpperCase());
+      variables[`VAR_${newVariableName}`] = variable_value;
+    });
+    const groupIndexMap = new Map<number, number>();
+    const showProvisionSections: Record<string, any> = {};
+    provisionJson.forEach((provision) => {
+      const group = provision.provision_group;
+      const index = (groupIndexMap.get(group) ?? 0) + 1;
+      groupIndexMap.set(group, index);
+
+      const groupText = numberWords[group];
+      const varName = `Section${groupText}_${index}_Text`;
+      showProvisionSections[varName] = provision.free_text;
+
+      const showVarName = `showSection${groupText}_${index}`;
+      showProvisionSections[showVarName] = 1;
+    });
+    const data = Object.assign({}, ttlsData, variables, showProvisionSections);
+
+    // TODO - log the request in nfr-data-log
+
+    const cdogsToken = await this.ttlsService.callGetToken();
+    let bufferBase64 = documentTemplateObject.the_file;
+    const md = JSON.stringify({
+      data,
+      formatters:
+        '{"myFormatter":"_function_myFormatter|function(data) { return data.slice(1); }","myOtherFormatter":"_function_myOtherFormatter|function(data) {return data.slice(2);}"}',
+      options: {
+        cacheReport: false,
+        convertTo: "docx",
+        overwrite: true,
+        reportName: "lur-report",
+      },
+      template: {
+        content: `${bufferBase64}`,
+        encodingType: "base64",
+        fileType: "docx",
+      },
+    });
+
+    const conf = {
+      method: "post",
+      url: process.env.cdogs_url,
+      headers: {
+        Authorization: `Bearer ${cdogsToken}`,
+        "Content-Type": "application/json",
+      },
+      responseType: "arraybuffer",
+      data: md,
+    };
+    const ax = require("axios");
+    const response = await ax(conf).catch((error) => {
+      console.log(error.response);
+    });
+    return response.data;
   }
 
   async getNFRProvisionsByVariant(
@@ -87,6 +332,13 @@ export class ReportService {
 
   async getEnabledProvisions(nfrDataId: number) {
     const url = `${hostname}:${port}/nfr-data/get-enabled-provisions/${nfrDataId}`;
+    return await axios.get(url).then((res) => {
+      return res.data;
+    });
+  }
+
+  async getMandatoryProvisionsByVariant(variantName: string) {
+    const url = `${hostname}:${port}/nfr-provision/get-mandatory-provisions/variant/${variantName}`;
     return await axios.get(url).then((res) => {
       return res.data;
     });

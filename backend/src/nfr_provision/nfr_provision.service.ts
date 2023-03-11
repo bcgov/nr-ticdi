@@ -206,6 +206,23 @@ export class NFRProvisionService {
     return provisionVariables;
   }
 
+  async getMandatoryProvisionsByVariant(
+    variantName: string
+  ): Promise<number[]> {
+    const variant = await this.nfrProvisionVariantRepository.findOne({
+      where: {
+        variant_name: variantName,
+      },
+    });
+    if (!variant) {
+      return [];
+    }
+    const provisions = await this.nfrProvisionRepository.find({
+      where: { provision_variant: variant, mandatory: true },
+    });
+    return provisions.map((provision) => provision.id);
+  }
+
   async remove(id: number): Promise<{ deleted: boolean; message?: string }> {
     try {
       await this.nfrProvisionRepository.delete(id);

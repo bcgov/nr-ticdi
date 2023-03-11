@@ -491,7 +491,6 @@ export class AdminService {
     return await axios
       .post(url, { ...provisionParams, update_userid })
       .then((res) => {
-        console.log("updated");
         return res.data;
       });
   }

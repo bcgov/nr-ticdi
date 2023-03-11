@@ -1,0 +1,183 @@
+{{#> template}}
+  {{#*inline "content"}}
+    <main role="main">
+      <form>
+            <div class="container">
+                <h1>Preview - Notice of Final Review</h1>
+                <hr />
+                <div class="form-group row">
+                    <div class="col-md-2">
+                        <p class="sectionTitle">Select an NFR Variant</p>
+                    </div>
+                    <div class="col-md-3">
+                        <select class="form-control" id="documentVariantId">
+                            {{#each documentTypes}}
+                            <option value="{{this}}">{{this}}</option>
+                            {{/each}}
+                        </select>
+                    </div>
+                </div>
+                <hr>
+
+                <div class="titleSpacing dataSection"><b>DTID:</b> <span id="dtid">{{message.dtid}}</span></div>
+                <div class="titleSpacing dataSection"><b>Tenure File Number:</b> {{message.db_file_number}}</div>
+                <div class="titleSpacing dataSection"><b>Primary Contact Name:</b> {{message.db_name_bcal_contact}}</div>
+                
+                <fieldset class="form-group collapsible">
+                    <legend style="cursor: pointer" class='togvis sectionTitle'><i class="fa fa-plus"></i>  Disposition Transaction ID Details</legend>
+                    <div class="contents" style="display: none;">
+                        <div class="form-row">
+                            <div class="form-group col-md-5 dataSection dataSection">
+                                <dt>Organization Unit</dt>
+                                <dd id="orgUnit">{{ message.organization_unit }}</dd>
+                            </div>
+                            <div class="form-group col-md-5 dataSection dataSection">
+                                <dt>Primary Contact Email Address</dt>
+                                <dd>{{ message.email_address }}</dd>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group col-md-5 dataSection dataSection">
+                                <dt>Incorporation Number</dt>
+                                <dd id="orgUnit">{{ message.incorporation_number }}</dd>
+                            </div>
+                            <div class="form-group col-md-5 dataSection dataSection">
+                                <dt>Primary Contact Phone Number</dt>
+                                <dd id="phoneNumber">{{ message.phone_number }}</dd>
+                            </div>
+                        </div>
+                    </div>
+                </fieldset>
+                <fieldset class="form-group collapsible">
+                    <legend style="cursor: pointer" class='togvis sectionTitle'><i class="fa fa-plus"></i>  Tenure Details</legend>
+                    <div class="contents" style="display: none;">
+                        <div class="form-row">
+                            <div class="form-group col-md-5 dataSection">
+                                <dt>Type</dt>
+                                <dd id="type">{{ message.type_name }}</dd>
+                            </div>
+                            <div class="form-group col-md-5 dataSection">
+                                <dt>Subtype</dt>
+                                <dd id="subType">{{message.sub_type_name}}</dd>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group col-md-5 dataSection">
+                                <dt>Purpose</dt>
+                                <dd id="purpose">{{ message.purpose_name }}</dd>
+                            </div>
+                            <div class="form-group col-md-5 dataSection">
+                                <dt>Subpurpose</dt>
+                                <dd id="subPurpose">{{message.sub_purpose_name}}</dd>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group col-md-5 dataSection">
+                                <dt>Mailing Address</dt>
+                                <dd id="address">{{message.mailing_address_line_1}}</dd>
+                                <dd id="address">{{message.mailing_address_line_2}}</dd>
+                                <dd id="address">{{message.mailing_address_line_3}}</dd>
+                                <dd id="cityProv">{{message.mailing_city}}</dd>
+                                <dd id="postalCode">{{message.mailing_province_state_code}}, {{message.mailing_postal_code}}</dd>
+                                <dd id="county">{{message.mailing_country}}</dd>
+                            </div>
+                            <div class="form-group col-md-5 dataSection">
+                                <dt>Location of Land</dt>
+                                <dd id="locLand">{{message.location_description}}</dd>
+                            </div>
+                        </div>
+                    </div>
+                </fieldset>
+                <fieldset class="form-group collapsible">
+                    <legend style="cursor: pointer" class='togvis sectionTitle'><i class="fa fa-plus"></i>  Interested Parties</legend>
+                    <div class="contents" style="display: none;">
+                        {{#each message.interested_parties}}
+                        <div class="form-row">
+                            <div class="form-group col-md-2 dataSection">
+                                <dt>First Name</dt>
+                                <dd id="firstName">{{ this.first_name }}</dd>
+                            </div>
+                            <div class="form-group col-md-2">
+                                <dt>Middle Name</dt>
+                                <dd id="middleName">{{this.middle_name}}</dd>
+                            </div>
+                            <div class="form-group col-md-2">
+                                <dt>Last Name</dt>
+                                <dd id="lastName">{{this.last_name}}</dd>
+                            </div>
+                            <div class="form-group col-md-3">
+                                <dt>Address</dt>
+                                <dd id="address">{{this.address}}</dd>
+                            </div>
+                        </div>
+                        {{/each}}
+                    </div>
+                </fieldset>
+                <fieldset class="form-group collapsible">
+                    <legend id="provisionLegend" style="cursor: pointer" class='togvis sectionTitle'><i class="fa fa-plus"></i>  Provisions</legend>
+                    <div class="contents" style="display: none;">
+                        <span>Select A Group:
+                            <select id="group-select">{{#each groupMaxJsonArray}}<option value="{{this.provision_group}}">{{this.provision_group}} - {{this.provision_group_text}}{{/each}}</option></select>     Max for this Group is <span id="maxGroupNum"></span></span>
+                        <table id="provisionTable" style="width:100%">
+                            <thead>
+                                <th>Type</th>
+                                <th style="min-width: 300px">Provision</th>
+                                <th style="min-width: 150px">Free Text</th>
+                                <th style="min-width: 150px">Category</th>
+                                <th></th>
+                                <th style="display: none"></th>
+                                <th style="display: none"></th>
+                                <th style="display: none"></th>
+                            </thead>
+                        </table>
+                        <br>
+                        <h5>Selected Provisions</h5>
+                        <table id="selectedProvisionsTable" style="width:100%">
+                            <thead>
+                                <th>Type</th>
+                                <th>Group</th>
+                                <th style="min-width: 300px">Provision</th>
+                                <th style="min-width: 150px">Free Text</th>
+                                <th style="min-width: 150px">Category</th>
+                                <th style="display: none"></th>
+                                <th style="display: none"></th>
+                            </thead>
+                        </table>
+                    </div>
+                </fieldset>
+                <fieldset class="form-group collapsible">
+                    <legend style="cursor: pointer" class='togvis sectionTitle'><i class="fa fa-plus"></i>  Variables</legend>
+                    <div class="contents" style="display: none;">
+                        <table id="variableTable"></table>
+                    </div>
+                    <div class="form-group row">
+                        
+                    </div>
+                </fieldset>
+                <div class="form-group row">
+                    <div class="col-md-4">
+                        <button id="nextGroup" class="btn btn-success">Save for Later</button>
+                    </div>
+                    <div class="col-md-4">
+                        <button type="button" class="btn btn-primary" onclick="generateReport()" id="genReport">Create</button>
+                    </div>
+                </div>
+                <div style="display: none">
+                    <table id="groupMaxTable"></table>
+                </div>
+            </div>
+        </form>
+        <input type="hidden" id="prdid" value="{{this.prdid}}">
+        <input type="hidden" id="tfn" value="{{message.db_file_number}}">
+        <input type="hidden" id="groupMaxJson">
+
+    </main>
+    <script>
+        $('#groupMaxJson').val(JSON.stringify('{{{json groupMaxJsonArray}}}'));
+        $('#dtid').val({{ message.dtid }});
+        $('#documentVariantId').prop("selectedIndex", {{selectedVariant}});
+        console.log({{message.err}});
+    </script>
+    <script src="/js/nfr.js"></script>
+  {{/inline}}
+{{/template}}

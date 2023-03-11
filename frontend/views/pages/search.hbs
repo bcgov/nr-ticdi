@@ -1,0 +1,158 @@
+{{#> template}}
+  {{#*inline "content"}}
+    <main role="main">
+        <div class="container container-fluid">
+            <h2>{{title}}</h2>
+            <hr />
+            <div class="row">
+                <div class="col-md-4">
+                    <input class="mt-1" type="text" id="searchInput" style="width: 100%">
+                </div>
+                <div class="col-md-2">
+                    <button class="btn btn-success ml-4" id="searchButton" onclick="searchRecords()">Search</button>
+                </div>
+            </div>
+            <div class="row">
+                <div>
+                    <table id="documentTable">
+                        <thead>
+                            <th style="min-width: 50px">Doc No.</th>
+                            <th style="min-width: 300px">Template Name</th>
+                            <th style="max-width: 120px">Uploaded Date</th>
+                            <th style="min-width: 80px">Status</th>
+                            <th>Active</th>
+                            <th></th>
+                        </thead>
+                        <tbody id="documentTableBody">
+                            <tr></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="row justify-content-end">
+                <div class="col-md-5">
+                    <button type="button" class="btn btn-success" onclick="openDocument()">Open</button>
+                </div>
+            </div>
+        </div>
+    </main>
+    <script>
+        var dataArray = [];
+        $( document ).ready(function() {
+            $('#documentTable').DataTable({
+                "paging": false,
+                "bFilter": false,
+                "ajax": {
+                    "url": "admin/search-nfr-templates",
+                    "dataSrc": ""
+                },
+                "columns": [
+                    { data: "version"},
+                    { data: "file_name"},
+                    { data: "updated_date"},
+                    { data: "status"},
+                    { data: "active"},
+                    { data: "nfr_id" }
+                ],
+                "columnDefs": [
+                {
+                    "targets": [0, 1, 2, 3, 4, 5],
+                    "render": function (data, type, row, meta) {
+                    if (type === 'display') {
+                        var columnTypes = ["version", "file_name", "updated_date", "status", "active", "nfr_id"];
+                        var columnType = columnTypes[meta.col];
+                        var nfr_id = row["nfr_id"];
+                        const checked = meta.row === 0 ? 'checked' : '';
+
+                        if (columnType === "active") {
+                            return "<input type='radio' id='" + columnType + "-" + nfr_id + `' data-id='` + nfr_id + `' name='radioActive' ${checked}>`;
+                        } else if (columnType === "nfr_id") {
+                            return "<input type='hidden' id='" + columnType + "-" + nfr_id + "' value='" + data + "' />";
+                        } else {
+                            return "<input type='text' id='" + columnType + "-" + nfr_id + "' value='" + data + "' readonly style='color: gray; width: 100%;' />";
+                        }
+                    } else {
+                        return data;
+                    }
+                    }
+                },
+                {
+                    targets: 4,
+                    orderDataType: "dom-checkbox",
+                    className: 'text-center'
+                },
+                {
+                    targets: [4,5],
+                    orderable: false
+                }],
+                "createdRow": function (row, data, dataIndex) {
+                    $(row).attr("id", "row-" + data["nfr_id"]);
+                },
+                "order": [
+                    [0, "asc"]
+                ]
+            });
+        });
+        function displayModalAlert(error) {
+            if (error !== null) {
+                var modal = $("#addAdministratorModal");
+                var modalAlert = modal.find(".modal-alert");
+                modalAlert.text(error);
+                modalAlert.fadeIn();
+                setTimeout(function() {
+                modalAlert.fadeOut();
+                }, 4000);
+            }
+        }
+        function getDateTimeForFileName() {
+            const date = new Date();
+            const year = date.getFullYear();
+            const month = (date.getMonth() + 1).toString().padStart(2, "0");
+            const day = date.getDate().toString().padStart(2, "0");
+            const hours = date.getHours().toString().padStart(2, "0");
+            const minutes = date.getMinutes().toString().padStart(2, "0");
+            const seconds = date.getSeconds().toString().padStart(2, "0");
+            return `${year}-${month}-${day}_${hours}-${minutes}-${seconds}`;
+        }
+        async function searchRecords() {
+            $("#searchButton").prop("disabled", true);
+            console.log("searchRecords:");
+            const dtid = $('#searchInput').val();
+            const template_id = $('input[name="radioActive"]:checked').attr('id').replace("active-", "");
+            const searchParams = {
+                dtid: dtid,
+                document_type: 2,
+                template_id: template_id
+            }
+            console.log(searchParams);
+            const result = await fetch(`/report/generate-specific-report`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json',},
+                body: JSON.stringify(searchParams)
+                })
+                .then((res) => res.blob())
+                .then((blob) => {
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement("a");
+                    a.style.display = "none";
+                    a.href = url;
+                    a.download = reportName + ".docx";
+                    document.body.appendChild(a);
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                    $("#searchButton").prop("disabled", false);
+                })
+                .catch(() => {
+                    $("#searchButton").prop("disabled", false);
+                });
+        }
+        async function openDocument() {
+            const nfr_id = $('input[name="radioActive"]:checked').data('id');
+            await fetch(`/admin/open-document/${nfr_id}`, {
+                method: 'GET'
+            }).then(() => window.location.href = '/nfr')
+            .catch((err) => console.log(err));
+        }
+    </script>
+  {{/inline}}
+{{/template}}

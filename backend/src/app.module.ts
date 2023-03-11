@@ -11,6 +11,12 @@ import { PrintRequestDetail } from "./print_request_detail/entities/print_reques
 import { PrintRequestLog } from "./print_request_log/entities/print_request_log.entity";
 import { DocumentTemplate } from "./document_template/entities/document_template.entity";
 import { PrintRequestDetailView } from "./print_request_detail/entities/print_request_detail_vw";
+import { NFRDataModule } from "./nfr_data/nfr_data.module";
+import { NFRData } from "./nfr_data/entities/nfr_data.entity";
+import { NFRDataLog } from "./nfr_data_log/entities/nfr_data_log.entity";
+import { NFRDataLogModule } from "./nfr_data_log/nfr_data_log.module";
+import { NFRProvision } from "./nfr_provision/entities/nfr_provision.entity";
+import { NFRProvisionModule } from "./nfr_provision/nfr_provision.module";
 
 console.log("Var check - POSTGRESQL_HOST", process.env.POSTGRESQL_HOST);
 console.log("Var check - POSTGRESQL_DATABASE", process.env.POSTGRESQL_DATABASE);
@@ -34,6 +40,9 @@ if (process.env.POSTGRESQL_PASSWORD != null) {
       entities: [
         PrintRequestDetail,
         PrintRequestLog,
+        NFRData,
+        NFRDataLog,
+        NFRProvision,
         DocumentTemplate,
         PrintRequestDetailView,
       ],
@@ -42,6 +51,9 @@ if (process.env.POSTGRESQL_PASSWORD != null) {
     }),
     DocumentTemplateModule,
     PrintRequestDetailModule,
+    NFRDataModule,
+    NFRDataLogModule,
+    NFRProvisionModule,
     PrintRequestLogModule,
   ],
   controllers: [AppController],

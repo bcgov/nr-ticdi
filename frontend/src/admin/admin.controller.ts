@@ -10,8 +10,11 @@ import {
   ParseFilePipe,
   FileTypeValidator,
   MaxFileSizeValidator,
+  Get,
+  Param,
+  Res,
 } from "@nestjs/common";
-import { SessionData } from "utils/types";
+import { ExportDataObject, SessionData, UserObject } from "utils/types";
 import { AxiosRequestConfig } from "axios";
 import { AdminService } from "./admin.service";
 import { AuthenticationFilter } from "src/authentication/authentication.filter";
@@ -19,6 +22,7 @@ import { AuthenticationGuard } from "src/authentication/authentication.guard";
 import { AdminGuard } from "./admin.guard";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { Express } from "express";
+import * as stream from "stream";
 
 let requestUrl: string;
 let requestConfig: AxiosRequestConfig;
@@ -41,6 +45,47 @@ export class AdminController {
     };
   }
 
+  @Get("activate-template/:id/:document_type")
+  async activateTemplate(
+    @Session() session: { data?: SessionData },
+    @Param("id") id,
+    @Param("document_type") document_type
+  ) {
+    const update_userid = session.data.activeAccount
+      ? session.data.activeAccount.idir_username
+        ? session.data.activeAccount.idir_username
+        : ""
+      : "";
+    return this.adminService.activateTemplate({
+      id: id,
+      update_userid: update_userid,
+      document_type: document_type,
+    });
+  }
+
+  @Get("download-template/:id")
+  async downloadTemplate(@Param("id") id, @Res() res) {
+    const dtObject = await this.adminService.downloadTemplate(id);
+    const base64Data = dtObject.the_file;
+    const buffer = Buffer.from(base64Data, "base64");
+    const streamableFile = new stream.PassThrough();
+    streamableFile.end(buffer);
+    res.set({
+      "Content-Type":
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      "Content-Disposition": "attachment; filename=file.docx",
+    });
+    streamableFile.pipe(res);
+  }
+
+  @Get("remove-template/:reportType/:id")
+  async removeTemplate(
+    @Param("reportType") reportType: string,
+    @Param("id") id: number
+  ) {
+    return this.adminService.removeTemplate(reportType, id);
+  }
+
   @Post("upload-template")
   @UseInterceptors(FileInterceptor("file"))
   async uploadTemplate2(
@@ -57,43 +102,185 @@ export class AdminController {
       })
     )
     file: Express.Multer.File,
-    @Body() params: { comments: string; active_flag: boolean }
+    @Body()
+    params: {
+      document_type: string;
+      active_flag: boolean;
+      template_name: string;
+    }
   ) {
-    let isAdmin = false;
-    if (
-      session.data &&
-      session.data.activeAccount &&
-      session.data.activeAccount.client_roles
-    ) {
-      for (let role of session.data.activeAccount.client_roles) {
-        if (role == "ticdi_admin") {
-          isAdmin = true;
-        }
-      }
-    }
-    if (isAdmin) {
-      const create_userid = session.data.activeAccount
+    const create_userid = session.data.activeAccount
+      ? session.data.activeAccount.idir_username
         ? session.data.activeAccount.idir_username
-          ? session.data.activeAccount.idir_username
-          : ""
-        : "";
-      const template_author = session.data.activeAccount
+        : ""
+      : "";
+    const template_author = session.data.activeAccount
+      ? session.data.activeAccount.name
         ? session.data.activeAccount.name
-          ? session.data.activeAccount.name
-          : ""
-        : "";
-      const uploadData = {
-        document_type: "",
-        comments: params.comments,
-        active_flag: params.active_flag,
-        mime_type: file.mimetype,
-        file_name: file.originalname,
-        template_author: template_author,
-        create_userid: create_userid,
-      };
-      return this.adminService.uploadTemplate(uploadData, file);
-    } else {
-      return { message: "No Admin Privileges Found" };
+        : ""
+      : "";
+    const uploadData = {
+      document_type: params.document_type,
+      active_flag: params.active_flag,
+      mime_type: file.mimetype,
+      file_name: params.template_name,
+      template_author: template_author,
+      create_userid: create_userid,
+    };
+    await this.adminService.uploadTemplate(uploadData, file);
+    return { message: "Template uploaded successfully" };
+  }
+
+  /**
+   * Used for an AJAX route to render all admins in a datatable
+   * @returns altered admin object array
+   */
+  @Get("get-admins")
+  getAdmins(): Promise<UserObject[]> {
+    return this.adminService.getAdminUsers();
+  }
+
+  @Get("get-export-data")
+  getExportData(): Promise<ExportDataObject[]> {
+    return this.adminService.getExportData();
+  }
+
+  @Post("add-admin")
+  async addAdmin(
+    @Body() searchInputs: { idirUsername: string }
+  ): Promise<{ userObject: UserObject; error: string }> {
+    try {
+      const user = await this.adminService.addAdmin(searchInputs.idirUsername);
+      return { userObject: user, error: null };
+    } catch (err) {
+      return { userObject: null, error: err.message };
     }
+  }
+
+  @Post("search-users")
+  async searchUsers(@Body() searchInputs: { email: string }): Promise<{
+    userObject: {
+      firstName: string;
+      lastName: string;
+      username: string;
+      idirUsername: string;
+    };
+    error: string;
+  }> {
+    try {
+      const user = await this.adminService.searchUsers(searchInputs.email);
+      return { userObject: user, error: null };
+    } catch (err) {
+      return { userObject: null, error: err.message };
+    }
+  }
+
+  @Get("remove-admin/:username")
+  removeAdmin(
+    @Param("username") username: string
+  ): Promise<{ message: string }> {
+    return this.adminService.removeAdmin(username);
+  }
+
+  @Get("templates/:reportId")
+  getTemplates(@Param("reportId") reportId: number): Promise<any> {
+    return this.adminService.getTemplates(reportId);
+  }
+
+  @Get("search-nfr-templates")
+  getNFRTemplates(): Promise<any> {
+    return this.adminService.getNFRTemplates();
+  }
+
+  @Get("open-document/:nfr_id")
+  setSessionDocument(
+    @Session() session: { data?: SessionData },
+    @Param("nfr_id") nfrId: number
+  ): void {
+    session.data.selected_document = { nfr_id: nfrId };
+  }
+
+  @Get("get-templates/:document_type")
+  getDocumentTemplates(@Param("document_type") documentType: string): any {
+    return this.adminService.getDocumentTemplates(documentType);
+  }
+
+  @Get("nfr-provisions")
+  getNFRProvisions(): any {
+    return this.adminService.getNFRProvisions();
+  }
+
+  @Get("nfr-provisions/:dtid")
+  getNFRProvisionsByDTID(@Param("dtid") dtid: number): any {
+    return this.adminService.getNFRProvisionsByDTID(dtid);
+  }
+
+  @Get("enable-provision/:provisionId")
+  enableProvision(@Param("provisionId") id: number): any {
+    return this.adminService.enableProvision(id);
+  }
+
+  @Get("disable-provision/:provisionId")
+  disableProvision(@Param("provisionId") id: number): any {
+    return this.adminService.disableProvision(id);
+  }
+
+  @Get("select-provision/:provisionId")
+  selectProvision(@Param("provisionId") id: number): any {
+    return this.adminService.selectProvision(id);
+  }
+
+  @Get("deselect-provision/:provisionId")
+  deselectProvision(@Param("provisionId") id: number): any {
+    return this.adminService.deselectProvision(id);
+  }
+
+  @Get("get-group-max")
+  getGroupMax() {
+    return this.adminService.getGroupMax();
+  }
+
+  @Get("get-group-max/:dtid")
+  getGroupMaxByDTID(@Param("dtid") dtid: number) {
+    return this.adminService.getGroupMaxByDTID(dtid);
+  }
+
+  @Post("add-provision")
+  addProvision(
+    @Body()
+    provisionParams: {
+      dtid: number;
+      type: string;
+      provision_group: number;
+      provision_group_text: string;
+      max: number;
+      provision: string;
+      freeText: string;
+      category: string;
+    },
+    @Session() session: { data?: SessionData }
+  ) {
+    const create_userid = session.data.activeAccount.idir_username;
+    return this.adminService.addProvision(provisionParams, create_userid);
+  }
+
+  @Post("update-provision")
+  updateProvision(
+    @Body()
+    provisionParams: {
+      id: number;
+      dtid: number;
+      type: string;
+      provision_group: number;
+      provision_group_text: string;
+      max: number;
+      provision: string;
+      freeText: string;
+      category: string;
+    },
+    @Session() session: { data?: SessionData }
+  ) {
+    const update_userid = session.data.activeAccount.idir_username;
+    return this.adminService.updateProvision(provisionParams, update_userid);
   }
 }

@@ -11,23 +11,23 @@ export class DocumentTemplate {
   @PrimaryGeneratedColumn()
   id: number;
   @Column()
-  document_type: string;
+  document_type: string; // the template type (Land Use Report / Notice of Final Review)
   @Column()
   template_version: number;
   @Column()
   template_author: string;
   @Column()
-  template_creation_date: string; // ?
-  @Column()
   active_flag: boolean;
+  @Column()
+  is_deleted: boolean;
   @Column()
   mime_type: string;
   @Column()
-  file_name: string;
+  file_name: string; // template name defined by the uploader
   @Column()
   the_file: string;
   @Column()
-  comments: string;
+  comments: string; // currently unused
   @Column()
   create_userid: string;
   @Column()
@@ -41,8 +41,8 @@ export class DocumentTemplate {
     document_type?: string,
     template_version?: number,
     template_author?: string,
-    template_creation_date?: string,
     active_flag?: boolean,
+    is_deleted?: boolean,
     mime_type?: string,
     file_name?: string,
     the_file?: string,
@@ -53,8 +53,8 @@ export class DocumentTemplate {
     this.document_type = document_type || "";
     this.template_version = template_version || null;
     this.template_author = template_author || "";
-    this.template_creation_date = template_creation_date || "";
     this.active_flag = active_flag || false;
+    this.is_deleted = is_deleted || false;
     this.mime_type = mime_type || "";
     this.file_name = file_name || "";
     this.the_file = the_file || "";

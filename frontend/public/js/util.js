@@ -2,13 +2,16 @@ async function generateReport() {
   const tenureFileNumber = $("#tfn").text();
   const prdid = $("#prdid").text();
   $("#genReport").prop("disabled", true);
-  const reportName = await fetch(`/report/getReportName/${tenureFileNumber}`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    responseType: "application/json",
-  })
+  const reportName = await fetch(
+    `/report/get-report-name/${tenureFileNumber}`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      responseType: "application/json",
+    }
+  )
     .then((res) => res.json())
     .then((resJson) => {
       return resJson.reportName;
@@ -16,14 +19,12 @@ async function generateReport() {
     .catch(() => {
       location.reload();
     });
-  const comments = $("#document_type_id option:selected").text();
-  const version = $("#versionSelect option:selected").text();
+  const document_type = $("#document_type_id option:selected").text();
   const data = {
     prdid: prdid,
-    version: version,
-    comments: comments,
+    document_type: document_type,
   };
-  fetch(`/report/generateReport`, {
+  fetch(`/report/generate-lur-report`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

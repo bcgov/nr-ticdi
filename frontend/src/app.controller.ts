@@ -6,17 +6,27 @@ import {
   UseGuards,
   UseFilters,
   Session,
+  Query,
+  Res,
 } from "@nestjs/common";
 import { AppService } from "./app.service";
-import { PAGE_TITLES } from "utils/constants";
+import { AdminService } from "./admin/admin.service";
+import {
+  NFR_VARIANTS,
+  NFR_VARIANTS_ARRAY,
+  PAGE_TITLES,
+  REPORT_TYPES,
+} from "utils/constants";
 import { SessionData } from "utils/types";
 import { AuthenticationGuard } from "./authentication/authentication.guard";
 import { AuthenticationFilter } from "./authentication/authentication.filter";
 import { TTLSService } from "./ttls/ttls.service";
 import { AdminGuard } from "./admin/admin.guard";
 import { AxiosRequestConfig } from "axios";
-import { firstValueFrom, lastValueFrom, map } from "rxjs";
+import { firstValueFrom } from "rxjs";
 import { HttpService } from "@nestjs/axios";
+import { Req } from "@nestjs/common/decorators/http/route-params.decorator";
+import { Request, Response } from "express";
 
 let requestUrl: string;
 let requestConfig: AxiosRequestConfig;
@@ -25,6 +35,7 @@ let requestConfig: AxiosRequestConfig;
 export class AppController {
   constructor(
     private readonly appService: AppService,
+    private readonly adminService: AdminService,
     private readonly ttlsService: TTLSService,
     private readonly httpService: HttpService
   ) {
@@ -57,26 +68,359 @@ export class AppController {
         }
       }
     }
-    const displayAdmin = isAdmin ? "Template Administration" : "-";
+    const displayAdmin = isAdmin ? "Administration" : "-";
     const title =
       process.env.ticdi_environment == "DEVELOPMENT"
         ? "DEVELOPMENT - " + PAGE_TITLES.INDEX
         : PAGE_TITLES.INDEX;
     return {
       title: title,
+      idirUsername: session.data.activeAccount
+        ? session.data.activeAccount.idir_username
+        : "",
       primaryContactName: "",
       displayAdmin: displayAdmin,
     };
   }
 
+  /**
+   * Redirects to the LUR report page
+   *
+   * @param res
+   * @param id
+   * @param docname
+   * @returns
+   */
   @Get("dtid/:id/:docname")
+  @UseFilters(AuthenticationFilter)
+  @UseGuards(AuthenticationGuard)
+  redirect(@Res() res, @Param("id") id: string, @Param("docname") docname) {
+    return res.redirect(`/lur/dtid/${id}`);
+  }
+
+  /**
+   * Renders the LUR report page
+   *
+   * @param session
+   * @param id
+   * @param docname
+   * @returns
+   */
+  @Get("lur/dtid/:id")
   @UseFilters(AuthenticationFilter)
   @UseGuards(AuthenticationGuard)
   @Render("index")
   async findOne(
     @Session() session: { data?: SessionData },
     @Param("id") id,
-    @Param("docname") docname: string
+    @Req() request: Request,
+    @Res() response: Response
+  ) {
+    const hasParams = request.originalUrl.includes("?session_state");
+    if (hasParams) {
+      const urlWithoutParams = request.path;
+      response.redirect(301, urlWithoutParams);
+    } else {
+      let isAdmin = false;
+      if (
+        session.data &&
+        session.data.activeAccount &&
+        session.data.activeAccount.client_roles
+      ) {
+        for (let role of session.data.activeAccount.client_roles) {
+          if (role == "ticdi_admin") {
+            isAdmin = true;
+          }
+        }
+      }
+      const title =
+        process.env.ticdi_environment == "DEVELOPMENT"
+          ? "DEVELOPMENT - " + PAGE_TITLES.INDEX
+          : PAGE_TITLES.INDEX;
+      const displayAdmin = isAdmin ? "Administration" : "-";
+      await this.ttlsService.setWebadeToken();
+      let ttlsJSON, primaryContactName;
+      try {
+        const response: any = await firstValueFrom(
+          this.ttlsService.callHttp(id)
+        )
+          .then((res) => {
+            return res;
+          })
+          .catch((err) => {
+            console.log("callHttp failed");
+            console.log(err);
+            console.log(err.response.data);
+          });
+        ttlsJSON = await this.ttlsService.sendToBackend(response);
+        if (ttlsJSON.inspected_date) {
+          ttlsJSON["inspected_date"] = this.ttlsService.formatInspectedDate(
+            ttlsJSON.inspected_date.toString()
+          );
+        }
+        primaryContactName = ttlsJSON.licence_holder_name;
+        return {
+          title: title,
+          idirUsername: session.data.activeAccount
+            ? session.data.activeAccount.idir_username
+            : "",
+          primaryContactName: primaryContactName,
+          displayAdmin: displayAdmin,
+          message: ttlsJSON,
+          documentTypes: ["Land Use Report", "Notice of Final Review"],
+          prdid: ttlsJSON.id,
+        };
+      } catch (err) {
+        console.log(err);
+        return {
+          title: title,
+          idirUsername: session.data.activeAccount
+            ? session.data.activeAccount.idir_username
+            : "",
+          primaryContactName: primaryContactName ? primaryContactName : null,
+          displayAdmin: displayAdmin,
+          message: ttlsJSON ? ttlsJSON : null,
+          documentTypes: ["Land Use Report", "Notice of Final Review"],
+          prdid: ttlsJSON ? ttlsJSON.id : null,
+          error: err,
+        };
+      }
+    }
+  }
+
+  @Get("nfr")
+  @UseFilters(AuthenticationFilter)
+  @UseGuards(AuthenticationGuard)
+  @Render("nfr")
+  async displayNofr(@Session() session: { data?: SessionData }) {
+    const nfrDataId = session.data.selected_document
+      ? session.data.selected_document.nfr_id
+      : 0;
+    let isAdmin = false;
+    if (
+      session.data &&
+      session.data.activeAccount &&
+      session.data.activeAccount.client_roles
+    ) {
+      for (let role of session.data.activeAccount.client_roles) {
+        if (role == "ticdi_admin") {
+          isAdmin = true;
+        }
+      }
+    }
+    const title =
+      process.env.ticdi_environment == "DEVELOPMENT"
+        ? "DEVELOPMENT - " + PAGE_TITLES.NOFR
+        : PAGE_TITLES.NOFR;
+    const displayAdmin = isAdmin ? "Administration" : "-";
+    const data = await this.ttlsService.getNfrData(nfrDataId);
+    let primaryContactName;
+    try {
+      return {
+        title: title,
+        idirUsername: session.data.activeAccount
+          ? session.data.activeAccount.idir_username
+          : "",
+        primaryContactName: primaryContactName,
+        displayAdmin: displayAdmin,
+        message: data,
+        documentTypes: NFR_VARIANTS_ARRAY,
+        nfr_id: data.id,
+        template_id: data.template_id,
+      };
+    } catch (err) {
+      console.log(err);
+      return {
+        title: title,
+        idirUsername: session.data.activeAccount
+          ? session.data.activeAccount.idir_username
+          : "",
+        primaryContactName: primaryContactName ? primaryContactName : null,
+        displayAdmin: displayAdmin,
+        message: data ? data : null,
+        documentTypes: NFR_VARIANTS_ARRAY,
+        nfr_id: data ? data.id : null,
+        template_id: data.template_id,
+        error: err,
+      };
+    }
+  }
+
+  /**
+   * Renders the NFR report page
+   *
+   * @param session
+   * @param id
+   * @param docname
+   * @returns
+   */
+  @Get("nfr/dtid/:id/:variant")
+  @UseFilters(AuthenticationFilter)
+  @UseGuards(AuthenticationGuard)
+  @Render("nfr")
+  async findNofr(
+    @Session() session: { data?: SessionData },
+    @Param("id") id: number,
+    @Param("variant") variant: string,
+    @Req() req: Request,
+    @Res() res: Response
+  ) {
+    console.log(variant);
+    const hasParams = req.originalUrl.includes("?session_state");
+    if (hasParams) {
+      const urlWithoutParams = req.path;
+      res.redirect(301, urlWithoutParams);
+    } else {
+      let isAdmin = false;
+      if (
+        session.data &&
+        session.data.activeAccount &&
+        session.data.activeAccount.client_roles
+      ) {
+        for (let role of session.data.activeAccount.client_roles) {
+          if (role == "ticdi_admin") {
+            isAdmin = true;
+          }
+        }
+      }
+      const title =
+        process.env.ticdi_environment == "DEVELOPMENT"
+          ? "DEVELOPMENT - " + PAGE_TITLES.NOFR
+          : PAGE_TITLES.NOFR;
+      const displayAdmin = isAdmin ? "Administration" : "-";
+      await this.ttlsService.setWebadeToken();
+      const groupMaxJsonArray = await this.adminService.getGroupMaxByDTID(id);
+      let ttlsJSON, primaryContactName;
+      try {
+        const response: any = await firstValueFrom(
+          this.ttlsService.callHttp(id)
+        )
+          .then((res) => {
+            return res;
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+        ttlsJSON = await this.ttlsService.sendToBackend(response);
+        if (ttlsJSON.inspected_date) {
+          ttlsJSON["inspected_date"] = this.ttlsService.formatInspectedDate(
+            ttlsJSON.inspected_date.toString()
+          );
+        }
+        primaryContactName = ttlsJSON.licence_holder_name;
+        ttlsJSON["interested_parties"] = [
+          {
+            first_name: "asdf",
+            middle_name: "fdsa",
+            last_name: "1234",
+            address: "123 fake street",
+          },
+          {
+            first_name: "uiop",
+            middle_name: "poiu",
+            last_name: "4321",
+            address: "555 fghj road",
+          },
+        ];
+        let selectedVariant = 0;
+        switch (variant) {
+          case NFR_VARIANTS.delayed: {
+            selectedVariant = 0;
+            break;
+          }
+          case NFR_VARIANTS.default: {
+            selectedVariant = 1;
+            break;
+          }
+          case NFR_VARIANTS.no_fees: {
+            selectedVariant = 2;
+            break;
+          }
+          case NFR_VARIANTS.survey_required: {
+            selectedVariant = 3;
+            break;
+          }
+          case NFR_VARIANTS.to_obtain_survey: {
+            selectedVariant = 4;
+            break;
+          }
+        }
+        return {
+          title: title,
+          idirUsername: session.data.activeAccount
+            ? session.data.activeAccount.idir_username
+            : "",
+          primaryContactName: primaryContactName,
+          displayAdmin: displayAdmin,
+          message: ttlsJSON,
+          groupMaxJsonArray: groupMaxJsonArray,
+          documentTypes: NFR_VARIANTS_ARRAY,
+          selectedVariant: selectedVariant,
+          prdid: ttlsJSON.id,
+        };
+      } catch (err) {
+        console.log(err);
+        return {
+          title: title,
+          idirUsername: session.data.activeAccount
+            ? session.data.activeAccount.idir_username
+            : "",
+          primaryContactName: primaryContactName ? primaryContactName : null,
+          displayAdmin: displayAdmin,
+          message: ttlsJSON ? ttlsJSON : null,
+          groupMaxJsonArray: groupMaxJsonArray,
+          documentTypes: NFR_VARIANTS_ARRAY,
+          prdid: ttlsJSON ? ttlsJSON.id : null,
+          error: err,
+        };
+      }
+    }
+  }
+
+  @Get("system-admin")
+  @Render("system-admin")
+  @UseFilters(AuthenticationFilter)
+  @UseGuards(AuthenticationGuard)
+  @UseGuards(AdminGuard)
+  async systemAdminPage(@Session() session: { data?: SessionData }) {
+    let isAdmin = false;
+    if (
+      session.data &&
+      session.data.activeAccount &&
+      session.data.activeAccount.client_roles
+    ) {
+      for (let role of session.data.activeAccount.client_roles) {
+        if (role == "ticdi_admin") {
+          isAdmin = true;
+        }
+      }
+    }
+    const displayAdmin = isAdmin ? "Administration" : "-";
+    const title =
+      process.env.ticdi_environment == "DEVELOPMENT"
+        ? "DEVELOPMENT - " + PAGE_TITLES.ADMIN
+        : PAGE_TITLES.ADMIN;
+    return {
+      title: title,
+      idirUsername: session.data.activeAccount
+        ? session.data.activeAccount.idir_username
+        : "",
+      displayAdmin: displayAdmin,
+      reportTypes: [
+        { reportType: REPORT_TYPES[0], reportIndex: 1 },
+        { reportType: REPORT_TYPES[1], reportIndex: 2 },
+      ],
+    };
+  }
+
+  @Get("manage-templates")
+  @Render("manage-templates")
+  @UseFilters(AuthenticationFilter)
+  @UseGuards(AuthenticationGuard)
+  @UseGuards(AdminGuard)
+  async adminPage(
+    @Session() session: { data?: SessionData },
+    @Query("report") reportIndex
   ) {
     let isAdmin = false;
     if (
@@ -90,70 +434,27 @@ export class AppController {
         }
       }
     }
+    const displayAdmin = isAdmin ? "Administration" : "-";
     const title =
       process.env.ticdi_environment == "DEVELOPMENT"
-        ? "DEVELOPMENT - " + PAGE_TITLES.INDEX
-        : PAGE_TITLES.INDEX;
-    const displayAdmin = isAdmin ? "Template Administration" : "-";
-    await this.ttlsService.setWebadeToken();
-    let ttlsJSON, primaryContactName, versions;
-    let documentTypes = [];
-    try {
-      const response: any = await firstValueFrom(this.ttlsService.callHttp(id))
-        .then((res) => {
-          return res;
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-      ttlsJSON = await this.ttlsService.sendToBackend(response);
-      if (ttlsJSON.inspected_date) {
-        ttlsJSON["inspected_date"] = this.ttlsService.formatInspectedDate(
-          ttlsJSON.inspected_date.toString()
-        );
-      }
-      versions = await this.ttlsService.getTemplateVersions("Land Use Report");
-      const documents = await lastValueFrom(
-        this.httpService
-          .get(requestUrl, requestConfig)
-          .pipe(map((response) => response.data))
-      );
-      for (let entry of documents) {
-        if (!documentTypes.includes(entry.comments)) {
-          documentTypes.push(entry.comments);
-        }
-      }
-      primaryContactName = ttlsJSON.licence_holder_name;
-      return {
-        title: title,
-        primaryContactName: primaryContactName,
-        displayAdmin: displayAdmin,
-        message: ttlsJSON,
-        version: versions,
-        documentTypes: documentTypes,
-        prdid: ttlsJSON.id,
-      };
-    } catch (err) {
-      console.log(err);
-      return {
-        title: title,
-        primaryContactName: primaryContactName ? primaryContactName : null,
-        displayAdmin: displayAdmin,
-        message: ttlsJSON ? ttlsJSON : null,
-        version: versions ? versions : null,
-        documentTypes: documentTypes ? documentTypes : null,
-        prdid: ttlsJSON ? ttlsJSON.id : null,
-        error: err,
-      };
-    }
+        ? "DEVELOPMENT - " + PAGE_TITLES.MANAGE_TEMPLATES
+        : PAGE_TITLES.MANAGE_TEMPLATES;
+    return {
+      title: title,
+      idirUsername: session.data.activeAccount
+        ? session.data.activeAccount.idir_username
+        : "",
+      primaryContactName: "",
+      displayAdmin: displayAdmin,
+    };
   }
 
-  @Get("template-admin")
-  @Render("template-admin")
+  @Get("search")
+  @Render("search")
   @UseFilters(AuthenticationFilter)
   @UseGuards(AuthenticationGuard)
   @UseGuards(AdminGuard)
-  async adminPage(@Session() session: { data?: SessionData }) {
+  async searchPage(@Session() session: { data?: SessionData }) {
     let isAdmin = false;
     if (
       session.data &&
@@ -166,28 +467,17 @@ export class AppController {
         }
       }
     }
-    const displayAdmin = isAdmin ? "Template Administration" : "-";
-    const data = await lastValueFrom(
-      this.httpService
-        .get(requestUrl, requestConfig)
-        .pipe(map((response) => response.data))
-    );
-    const documentTypes = ["Land Use Report"];
-    for (let entry of data) {
-      if (!documentTypes.includes(entry.comments)) {
-        documentTypes.push(entry.comments);
-      }
-    }
+    const displayAdmin = isAdmin ? "Administration" : "-";
     const title =
       process.env.ticdi_environment == "DEVELOPMENT"
-        ? "DEVELOPMENT - " + PAGE_TITLES.ADMIN
-        : PAGE_TITLES.ADMIN;
+        ? "DEVELOPMENT - " + PAGE_TITLES.SEARCH
+        : PAGE_TITLES.SEARCH;
     return {
       title: title,
-      primaryContactName: "",
+      idirUsername: session.data.activeAccount
+        ? session.data.activeAccount.idir_username
+        : "",
       displayAdmin: displayAdmin,
-      data: data,
-      documentTypes: documentTypes,
     };
   }
 
@@ -199,5 +489,16 @@ export class AppController {
   @Get()
   getHello2(): string {
     return this.appService.getHello();
+  }
+
+  @Get("/404")
+  @Render("404")
+  @UseFilters(AuthenticationFilter)
+  @UseGuards(AuthenticationGuard)
+  notFound() {
+    return {
+      title: "404 Not Found",
+      message: "Sorry, the page you are looking for does not exist.",
+    };
   }
 }

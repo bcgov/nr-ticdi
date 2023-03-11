@@ -16,6 +16,8 @@ import { AxiosRequestConfig } from "axios";
 import { AuthenticationFilter } from "src/authentication/authentication.filter";
 import { AuthenticationGuard } from "src/authentication/authentication.guard";
 import { GenerateReportGuard } from "src/authentication/generate-report.guard";
+import { AdminGuard } from "src/admin/admin.guard";
+import { ReportService } from "./report.service";
 
 let requestUrl: string;
 let requestConfig: AxiosRequestConfig;
@@ -25,7 +27,10 @@ let requestConfig: AxiosRequestConfig;
 @UseGuards(GenerateReportGuard)
 @Controller("report")
 export class ReportController {
-  constructor(private readonly ttlsService: TTLSService) {
+  constructor(
+    private readonly ttlsService: TTLSService,
+    private readonly reportService: ReportService
+  ) {
     const hostname = process.env.backend_url
       ? process.env.backend_url
       : `http://localhost`;
@@ -38,14 +43,14 @@ export class ReportController {
     };
   }
 
-  @Get("getReportName/:tfn")
+  @Get("get-report-name/:tfn")
   getReportName(
     @Param("tfn") tenureFileNumber: string
   ): Promise<{ reportName: string }> {
     return this.ttlsService.generateReportName(tenureFileNumber);
   }
 
-  @Post("generateReport")
+  @Post("generate-lur-report")
   @Header(
     "Content-Type",
     "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
@@ -53,7 +58,7 @@ export class ReportController {
   @Header("Content-Disposition", "attachment; filename=landusereport.docx")
   async generateReport(
     @Session() session: { data: SessionData },
-    @Body() data: { prdid: string; version: string; comments: string }
+    @Body() data: { prdid: string; document_type: string }
   ) {
     // this should eventually check permissions and prevent unauthorized users from generating documents
     let idir_username = "";
@@ -66,10 +71,23 @@ export class ReportController {
     return new StreamableFile(
       await this.ttlsService.generateLURReport(
         +data.prdid,
-        +data.version,
-        data.comments,
+        data.document_type,
         idir_username
       )
     );
+  }
+
+  // TODO generate-nfr-report
+
+  @UseGuards(AdminGuard)
+  @Post("generate-specific-report")
+  async generateSpecificReport(
+    @Body() data: { prdid: string; documentType: string; templateId: number }
+  ) {
+    console.log(data);
+    return "";
+    // return new StreamableFile(
+    //   await this.reportService.generateSpecificReport()
+    // );
   }
 }

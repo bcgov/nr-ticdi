@@ -238,11 +238,14 @@ selectedProvisionsTable = $("#selectedProvisionsTable").DataTable({
   },
 });
 
+let variablesUrl = `${
+  window.location.origin
+}/report/get-provision-variables/${encodeURI(variantName)}`;
+variablesUrl += nfrDataId != "" ? `/${nfrDataId}` : "/-1";
+console.log(variablesUrl);
 variableTable = $("#variableTable").DataTable({
   ajax: {
-    url: `${window.location.origin}/report/get-provision-variables/${encodeURI(
-      variantName
-    )}`,
+    url: variablesUrl,
     dataSrc: "",
   },
   paging: false,
@@ -404,7 +407,7 @@ async function generateNFRReport() {
   const dtid = $("#dtid").text();
   $("#genReport").prop("disabled", true);
   const reportName = await fetch(
-    `/report/get-nfr-report-name/${tenureFileNumber}`,
+    `/report/get-nfr-report-name/${dtid}/${tenureFileNumber}`,
     {
       method: "GET",
       headers: {

@@ -219,12 +219,24 @@ export class AppController {
         ? "DEVELOPMENT - " + PAGE_TITLES.NOFR
         : PAGE_TITLES.NOFR;
     const displayAdmin = isAdmin ? "Administration" : "-";
-    const nfrData = await this.reportService.getNfrData(nfrDataId);
-    const groupMaxJsonArray = await this.reportService.getGroupMaxByVariant(
-      nfrData.variant_name
-    );
-    let ttlsJSON, primaryContactName;
+
+    let ttlsJSON, primaryContactName, groupMaxJsonArray, nfrData;
     try {
+      const nfrDataObject = await this.reportService.getNfrData(nfrDataId);
+      nfrData = nfrDataObject.nfrData;
+      const provisionIds = nfrDataObject.provisionIds;
+      const variableIds = nfrDataObject.variableIds;
+      groupMaxJsonArray = await this.reportService.getGroupMaxByVariant(
+        nfrData.variant_name
+      );
+      const mandatoryProvisionIds =
+        await this.reportService.getMandatoryProvisionsByVariant(
+          nfrData.variant_name
+        );
+      const combinedProvisions = provisionIds.concat(mandatoryProvisionIds);
+      const enabledProvisions = combinedProvisions.filter(
+        (item, index) => combinedProvisions.indexOf(item) === index
+      );
       await this.ttlsService.setWebadeToken();
       const response: any = await firstValueFrom(
         this.ttlsService.callHttp(nfrData.dtid)
@@ -235,25 +247,20 @@ export class AppController {
         .catch((err) => {
           console.log(err);
         });
-      ttlsJSON = await this.ttlsService.sendToBackend(response);
-      if (ttlsJSON.inspected_date) {
-        ttlsJSON["inspected_date"] = this.ttlsService.formatInspectedDate(
-          ttlsJSON.inspected_date.toString()
-        );
-      }
-      primaryContactName = ttlsJSON.licence_holder_name;
-      ttlsJSON["interested_parties"] = [
+      ttlsJSON = await this.ttlsService.formatNFRData(response);
+      primaryContactName = ttlsJSON.licenceHolderName;
+      ttlsJSON["interestedParties"] = [
         {
-          first_name: "asdf",
-          middle_name: "fdsa",
-          last_name: "1234",
+          firstName: "First",
+          middleName: "Middle",
+          lastName: "Last",
           address: "123 fake street",
         },
         {
-          first_name: "uiop",
-          middle_name: "poiu",
-          last_name: "4321",
-          address: "555 fghj road",
+          firstName: "First2",
+          middleName: "Middle2",
+          lastName: "Last2",
+          address: "346 Miron Drive",
         },
       ];
       let selectedVariant = 0;
@@ -293,7 +300,7 @@ export class AppController {
         template_id: nfrData.template_id,
         variant_name: nfrData.variant_name,
         selectedVariant: selectedVariant,
-        enabledProvisionList: nfrData.enabled_provisions,
+        enabledProvisionList: enabledProvisions,
         prdid: ttlsJSON.id,
       };
     } catch (err) {

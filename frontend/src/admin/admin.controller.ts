@@ -187,9 +187,9 @@ export class AdminController {
     return this.adminService.getTemplates(reportId);
   }
 
-  @Get("search-nfr-templates")
-  getNFRTemplates(): Promise<any> {
-    return this.adminService.getNFRTemplates();
+  @Get("search-nfr-data")
+  getNFRData(): Promise<any> {
+    return this.adminService.getNFRData();
   }
 
   @Get("open-document/:nfr_id")

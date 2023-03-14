@@ -3,7 +3,7 @@ async function generateReport() {
   const prdid = $("#prdid").text();
   $("#genReport").prop("disabled", true);
   const reportName = await fetch(
-    `/report/get-report-name/${tenureFileNumber}`,
+    `/report/get-report-name/${dtid}/${tenureFileNumber}`,
     {
       method: "GET",
       headers: {

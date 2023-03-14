@@ -16,7 +16,6 @@ import { AxiosRequestConfig } from "axios";
 import { AuthenticationFilter } from "src/authentication/authentication.filter";
 import { AuthenticationGuard } from "src/authentication/authentication.guard";
 import { GenerateReportGuard } from "src/authentication/generate-report.guard";
-import { AdminGuard } from "src/admin/admin.guard";
 import { ReportService } from "./report.service";
 
 let requestUrl: string;
@@ -43,18 +42,20 @@ export class ReportController {
     };
   }
 
-  @Get("get-report-name/:tfn")
+  @Get("get-report-name/:dtid/:tfn")
   getReportName(
+    @Param("dtid") dtid: number,
     @Param("tfn") tenureFileNumber: string
   ): Promise<{ reportName: string }> {
-    return this.reportService.generateReportName(tenureFileNumber);
+    return this.reportService.generateReportName(dtid, tenureFileNumber);
   }
 
-  @Get("get-nfr-report-name/:tfn")
+  @Get("get-nfr-report-name/:dtid/:tfn")
   getNFRReportName(
+    @Param("dtid") dtid: number,
     @Param("tfn") tenureFileNumber: string
   ): Promise<{ reportName: string }> {
-    return this.reportService.generateNFRReportName(tenureFileNumber);
+    return this.reportService.generateNFRReportName(dtid, tenureFileNumber);
   }
 
   @Post("generate-lur-report")
@@ -124,23 +125,20 @@ export class ReportController {
     return this.reportService.getGroupMaxByVariant(variantName);
   }
 
-  @Get("get-provision-variables/:variant")
-  getVariablesByVariant(@Param("variant") variantName: string) {
-    return this.reportService.getVariablesByVariant(variantName);
-  }
-
   @Get("nfr-provisions/:variant/:nfrId")
   getNFRProvisionsByVariant(
     @Param("variant") variantName: string,
     @Param("nfrId") nfrId: number
   ): any {
-    // TODO, if nfrId != -1 (displaying a report that was saved for later), use a separate function that will grab free_text values
     return this.reportService.getNFRProvisionsByVariant(variantName, nfrId);
   }
 
-  @Get("enabled-provisions/:nfrDataId")
-  getEnabledProvisions(@Param("nfrDataId") nfrDataId: number) {
-    return this.reportService.getEnabledProvisions(nfrDataId);
+  @Get("get-provision-variables/:variant/:nfrId")
+  getNFRVariablesByVariant(
+    @Param("variant") variantName: string,
+    @Param("nfrId") nfrId: number
+  ) {
+    return this.reportService.getNFRVariablesByVariant(variantName, nfrId);
   }
 
   @Post("save-nfr")

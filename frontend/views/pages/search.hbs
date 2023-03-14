@@ -16,12 +16,13 @@
                 <div>
                     <table id="documentTable">
                         <thead>
-                            <th style="min-width: 50px">Doc No.</th>
+                            <th style="min-width: 80px">DTID</th>
+                            <th style="min-width: 40px">Doc No.</th>
                             <th style="min-width: 300px">Template Name</th>
                             <th style="max-width: 120px">Uploaded Date</th>
                             <th style="min-width: 80px">Status</th>
-                            <th>Active</th>
-                            <th></th>
+                            <th></th> {{!-- Active --}}
+                            <th></th> {{!-- NFR_ID --}}
                         </thead>
                         <tbody id="documentTableBody">
                             <tr></tr>
@@ -43,10 +44,11 @@
                 "paging": false,
                 "bFilter": false,
                 "ajax": {
-                    "url": "admin/search-nfr-templates",
+                    "url": "admin/search-nfr-data",
                     "dataSrc": ""
                 },
                 "columns": [
+                    { data: "dtid"},
                     { data: "version"},
                     { data: "file_name"},
                     { data: "updated_date"},
@@ -56,20 +58,20 @@
                 ],
                 "columnDefs": [
                 {
-                    "targets": [0, 1, 2, 3, 4, 5],
+                    "targets": [0, 1, 2, 3, 4, 5, 6],
                     "render": function (data, type, row, meta) {
                     if (type === 'display') {
-                        var columnTypes = ["version", "file_name", "updated_date", "status", "active", "nfr_id"];
+                        var columnTypes = ["dtid", "version", "file_name", "updated_date", "status", "active", "nfr_id"];
                         var columnType = columnTypes[meta.col];
                         var nfr_id = row["nfr_id"];
                         const checked = meta.row === 0 ? 'checked' : '';
 
                         if (columnType === "active") {
-                            return "<input type='radio' id='" + columnType + "-" + nfr_id + `' data-id='` + nfr_id + `' name='radioActive' ${checked}>`;
+                            return `<input type='hidden' id='${columnType}-${nfr_id}' data-id='${nfr_id}' name='radioActive' ${checked}>`;
                         } else if (columnType === "nfr_id") {
-                            return "<input type='hidden' id='" + columnType + "-" + nfr_id + "' value='" + data + "' />";
+                            return `<input type='hidden' id='${columnType}-${nfr_id}' value='${data}' />`;
                         } else {
-                            return "<input type='text' id='" + columnType + "-" + nfr_id + "' value='" + data + "' readonly style='color: gray; width: 100%;' />";
+                            return `<input type='text' id='${columnType}-${nfr_id}' value='${data}' readonly style='color: gray; width: 100%;' />`;
                         }
                     } else {
                         return data;
@@ -77,12 +79,12 @@
                     }
                 },
                 {
-                    targets: 4,
+                    targets: 5,
                     orderDataType: "dom-checkbox",
                     className: 'text-center'
                 },
                 {
-                    targets: [4,5],
+                    targets: [5,6],
                     orderable: false
                 }],
                 "createdRow": function (row, data, dataIndex) {

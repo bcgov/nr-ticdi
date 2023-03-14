@@ -48,9 +48,14 @@ export class NFRDataController {
     return this.nfrDataService.findViewByNFRDataId(+nfrDataId);
   }
 
-  @Get("get-enabled-provisions/:id")
-  getEnabledProvisions(@Param("id") id) {
-    return this.nfrDataService.getEnabledProvisions(id);
+  @Get("variables/:nfrDataId")
+  getVariablesByNfrId(@Param("nfrDataId") id: number) {
+    return this.nfrDataService.getVariablesByNfrId(id);
+  }
+
+  @Get("provisions/:nfrDataId")
+  getProvisionsByNfrId(@Param("nfrDataId") id: number) {
+    return this.nfrDataService.getProvisionsByNfrId(id);
   }
 
   @Delete(":dtid")

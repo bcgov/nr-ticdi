@@ -181,14 +181,9 @@
     <script>
         $('#groupMaxJson').val(JSON.stringify('{{{json groupMaxJsonArray}}}'));
         $('#documentVariantId').prop("selectedIndex", {{ selectedVariant }});
-        $('#documentVariantId').prop("disabled", true);
-        const isNFRSearch = !window.location.href.includes("nfr/dtid");
         const currentUrl = window.location.pathname;
         const preloadEnabledProvisions = [{{enabledProvisionList}}];
         let variantName = $('#documentVariantId').val();
-        if (!isNFRSearch) {
-            $('#documentVariantId').prop("disabled", false);
-        }
         $('#variantName').val(variantName);
         console.log({{message.err}});
     </script>

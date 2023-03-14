@@ -9,6 +9,8 @@ import { NFRData } from "./entities/nfr_data.entity";
 import { NFRDataProvision } from "./entities/nfr_data_provision.entity";
 import { NFRDataVariable } from "./entities/nfr_data_variable.entity";
 import { NFRDataView } from "./entities/nfr_data_vw";
+import { NFRProvisionService } from "src/nfr_provision/nfr_provision.service";
+import { DocumentTemplateService } from "src/document_template/document_template.service";
 
 @Injectable()
 export class NFRDataService {
@@ -23,6 +25,8 @@ export class NFRDataService {
     private nfrProvisionVariableRepository: Repository<NFRProvisionVariable>,
     @InjectRepository(NFRDataVariable)
     private nfrDataVariableRepository: Repository<NFRDataVariable>,
+    private nfrProvisionService: NFRProvisionService,
+    private documentTemplateService: DocumentTemplateService,
     private dataSource: DataSource
   ) {}
 
@@ -41,6 +45,9 @@ export class NFRDataService {
         variableArray
       );
     }
+    const documentTemplate =
+      await this.documentTemplateService.findActiveByDocumentType(2); // 2 corresponds to NFR
+    nfrDataDto["template_id"] = documentTemplate.id;
     const newNfrData: NFRData = this.nfrDataRepository.create(nfrDataDto);
     nfrData = await this.nfrDataRepository.save(newNfrData);
 
@@ -149,11 +156,33 @@ export class NFRDataService {
     return await this.nfrDataRepository.find();
   }
 
-  async findByNfrDataId(nfrDataId: number): Promise<NFRData> {
+  async findByNfrDataId(nfrDataId: number): Promise<{
+    nfrData: NFRData;
+    provisionIds: number[];
+    variableIds: number[];
+  }> {
     try {
-      return this.nfrDataRepository.findOneBy({
-        id: nfrDataId,
+      const nfrData = await this.nfrDataRepository.findOne({
+        where: { id: nfrDataId },
+        join: {
+          alias: "nfr_data",
+          leftJoinAndSelect: {
+            nfr_data_provisions: "nfr_data.nfr_data_provisions",
+            nfr_provision: "nfr_data_provisions.nfr_provision",
+            nfr_data_variables: "nfr_data.nfr_data_variables",
+            nfr_variable: "nfr_data_variables.nfr_variable",
+          },
+        },
       });
+      const existingDataProvisions = nfrData.nfr_data_provisions;
+      const provisionIds = existingDataProvisions.map(
+        (dataProvision) => dataProvision.nfr_provision.id
+      );
+      const existingDataVariables = nfrData.nfr_data_variables;
+      const variableIds = existingDataVariables.map(
+        (dataVariable) => dataVariable.nfr_variable.id
+      );
+      return { nfrData, provisionIds, variableIds };
     } catch (err) {
       console.log(err);
       return null;
@@ -177,14 +206,71 @@ export class NFRDataService {
     });
   }
 
-  // TODO - enabled provisions logic has changed, this will need to be changed
-  async getEnabledProvisions(id: number): Promise<number[]> {
-    const nfrData = await this.nfrDataRepository.findOne({
+  async getVariablesByNfrId(id: number) {
+    const nfrData: NFRData = await this.nfrDataRepository.findOne({
       where: { id: id },
-      relations: ["nfr_data_provisions"],
+      join: {
+        alias: "nfr_data",
+        leftJoinAndSelect: {
+          nfr_data_variables: "nfr_data.nfr_data_variables",
+          nfr_variable: "nfr_data_variables.nfr_variable",
+        },
+      },
     });
-    // return nfrData.enabled_provisions;
-    return null;
+    // saved variables attached to the nfrData entry
+    const existingDataVariables: NFRDataVariable[] = nfrData.nfr_data_variables;
+    // all variables associated with the variant
+    const variables: NFRProvisionVariable[] =
+      await this.nfrProvisionService.getVariablesByVariant(
+        nfrData.variant_name
+      );
+    // inserting the existing variable_values to the set of all variables
+    for (const variable of variables) {
+      const existingDataVariable = existingDataVariables.find(
+        (dataVariable) => dataVariable.nfr_variable.id === variable.id
+      );
+      if (existingDataVariable) {
+        variable.variable_value = existingDataVariable.data_variable_value;
+      }
+    }
+    const variableIds = existingDataVariables.map(
+      (dataVariable) => dataVariable.nfr_variable.id
+    );
+    return { variables, variableIds };
+  }
+
+  async getProvisionsByNfrId(id: number) {
+    const nfrData: NFRData = await this.nfrDataRepository.findOne({
+      where: { id: id },
+      join: {
+        alias: "nfr_data",
+        leftJoinAndSelect: {
+          nfr_data_provisions: "nfr_data.nfr_data_provisions",
+          nfr_provision: "nfr_data_provisions.nfr_provision",
+        },
+      },
+    });
+    // saved provisions attached to the nfrData entry
+    const existingDataProvisions: NFRDataProvision[] =
+      nfrData.nfr_data_provisions;
+    // all provisions associated with the variant
+    const provisions: NFRProvision[] =
+      await this.nfrProvisionService.getProvisionsByVariant(
+        nfrData.variant_name
+      );
+    // inserting the existing free_text values to the set of all provisions
+    for (const provision of provisions) {
+      const existingDataProvision = existingDataProvisions.find(
+        (dataProvision) => dataProvision.nfr_provision.id === provision.id
+      );
+      if (existingDataProvision) {
+        provision.free_text = existingDataProvision.provision_free_text;
+      }
+    }
+    const provisionIds = existingDataProvisions.map(
+      (dataProvision) => dataProvision.nfr_provision.id
+    );
+    return { provisions, provisionIds };
   }
 
   async remove(dtid: number): Promise<{ deleted: boolean; message?: string }> {

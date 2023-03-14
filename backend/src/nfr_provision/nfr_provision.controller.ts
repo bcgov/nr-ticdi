@@ -36,8 +36,8 @@ export class NFRProvisionController {
   }
 
   @Get("variant/:variant")
-  findProvisionsByVariant(@Param("variant") variantName: string) {
-    return this.nfrProvisionService.findProvisionsByVariant(variantName);
+  getProvisionsByVariant(@Param("variant") variantName: string) {
+    return this.nfrProvisionService.getProvisionsByVariant(variantName);
   }
 
   @Get("enable/:id")

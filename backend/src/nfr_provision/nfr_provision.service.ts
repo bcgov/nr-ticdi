@@ -99,7 +99,7 @@ export class NFRProvisionService {
     }
   }
 
-  async findProvisionsByVariant(variantName: string): Promise<NFRProvision[]> {
+  async getProvisionsByVariant(variantName: string): Promise<NFRProvision[]> {
     try {
       const variant = await this.nfrProvisionVariantRepository.findOne({
         where: {

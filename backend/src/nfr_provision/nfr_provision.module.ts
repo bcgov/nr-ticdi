@@ -16,5 +16,6 @@ import { NFRProvisionVariable } from "./entities/nfr_provision_variable.entity";
   ],
   controllers: [NFRProvisionController],
   providers: [NFRProvisionService],
+  exports: [NFRProvisionService],
 })
 export class NFRProvisionModule {}

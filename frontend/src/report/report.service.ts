@@ -32,9 +32,8 @@ export class ReportService {
    * @param tenureFileNumber
    * @returns
    */
-  async generateReportName(tenureFileNumber: string) {
-    const url =
-      `${hostname}:${port}/print-request-log/version/` + tenureFileNumber;
+  async generateReportName(dtid: number, tenureFileNumber: string) {
+    const url = `${hostname}:${port}/print-request-log/version/` + dtid;
     // grab the next version string for the dtid
     const version = await axios
       .get(url, {
@@ -140,19 +139,18 @@ export class ReportService {
    * @param tenureFileNumber
    * @returns
    */
-  async generateNFRReportName(tenureFileNumber: string) {
-    const url = `${hostname}:${port}/nfr-data-log/version/` + tenureFileNumber;
+  async generateNFRReportName(dtid: number, tenureFileNumber: string) {
+    const url = `${hostname}:${port}/nfr-data-log/version/` + dtid;
     // grab the next version string for the dtid
-    // const version = await axios
-    //   .get(url, {
-    //     headers: {
-    //       "Content-Type": "application/json",
-    //     },
-    //   })
-    //   .then((res) => {
-    //     return res.data;
-    //   });
-    const version = 1;
+    const version = await axios
+      .get(url, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      })
+      .then((res) => {
+        return res.data;
+      });
     return { reportName: "NFR_" + tenureFileNumber + "_" + version };
   }
 
@@ -173,6 +171,15 @@ export class ReportService {
       .catch((err) => {
         console.log(err);
       });
+    const tenantAddr = rawData.tenantAddr[0];
+    const interestParcel = rawData.interestParcel[0];
+    const DB_Address_Mailing_Tenant = `${
+      tenantAddr ? tenantAddr.legalName : ""
+    },\r\n ${tenantAddr ? tenantAddr.addrLine1 : ""},\r\n ${
+      tenantAddr ? tenantAddr.city : ""
+    }, ${tenantAddr ? tenantAddr.provAbbr : ""},\r\n ${
+      tenantAddr ? tenantAddr.postalCode : ""
+    },\r\n`;
     const ttlsData = {
       DB_Address_Regional_Office: `${rawData.regOfficeStreet},\r\n ${rawData.regOfficeCity},\r\n ${rawData.regOfficeProv},\r\n ${rawData.regOfficePostalCode}`,
       DB_Name_BCAL_Contact: this.ttlsService.getContactAgent(
@@ -181,9 +188,11 @@ export class ReportService {
         rawData.contactLastName
       ),
       DB_File_Number: rawData.fileNum,
-      DB_Address_Mailing_Tenant: `${rawData.tenantAddr[0].legalName},\r\n ${rawData.tenantAddr[0].addrLine1},\r\n ${rawData.tenantAddr[0].city}, ${rawData.tenantAddr[0].provAbbr},\r\n ${rawData.tenantAddr[0].postalCode},\r\n`,
+      DB_Address_Mailing_Tenant: DB_Address_Mailing_Tenant,
       DB_Tenure_Type: rawData.type,
-      DB_Legal_Description: rawData.interestParcel[0].legalDescription,
+      DB_Legal_Description: interestParcel
+        ? interestParcel.legalDescription
+        : "",
       DB_Fee_Payable_Type: rawData.feePayableType,
       DB_Fee_Payable_Amount_GST: rawData.feePayableAmountGst,
       DB_Fee_Payable_Amount: rawData.feePayableAmount,
@@ -239,6 +248,16 @@ export class ReportService {
       request_json: JSON.stringify(data),
     });
 
+    // Save the NFR Data
+    await this.saveNFR(
+      dtid,
+      variantName,
+      "In Progress",
+      provisionJson,
+      variableJson,
+      idirUsername
+    );
+
     // Generate the report
     const cdogsToken = await this.ttlsService.callGetToken();
     let bufferBase64 = documentTemplateObject.the_file;
@@ -288,39 +307,48 @@ export class ReportService {
       "provision_group",
       "id",
     ];
-    const url = `${hostname}:${port}/nfr-provision/variant/${variantName}`;
-    const nfrProvisions = await axios
-      .get(url)
-      .then((res) => {
-        return res.data;
-      })
-      .catch((err) => console.log(err.response.data));
-    const reduced = nfrProvisions.map((obj) =>
-      Object.keys(obj)
-        .filter((key) => returnItems.includes(key))
-        .reduce(
-          (acc, key) => {
-            acc[key] = obj[key];
-            return acc;
-          },
-          { select: false }
-        )
-    );
+    let reduced, provisions;
     if (nfrId != -1) {
-      const nfrDataUrl = `${hostname}:${port}/nfr-data/${nfrId}`;
-      const nfrData = await axios
-        .get(nfrDataUrl)
+      // nfrDataId exists so return a list of provisions with pre-existing free_text data inserted, certain provisions preselected
+      const url = `${hostname}:${port}/nfr-data/provisions/${nfrId}`;
+      const nfrProvisions = await axios
+        .get(url)
         .then((res) => {
           return res.data;
         })
         .catch((err) => console.log(err.response.data));
-      reduced.map((obj) => {
-        if (nfrData.enabled_provisions.includes(obj.id)) {
+      const provisionIds = nfrProvisions.provisionIds;
+      provisions = nfrProvisions.provisions;
+      reduced = provisions.map((obj) => {
+        if (provisionIds.includes(obj.id)) {
           obj.select = true;
+        } else {
+          obj.select = false;
         }
         return obj;
       });
+    } else {
+      // no nfrDataId so just return generic provisions with all of them deselected by default
+      const url = `${hostname}:${port}/nfr-provision/variant/${variantName}`;
+      provisions = await axios
+        .get(url)
+        .then((res) => {
+          return res.data;
+        })
+        .catch((err) => console.log(err.response.data));
+      reduced = provisions.map((obj) =>
+        Object.keys(obj)
+          .filter((key) => returnItems.includes(key))
+          .reduce(
+            (acc, key) => {
+              acc[key] = obj[key];
+              return acc;
+            },
+            { select: false }
+          )
+      );
     }
+    // make the returned data readable for the ajax request
     return reduced.map((obj) => {
       const groupObj = obj.provision_group;
       delete obj["provision_group"];
@@ -337,18 +365,26 @@ export class ReportService {
     });
   }
 
-  async getVariablesByVariant(variantName: string): Promise<any> {
-    const url = `${hostname}:${port}/nfr-provision/get-provision-variables/variant/${variantName}`;
-    return await axios.get(url).then((res) => {
-      return res.data;
-    });
-  }
-
-  async getEnabledProvisions(nfrDataId: number) {
-    const url = `${hostname}:${port}/nfr-data/get-enabled-provisions/${nfrDataId}`;
-    return await axios.get(url).then((res) => {
-      return res.data;
-    });
+  async getNFRVariablesByVariant(
+    variantName: string,
+    nfrId: number
+  ): Promise<any> {
+    if (nfrId != -1) {
+      // if an nfrId is provided, get the variables with any existing user specified values
+      const url = `${hostname}:${port}/nfr-data/variables/${nfrId}`;
+      return axios
+        .get(url)
+        .then((res) => {
+          return res.data.variables;
+        })
+        .catch((err) => console.log(err.response.data));
+    } else {
+      // grab the basic variable list corresponding to the variant
+      const url = `${hostname}:${port}/nfr-provision/get-provision-variables/variant/${variantName}`;
+      return axios.get(url).then((res) => {
+        return res.data;
+      });
+    }
   }
 
   async getMandatoryProvisionsByVariant(variantName: string) {

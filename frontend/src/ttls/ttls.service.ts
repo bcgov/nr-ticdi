@@ -38,26 +38,27 @@ export class TTLSService {
   }
 
   formatNFRData(ttlsData: any): any {
+    const tenantAddr = ttlsData.tenantAddr[0];
     const mappedData = {
       dtid: ttlsData.dtid,
       fileNum: ttlsData.fileNum,
-      incorporationNum: ttlsData.tenantAddr[0].incorporationNum,
+      incorporationNum: tenantAddr ? tenantAddr.incorporationNum : "",
       orgUnit: ttlsData.orgUnit,
       purpose: ttlsData.purpose,
       subPurpose: ttlsData.subPurpose,
       type: ttlsData.type,
       subType: ttlsData.subType,
-      firstName: ttlsData.tenantAddr[0].firstName,
-      middleName: ttlsData.tenantAddr[0].middleName,
-      lastName: ttlsData.tenantAddr[0].lastName,
-      legalName: ttlsData.tenantAddr[0].legalName,
-      licenceHolderName: this.getLicenceHolderName(ttlsData.tenantAddr),
-      emailAddress: ttlsData.tenantAddr[0].emailAddress,
+      firstName: tenantAddr ? tenantAddr.firstName : "",
+      middleName: tenantAddr ? tenantAddr.middleName : "",
+      lastName: tenantAddr ? tenantAddr.lastName : "",
+      legalName: tenantAddr ? tenantAddr.legalName : "",
+      licenceHolderName: this.getLicenceHolderName(tenantAddr),
+      emailAddress: tenantAddr ? tenantAddr.emailAddress : "",
       phoneNumber: this.formatPhoneNumber(
-        ttlsData.tenantAddr[0].phoneNumber,
-        ttlsData.tenantAddr[0].areaCode
+        tenantAddr ? tenantAddr.phoneNumber : "",
+        tenantAddr ? tenantAddr.areaCode : ""
       ),
-      licenceHolder: this.getLicenceHolder(ttlsData.tenantAddr),
+      licenceHolder: this.getLicenceHolder(tenantAddr),
       contactAgent: this.getContactAgent(
         ttlsData.contactFirstName,
         ttlsData.contactMiddleName,
@@ -73,17 +74,17 @@ export class TTLSService {
       ),
       contactEmail: ttlsData.contactEmail,
       inspectionDate: ttlsData.inspectionDate,
-      mailingAddress: this.getMailingAddress(ttlsData.tenantAddr),
-      addrLine1: ttlsData.tenantAddr[0].addrLine1,
-      addrLine2: ttlsData.tenantAddr[0].addrLine2,
-      addrLine3: ttlsData.tenantAddr[0].addrLine3,
-      city: ttlsData.tenantAddr[0].city,
-      regionCd: ttlsData.tenantAddr[0].regionCd,
-      postalCode: ttlsData.tenantAddr[0].postalCode,
-      provAndPostalCode: this.getProvAndPostalCode(ttlsData.tenantAddr[0]),
-      zipCode: ttlsData.tenantAddr[0].zipCode,
-      countryCd: ttlsData.tenantAddr[0].countryCd,
-      country: ttlsData.tenantAddr[0].country,
+      mailingAddress: this.getMailingAddress(tenantAddr),
+      addrLine1: tenantAddr ? tenantAddr.addrLine1 : "",
+      addrLine2: tenantAddr ? tenantAddr.addrLine2 : "",
+      addrLine3: tenantAddr ? tenantAddr.addrLine3 : "",
+      city: tenantAddr ? tenantAddr.city : "",
+      regionCd: tenantAddr ? tenantAddr.regionCd : "",
+      postalCode: tenantAddr ? tenantAddr.postalCode : "",
+      provAndPostalCode: this.getProvAndPostalCode(tenantAddr),
+      zipCode: tenantAddr ? tenantAddr.zipCode : "",
+      countryCd: tenantAddr ? tenantAddr.countryCd : "",
+      country: tenantAddr ? tenantAddr.country : "",
       locLand: ttlsData.locLand,
     };
     return mappedData;
@@ -213,7 +214,10 @@ export class TTLSService {
     lastName: string;
     legalName: string;
   }): string {
-    if (tenantAddr.firstName || tenantAddr.middleName || tenantAddr.lastName) {
+    if (
+      tenantAddr &&
+      (tenantAddr.firstName || tenantAddr.middleName || tenantAddr.lastName)
+    ) {
       let name = tenantAddr.firstName ? tenantAddr.firstName : "";
       name = tenantAddr.middleName
         ? name.concat(" " + tenantAddr.middleName)
@@ -222,7 +226,7 @@ export class TTLSService {
         ? name.concat(" " + tenantAddr.lastName)
         : name;
       return name;
-    } else if (tenantAddr.legalName) {
+    } else if (tenantAddr && tenantAddr.legalName) {
       return tenantAddr.legalName;
     }
     return "";
@@ -234,7 +238,10 @@ export class TTLSService {
     middleName: string;
     lastName: string;
   }): string {
-    if (tenantAddr.firstName || tenantAddr.middleName || tenantAddr.lastName) {
+    if (
+      tenantAddr &&
+      (tenantAddr.firstName || tenantAddr.middleName || tenantAddr.lastName)
+    ) {
       let name = tenantAddr.firstName ? tenantAddr.firstName : "";
       name = tenantAddr.middleName
         ? name.concat(" " + tenantAddr.middleName)
@@ -269,13 +276,13 @@ export class TTLSService {
     addrLine3: string;
   }): string {
     let mailingAddress = "";
-    if (tenantAddr.addrLine1) {
+    if (tenantAddr && tenantAddr.addrLine1) {
       mailingAddress = tenantAddr.addrLine1;
     }
-    if (tenantAddr.addrLine2) {
+    if (tenantAddr && tenantAddr.addrLine2) {
       mailingAddress = mailingAddress.concat(", " + tenantAddr.addrLine2);
     }
-    if (tenantAddr.addrLine3) {
+    if (tenantAddr && tenantAddr.addrLine3) {
       mailingAddress = mailingAddress.concat(", " + tenantAddr.addrLine3);
     }
     return mailingAddress;
@@ -285,13 +292,14 @@ export class TTLSService {
     provAbbr: string;
     postalCode: string;
   }): string {
-    if (tenantAddr.provAbbr && tenantAddr.postalCode) {
+    if (tenantAddr && tenantAddr.provAbbr && tenantAddr.postalCode) {
       return tenantAddr.provAbbr + ", " + tenantAddr.postalCode;
-    } else if (tenantAddr.provAbbr) {
+    } else if (tenantAddr && tenantAddr.provAbbr) {
       return tenantAddr.provAbbr;
-    } else {
+    } else if (tenantAddr && tenantAddr.postalCode) {
       return tenantAddr.postalCode;
     }
+    return "";
   }
 
   formatInspectedDate(inspected_date: string): string {

@@ -309,7 +309,7 @@ export class AdminService {
     return documents;
   }
 
-  async getNFRTemplates() {
+  async getNFRData() {
     const nfrDataUrl = `${hostname}:${port}/nfr-data`;
     const templateUrl = `${hostname}:${port}/document-template/nfr-template-info`;
     const nfrData = await axios
@@ -348,6 +348,7 @@ export class AdminService {
       if (template.id === nfr.template_id) {
         if (!template.is_deleted) {
           combinedArray.push({
+            dtid: nfr.dtid,
             version: template.template_version,
             file_name: template.file_name,
             updated_date: nfr.update_timestamp.split("T")[0],
@@ -363,8 +364,6 @@ export class AdminService {
         j++;
       }
     }
-    console.log(combinedArray);
-
     return combinedArray;
   }
 

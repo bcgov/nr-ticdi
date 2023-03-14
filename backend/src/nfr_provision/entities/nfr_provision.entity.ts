@@ -12,6 +12,7 @@ import {
 import { NFRProvisionGroup } from "./nfr_provision_group.entity";
 import { NFRProvisionVariant } from "./nfr_provision_variant.entity";
 import { NFRProvisionVariable } from "./nfr_provision_variable.entity";
+import { NFRDataProvision } from "src/nfr_data/entities/nfr_data_provision.entity";
 
 @Entity()
 export class NFRProvision {
@@ -54,6 +55,15 @@ export class NFRProvision {
   @ManyToMany(() => NFRProvisionVariant, { nullable: true, cascade: true })
   @JoinTable()
   provision_variant: NFRProvisionVariant[];
+  @OneToMany(
+    () => NFRDataProvision,
+    (nfrDataProvision) => nfrDataProvision.nfr_provision,
+    {
+      nullable: true,
+      cascade: true,
+    }
+  )
+  nfr_data_provisions: NFRDataProvision[];
 
   constructor(
     type?: string,

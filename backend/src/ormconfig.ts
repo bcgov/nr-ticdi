@@ -9,6 +9,8 @@ import { NFRProvision } from "./nfr_provision/entities/nfr_provision.entity";
 import { NFRProvisionGroup } from "./nfr_provision/entities/nfr_provision_group.entity";
 import { NFRProvisionVariable } from "./nfr_provision/entities/nfr_provision_variable.entity";
 import { NFRProvisionVariant } from "./nfr_provision/entities/nfr_provision_variant.entity";
+import { NFRDataProvision } from "./nfr_data/entities/nfr_data_provision.entity";
+import { NFRDataVariable } from "./nfr_data/entities/nfr_data_variable.entity";
 
 const config: TypeOrmModuleOptions = {
   type: "postgres",
@@ -21,6 +23,8 @@ const config: TypeOrmModuleOptions = {
     PrintRequestDetail,
     PrintRequestLog,
     NFRData,
+    NFRDataProvision,
+    NFRDataVariable,
     NFRDataLog,
     NFRProvision,
     NFRProvisionGroup,

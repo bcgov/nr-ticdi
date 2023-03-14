@@ -109,10 +109,12 @@ export class NFRProvisionService {
       if (!variant) {
         return [];
       }
-      const provisions = await this.nfrProvisionRepository.find({
-        where: { provision_variant: variant },
-        relations: ["provision_group"],
-      });
+      const provisions: NFRProvision[] = await this.nfrProvisionRepository.find(
+        {
+          where: { provision_variant: variant },
+          relations: ["provision_group"],
+        }
+      );
       return provisions;
     } catch (err) {
       console.log(err);
@@ -237,9 +239,10 @@ export class NFRProvisionService {
     max: number,
     provision_group_text: string
   ) {
-    let nfrProvisionGroup = await this.nfrProvisionGroupRepository.findOneBy({
-      provision_group: provision_group,
-    });
+    let nfrProvisionGroup: NFRProvisionGroup =
+      await this.nfrProvisionGroupRepository.findOneBy({
+        provision_group: provision_group,
+      });
     if (!nfrProvisionGroup) {
       const newGroup = this.nfrProvisionGroupRepository.create({
         provision_group: provision_group,
@@ -252,7 +255,7 @@ export class NFRProvisionService {
       nfrProvisionGroup.max != max ||
       nfrProvisionGroup.provision_group_text != provision_group_text
     ) {
-      await this.nfrProvisionGroupRepository.update(nfrProvisionGroup, {
+      await this.nfrProvisionGroupRepository.update(nfrProvisionGroup.id, {
         max: max,
         provision_group_text: provision_group_text,
       });

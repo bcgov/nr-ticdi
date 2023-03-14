@@ -6,6 +6,5 @@ export class CreateNFRDataDto extends PickType(NFRDataDto, [
   "variant_name",
   "template_id",
   "status",
-  "enabled_provisions",
   "create_userid",
 ] as const) {}

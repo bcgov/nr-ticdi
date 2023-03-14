@@ -133,9 +133,9 @@ export class ReportService {
   }
 
   /**
-   * Generates a LUR report name using tenure file number
+   * Generates an NFR report name using tenure file number
    * and a version number. The version number is incremented
-   * each time someone generates a LUR report.
+   * each time someone generates a NFR report.
    *
    * @param tenureFileNumber
    * @returns
@@ -159,10 +159,12 @@ export class ReportService {
   async generateNFRReport(
     dtid: number,
     variantName: string,
+    idirUsername: string,
     variableJson: VariableJSON[],
     provisionJson: ProvisionJSON[]
   ) {
     const templateUrl = `${hostname}:${port}/document-template/get-active-report/2`;
+    const logUrl = `${hostname}:${port}/nfr-data-log/`;
     await this.ttlsService.setWebadeToken();
     const rawData: any = await firstValueFrom(this.ttlsService.callHttp(dtid))
       .then((res) => {
@@ -198,6 +200,8 @@ export class ReportService {
       .then((res) => {
         return res.data;
       });
+
+    // Format variables with names that the document template expects
     const variables = {};
     variableJson.forEach(({ variable_name, variable_value }) => {
       const newVariableName = variable_name
@@ -208,6 +212,8 @@ export class ReportService {
         .replace(/^(\w)/, (match) => match.toUpperCase());
       variables[`VAR_${newVariableName}`] = variable_value;
     });
+
+    // Format provisions in a way that the document template expects
     const groupIndexMap = new Map<number, number>();
     const showProvisionSections: Record<string, any> = {};
     provisionJson.forEach((provision) => {
@@ -224,8 +230,16 @@ export class ReportService {
     });
     const data = Object.assign({}, ttlsData, variables, showProvisionSections);
 
-    // TODO - log the request in nfr-data-log
+    // Log the request
+    const document_template_id = documentTemplateObject.id;
+    await axios.post(logUrl, {
+      document_template_id: document_template_id,
+      dtid: dtid,
+      request_app_user: idirUsername,
+      request_json: JSON.stringify(data),
+    });
 
+    // Generate the report
     const cdogsToken = await this.ttlsService.callGetToken();
     let bufferBase64 = documentTemplateObject.the_file;
     const md = JSON.stringify({
@@ -362,7 +376,8 @@ export class ReportService {
     dtid: number,
     variant_name: string,
     status: string,
-    enabled_provisions: number[],
+    provisionJsonArray: ProvisionJSON[],
+    variableJsonArray: VariableJSON[],
     idir_username: string
   ) {
     const templateUrl = `${hostname}:${port}/document-template/get-active-report/${encodeURI(
@@ -377,9 +392,10 @@ export class ReportService {
       variant_name: variant_name,
       template_id: documentTemplate.id,
       status: status,
-      enabled_provisions: enabled_provisions,
       create_userid: idir_username,
       ttls_data: [],
+      provisionJsonArray,
+      variableJsonArray,
     };
     await axios
       .post(url, {

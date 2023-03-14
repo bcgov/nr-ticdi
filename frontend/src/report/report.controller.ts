@@ -112,24 +112,11 @@ export class ReportController {
       await this.reportService.generateNFRReport(
         data.dtid,
         data.variantName,
+        idir_username,
         data.variableJson,
         data.provisionJson
       )
     );
-  }
-
-  // TODO generate-nfr-report
-
-  @UseGuards(AdminGuard)
-  @Post("generate-specific-report")
-  async generateSpecificReport(
-    @Body() data: { prdid: string; documentType: string; templateId: number }
-  ) {
-    console.log(data);
-    return "";
-    // return new StreamableFile(
-    //   await this.reportService.generateSpecificReport()
-    // );
   }
 
   @Get("get-group-max/:variant")
@@ -147,6 +134,7 @@ export class ReportController {
     @Param("variant") variantName: string,
     @Param("nfrId") nfrId: number
   ): any {
+    // TODO, if nfrId != -1 (displaying a report that was saved for later), use a separate function that will grab free_text values
     return this.reportService.getNFRProvisionsByVariant(variantName, nfrId);
   }
 
@@ -159,11 +147,12 @@ export class ReportController {
   saveNFR(
     @Session() session: { data: SessionData },
     @Body()
-    nfrData: {
+    data: {
       dtid: number;
       variant_name: string;
       status: string;
-      enabled_provisions: number[];
+      provisionArray: ProvisionJSON[];
+      variableArray: VariableJSON[];
     }
   ) {
     let idir_username = "";
@@ -174,10 +163,11 @@ export class ReportController {
       console.log("no active account found");
     }
     return this.reportService.saveNFR(
-      nfrData.dtid,
-      nfrData.variant_name,
-      nfrData.status,
-      nfrData.enabled_provisions,
+      data.dtid,
+      data.variant_name,
+      data.status,
+      data.provisionArray,
+      data.variableArray,
       idir_username
     );
   }

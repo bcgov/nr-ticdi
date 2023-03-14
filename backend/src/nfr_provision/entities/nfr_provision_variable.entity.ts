@@ -1,4 +1,11 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from "typeorm";
+import { NFRDataVariable } from "src/nfr_data/entities/nfr_data_variable.entity";
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  ManyToOne,
+  OneToMany,
+} from "typeorm";
 import { NFRProvision } from "./nfr_provision.entity";
 
 /**
@@ -21,4 +28,14 @@ export class NFRProvisionVariable {
     nullable: true,
   })
   provision: NFRProvision;
+
+  @OneToMany(
+    () => NFRDataVariable,
+    (nfrDataVariable) => nfrDataVariable.nfr_variable,
+    {
+      nullable: true,
+      cascade: true,
+    }
+  )
+  nfr_data_variables: NFRDataVariable[];
 }

@@ -39,9 +39,6 @@ groupMaxTable = $("#groupMaxTable").DataTable({
   ],
   order: [0, "asc"],
 });
-let selectedProvisionsUrl = `${
-  window.location.origin
-}/report/nfr-provisions/${encodeURI(variantName)}`;
 
 provisionTable = $("#provisionTable").DataTable({
   ajax: {
@@ -56,7 +53,7 @@ provisionTable = $("#provisionTable").DataTable({
   columns: [
     { data: "type" },
     { data: "provision_name" },
-    { data: "free_text" },
+    { data: "free_text", defaultContent: "" },
     { data: "category" },
     { data: "select" },
     { data: "provision_group" },
@@ -174,6 +171,9 @@ provisionTable = $("#provisionTable").DataTable({
   order: [[1, "asc"]],
 });
 
+let selectedProvisionsUrl = `${
+  window.location.origin
+}/report/nfr-provisions/${encodeURI(variantName)}`;
 selectedProvisionsUrl += nfrDataId != "" ? `/${nfrDataId}` : "/-1";
 selectedProvisionsTable = $("#selectedProvisionsTable").DataTable({
   ajax: {
@@ -310,6 +310,12 @@ $("#group-select").on("change", function () {
       $(this.node()).hide();
     }
   });
+  if (Array.isArray(groupMaxJsonArray) && groupMaxJsonArray.length > 0) {
+    const groupMax = groupMaxJsonArray.find(
+      (element) => element.provision_group == selectedGroup
+    ).max;
+    $("#maxGroupNum").text(groupMax);
+  }
 });
 
 function filterRows() {
@@ -346,17 +352,43 @@ $("fieldset legend").click(function () {
 
 function saveForLater() {
   // get the provisions that the user has selected
-  let enabledProvisions = [];
-  $("#provisionTable")
-    .find(".provisionSelect:checked")
-    .each(function () {
-      enabledProvisions.push($(this).data("id"));
+  const dtid = $("#dtid").text();
+  let provisionArray = [];
+  let variableArray = [];
+  selectedProvisionsTable
+    .rows()
+    .nodes()
+    .each((row) => {
+      if ($(row).css("display") !== "none") {
+        const provision_id = $(row).data("id");
+        const free_text = $(row).find(".free_text").val();
+        provisionArray.push({
+          provision_id: provision_id,
+          free_text: free_text,
+        });
+      }
+    });
+  variableTable
+    .rows()
+    .nodes()
+    .each((row) => {
+      if ($(row).css("display") !== "none") {
+        const provision_id = $(row).data("id");
+        const variable_id = $(row).data("variable_id");
+        const variable_value = $(row).find(".variable_value").val();
+        variableArray.push({
+          provision_id: provision_id,
+          variable_id: variable_id,
+          variable_value: variable_value,
+        });
+      }
     });
   const data = {
     dtid: dtid,
-    variant_name: decodeURI(variantName),
+    variant_name: variantName,
     status: "In Progress",
-    enabled_provisions: enabledProvisions,
+    provisionArray: provisionArray,
+    variableArray: variableArray,
   };
   fetch(`${window.location.origin}/report/save-nfr`, {
     method: "POST",

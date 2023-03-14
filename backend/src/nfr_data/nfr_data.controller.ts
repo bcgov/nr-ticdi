@@ -1,4 +1,5 @@
 import { Body, Controller, Delete, Get, Param, Post } from "@nestjs/common";
+import { ProvisionJSON, VariableJSON } from "utils/types";
 import { CreateNFRDataDto } from "./dto/create-nfr_data.dto";
 import { NFRDataService } from "./nfr_data.service";
 
@@ -10,10 +11,17 @@ export class NFRDataController {
   async create(
     @Body()
     data: {
-      body: CreateNFRDataDto;
+      body: CreateNFRDataDto & {
+        provisionJsonArray: ProvisionJSON[];
+        variableJsonArray: VariableJSON[];
+      };
     }
   ) {
-    return this.nfrDataService.create(data.body);
+    const provArr = data.body.provisionJsonArray;
+    const varArr = data.body.variableJsonArray;
+    delete data.body["provisionJsonArray"];
+    delete data.body["variableJsonArray"];
+    return this.nfrDataService.createOrUpdate(data.body, provArr, varArr);
   }
 
   @Get()

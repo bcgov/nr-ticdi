@@ -36,23 +36,29 @@ export class NFRDataService {
     variableArray: { variable_id: number; variable_value: string }[]
   ): Promise<NFRData> {
     const { dtid } = nfrDataDto;
-    let nfrData: NFRData = await this.nfrDataRepository.findOneBy({ dtid });
-    console.log(nfrData);
+    const nfrData = await this.nfrDataRepository.findOne({
+      where: { dtid },
+      relations: [
+        "nfr_data_variables",
+        "nfr_data_provisions",
+        "nfr_data_variables.nfr_variable",
+        "nfr_data_provisions.nfr_provision",
+      ],
+    });
+
     if (nfrData) {
-      console.log("found nfr data, updating it and returning");
       return await this.updateNfrData(
-        dtid,
         nfrDataDto,
+        nfrData,
         provisionArray,
         variableArray
       );
     }
-    console.log("made it past the update statement");
     const documentTemplate =
       await this.documentTemplateService.findActiveByDocumentType(2); // 2 corresponds to NFR
     nfrDataDto["template_id"] = documentTemplate.id;
     const newNfrData: NFRData = this.nfrDataRepository.create(nfrDataDto);
-    nfrData = await this.nfrDataRepository.save(newNfrData);
+    const updatedNfrData = await this.nfrDataRepository.save(newNfrData);
 
     const nfrProvisionIds = provisionArray.map(
       ({ provision_id }) => provision_id
@@ -71,7 +77,7 @@ export class NFRDataService {
           (provision) => provision.id === provision_id
         );
         const nfrDataProvision = new NFRDataProvision();
-        nfrDataProvision.nfr_data = nfrData;
+        nfrDataProvision.nfr_data = updatedNfrData;
         nfrDataProvision.nfr_provision = nfrProvision;
         nfrDataProvision.provision_free_text = free_text;
         return nfrDataProvision;
@@ -83,39 +89,26 @@ export class NFRDataService {
           (variable) => variable.id === variable_id
         );
         const nfrDataVariable = new NFRDataVariable();
-        nfrDataVariable.nfr_data = nfrData;
+        nfrDataVariable.nfr_data = updatedNfrData;
         nfrDataVariable.nfr_variable = nfrVariable;
         nfrDataVariable.data_variable_value = variable_value;
         return nfrDataVariable;
       }
     );
+    await this.deleteDataVarsAndProvs(nfrData, provisionArray, variableArray);
 
     await this.nfrDataProvisionRepository.save(nfrDataProvisions);
     await this.nfrDataVariableRepository.save(nfrDataVariables);
 
-    return nfrData;
+    return updatedNfrData;
   }
 
   async updateNfrData(
-    dtid: number,
     nfrDataDto: CreateNFRDataDto,
+    nfrData: NFRData,
     provisionArray: { provision_id: number; free_text: string }[],
     variableArray: { variable_id: number; variable_value: string }[]
   ): Promise<NFRData> {
-    const nfrData = await this.nfrDataRepository.findOne({
-      where: { dtid },
-      relations: [
-        "nfr_data_variables",
-        "nfr_data_provisions",
-        "nfr_data_variables.nfr_variable",
-        "nfr_data_provisions.nfr_provision",
-      ],
-    });
-
-    if (!nfrData) {
-      throw new NotFoundException(`NFRData with dtid ${dtid} not found`);
-    }
-
     // Update NFRData entity
     nfrData.variant_name = nfrDataDto.variant_name;
     nfrData.template_id = nfrDataDto.template_id;
@@ -129,7 +122,6 @@ export class NFRDataService {
       const nfrDataProvision = nfrData.nfr_data_provisions.find(
         (p) => p.nfr_provision.id === provision.provision_id
       );
-      console.log(nfrDataProvision);
 
       if (
         nfrDataProvision &&
@@ -139,13 +131,10 @@ export class NFRDataService {
         nfrDataProvision.provision_free_text = provision.free_text;
         await this.nfrDataProvisionRepository.save(nfrDataProvision);
       } else if (!nfrDataProvision) {
-        console.log("creating a new nfr data provision");
         // No data found for this specific provision so create a new entry in NFRDataProvision
         const nfrProvision = await this.nfrProvisionRepository.findOneBy({
           id: provision.provision_id,
         });
-        console.log("provision.provision_id: " + provision.provision_id);
-        console.log(nfrProvision);
         const newNfrDataProvision: NFRDataProvision =
           this.nfrDataProvisionRepository.create({
             nfr_provision: nfrProvision,
@@ -185,8 +174,52 @@ export class NFRDataService {
         await this.nfrDataVariableRepository.save(newNfrDataVariable);
       }
     }
+    await this.deleteDataVarsAndProvs(nfrData, provisionArray, variableArray);
 
     return updatedNfrData;
+  }
+
+  async deleteDataVarsAndProvs(
+    nfrData: NFRData,
+    provisionArray: { provision_id: number; free_text: string }[],
+    variableArray: { variable_id: number; variable_value: string }[]
+  ) {
+    // Delete data provisions that have been removed by the user
+    const oldProvisionIds = nfrData.nfr_data_provisions.map(
+      (dataProvision) => dataProvision.nfr_provision.id
+    );
+    const newProvisionIds = provisionArray.map(
+      ({ provision_id }) => provision_id
+    );
+    const provisionsToDelete = oldProvisionIds.filter(
+      (item) => !newProvisionIds.includes(item)
+    );
+    const nfrDataProvisionsToDelete = nfrData.nfr_data_provisions
+      .filter((dataProvision) =>
+        provisionsToDelete.includes(dataProvision.nfr_provision.id)
+      )
+      .map((dataProvision) => dataProvision.id);
+    if (nfrDataProvisionsToDelete.length > 0) {
+      await this.nfrDataProvisionRepository.delete(nfrDataProvisionsToDelete);
+    }
+
+    // Delete data variables that have been removed by the user
+    const oldVariableIds = nfrData.nfr_data_variables.map(
+      (dataVariable) => dataVariable.nfr_variable.id
+    );
+    const newVariableIds = variableArray.map(({ variable_id }) => variable_id);
+    const variablesToDelete = oldVariableIds.filter(
+      (item) => !newVariableIds.includes(item)
+    );
+    const nfrDataVariablesToDelete = nfrData.nfr_data_variables
+      .filter((dataVariable) =>
+        variablesToDelete.includes(dataVariable.nfr_variable.id)
+      )
+      .map((dataVariable) => dataVariable.id);
+    if (nfrDataVariablesToDelete.length > 0) {
+      await this.nfrDataVariableRepository.delete(nfrDataVariablesToDelete);
+    }
+    return null;
   }
 
   async findAll(): Promise<NFRData[]> {

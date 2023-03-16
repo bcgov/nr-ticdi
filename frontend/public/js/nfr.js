@@ -185,16 +185,27 @@ provisionTable = $("#provisionTable").DataTable({
     }
     if (reloadingTables) {
       // reloadingTables will be false for preload and true after the user changes the dropdown select
+      const gmUrl = `${window.location.origin}/report/get-group-max/${variantName}`;
       const spUrl = `${
         window.location.origin
       }/report/nfr-provisions/${encodeURI(variantName)}/-1`;
       const vUrl = `${
         window.location.origin
       }/report/get-provision-variables/${encodeURI(variantName)}/-1`;
-      selectedProvisionsTable.ajax.url(spUrl).load();
-      selectedProvisionsTable.draw();
-      variableTable.ajax.url(vUrl).load();
-      variableTable.draw();
+      fetch(`/report/get-group-max/${variantName}`)
+        .then((res) => {
+          return res.json();
+        })
+        .then((resJson) => {
+          groupMaxJsonArray = resJson;
+          updateGroupSelect(groupMaxJsonArray);
+          groupMaxTable.ajax.url(gmUrl).load();
+          groupMaxTable.draw();
+          selectedProvisionsTable.ajax.url(spUrl).load();
+          selectedProvisionsTable.draw();
+          variableTable.ajax.url(vUrl).load();
+          variableTable.draw();
+        });
     }
   },
   initComplete: function (settings, json) {
@@ -602,4 +613,18 @@ function getVariableJson(provisionIds) {
     }
   });
   return data;
+}
+
+function updateGroupSelect(groupMaxJsonArray) {
+  // repopulate the group select using the new groupMaxJsonArray
+  const selectElement = document.getElementById("group-select");
+  selectElement.innerHTML = "";
+  groupMaxJsonArray.forEach((item) => {
+    const optionElement = document.createElement("option");
+    optionElement.value = item.provision_group;
+    optionElement.text = `${item.provision_group} - ${item.provision_group_text}`;
+    selectElement.appendChild(optionElement);
+  });
+  // this will update groupMaxNum
+  filterRows();
 }

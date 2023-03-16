@@ -182,3 +182,11 @@ td input[type="checkbox"] {
     transform: rotate(360deg);
   }
 }
+
+#group-select option {
+  background-color: lightgoldenrodyellow;
+}
+
+#group-select option.viewed {
+  background-color: lightgreen;
+}

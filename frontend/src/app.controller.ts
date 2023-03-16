@@ -84,21 +84,6 @@ export class AppController {
   }
 
   /**
-   * Redirects to the LUR report page
-   *
-   * @param res
-   * @param id
-   * @param docname
-   * @returns
-   */
-  @Get("dtid/:id/:docname")
-  @UseFilters(AuthenticationFilter)
-  @UseGuards(AuthenticationGuard)
-  redirect(@Res() res, @Param("id") id: string, @Param("docname") docname) {
-    return res.redirect(`/lur/dtid/${id}`);
-  }
-
-  /**
    * Renders the LUR report page
    *
    * @param session
@@ -106,7 +91,7 @@ export class AppController {
    * @param docname
    * @returns
    */
-  @Get("lur/dtid/:id")
+  @Get("dtid/:id")
   @UseFilters(AuthenticationFilter)
   @UseGuards(AuthenticationGuard)
   @Render("index")
@@ -196,7 +181,7 @@ export class AppController {
    * @param docname
    * @returns
    */
-  @Get("nfr/dtid/:dtid/:variant")
+  @Get("dtid/:dtid/:variant")
   @UseFilters(AuthenticationFilter)
   @UseGuards(AuthenticationGuard)
   @Render("nfr")
@@ -211,6 +196,9 @@ export class AppController {
     if (hasParams) {
       const urlWithoutParams = req.path;
       res.redirect(301, urlWithoutParams);
+    } else if (!NFR_VARIANTS_ARRAY.includes(variantName)) {
+      const redirectUrl = `/dtid/${dtid}`;
+      res.redirect(301, redirectUrl);
     } else {
       let isAdmin = false;
       if (

@@ -203,6 +203,36 @@ objects:
                     secretKeyRef: 
                       name: cdogs
                       key: cdogs_token_endpoint
+                - name: users_api_base_url
+                  valueFrom:
+                    secretKeyRef: 
+                      name: css-users-api
+                      key: users_api_base_url
+                - name: css_environment
+                  valueFrom:
+                    secretKeyRef: 
+                      name: css-users-api
+                      key: css_environment
+                - name: integration_id
+                  valueFrom:
+                    secretKeyRef: 
+                      name: css-users-api
+                      key: integration_id
+                - name: users_api_token_url
+                  valueFrom:
+                    secretKeyRef: 
+                      name: css-users-api
+                      key: users_api_token_url
+                - name: users_api_client_id
+                  valueFrom:
+                    secretKeyRef: 
+                      name: css-users-api
+                      key: users_api_client_id
+                - name: users_api_client_secret
+                  valueFrom:
+                    secretKeyRef: 
+                      name: css-users-api
+                      key: users_api_client_secret
               ports:
                 - containerPort: 3000
                   protocol: TCP

@@ -14,6 +14,8 @@ if (Array.isArray(groupMaxJsonArray) && groupMaxJsonArray.length > 0) {
 }
 let groupMaxTable;
 let provisionTable, variableTable, selectedProvisionsTable;
+// color css for provision group dropdown
+$("#group-select").find("option:first-child").addClass("viewed");
 
 const nfrDataId = $("#nfrDataId").val();
 $(".dataSection dd").each(function () {
@@ -384,6 +386,8 @@ $("#documentVariantId").on("change", function () {
 // event listener for the Select A Group dropdown
 $("#group-select").on("change", function () {
   const selectedGroup = $(this).val();
+  const selectedOption = $(this).find("option:selected");
+  selectedOption.addClass("viewed");
   provisionTable.rows().every(function () {
     const provisionGroup = this.data().provision_group;
     if (selectedGroup == "" || provisionGroup == selectedGroup) {
@@ -625,6 +629,8 @@ function updateGroupSelect(groupMaxJsonArray) {
     optionElement.text = `${item.provision_group} - ${item.provision_group_text}`;
     selectElement.appendChild(optionElement);
   });
+  // color the first option green
+  $("#group-select").find("option:first-child").addClass("viewed");
   // this will update groupMaxNum
   filterRows();
 }

@@ -24,9 +24,9 @@ export class AppService {
       groupCount.count == 0 &&
       variantCount.count == 0
     ) {
-      const sql = fs.readFileSync("./utils/db/init-db.sql", "utf8");
-      await queryRunner.query(sql);
-      await queryRunner.release();
+      //const sql = fs.readFileSync("./utils/db/init-db.sql", "utf8");
+      //await queryRunner.query(sql);
+      //await queryRunner.release();
     }
   }
 

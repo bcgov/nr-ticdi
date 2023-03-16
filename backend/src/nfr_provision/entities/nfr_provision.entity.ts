@@ -54,7 +54,10 @@ export class NFRProvision {
     }
   )
   provision_variables: NFRProvisionVariable[];
-  @ManyToMany(() => NFRProvisionVariant, { nullable: true, cascade: true })
+  @ManyToMany(() => NFRProvisionVariant, {
+    nullable: true,
+    eager: true,
+  })
   @JoinTable()
   provision_variant: NFRProvisionVariant[];
   @OneToMany(

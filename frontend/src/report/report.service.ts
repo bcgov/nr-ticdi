@@ -462,4 +462,11 @@ export class ReportService {
       return res.data;
     });
   }
+
+  async getVariantsWithIds() {
+    const url = `${hostname}:${port}/nfr-provision/get-variants-with-ids/0`;
+    return axios.get(url).then((res) => {
+      return res.data;
+    });
+  }
 }

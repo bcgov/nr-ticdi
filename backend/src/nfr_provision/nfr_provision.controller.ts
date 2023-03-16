@@ -73,6 +73,11 @@ export class NFRProvisionController {
     );
   }
 
+  @Get("get-variants-with-ids/:id")
+  getVariantsWithIds() {
+    return this.nfrProvisionService.getVariantsWithIds();
+  }
+
   @Delete(":id")
   remove(@Param("id") id: number) {
     return this.nfrProvisionService.remove(id);

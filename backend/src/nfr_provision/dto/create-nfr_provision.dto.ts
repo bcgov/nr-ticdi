@@ -9,6 +9,8 @@ export class CreateNFRProvisionDto extends PickType(NFRProvisionDto, [
   "max",
   "provision_name",
   "free_text",
+  "help_text",
   "category",
+  "variants",
   "create_userid",
 ] as const) {}

@@ -382,6 +382,10 @@ export class AppController {
       process.env.ticdi_environment == "DEVELOPMENT"
         ? "DEVELOPMENT - " + PAGE_TITLES.MANAGE_TEMPLATES
         : PAGE_TITLES.MANAGE_TEMPLATES;
+    let variantJsonArray = [];
+    if (reportIndex == 2) {
+      variantJsonArray = await this.reportService.getVariantsWithIds();
+    }
     return {
       title: title,
       idirUsername: session.data.activeAccount
@@ -389,6 +393,7 @@ export class AppController {
         : "",
       primaryContactName: "",
       displayAdmin: displayAdmin,
+      variantJsonArray: variantJsonArray,
     };
   }
 

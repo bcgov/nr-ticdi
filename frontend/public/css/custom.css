@@ -190,3 +190,11 @@ td input[type="checkbox"] {
 #group-select option.viewed {
   background-color: lightgreen;
 }
+
+.variant-name {
+  display: inline-block;
+  width: 80%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

@@ -410,8 +410,10 @@ export class AdminService {
       "max",
       "provision_name",
       "free_text",
+      "help_text",
       "category",
       "active_flag",
+      "variants",
     ];
     const url = `${hostname}:${port}/nfr-provision`;
     const nfrProvisions = await axios
@@ -461,8 +463,10 @@ export class AdminService {
       provision_group_text: string;
       max: number;
       provision: string;
-      freeText: string;
+      free_text: string;
+      help_text: string;
       category: string;
+      variants: number[];
     },
     create_userid: string
   ) {
@@ -482,8 +486,10 @@ export class AdminService {
       provision_group_text: string;
       max: number;
       provision: string;
-      freeText: string;
+      free_text: string;
+      help_text: string;
       category: string;
+      variants: number[];
     },
     update_userid: string
   ) {

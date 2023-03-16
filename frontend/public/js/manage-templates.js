@@ -112,14 +112,16 @@ $(document).ready(function () {
         { data: "max" },
         { data: "provision_name" },
         { data: "free_text" },
+        { data: "help_text" },
         { data: "category" },
         { data: "active_flag" },
         { data: "edit" },
         { data: "id" },
+        { data: "variants" },
       ],
       columnDefs: [
         {
-          targets: [0, 1, 2, 3, 4, 5, 6, 7, 8],
+          targets: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
           render: function (data, type, row, meta) {
             if (type === "display") {
               var columnTypes = [
@@ -128,23 +130,30 @@ $(document).ready(function () {
                 "max",
                 "provision_name",
                 "free_text",
+                "help_text",
                 "category",
                 "active_flag",
                 "edit",
                 "id",
+                "variants",
               ];
               var columnType = columnTypes[meta.col];
               var id = row["id"];
               var group = row["provision_group"];
               var max = row["max"];
+              var variants = JSON.stringify(row["variants"]);
 
               if (columnType === "active_flag") {
                 const checked = data === true ? "checked" : "";
                 return `<input type='checkbox' id='active-${id}' data-id='${id}' data-group='${group}' data-max='${max}' name='radioActive' ${checked}>`;
-              } else if (columnType === "id") {
+              } else if (
+                columnType === "help_text" ||
+                columnType === "id" ||
+                columnType === "variants"
+              ) {
                 return `<input type='hidden' id='${columnType}-${id}' value='${data}' />`;
               } else if (columnType === "edit") {
-                return `<a href="#" data-id="${id}" onclick="openEditModal.call(this)">Edit</a>`;
+                return `<a href="#" data-id="${id}" data-variants="${variants}" onclick="openEditModal.call(this)">Edit</a>`;
               } else {
                 return `<input type='text' id='${columnType}-${id}' value='${data}' readonly style='color: gray; width: 100%;' />`;
               }
@@ -154,12 +163,12 @@ $(document).ready(function () {
           },
         },
         {
-          targets: [6],
+          targets: [7],
           className: "text-center",
           orderDataType: "dom-checkbox",
         },
         {
-          targets: [7, 8],
+          targets: [8, 9, 10],
           orderable: false,
         },
       ],
@@ -354,7 +363,15 @@ function addProvision() {
   const provision_group_text = $("#addProvisionGroupText").val();
   const provision_name = $("#addProvisionName").val();
   const free_text = $("#addProvisionFreeText").val();
+  const help_text = $("#addProvisionHelpText").val();
   const category = $("#addProvisionCategory").val();
+  const variantCheckboxes = document.querySelectorAll(".addProvisionVariant");
+  const variants = [];
+  variantCheckboxes.forEach((checkbox) => {
+    if (checkbox.checked) {
+      variants.push(checkbox.dataset.id);
+    }
+  });
   const data = JSON.stringify({
     type: type,
     provision_group: provision_group,
@@ -362,7 +379,9 @@ function addProvision() {
     provision_name: provision_name,
     provision_group_text: provision_group_text,
     free_text: free_text,
+    help_text: help_text,
     category: category,
+    variants: variants,
   });
   const matchingRow = $("#groupMaxTable")
     .find("tr td:first-child")
@@ -428,7 +447,15 @@ function confirmAddProvision() {
   const max = $("#addProvisionMax").val();
   const provision_name = $("#addProvisionName").val();
   const free_text = $("#addProvisionFreeText").val();
+  const help_text = $("#addProvisionHelpText").val();
   const category = $("#addProvisionCategory").val();
+  const variantCheckboxes = document.querySelectorAll(".addProvisionVariant");
+  const variants = [];
+  variantCheckboxes.forEach((checkbox) => {
+    if (checkbox.checked) {
+      variants.push(checkbox.dataset.id);
+    }
+  });
   const data = JSON.stringify({
     type: type,
     provision_group: provision_group,
@@ -436,7 +463,9 @@ function confirmAddProvision() {
     max: max,
     provision_name: provision_name,
     free_text: free_text,
+    help_text: help_text,
     category: category,
+    category: variants,
   });
   fetch("admin/add-provision", {
     method: "POST",
@@ -510,7 +539,9 @@ function openEditModal() {
   const max = $(`#max-${provisionId}`).val();
   const provision_name = $(`#provision_name-${provisionId}`).val();
   const free_text = $(`#free_text-${provisionId}`).val();
+  const help_text = $(`#help_text-${provisionId}`).val();
   const category = $(`#category-${provisionId}`).val();
+  const variants = $(this).data("variants");
   let provision_group_text = "";
   const matchingRow = $("#groupMaxTable")
     .find("tr td:first-child")
@@ -536,7 +567,17 @@ function openEditModal() {
   $("#editProvisionMax").val(max);
   $("#editProvisionName").val(provision_name);
   $("#editProvisionFreeText").val(free_text);
+  $("#editProvisionHelpText").val(help_text);
   $("#editProvisionCategory").val(category);
+  const variantCheckboxes = document.querySelectorAll(".editProvisionVariant");
+  variantCheckboxes.forEach((checkbox) => {
+    const variantId = parseInt(checkbox.dataset.id);
+    if (variants.includes(variantId)) {
+      checkbox.checked = true;
+    } else {
+      checkbox.checked = false;
+    }
+  });
   $("#editProvisionModal").modal("toggle");
 }
 function editProvision() {
@@ -547,7 +588,15 @@ function editProvision() {
   const max = $("#editProvisionMax").val();
   const provision_name = $("#editProvisionName").val();
   const free_text = $("#editProvisionFreeText").val();
+  const help_text = $("#editProvisionHelpText").val();
   const category = $("#editProvisionCategory").val();
+  const variantCheckboxes = document.querySelectorAll(".editProvisionVariant");
+  const variants = [];
+  variantCheckboxes.forEach((checkbox) => {
+    if (checkbox.checked) {
+      variants.push(checkbox.dataset.id);
+    }
+  });
   const data = JSON.stringify({
     id: id,
     type: type,
@@ -556,7 +605,9 @@ function editProvision() {
     max: max,
     provision_name: provision_name,
     free_text: free_text,
+    help_text: help_text,
     category: category,
+    variants: variants,
   });
   const matchingRow = $("#groupMaxTable")
     .find("tr td:first-child")
@@ -623,7 +674,15 @@ function confirmEditProvision() {
   const max = $("#editProvisionMax").val();
   const provision_name = $("#editProvisionName").val();
   const free_text = $("#editProvisionFreeText").val();
+  const help_text = $("#editProvisionHelpText").val();
   const category = $("#editProvisionCategory").val();
+  const variantCheckboxes = document.querySelectorAll(".editProvisionVariant");
+  const variants = [];
+  variantCheckboxes.forEach((checkbox) => {
+    if (checkbox.checked) {
+      variants.push(checkbox.dataset.id);
+    }
+  });
   const data = JSON.stringify({
     id: id,
     type: type,
@@ -632,7 +691,9 @@ function confirmEditProvision() {
     max: max,
     provision_name: provision_name,
     free_text: free_text,
+    help_text: help_text,
     category: category,
+    variants: variants,
   });
   fetch("admin/update-provision", {
     method: "POST",

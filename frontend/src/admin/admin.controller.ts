@@ -234,8 +234,10 @@ export class AdminController {
       provision_group_text: string;
       max: number;
       provision: string;
-      freeText: string;
+      free_text: string;
+      help_text: string;
       category: string;
+      variants: number[];
     },
     @Session() session: { data?: SessionData }
   ) {
@@ -253,8 +255,10 @@ export class AdminController {
       provision_group_text: string;
       max: number;
       provision: string;
-      freeText: string;
+      free_text: string;
+      help_text: string;
       category: string;
+      variants: number[];
     },
     @Session() session: { data?: SessionData }
   ) {

@@ -22,8 +22,10 @@ export class NFRProvisionService {
   ) {}
 
   async create(nfrProvision: CreateNFRProvisionDto): Promise<NFRProvision> {
+    const variantIds = nfrProvision.variants;
     const provision_group = Math.floor(nfrProvision.provision_group);
     const provision_group_text = nfrProvision.provision_group_text;
+    delete nfrProvision["variants"];
     delete nfrProvision["provision_group"];
     delete nfrProvision["provision_group_text"];
     nfrProvision.max = Math.floor(nfrProvision.max);
@@ -44,19 +46,22 @@ export class NFRProvisionService {
     const nfrProvisionGroup = await this.nfrProvisionGroupRepository.findOneBy({
       provision_group,
     });
-    const newProvision = this.nfrProvisionRepository.create({
+    const nfrProvisionVariants = await this.nfrProvisionVariantRepository.find({
+      where: { id: In(variantIds) },
+    });
+    const newProvision: NFRProvision = this.nfrProvisionRepository.create({
       ...nfrProvision,
       provision_group: nfrProvisionGroup,
+      provision_variant: nfrProvisionVariants,
     });
     return this.nfrProvisionRepository.save(newProvision);
   }
 
-  async update(
-    id: number,
-    nfrProvision: UpdateNFRProvisionDto
-  ): Promise<UpdateResult> {
+  async update(id: number, nfrProvision: UpdateNFRProvisionDto): Promise<any> {
+    const variantIds = nfrProvision.variants;
     const provision_group = Math.floor(nfrProvision.provision_group);
     const provision_group_text = nfrProvision.provision_group_text;
+    delete nfrProvision["variants"];
     delete nfrProvision["provision_group"];
     delete nfrProvision["provision_group_text"];
     nfrProvision.max = Math.floor(nfrProvision.max);
@@ -68,23 +73,43 @@ export class NFRProvisionService {
     const nfrProvisionGroup = await this.nfrProvisionGroupRepository.findOneBy({
       provision_group,
     });
-    const updatedProvision = this.nfrProvisionRepository.create({
-      ...nfrProvision,
-      provision_group: nfrProvisionGroup,
+    const nfrProvisionVariants = await this.nfrProvisionVariantRepository.find({
+      where: { id: In(variantIds) },
     });
-    return this.nfrProvisionRepository.update(id, updatedProvision);
+    const existingProvision: NFRProvision =
+      await this.nfrProvisionRepository.findOneBy({ id });
+    existingProvision.type = nfrProvision.type;
+    existingProvision.provision_name = nfrProvision.provision_name;
+    existingProvision.free_text = nfrProvision.free_text;
+    existingProvision.help_text = nfrProvision.help_text;
+    existingProvision.category = nfrProvision.category;
+    existingProvision.update_userid = nfrProvision.update_userid;
+    const updatedProvision = this.nfrProvisionRepository.create({
+      ...existingProvision,
+      provision_group: nfrProvisionGroup,
+      provision_variant: nfrProvisionVariants,
+    });
+    return this.nfrProvisionRepository.save(updatedProvision);
   }
 
-  async findAll(): Promise<NFRProvision[]> {
+  async findAll(): Promise<any[]> {
     const nfrProvisions = await this.nfrProvisionRepository.find({
-      relations: ["provision_group"],
+      relations: ["provision_group", "provision_variant"],
     });
-    nfrProvisions.forEach((nfrProvision) => {
+    return nfrProvisions.map((nfrProvision) => {
+      const provisionVariantIds = nfrProvision.provision_variant.map(
+        (provisionVariant) => provisionVariant.id
+      );
+
       delete nfrProvision.provision_group["id"];
+      delete nfrProvision["provision_variant"];
+
+      return {
+        ...nfrProvision,
+        ...nfrProvision.provision_group,
+        variants: provisionVariantIds,
+      };
     });
-    return nfrProvisions.map((nfrProvision) =>
-      Object.assign(nfrProvision, nfrProvision.provision_group)
-    );
   }
 
   async findById(provisionId: number): Promise<NFRProvision> {
@@ -223,6 +248,14 @@ export class NFRProvisionService {
       where: { provision_variant: variant, mandatory: true },
     });
     return provisions.map((provision) => provision.id);
+  }
+
+  async getVariantsWithIds(): Promise<{ id: number; variant_name: string }[]> {
+    const variants = await this.nfrProvisionVariantRepository.find();
+    const variantMap = variants.map((variant) => {
+      return { id: variant.id, variant_name: variant.variant_name };
+    });
+    return variantMap;
   }
 
   async remove(id: number): Promise<{ deleted: boolean; message?: string }> {

@@ -2,6 +2,7 @@ const dtid = +$("#dtid").text();
 let preloadedProvisions = false;
 let preloadedSelected = false;
 let preloadedVariables = false;
+let reloadingTables = false;
 const groupMaxJsonInput = document.getElementById("groupMaxJson");
 let groupMaxJsonArray = JSON.parse(groupMaxJsonInput.value);
 groupMaxJsonArray = JSON.parse(groupMaxJsonArray);
@@ -122,7 +123,10 @@ provisionTable = $("#provisionTable").DataTable({
   ],
   rowCallback: function (row, data, index) {
     $(row).attr("data-id", data.id);
-    if (!enabledProvisions.includes(data.id) && !preloadedProvisions) {
+    if (
+      !enabledProvisions.includes(data.id) &&
+      (!preloadedProvisions || reloadingTables)
+    ) {
       $(row).hide();
     }
   },
@@ -178,6 +182,19 @@ provisionTable = $("#provisionTable").DataTable({
             });
         }
       });
+    }
+    if (reloadingTables) {
+      // reloadingTables will be false for preload and true after the user changes the dropdown select
+      const spUrl = `${
+        window.location.origin
+      }/report/nfr-provisions/${encodeURI(variantName)}/-1`;
+      const vUrl = `${
+        window.location.origin
+      }/report/get-provision-variables/${encodeURI(variantName)}/-1`;
+      selectedProvisionsTable.ajax.url(spUrl).load();
+      selectedProvisionsTable.draw();
+      variableTable.ajax.url(vUrl).load();
+      variableTable.draw();
     }
   },
   initComplete: function (settings, json) {
@@ -249,7 +266,10 @@ selectedProvisionsTable = $("#selectedProvisionsTable").DataTable({
   order: [[1, "asc"]],
   rowCallback: function (row, data) {
     $(row).attr("data-id", data.id);
-    if (!enabledProvisions.includes(data.id) && !preloadedSelected) {
+    if (
+      !enabledProvisions.includes(data.id) &&
+      (!preloadedSelected || reloadingTables)
+    ) {
       $(row).hide();
     }
   },
@@ -311,7 +331,10 @@ variableTable = $("#variableTable").DataTable({
     $(row).addClass(`variable-provision-row-${data.provisionId}`);
     $(row).attr("data-id", data.provisionId);
     $(row).attr("data-variable_id", data.id);
-    if (!enabledProvisions.includes(data.provisionId) && !preloadedVariables) {
+    if (
+      !enabledProvisions.includes(data.provisionId) &&
+      (!preloadedVariables || reloadingTables)
+    ) {
       $(row).hide();
     }
   },
@@ -324,6 +347,27 @@ variableTable = $("#variableTable").DataTable({
 // Don't reload the page when Save For Later button is clicked
 document.querySelector("#saveNfr").addEventListener("click", function (event) {
   event.preventDefault();
+});
+
+$("#documentVariantId").on("change", function () {
+  variantName = $(this).val();
+  reloadingTables = true;
+  const pUrl = `${window.location.origin}/report/nfr-provisions/${encodeURI(
+    variantName
+  )}/-1`;
+  fetch(`/report/enabled-provisions/${encodeURI(variantName)}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    responseType: "application/json",
+  })
+    .then((res) => res.json())
+    .then((resJson) => {
+      mandatoryProvisions = resJson;
+      enabledProvisions = mandatoryProvisions;
+      provisionTable.ajax.url(pUrl).load();
+    });
 });
 
 // event listener for the Select A Group dropdown

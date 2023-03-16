@@ -455,4 +455,11 @@ export class ReportService {
         return res.data;
       });
   }
+
+  async getEnabledProvisionsByVariant(variantName: string) {
+    const url = `${hostname}:${port}/nfr-provision/get-mandatory-provisions/variant/${variantName}`;
+    return axios.get(url).then((res) => {
+      return res.data;
+    });
+  }
 }

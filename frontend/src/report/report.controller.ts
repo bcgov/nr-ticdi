@@ -169,4 +169,9 @@ export class ReportController {
       idir_username
     );
   }
+
+  @Get("enabled-provisions/:variantName")
+  getEnabledProvisionsByVariant(@Param("variantName") variantName: string) {
+    return this.reportService.getEnabledProvisionsByVariant(variantName);
+  }
 }

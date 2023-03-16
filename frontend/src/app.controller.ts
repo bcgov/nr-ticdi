@@ -189,144 +189,6 @@ export class AppController {
   }
 
   /**
-   * This page is used with the search page.
-   *
-   * @param session
-   * @returns
-   */
-  @Get("nfr")
-  @UseFilters(AuthenticationFilter)
-  @UseGuards(AuthenticationGuard)
-  @Render("nfr")
-  async displayNofr(@Session() session: { data?: SessionData }) {
-    const nfrDataId = session.data.selected_document
-      ? session.data.selected_document.nfr_id
-      : 0;
-    let isAdmin = false;
-    if (
-      session.data &&
-      session.data.activeAccount &&
-      session.data.activeAccount.client_roles
-    ) {
-      for (let role of session.data.activeAccount.client_roles) {
-        if (role == "ticdi_admin") {
-          isAdmin = true;
-        }
-      }
-    }
-    const title =
-      process.env.ticdi_environment == "DEVELOPMENT"
-        ? "DEVELOPMENT - " + PAGE_TITLES.NOFR
-        : PAGE_TITLES.NOFR;
-    const displayAdmin = isAdmin ? "Administration" : "-";
-
-    let ttlsJSON, primaryContactName, groupMaxJsonArray, nfrData;
-    try {
-      const nfrDataObject = await this.reportService.getNfrData(nfrDataId);
-      nfrData = nfrDataObject.nfrData;
-      const provisionIds = nfrDataObject.provisionIds;
-      const variableIds = nfrDataObject.variableIds;
-      groupMaxJsonArray = await this.reportService.getGroupMaxByVariant(
-        nfrData.variant_name
-      );
-      const mandatoryProvisionIds =
-        await this.reportService.getMandatoryProvisionsByVariant(
-          nfrData.variant_name
-        );
-      const combinedProvisions = provisionIds.concat(mandatoryProvisionIds);
-      const enabledProvisions = combinedProvisions.filter(
-        (item, index) => combinedProvisions.indexOf(item) === index
-      );
-      await this.ttlsService.setWebadeToken();
-      const response: any = await firstValueFrom(
-        this.ttlsService.callHttp(nfrData.dtid)
-      )
-        .then((res) => {
-          return res;
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-      ttlsJSON = await this.ttlsService.formatNFRData(response);
-      primaryContactName = ttlsJSON.licenceHolderName;
-      ttlsJSON["interestedParties"] = [
-        {
-          firstName: "First",
-          middleName: "Middle",
-          lastName: "Last",
-          address: "123 fake street",
-        },
-        {
-          firstName: "First2",
-          middleName: "Middle2",
-          lastName: "Last2",
-          address: "346 Miron Drive",
-        },
-      ];
-      let selectedVariant = 0;
-      switch (nfrData.variant_name) {
-        case NFR_VARIANTS.default: {
-          selectedVariant = 0;
-          break;
-        }
-        case NFR_VARIANTS.delayed: {
-          selectedVariant = 1;
-          break;
-        }
-        case NFR_VARIANTS.no_fees: {
-          selectedVariant = 2;
-          break;
-        }
-        case NFR_VARIANTS.survey_required: {
-          selectedVariant = 3;
-          break;
-        }
-        case NFR_VARIANTS.to_obtain_survey: {
-          selectedVariant = 4;
-          break;
-        }
-      }
-      return {
-        title: title,
-        idirUsername: session.data.activeAccount
-          ? session.data.activeAccount.idir_username
-          : "",
-        primaryContactName: primaryContactName,
-        displayAdmin: displayAdmin,
-        message: ttlsJSON,
-        groupMaxJsonArray: groupMaxJsonArray,
-        documentTypes: NFR_VARIANTS_ARRAY,
-        nfrDataId: nfrData.id,
-        template_id: nfrData.template_id,
-        variant_name: nfrData.variant_name,
-        selectedVariant: selectedVariant,
-        enabledProvisionList: enabledProvisions,
-        prdid: ttlsJSON.id,
-      };
-    } catch (err) {
-      console.log(err);
-      return {
-        title: title,
-        idirUsername: session.data.activeAccount
-          ? session.data.activeAccount.idir_username
-          : "",
-        primaryContactName: primaryContactName ? primaryContactName : null,
-        displayAdmin: displayAdmin,
-        message: ttlsJSON ? ttlsJSON : null,
-        groupMaxJsonArray: groupMaxJsonArray ? groupMaxJsonArray : null,
-        documentTypes: NFR_VARIANTS_ARRAY,
-        nfrDataId: nfrData ? nfrData.id : null,
-        template_id: nfrData ? nfrData.template_id : null,
-        variant_name: nfrData ? nfrData.variant_name : null,
-        selectedVariant: 0,
-        enabledProvisionList: [],
-        prdid: ttlsJSON ? ttlsJSON.id : null,
-        error: err,
-      };
-    }
-  }
-
-  /**
    * Renders the NFR report page
    *
    * @param session
@@ -334,13 +196,13 @@ export class AppController {
    * @param docname
    * @returns
    */
-  @Get("nfr/dtid/:id/:variant")
+  @Get("nfr/dtid/:dtid/:variant")
   @UseFilters(AuthenticationFilter)
   @UseGuards(AuthenticationGuard)
   @Render("nfr")
   async findNofr(
     @Session() session: { data?: SessionData },
-    @Param("id") id: number,
+    @Param("dtid") dtid: number,
     @Param("variant") variantName: string,
     @Req() req: Request,
     @Res() res: Response
@@ -370,13 +232,25 @@ export class AppController {
       const groupMaxJsonArray = await this.reportService.getGroupMaxByVariant(
         variantName
       );
-      const mandatoryProvisionIds =
-        await this.reportService.getMandatoryProvisionsByVariant(variantName);
-      let ttlsJSON, primaryContactName;
+      let ttlsJSON, primaryContactName, nfrData;
       try {
+        const nfrDataObject = await this.reportService.getNfrDataByDtid(dtid);
+        nfrData = nfrDataObject.nfrData;
+        const provisionIds = nfrDataObject.provisionIds
+          ? nfrDataObject.provisionIds
+          : [];
+        const variableIds = nfrDataObject.variableIds
+          ? nfrDataObject.variableIds
+          : [];
+        const mandatoryProvisionIds =
+          await this.reportService.getMandatoryProvisionsByVariant(variantName);
+        const combinedProvisions = provisionIds.concat(mandatoryProvisionIds);
+        const enabledProvisions = combinedProvisions.filter(
+          (item, index) => combinedProvisions.indexOf(item) === index
+        );
         await this.ttlsService.setWebadeToken();
         const response: any = await firstValueFrom(
-          this.ttlsService.callHttp(id)
+          this.ttlsService.callHttp(dtid)
         )
           .then((res) => {
             return res;
@@ -433,9 +307,10 @@ export class AppController {
           message: ttlsJSON,
           groupMaxJsonArray: groupMaxJsonArray,
           documentTypes: NFR_VARIANTS_ARRAY,
+          nfrDataId: nfrData ? nfrData.id : -1,
           selectedVariant: selectedVariant,
-          enabledProvisionList: mandatoryProvisionIds,
-          prdid: ttlsJSON.id,
+          mandatoryProvisionList: mandatoryProvisionIds,
+          enabledProvisionList: enabledProvisions,
         };
       } catch (err) {
         console.log(err);
@@ -449,7 +324,7 @@ export class AppController {
           message: ttlsJSON ? ttlsJSON : null,
           groupMaxJsonArray: groupMaxJsonArray,
           documentTypes: NFR_VARIANTS_ARRAY,
-          prdid: ttlsJSON ? ttlsJSON.id : null,
+          nfrDataId: -1,
           enabledProvisionList: [],
           error: err,
         };
@@ -600,7 +475,7 @@ export class AppController {
     const displayAdmin = isAdmin ? "Administration" : "-";
     return {
       title: "404 Not Found",
-      message: "Sorry, the page you are looking for does not exist.",
+      message: "Sorry, that page does not exist.",
       displayAdmin: displayAdmin,
     };
   }

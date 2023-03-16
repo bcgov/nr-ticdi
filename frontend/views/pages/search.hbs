@@ -23,6 +23,7 @@
                             <th style="min-width: 80px">Status</th>
                             <th></th> {{!-- Active --}}
                             <th></th> {{!-- NFR_ID --}}
+                            <th></th> {{!-- variant_name --}}
                         </thead>
                         <tbody id="documentTableBody">
                             <tr></tr>
@@ -54,21 +55,24 @@
                     { data: "updated_date"},
                     { data: "status"},
                     { data: "active"},
-                    { data: "nfr_id" }
+                    { data: "nfr_id" },
+                    { data: "variant_name" }
                 ],
                 "columnDefs": [
                 {
-                    "targets": [0, 1, 2, 3, 4, 5, 6],
+                    "targets": [0, 1, 2, 3, 4, 5, 6, 7],
                     "render": function (data, type, row, meta) {
                     if (type === 'display') {
-                        var columnTypes = ["dtid", "version", "file_name", "updated_date", "status", "active", "nfr_id"];
+                        var columnTypes = ["dtid", "version", "file_name", "updated_date", "status", "active", "nfr_id", "variant_name"];
                         var columnType = columnTypes[meta.col];
                         var nfr_id = row["nfr_id"];
+                        var dtid = row["dtid"];
+                        var variant_name = row["variant_name"]
                         const checked = meta.row === 0 ? 'checked' : '';
 
                         if (columnType === "active") {
-                            return `<input type='hidden' id='${columnType}-${nfr_id}' data-id='${nfr_id}' name='radioActive' ${checked}>`;
-                        } else if (columnType === "nfr_id") {
+                            return `<input type='radio' id='${columnType}-${nfr_id}' data-id='${nfr_id}' data-dtid='${dtid}' data-variant_name='${variant_name}' name='radioActive' ${checked}>`;
+                        } else if (columnType === "nfr_id" || columnType == "variant_name") {
                             return `<input type='hidden' id='${columnType}-${nfr_id}' value='${data}' />`;
                         } else {
                             return `<input type='text' id='${columnType}-${nfr_id}' value='${data}' readonly style='color: gray; width: 100%;' />`;
@@ -84,7 +88,7 @@
                     className: 'text-center'
                 },
                 {
-                    targets: [5,6],
+                    targets: [5,6,7],
                     orderable: false
                 }],
                 "createdRow": function (row, data, dataIndex) {
@@ -147,11 +151,9 @@
                 });
         }
         async function openDocument() {
-            const nfr_id = $('input[name="radioActive"]:checked').data('id');
-            await fetch(`/admin/open-document/${nfr_id}`, {
-                method: 'GET'
-            }).then(() => window.location.href = '/nfr')
-            .catch((err) => console.log(err));
+            const dtid = $('input[name="radioActive"]:checked').data('dtid');
+            const variantName = $('input[name="radioActive"]:checked').data('variant_name');
+            window.location.href = `/nfr/dtid/${dtid}/${variantName}`
         }
     </script>
   {{/inline}}

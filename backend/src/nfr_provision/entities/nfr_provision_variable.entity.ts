@@ -17,18 +17,16 @@ import { NFRProvision } from "./nfr_provision.entity";
 export class NFRProvisionVariable {
   @PrimaryGeneratedColumn()
   id: number;
-
   @Column({ nullable: true })
   variable_name: string;
-
   @Column({ nullable: true })
   variable_value: string;
-
+  @Column({ nullable: true })
+  help_text: string;
   @ManyToOne(() => NFRProvision, (provision) => provision.provision_variables, {
     nullable: true,
   })
   provision: NFRProvision;
-
   @OneToMany(
     () => NFRDataVariable,
     (nfrDataVariable) => nfrDataVariable.nfr_variable,

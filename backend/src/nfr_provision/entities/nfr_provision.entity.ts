@@ -25,6 +25,8 @@ export class NFRProvision {
   @Column({ nullable: true })
   free_text: string;
   @Column({ nullable: true })
+  help_text: string;
+  @Column({ nullable: true })
   category: string;
   @Column({ nullable: true })
   active_flag: boolean;

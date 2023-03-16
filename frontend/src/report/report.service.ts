@@ -252,7 +252,7 @@ export class ReportService {
     await this.saveNFR(
       dtid,
       variantName,
-      "In Progress",
+      "Complete",
       provisionJson,
       variableJson,
       idirUsername
@@ -302,6 +302,7 @@ export class ReportService {
     const returnItems = [
       "type",
       "provision_name",
+      "help_text",
       "free_text",
       "category",
       "provision_group",
@@ -406,6 +407,19 @@ export class ReportService {
         return res.data;
       });
     return data;
+  }
+
+  async getNfrDataByDtid(dtid: number): Promise<any> {
+    const url = `${hostname}:${port}/nfr-data/dtid/${dtid}`;
+    return axios
+      .get(url, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      })
+      .then((res) => {
+        return res.data;
+      });
   }
 
   async saveNFR(

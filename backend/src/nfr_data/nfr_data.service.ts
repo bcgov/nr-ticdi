@@ -37,7 +37,9 @@ export class NFRDataService {
   ): Promise<NFRData> {
     const { dtid } = nfrDataDto;
     let nfrData: NFRData = await this.nfrDataRepository.findOneBy({ dtid });
+    console.log(nfrData);
     if (nfrData) {
+      console.log("found nfr data, updating it and returning");
       return await this.updateNfrData(
         dtid,
         nfrDataDto,
@@ -45,6 +47,7 @@ export class NFRDataService {
         variableArray
       );
     }
+    console.log("made it past the update statement");
     const documentTemplate =
       await this.documentTemplateService.findActiveByDocumentType(2); // 2 corresponds to NFR
     nfrDataDto["template_id"] = documentTemplate.id;
@@ -119,18 +122,37 @@ export class NFRDataService {
     nfrData.status = nfrDataDto.status;
     nfrData.update_userid = nfrDataDto.create_userid;
 
+    const updatedNfrData = await this.nfrDataRepository.save(nfrData);
+
     // Update NFRDataProvision entities
     for (const provision of provisionArray) {
       const nfrDataProvision = nfrData.nfr_data_provisions.find(
         (p) => p.nfr_provision.id === provision.provision_id
       );
+      console.log(nfrDataProvision);
 
       if (
         nfrDataProvision &&
         nfrDataProvision.provision_free_text != provision.free_text
       ) {
+        // Update an existing NFRDataProvision entry
         nfrDataProvision.provision_free_text = provision.free_text;
         await this.nfrDataProvisionRepository.save(nfrDataProvision);
+      } else if (!nfrDataProvision) {
+        console.log("creating a new nfr data provision");
+        // No data found for this specific provision so create a new entry in NFRDataProvision
+        const nfrProvision = await this.nfrProvisionRepository.findOneBy({
+          id: provision.provision_id,
+        });
+        console.log("provision.provision_id: " + provision.provision_id);
+        console.log(nfrProvision);
+        const newNfrDataProvision: NFRDataProvision =
+          this.nfrDataProvisionRepository.create({
+            nfr_provision: nfrProvision,
+            nfr_data: updatedNfrData,
+            provision_free_text: provision.free_text,
+          });
+        await this.nfrDataProvisionRepository.save(newNfrDataProvision);
       }
     }
 
@@ -144,12 +166,27 @@ export class NFRDataService {
         nfrDataVariable &&
         nfrDataVariable.data_variable_value != variable.variable_value
       ) {
+        // Update an existing NFRDataVariable entry
         nfrDataVariable.data_variable_value = variable.variable_value;
         await this.nfrDataVariableRepository.save(nfrDataVariable);
+      } else if (!nfrDataVariable) {
+        // No data found for this specific variable so create a new entry in NFRDataVariable
+        const nfrVariable = await this.nfrProvisionVariableRepository.findOneBy(
+          {
+            id: variable.variable_id,
+          }
+        );
+        const newNfrDataVariable: NFRDataVariable =
+          this.nfrDataVariableRepository.create({
+            nfr_variable: nfrVariable,
+            nfr_data: updatedNfrData,
+            data_variable_value: variable.variable_value,
+          });
+        await this.nfrDataVariableRepository.save(newNfrDataVariable);
       }
     }
 
-    return this.nfrDataRepository.save(nfrData);
+    return updatedNfrData;
   }
 
   async findAll(): Promise<NFRData[]> {
@@ -189,11 +226,33 @@ export class NFRDataService {
     }
   }
 
-  async findByDtid(dtid: number): Promise<NFRData> {
+  async findByDtid(dtid: number): Promise<{
+    nfrData: NFRData;
+    provisionIds: number[];
+    variableIds: number[];
+  }> {
     try {
-      return dtid != null
-        ? this.nfrDataRepository.findOneBy({ dtid: dtid })
-        : null;
+      const nfrData = await this.nfrDataRepository.findOne({
+        where: { dtid: dtid },
+        join: {
+          alias: "nfr_data",
+          leftJoinAndSelect: {
+            nfr_data_provisions: "nfr_data.nfr_data_provisions",
+            nfr_provision: "nfr_data_provisions.nfr_provision",
+            nfr_data_variables: "nfr_data.nfr_data_variables",
+            nfr_variable: "nfr_data_variables.nfr_variable",
+          },
+        },
+      });
+      const existingDataProvisions = nfrData.nfr_data_provisions;
+      const provisionIds = existingDataProvisions.map(
+        (dataProvision) => dataProvision.nfr_provision.id
+      );
+      const existingDataVariables = nfrData.nfr_data_variables;
+      const variableIds = existingDataVariables.map(
+        (dataVariable) => dataVariable.nfr_variable.id
+      );
+      return { nfrData, provisionIds, variableIds };
     } catch (err) {
       console.log(err);
       return null;

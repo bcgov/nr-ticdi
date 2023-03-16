@@ -121,13 +121,14 @@
                         <table id="provisionTable" style="width:100%">
                             <thead>
                                 <th>Type</th>
-                                <th style="min-width: 300px">Provision</th>
-                                <th style="min-width: 150px">Free Text</th>
+                                <th style="min-width: 450px">Provision</th>
+                                <th style="min-width: 200px">Help</th>
                                 <th style="min-width: 150px">Category</th>
                                 <th></th>
                                 <th style="display: none"></th>
                                 <th style="display: none"></th>
                                 <th style="display: none"></th>
+                                <th style="display: none"></th> 
                             </thead>
                         </table>
                         <br>
@@ -137,7 +138,7 @@
                                 <th>Type</th>
                                 <th>Group</th>
                                 <th style="min-width: 300px">Provision</th>
-                                <th style="min-width: 150px">Free Text</th>
+                                <th style="min-width: 300px">Free Text</th>
                                 <th style="min-width: 150px">Category</th>
                                 <th style="display: none"></th>
                                 <th style="display: none"></th>
@@ -151,7 +152,8 @@
                         <table id="variableTable" style="width:100%">
                             <thead>
                                 <th style="min-width: 300px">Variable</th>
-                                <th style="min-width: 300px">Value</th>
+                                <th style="min-width: 450px">Value</th>
+                                <th style="min-width: 150px">Help</th>
                                 <th style="display: none"></th>
                                 <th style="display: none"></th>
                             </thead>
@@ -162,11 +164,16 @@
                     </div>
                 </fieldset>
                 <div class="form-group row">
-                    <div class="col-md-4">
+                    <div class="col-sm-2">
                         <button id="saveNfr" class="btn btn-success" onclick="saveForLater()">Save for Later</button>
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-sm-2">
                         <button type="button" class="btn btn-primary" onclick="generateNFRReport()" id="genReport">Create</button>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-sm-2">
+                        <div id="savedMsg" class="m-0 p-2" style="display: none; color: green; font-size: small">DTID Details Saved</div>
                     </div>
                 </div>
                 <div style="display: none">
@@ -182,7 +189,8 @@
         $('#groupMaxJson').val(JSON.stringify('{{{json groupMaxJsonArray}}}'));
         $('#documentVariantId').prop("selectedIndex", {{ selectedVariant }});
         const currentUrl = window.location.pathname;
-        const preloadEnabledProvisions = [{{enabledProvisionList}}];
+        const enabledProvisions = [{{enabledProvisionList}}];
+        const mandatoryProvisions = [{{mandatoryProvisionList}}];
         let variantName = $('#documentVariantId').val();
         $('#variantName').val(variantName);
         console.log({{message.err}});

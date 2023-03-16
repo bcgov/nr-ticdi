@@ -8,10 +8,13 @@ export class NFRDataVariable {
   id: number;
   @ManyToOne(
     () => NFRProvisionVariable,
-    (nfr_variable) => nfr_variable.nfr_data_variables
+    (nfr_variable) => nfr_variable.nfr_data_variables,
+    { onDelete: "CASCADE" }
   )
   nfr_variable: NFRProvisionVariable;
-  @ManyToOne(() => NFRData, (nfr_data) => nfr_data.nfr_data_variables)
+  @ManyToOne(() => NFRData, (nfr_data) => nfr_data.nfr_data_variables, {
+    onDelete: "CASCADE",
+  })
   nfr_data: NFRData;
   @Column({ nullable: true })
   data_variable_value: string;

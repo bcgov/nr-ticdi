@@ -355,6 +355,7 @@ export class AdminService {
             status: nfr.status,
             active: template.active_flag,
             nfr_id: nfr.id,
+            variant_name: nfr.variant_name,
           });
         }
         j++;

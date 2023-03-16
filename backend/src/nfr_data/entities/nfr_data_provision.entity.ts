@@ -8,10 +8,13 @@ export class NFRDataProvision {
   id: number;
   @ManyToOne(
     () => NFRProvision,
-    (nfr_provision) => nfr_provision.nfr_data_provisions
+    (nfr_provision) => nfr_provision.nfr_data_provisions,
+    { onDelete: "CASCADE" }
   )
   nfr_provision: NFRProvision;
-  @ManyToOne(() => NFRData, (nfr_data) => nfr_data.nfr_data_provisions)
+  @ManyToOne(() => NFRData, (nfr_data) => nfr_data.nfr_data_provisions, {
+    onDelete: "CASCADE",
+  })
   nfr_data: NFRData;
   @Column({ nullable: true })
   provision_free_text: string;

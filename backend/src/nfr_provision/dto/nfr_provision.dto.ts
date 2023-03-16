@@ -4,7 +4,7 @@ export class NFRProvisionDto {
   provision_group?: number;
   provision_group_text?: string;
   max?: number;
-  provision_text?: string;
+  provision_name?: string;
   free_text?: string;
   category?: string;
   create_userid?: string;

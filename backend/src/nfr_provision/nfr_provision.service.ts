@@ -1,10 +1,12 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Repository, UpdateResult } from "typeorm";
+import { In, Repository, UpdateResult } from "typeorm";
 import { CreateNFRProvisionDto } from "./dto/create-nfr_provision.dto";
 import { NFRProvision } from "./entities/nfr_provision.entity";
 import { UpdateNFRProvisionDto } from "./dto/update-nfr_provision.dto";
 import { NFRProvisionGroup } from "./entities/nfr_provision_group.entity";
+import { NFRProvisionVariant } from "./entities/nfr_provision_variant.entity";
+import { NFRProvisionVariable } from "./entities/nfr_provision_variable.entity";
 
 @Injectable()
 export class NFRProvisionService {
@@ -12,7 +14,11 @@ export class NFRProvisionService {
     @InjectRepository(NFRProvision)
     private nfrProvisionRepository: Repository<NFRProvision>,
     @InjectRepository(NFRProvisionGroup)
-    private nfrProvisionGroupRepository: Repository<NFRProvisionGroup>
+    private nfrProvisionGroupRepository: Repository<NFRProvisionGroup>,
+    @InjectRepository(NFRProvisionVariant)
+    private nfrProvisionVariantRepository: Repository<NFRProvisionVariant>,
+    @InjectRepository(NFRProvisionVariable)
+    private nfrProvisionVariableRepository: Repository<NFRProvisionVariable>
   ) {}
 
   async create(nfrProvision: CreateNFRProvisionDto): Promise<NFRProvision> {
@@ -21,7 +27,6 @@ export class NFRProvisionService {
     delete nfrProvision["provision_group"];
     delete nfrProvision["provision_group_text"];
     nfrProvision.max = Math.floor(nfrProvision.max);
-    console.log(nfrProvision);
     await this.updateGroupMaximums(
       provision_group,
       nfrProvision.max,
@@ -94,24 +99,23 @@ export class NFRProvisionService {
     }
   }
 
-  async findByDtid(dtid: number): Promise<NFRProvision[]> {
+  async getProvisionsByVariant(variantName: string): Promise<NFRProvision[]> {
     try {
-      const nfrProvisions =
-        dtid != null
-          ? await this.nfrProvisionRepository.find({
-              where: {
-                dtid: dtid,
-                active_flag: true,
-              },
-              relations: ["provision_group"],
-            })
-          : null;
-      nfrProvisions.forEach((nfrProvision) => {
-        delete nfrProvision.provision_group["id"];
+      const variant = await this.nfrProvisionVariantRepository.findOne({
+        where: {
+          variant_name: variantName,
+        },
       });
-      return nfrProvisions.map((nfrProvision) =>
-        Object.assign(nfrProvision, nfrProvision.provision_group)
+      if (!variant) {
+        return [];
+      }
+      const provisions: NFRProvision[] = await this.nfrProvisionRepository.find(
+        {
+          where: { provision_variant: variant },
+          relations: ["provision_group"],
+        }
       );
+      return provisions;
     } catch (err) {
       console.log(err);
       return null;
@@ -132,71 +136,98 @@ export class NFRProvisionService {
     return { message: "Provision Disabled" };
   }
 
-  async select(id: number): Promise<any> {
-    const nfrProvision = await this.nfrProvisionRepository.findOne({
-      where: { id: id },
-      relations: ["provision_group"],
-    });
-    if (!nfrProvision) {
-      throw new Error(`NFRProvision with ID ${id} not found`);
-    }
-    const nfrProvisionGroup = nfrProvision.provision_group;
-    if (!nfrProvisionGroup) {
-      throw new Error(
-        `NFRProvision with ID ${id} has no associated NFRProvisionGroup`
-      );
-    }
-    const selectedCount = await this.nfrProvisionRepository.count({
-      where: { provision_group: nfrProvisionGroup, select: true },
-    });
-
-    if (selectedCount < nfrProvisionGroup.max) {
-      nfrProvision.select = true;
-      await this.nfrProvisionRepository.save(nfrProvision);
-      return { message: "Provision Selected" };
-    } else {
-      return { message: "Provision group is already at maximum." };
-    }
-  }
-
-  async deselect(id: number): Promise<any> {
-    await this.nfrProvisionRepository.update(id, {
-      select: false,
-    });
-    return { message: "Provision Deselected" };
-  }
-
   async getGroupMax(): Promise<any> {
     const nfrProvisions = await this.nfrProvisionRepository.find({
       relations: ["provision_group"],
     });
-    const nfrProvisionGroups = new Set<NFRProvisionGroup>();
+    let nfrProvisionGroups: NFRProvisionGroup[] = [];
     nfrProvisions.forEach((nfrProvision) => {
-      nfrProvisionGroups.add(nfrProvision.provision_group);
+      nfrProvisionGroups.push(nfrProvision.provision_group);
     });
+    nfrProvisionGroups = this.removeDuplicates(
+      nfrProvisionGroups,
+      "provision_group"
+    );
     return Array.from(nfrProvisionGroups).sort(
       (a, b) => a.provision_group - b.provision_group
     );
   }
 
-  async getGroupMaxByDTID(dtid: number): Promise<any> {
-    const nfrProvisions = await this.nfrProvisionRepository.find({
-      where: { dtid: dtid },
-      relations: ["provision_group"],
-    });
-    const nfrProvisionGroups = new Set<NFRProvisionGroup>();
-    nfrProvisions.forEach((nfrProvision) => {
-      nfrProvisionGroups.add(nfrProvision.provision_group);
-    });
-    const sortedNfrProvisionGroups = Array.from(nfrProvisionGroups).sort(
-      (a, b) => a.provision_group - b.provision_group
-    );
-    return sortedNfrProvisionGroups;
+  async getGroupMaxByVariant(variantName: string): Promise<any> {
+    try {
+      const variant = await this.nfrProvisionVariantRepository.findOne({
+        where: {
+          variant_name: variantName,
+        },
+      });
+      if (!variant) {
+        return [];
+      }
+      const provisions = await this.nfrProvisionRepository.find({
+        where: { provision_variant: variant },
+        relations: ["provision_group"],
+      });
+      let nfrProvisionGroups: NFRProvisionGroup[] = [];
+      provisions.forEach((nfrProvision) => {
+        nfrProvisionGroups.push(nfrProvision.provision_group);
+      });
+      nfrProvisionGroups = this.removeDuplicates(
+        nfrProvisionGroups,
+        "provision_group"
+      );
+      return Array.from(nfrProvisionGroups).sort(
+        (a, b) => a.provision_group - b.provision_group
+      );
+    } catch (err) {
+      console.log(err);
+      return null;
+    }
   }
 
-  async remove(dtid: number): Promise<{ deleted: boolean; message?: string }> {
+  async getVariablesByVariant(variantName: string): Promise<any> {
+    const variant = await this.nfrProvisionVariantRepository.findOne({
+      where: {
+        variant_name: variantName,
+      },
+    });
+    if (!variant) {
+      return [];
+    }
+    const provisions = await this.nfrProvisionRepository.find({
+      where: { provision_variant: variant },
+      relations: ["provision_variables"],
+    });
+
+    const provisionVariables: NFRProvisionVariable[] = [];
+    provisions.forEach((provision) => {
+      provision.provision_variables.forEach((variable) => {
+        variable["provisionId"] = provision.id;
+        provisionVariables.push(variable);
+      });
+    });
+    return provisionVariables;
+  }
+
+  async getMandatoryProvisionsByVariant(
+    variantName: string
+  ): Promise<number[]> {
+    const variant = await this.nfrProvisionVariantRepository.findOne({
+      where: {
+        variant_name: variantName,
+      },
+    });
+    if (!variant) {
+      return [];
+    }
+    const provisions = await this.nfrProvisionRepository.find({
+      where: { provision_variant: variant, mandatory: true },
+    });
+    return provisions.map((provision) => provision.id);
+  }
+
+  async remove(id: number): Promise<{ deleted: boolean; message?: string }> {
     try {
-      await this.nfrProvisionRepository.delete({ dtid: dtid });
+      await this.nfrProvisionRepository.delete(id);
       return { deleted: true };
     } catch (err) {
       return { deleted: false, message: err.message };
@@ -208,9 +239,10 @@ export class NFRProvisionService {
     max: number,
     provision_group_text: string
   ) {
-    let nfrProvisionGroup = await this.nfrProvisionGroupRepository.findOneBy({
-      provision_group: provision_group,
-    });
+    let nfrProvisionGroup: NFRProvisionGroup =
+      await this.nfrProvisionGroupRepository.findOneBy({
+        provision_group: provision_group,
+      });
     if (!nfrProvisionGroup) {
       const newGroup = this.nfrProvisionGroupRepository.create({
         provision_group: provision_group,
@@ -223,14 +255,22 @@ export class NFRProvisionService {
       nfrProvisionGroup.max != max ||
       nfrProvisionGroup.provision_group_text != provision_group_text
     ) {
-      await this.nfrProvisionGroupRepository.update(nfrProvisionGroup, {
+      await this.nfrProvisionGroupRepository.update(nfrProvisionGroup.id, {
         max: max,
         provision_group_text: provision_group_text,
       });
-      await this.nfrProvisionRepository.update(
-        { provision_group: nfrProvisionGroup },
-        { select: false }
-      );
     }
+  }
+
+  removeDuplicates<T>(array: T[], property: keyof T): T[] {
+    return array.reduce<T[]>((accumulator, currentObject) => {
+      const existingObject = accumulator.find(
+        (obj) => obj[property] === currentObject[property]
+      );
+      if (!existingObject) {
+        accumulator.push(currentObject);
+      }
+      return accumulator;
+    }, []);
   }
 }

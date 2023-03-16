@@ -10,7 +10,7 @@
                         <p class="sectionTitle">Select an NFR Variant</p>
                     </div>
                     <div class="col-md-3">
-                        <select class="form-control" id="documentVariantId">
+                        <select class="form-control" id="documentVariantId" style="width: 400px">
                             {{#each documentTypes}}
                             <option value="{{this}}">{{this}}</option>
                             {{/each}}
@@ -20,8 +20,8 @@
                 <hr>
 
                 <div class="titleSpacing dataSection"><b>DTID:</b> <span id="dtid">{{message.dtid}}</span></div>
-                <div class="titleSpacing dataSection"><b>Tenure File Number:</b> {{message.db_file_number}}</div>
-                <div class="titleSpacing dataSection"><b>Primary Contact Name:</b> {{message.db_name_bcal_contact}}</div>
+                <div class="titleSpacing dataSection"><b>Tenure File Number:</b> <span id="tfn">{{message.fileNum}}</span></div>
+                <div class="titleSpacing dataSection"><b>Primary Contact Name:</b> {{message.primaryContact}}</div>
                 
                 <fieldset class="form-group collapsible">
                     <legend style="cursor: pointer" class='togvis sectionTitle'><i class="fa fa-plus"></i>  Disposition Transaction ID Details</legend>
@@ -29,21 +29,21 @@
                         <div class="form-row">
                             <div class="form-group col-md-5 dataSection dataSection">
                                 <dt>Organization Unit</dt>
-                                <dd id="orgUnit">{{ message.organization_unit }}</dd>
+                                <dd id="orgUnit">{{ message.orgUnit }}</dd>
                             </div>
                             <div class="form-group col-md-5 dataSection dataSection">
                                 <dt>Primary Contact Email Address</dt>
-                                <dd>{{ message.email_address }}</dd>
+                                <dd>{{ message.emailAddress }}</dd>
                             </div>
                         </div>
                         <div class="form-row">
                             <div class="form-group col-md-5 dataSection dataSection">
                                 <dt>Incorporation Number</dt>
-                                <dd id="orgUnit">{{ message.incorporation_number }}</dd>
+                                <dd id="orgUnit">{{ message.incorporationNum }}</dd>
                             </div>
                             <div class="form-group col-md-5 dataSection dataSection">
                                 <dt>Primary Contact Phone Number</dt>
-                                <dd id="phoneNumber">{{ message.phone_number }}</dd>
+                                <dd id="phoneNumber">{{ message.contactPhoneNumber }}</dd>
                             </div>
                         </div>
                     </div>
@@ -54,36 +54,36 @@
                         <div class="form-row">
                             <div class="form-group col-md-5 dataSection">
                                 <dt>Type</dt>
-                                <dd id="type">{{ message.type_name }}</dd>
+                                <dd id="type">{{ message.type }}</dd>
                             </div>
                             <div class="form-group col-md-5 dataSection">
                                 <dt>Subtype</dt>
-                                <dd id="subType">{{message.sub_type_name}}</dd>
+                                <dd id="subType">{{message.subType}}</dd>
                             </div>
                         </div>
                         <div class="form-row">
                             <div class="form-group col-md-5 dataSection">
                                 <dt>Purpose</dt>
-                                <dd id="purpose">{{ message.purpose_name }}</dd>
+                                <dd id="purpose">{{ message.purpose }}</dd>
                             </div>
                             <div class="form-group col-md-5 dataSection">
                                 <dt>Subpurpose</dt>
-                                <dd id="subPurpose">{{message.sub_purpose_name}}</dd>
+                                <dd id="subPurpose">{{message.subPurpose}}</dd>
                             </div>
                         </div>
                         <div class="form-row">
                             <div class="form-group col-md-5 dataSection">
                                 <dt>Mailing Address</dt>
-                                <dd id="address">{{message.mailing_address_line_1}}</dd>
-                                <dd id="address">{{message.mailing_address_line_2}}</dd>
-                                <dd id="address">{{message.mailing_address_line_3}}</dd>
-                                <dd id="cityProv">{{message.mailing_city}}</dd>
-                                <dd id="postalCode">{{message.mailing_province_state_code}}, {{message.mailing_postal_code}}</dd>
-                                <dd id="county">{{message.mailing_country}}</dd>
+                                <dd id="address1">{{message.addrLine1}}</dd>
+                                <dd id="address2">{{message.addrLine2}}</dd>
+                                <dd id="address3">{{message.addrLine3}}</dd>
+                                <dd id="cityProv">{{message.city}}</dd>
+                                <dd id="postalCode">{{ message.provAndPostalCode }}</dd>
+                                <dd id="county">{{message.country}}</dd>
                             </div>
                             <div class="form-group col-md-5 dataSection">
                                 <dt>Location of Land</dt>
-                                <dd id="locLand">{{message.location_description}}</dd>
+                                <dd id="locLand">{{message.locLand}}</dd>
                             </div>
                         </div>
                     </div>
@@ -91,19 +91,19 @@
                 <fieldset class="form-group collapsible">
                     <legend style="cursor: pointer" class='togvis sectionTitle'><i class="fa fa-plus"></i>  Interested Parties</legend>
                     <div class="contents" style="display: none;">
-                        {{#each message.interested_parties}}
+                        {{#each message.interestedParties}}
                         <div class="form-row">
                             <div class="form-group col-md-2 dataSection">
                                 <dt>First Name</dt>
-                                <dd id="firstName">{{ this.first_name }}</dd>
+                                <dd id="firstName">{{ this.firstName }}</dd>
                             </div>
                             <div class="form-group col-md-2">
                                 <dt>Middle Name</dt>
-                                <dd id="middleName">{{this.middle_name}}</dd>
+                                <dd id="middleName">{{this.middleName}}</dd>
                             </div>
                             <div class="form-group col-md-2">
                                 <dt>Last Name</dt>
-                                <dd id="lastName">{{this.last_name}}</dd>
+                                <dd id="lastName">{{this.lastName}}</dd>
                             </div>
                             <div class="form-group col-md-3">
                                 <dt>Address</dt>
@@ -121,13 +121,14 @@
                         <table id="provisionTable" style="width:100%">
                             <thead>
                                 <th>Type</th>
-                                <th style="min-width: 300px">Provision</th>
-                                <th style="min-width: 150px">Free Text</th>
+                                <th style="min-width: 450px">Provision</th>
+                                <th style="min-width: 200px">Help</th>
                                 <th style="min-width: 150px">Category</th>
                                 <th></th>
                                 <th style="display: none"></th>
                                 <th style="display: none"></th>
                                 <th style="display: none"></th>
+                                <th style="display: none"></th> 
                             </thead>
                         </table>
                         <br>
@@ -137,7 +138,7 @@
                                 <th>Type</th>
                                 <th>Group</th>
                                 <th style="min-width: 300px">Provision</th>
-                                <th style="min-width: 150px">Free Text</th>
+                                <th style="min-width: 300px">Free Text</th>
                                 <th style="min-width: 150px">Category</th>
                                 <th style="display: none"></th>
                                 <th style="display: none"></th>
@@ -148,18 +149,31 @@
                 <fieldset class="form-group collapsible">
                     <legend style="cursor: pointer" class='togvis sectionTitle'><i class="fa fa-plus"></i>  Variables</legend>
                     <div class="contents" style="display: none;">
-                        <table id="variableTable"></table>
+                        <table id="variableTable" style="width:100%">
+                            <thead>
+                                <th style="min-width: 300px">Variable</th>
+                                <th style="min-width: 450px">Value</th>
+                                <th style="min-width: 150px">Help</th>
+                                <th style="display: none"></th>
+                                <th style="display: none"></th>
+                            </thead>
+                        </table>
                     </div>
                     <div class="form-group row">
                         
                     </div>
                 </fieldset>
                 <div class="form-group row">
-                    <div class="col-md-4">
-                        <button id="nextGroup" class="btn btn-success">Save for Later</button>
+                    <div class="col-sm-2">
+                        <button id="saveNfr" class="btn btn-success" onclick="saveForLater()">Save for Later</button>
                     </div>
-                    <div class="col-md-4">
-                        <button type="button" class="btn btn-primary" onclick="generateReport()" id="genReport">Create</button>
+                    <div class="col-sm-2">
+                        <button type="button" class="btn btn-primary" onclick="generateNFRReport()" id="genReport">Create</button>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-sm-2">
+                        <div id="savedMsg" class="m-0 p-2" style="display: none; color: green; font-size: small">DTID Details Saved</div>
                     </div>
                 </div>
                 <div style="display: none">
@@ -167,15 +181,18 @@
                 </div>
             </div>
         </form>
-        <input type="hidden" id="prdid" value="{{this.prdid}}">
-        <input type="hidden" id="tfn" value="{{message.db_file_number}}">
+        <input type="hidden" id="nfrDataId" value="{{this.nfrDataId}}">
         <input type="hidden" id="groupMaxJson">
 
     </main>
     <script>
         $('#groupMaxJson').val(JSON.stringify('{{{json groupMaxJsonArray}}}'));
-        $('#dtid').val({{ message.dtid }});
-        $('#documentVariantId').prop("selectedIndex", {{selectedVariant}});
+        $('#documentVariantId').prop("selectedIndex", {{ selectedVariant }});
+        const currentUrl = window.location.pathname;
+        let enabledProvisions = [{{enabledProvisionList}}];
+        let mandatoryProvisions = [{{mandatoryProvisionList}}];
+        let variantName = $('#documentVariantId').val();
+        $('#variantName').val(variantName);
         console.log({{message.err}});
     </script>
     <script src="/js/nfr.js"></script>

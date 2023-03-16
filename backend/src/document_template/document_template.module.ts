@@ -8,5 +8,6 @@ import { DocumentTemplate } from "./entities/document_template.entity";
   imports: [TypeOrmModule.forFeature([DocumentTemplate])],
   controllers: [DocumentTemplateController],
   providers: [DocumentTemplateService],
+  exports: [DocumentTemplateService],
 })
 export class DocumentTemplateModule {}

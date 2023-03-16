@@ -1,4 +1,5 @@
 import { Body, Controller, Delete, Get, Param, Post } from "@nestjs/common";
+import { ProvisionJSON, VariableJSON } from "utils/types";
 import { CreateNFRDataDto } from "./dto/create-nfr_data.dto";
 import { NFRDataService } from "./nfr_data.service";
 
@@ -10,11 +11,17 @@ export class NFRDataController {
   async create(
     @Body()
     data: {
-      nfrData: CreateNFRDataDto;
+      body: CreateNFRDataDto & {
+        provisionJsonArray: ProvisionJSON[];
+        variableJsonArray: VariableJSON[];
+      };
     }
   ) {
-    let nfrData = data.nfrData;
-    return this.nfrDataService.create(nfrData);
+    const provArr = data.body.provisionJsonArray;
+    const varArr = data.body.variableJsonArray;
+    delete data.body["provisionJsonArray"];
+    delete data.body["variableJsonArray"];
+    return this.nfrDataService.createOrUpdate(data.body, provArr, varArr);
   }
 
   @Get()
@@ -39,6 +46,16 @@ export class NFRDataController {
   @Get("view/:nfrDataId")
   findViewByPRDID(@Param("nfrDataId") nfrDataId: string) {
     return this.nfrDataService.findViewByNFRDataId(+nfrDataId);
+  }
+
+  @Get("variables/:nfrDataId")
+  getVariablesByNfrId(@Param("nfrDataId") id: number) {
+    return this.nfrDataService.getVariablesByNfrId(id);
+  }
+
+  @Get("provisions/:nfrDataId")
+  getProvisionsByNfrId(@Param("nfrDataId") id: number) {
+    return this.nfrDataService.getProvisionsByNfrId(id);
   }
 
   @Delete(":dtid")

@@ -7,7 +7,7 @@ export class UpdateNFRProvisionDto extends PickType(NFRProvisionDto, [
   "provision_group",
   "provision_group_text",
   "max",
-  "provision_text",
+  "provision_name",
   "free_text",
   "category",
   "update_userid",

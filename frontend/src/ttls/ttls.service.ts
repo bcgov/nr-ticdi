@@ -37,6 +37,59 @@ export class TTLSService {
     this.webade_token = await this.getWebadeToken();
   }
 
+  formatNFRData(ttlsData: any): any {
+    const tenantAddr = ttlsData.tenantAddr[0];
+    const mappedData = {
+      dtid: ttlsData.dtid,
+      fileNum: ttlsData.fileNum,
+      incorporationNum: tenantAddr ? tenantAddr.incorporationNum : "",
+      orgUnit: ttlsData.orgUnit,
+      purpose: ttlsData.purpose,
+      subPurpose: ttlsData.subPurpose,
+      type: ttlsData.type,
+      subType: ttlsData.subType,
+      firstName: tenantAddr ? tenantAddr.firstName : "",
+      middleName: tenantAddr ? tenantAddr.middleName : "",
+      lastName: tenantAddr ? tenantAddr.lastName : "",
+      legalName: tenantAddr ? tenantAddr.legalName : "",
+      licenceHolderName: this.getLicenceHolderName(tenantAddr),
+      emailAddress: tenantAddr ? tenantAddr.emailAddress : "",
+      phoneNumber: this.formatPhoneNumber(
+        tenantAddr ? tenantAddr.phoneNumber : "",
+        tenantAddr ? tenantAddr.areaCode : ""
+      ),
+      licenceHolder: this.getLicenceHolder(tenantAddr),
+      contactAgent: this.getContactAgent(
+        ttlsData.contactFirstName,
+        ttlsData.contactMiddleName,
+        ttlsData.contactLastName
+      ),
+      contactCompanyName: ttlsData.contactCompanyName,
+      contactFirstName: ttlsData.contactFirstName,
+      contactMiddleName: ttlsData.contactMiddleName,
+      contactLastName: ttlsData.contactLastName,
+      contactPhoneNumber: this.formatPhoneNumber(
+        ttlsData.contactPhoneNumber,
+        null
+      ),
+      contactEmail: ttlsData.contactEmail,
+      inspectionDate: ttlsData.inspectionDate,
+      mailingAddress: this.getMailingAddress(tenantAddr),
+      addrLine1: tenantAddr ? tenantAddr.addrLine1 : "",
+      addrLine2: tenantAddr ? tenantAddr.addrLine2 : "",
+      addrLine3: tenantAddr ? tenantAddr.addrLine3 : "",
+      city: tenantAddr ? tenantAddr.city : "",
+      regionCd: tenantAddr ? tenantAddr.regionCd : "",
+      postalCode: tenantAddr ? tenantAddr.postalCode : "",
+      provAndPostalCode: this.getProvAndPostalCode(tenantAddr),
+      zipCode: tenantAddr ? tenantAddr.zipCode : "",
+      countryCd: tenantAddr ? tenantAddr.countryCd : "",
+      country: tenantAddr ? tenantAddr.country : "",
+      locLand: ttlsData.locLand,
+    };
+    return mappedData;
+  }
+
   // sends json data to the backend to be inserted into the database
   async sendToBackend(jdf: any): Promise<any> {
     const url = `${hostname}:${port}/print-request-detail`;
@@ -161,7 +214,10 @@ export class TTLSService {
     lastName: string;
     legalName: string;
   }): string {
-    if (tenantAddr.firstName || tenantAddr.middleName || tenantAddr.lastName) {
+    if (
+      tenantAddr &&
+      (tenantAddr.firstName || tenantAddr.middleName || tenantAddr.lastName)
+    ) {
       let name = tenantAddr.firstName ? tenantAddr.firstName : "";
       name = tenantAddr.middleName
         ? name.concat(" " + tenantAddr.middleName)
@@ -170,7 +226,7 @@ export class TTLSService {
         ? name.concat(" " + tenantAddr.lastName)
         : name;
       return name;
-    } else if (tenantAddr.legalName) {
+    } else if (tenantAddr && tenantAddr.legalName) {
       return tenantAddr.legalName;
     }
     return "";
@@ -182,7 +238,10 @@ export class TTLSService {
     middleName: string;
     lastName: string;
   }): string {
-    if (tenantAddr.firstName || tenantAddr.middleName || tenantAddr.lastName) {
+    if (
+      tenantAddr &&
+      (tenantAddr.firstName || tenantAddr.middleName || tenantAddr.lastName)
+    ) {
       let name = tenantAddr.firstName ? tenantAddr.firstName : "";
       name = tenantAddr.middleName
         ? name.concat(" " + tenantAddr.middleName)
@@ -217,16 +276,30 @@ export class TTLSService {
     addrLine3: string;
   }): string {
     let mailingAddress = "";
-    if (tenantAddr.addrLine1) {
+    if (tenantAddr && tenantAddr.addrLine1) {
       mailingAddress = tenantAddr.addrLine1;
     }
-    if (tenantAddr.addrLine2) {
+    if (tenantAddr && tenantAddr.addrLine2) {
       mailingAddress = mailingAddress.concat(", " + tenantAddr.addrLine2);
     }
-    if (tenantAddr.addrLine3) {
+    if (tenantAddr && tenantAddr.addrLine3) {
       mailingAddress = mailingAddress.concat(", " + tenantAddr.addrLine3);
     }
     return mailingAddress;
+  }
+
+  getProvAndPostalCode(tenantAddr: {
+    provAbbr: string;
+    postalCode: string;
+  }): string {
+    if (tenantAddr && tenantAddr.provAbbr && tenantAddr.postalCode) {
+      return tenantAddr.provAbbr + ", " + tenantAddr.postalCode;
+    } else if (tenantAddr && tenantAddr.provAbbr) {
+      return tenantAddr.provAbbr;
+    } else if (tenantAddr && tenantAddr.postalCode) {
+      return tenantAddr.postalCode;
+    }
+    return "";
   }
 
   formatInspectedDate(inspected_date: string): string {
@@ -340,114 +413,6 @@ export class TTLSService {
       });
   }
 
-  /**
-   * Generates a LUR report name using tenure file number
-   * and a version number. The version number is incremented
-   * each time someone generates a LUR report.
-   *
-   * @param tenureFileNumber
-   * @returns
-   */
-  async generateReportName(tenureFileNumber: string) {
-    const url =
-      `${hostname}:${port}/print-request-log/version/` + tenureFileNumber;
-    // grab the next version string for the dtid
-    const version = await axios
-      .get(url, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      })
-      .then((res) => {
-        return res.data;
-      });
-    return { reportName: "LUR_" + tenureFileNumber + "_" + version };
-  }
-
-  /**
-   * Generates the Land use Report using CDOGS
-   *
-   * @param prdid
-   * @param document_type
-   * @param username
-   * @returns
-   */
-  async generateLURReport(
-    prdid: number,
-    document_type: string,
-    username: string
-  ) {
-    const url = `${hostname}:${port}/print-request-detail/view/` + prdid;
-    const templateUrl =
-      `${hostname}:${port}/document-template/get-active-report/` +
-      encodeURI(document_type);
-    const logUrl = `${hostname}:${port}/print-request-log/`;
-    // get the view given the print request detail id
-    const data = await axios
-      .get(url, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      })
-      .then((res) => {
-        return res.data;
-      });
-    if (data.InspectionDate) {
-      data["InspectionDate"] = this.formatInspectedDate(data.InspectionDate);
-    }
-    // get the document template
-    const documentTemplateObject: { id: number; the_file: string } = await axios
-      .get(templateUrl)
-      .then((res) => {
-        return res.data;
-      });
-
-    // log the request
-    const document_template_id = documentTemplateObject.id;
-    await axios.post(logUrl, {
-      document_template_id: document_template_id,
-      print_request_detail_id: prdid,
-      dtid: data.DTID,
-      request_app_user: username,
-      request_json: JSON.stringify(data),
-    });
-
-    const cdogsToken = await this.callGetToken();
-    let bufferBase64 = documentTemplateObject.the_file;
-    const md = JSON.stringify({
-      data,
-      formatters:
-        '{"myFormatter":"_function_myFormatter|function(data) { return data.slice(1); }","myOtherFormatter":"_function_myOtherFormatter|function(data) {return data.slice(2);}"}',
-      options: {
-        cacheReport: false,
-        convertTo: "docx",
-        overwrite: true,
-        reportName: "lur-report",
-      },
-      template: {
-        content: `${bufferBase64}`,
-        encodingType: "base64",
-        fileType: "docx",
-      },
-    });
-
-    const conf = {
-      method: "post",
-      url: process.env.cdogs_url,
-      headers: {
-        Authorization: `Bearer ${cdogsToken}`,
-        "Content-Type": "application/json",
-      },
-      responseType: "arraybuffer",
-      data: md,
-    };
-    const ax = require("axios");
-    const response = await ax(conf).catch((error) => {
-      console.log(error.response);
-    });
-    return response.data;
-  }
-
   // TODO
   async generateNFRReport(
     prdid: number,
@@ -523,20 +488,5 @@ export class TTLSService {
       console.log(error.response);
     });
     return response.data;
-  }
-
-  async getNfrData(nfrDataId: number): Promise<any> {
-    const url = `${hostname}:${port}/nfr-data/${nfrDataId}`;
-    const data = await axios
-      .get(url, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      })
-      .then((res) => {
-        return res.data;
-      });
-    console.log(data);
-    return data;
   }
 }

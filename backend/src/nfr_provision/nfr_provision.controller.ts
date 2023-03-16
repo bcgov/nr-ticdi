@@ -35,9 +35,9 @@ export class NFRProvisionController {
     }
   }
 
-  @Get("dtid/:dtid")
-  findByDtid(@Param("dtid") dtid: number) {
-    return this.nfrProvisionService.findByDtid(dtid);
+  @Get("variant/:variant")
+  getProvisionsByVariant(@Param("variant") variantName: string) {
+    return this.nfrProvisionService.getProvisionsByVariant(variantName);
   }
 
   @Get("enable/:id")
@@ -50,29 +50,31 @@ export class NFRProvisionController {
     return this.nfrProvisionService.disable(id);
   }
 
-  @Get("select/:id")
-  selectProvision(@Param("id") id: number) {
-    return this.nfrProvisionService.select(id);
-  }
-
-  @Get("deselect/:id")
-  deselectProvision(@Param("id") id: number) {
-    return this.nfrProvisionService.deselect(id);
-  }
-
   // nestjs gets upset when there is no parameter, id is unused
   @Get("get-group-max/:id")
   getGroupMax(@Param("id") id: number) {
     return this.nfrProvisionService.getGroupMax();
   }
 
-  @Get("get-group-max/dtid/:dtid")
-  getGroupMaxByDTID(@Param("dtid") dtid: number) {
-    return this.nfrProvisionService.getGroupMaxByDTID(dtid);
+  @Get("get-group-max/variant/:variant")
+  getGroupMaxByDTID(@Param("variant") variantName: string) {
+    return this.nfrProvisionService.getGroupMaxByVariant(variantName);
   }
 
-  @Delete(":dtid")
-  remove(@Param("dtid") dtid: string) {
-    return this.nfrProvisionService.remove(+dtid);
+  @Get("get-provision-variables/variant/:variant")
+  getVariablesByVariant(@Param("variant") variantName: string) {
+    return this.nfrProvisionService.getVariablesByVariant(variantName);
+  }
+
+  @Get("get-mandatory-provisions/variant/:variant")
+  getMandatoryProvisionsByVariant(@Param("variant") variantName: string) {
+    return this.nfrProvisionService.getMandatoryProvisionsByVariant(
+      variantName
+    );
+  }
+
+  @Delete(":id")
+  remove(@Param("id") id: number) {
+    return this.nfrProvisionService.remove(id);
   }
 }

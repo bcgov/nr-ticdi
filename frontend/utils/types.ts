@@ -5,7 +5,7 @@ export type SessionData = {
   activeAccount: AccountObject;
   selected_document: {
     nfr_id: number;
-  }
+  };
 };
 
 export type AccountObject = {
@@ -50,4 +50,18 @@ export type SearchResultsItem = {
     idir_username: [string];
     display_name: [string];
   };
+};
+
+export type VariableJSON = {
+  variable_name: string;
+  variable_value: string;
+  provision_id: number;
+  variable_id: number;
+};
+
+export type ProvisionJSON = {
+  provision_name: string;
+  provision_group: number;
+  free_text: string;
+  provision_id: number;
 };

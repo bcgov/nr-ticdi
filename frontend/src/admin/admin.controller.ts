@@ -187,9 +187,9 @@ export class AdminController {
     return this.adminService.getTemplates(reportId);
   }
 
-  @Get("search-nfr-templates")
-  getNFRTemplates(): Promise<any> {
-    return this.adminService.getNFRTemplates();
+  @Get("search-nfr-data")
+  getNFRData(): Promise<any> {
+    return this.adminService.getNFRData();
   }
 
   @Get("open-document/:nfr_id")
@@ -210,11 +210,6 @@ export class AdminController {
     return this.adminService.getNFRProvisions();
   }
 
-  @Get("nfr-provisions/:dtid")
-  getNFRProvisionsByDTID(@Param("dtid") dtid: number): any {
-    return this.adminService.getNFRProvisionsByDTID(dtid);
-  }
-
   @Get("enable-provision/:provisionId")
   enableProvision(@Param("provisionId") id: number): any {
     return this.adminService.enableProvision(id);
@@ -225,31 +220,15 @@ export class AdminController {
     return this.adminService.disableProvision(id);
   }
 
-  @Get("select-provision/:provisionId")
-  selectProvision(@Param("provisionId") id: number): any {
-    return this.adminService.selectProvision(id);
-  }
-
-  @Get("deselect-provision/:provisionId")
-  deselectProvision(@Param("provisionId") id: number): any {
-    return this.adminService.deselectProvision(id);
-  }
-
   @Get("get-group-max")
   getGroupMax() {
     return this.adminService.getGroupMax();
-  }
-
-  @Get("get-group-max/:dtid")
-  getGroupMaxByDTID(@Param("dtid") dtid: number) {
-    return this.adminService.getGroupMaxByDTID(dtid);
   }
 
   @Post("add-provision")
   addProvision(
     @Body()
     provisionParams: {
-      dtid: number;
       type: string;
       provision_group: number;
       provision_group_text: string;
@@ -269,7 +248,6 @@ export class AdminController {
     @Body()
     provisionParams: {
       id: number;
-      dtid: number;
       type: string;
       provision_group: number;
       provision_group_text: string;

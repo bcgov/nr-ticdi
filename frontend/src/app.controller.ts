@@ -27,6 +27,7 @@ import { firstValueFrom } from "rxjs";
 import { HttpService } from "@nestjs/axios";
 import { Req } from "@nestjs/common/decorators/http/route-params.decorator";
 import { Request, Response } from "express";
+import { ReportService } from "./report/report.service";
 
 let requestUrl: string;
 let requestConfig: AxiosRequestConfig;
@@ -35,9 +36,8 @@ let requestConfig: AxiosRequestConfig;
 export class AppController {
   constructor(
     private readonly appService: AppService,
-    private readonly adminService: AdminService,
-    private readonly ttlsService: TTLSService,
-    private readonly httpService: HttpService
+    private readonly reportService: ReportService,
+    private readonly ttlsService: TTLSService
   ) {
     const hostname = process.env.backend_url
       ? process.env.backend_url
@@ -188,64 +188,6 @@ export class AppController {
     }
   }
 
-  @Get("nfr")
-  @UseFilters(AuthenticationFilter)
-  @UseGuards(AuthenticationGuard)
-  @Render("nfr")
-  async displayNofr(@Session() session: { data?: SessionData }) {
-    const nfrDataId = session.data.selected_document
-      ? session.data.selected_document.nfr_id
-      : 0;
-    let isAdmin = false;
-    if (
-      session.data &&
-      session.data.activeAccount &&
-      session.data.activeAccount.client_roles
-    ) {
-      for (let role of session.data.activeAccount.client_roles) {
-        if (role == "ticdi_admin") {
-          isAdmin = true;
-        }
-      }
-    }
-    const title =
-      process.env.ticdi_environment == "DEVELOPMENT"
-        ? "DEVELOPMENT - " + PAGE_TITLES.NOFR
-        : PAGE_TITLES.NOFR;
-    const displayAdmin = isAdmin ? "Administration" : "-";
-    const data = await this.ttlsService.getNfrData(nfrDataId);
-    let primaryContactName;
-    try {
-      return {
-        title: title,
-        idirUsername: session.data.activeAccount
-          ? session.data.activeAccount.idir_username
-          : "",
-        primaryContactName: primaryContactName,
-        displayAdmin: displayAdmin,
-        message: data,
-        documentTypes: NFR_VARIANTS_ARRAY,
-        nfr_id: data.id,
-        template_id: data.template_id,
-      };
-    } catch (err) {
-      console.log(err);
-      return {
-        title: title,
-        idirUsername: session.data.activeAccount
-          ? session.data.activeAccount.idir_username
-          : "",
-        primaryContactName: primaryContactName ? primaryContactName : null,
-        displayAdmin: displayAdmin,
-        message: data ? data : null,
-        documentTypes: NFR_VARIANTS_ARRAY,
-        nfr_id: data ? data.id : null,
-        template_id: data.template_id,
-        error: err,
-      };
-    }
-  }
-
   /**
    * Renders the NFR report page
    *
@@ -254,18 +196,17 @@ export class AppController {
    * @param docname
    * @returns
    */
-  @Get("nfr/dtid/:id/:variant")
+  @Get("nfr/dtid/:dtid/:variant")
   @UseFilters(AuthenticationFilter)
   @UseGuards(AuthenticationGuard)
   @Render("nfr")
   async findNofr(
     @Session() session: { data?: SessionData },
-    @Param("id") id: number,
-    @Param("variant") variant: string,
+    @Param("dtid") dtid: number,
+    @Param("variant") variantName: string,
     @Req() req: Request,
     @Res() res: Response
   ) {
-    console.log(variant);
     const hasParams = req.originalUrl.includes("?session_state");
     if (hasParams) {
       const urlWithoutParams = req.path;
@@ -288,12 +229,28 @@ export class AppController {
           ? "DEVELOPMENT - " + PAGE_TITLES.NOFR
           : PAGE_TITLES.NOFR;
       const displayAdmin = isAdmin ? "Administration" : "-";
-      await this.ttlsService.setWebadeToken();
-      const groupMaxJsonArray = await this.adminService.getGroupMaxByDTID(id);
-      let ttlsJSON, primaryContactName;
+      const groupMaxJsonArray = await this.reportService.getGroupMaxByVariant(
+        variantName
+      );
+      let ttlsJSON, primaryContactName, nfrData;
       try {
+        const nfrDataObject = await this.reportService.getNfrDataByDtid(dtid);
+        nfrData = nfrDataObject.nfrData;
+        const provisionIds = nfrDataObject.provisionIds
+          ? nfrDataObject.provisionIds
+          : [];
+        const variableIds = nfrDataObject.variableIds
+          ? nfrDataObject.variableIds
+          : [];
+        const mandatoryProvisionIds =
+          await this.reportService.getMandatoryProvisionsByVariant(variantName);
+        const combinedProvisions = provisionIds.concat(mandatoryProvisionIds);
+        const enabledProvisions = combinedProvisions.filter(
+          (item, index) => combinedProvisions.indexOf(item) === index
+        );
+        await this.ttlsService.setWebadeToken();
         const response: any = await firstValueFrom(
-          this.ttlsService.callHttp(id)
+          this.ttlsService.callHttp(dtid)
         )
           .then((res) => {
             return res;
@@ -301,34 +258,29 @@ export class AppController {
           .catch((err) => {
             console.log(err);
           });
-        ttlsJSON = await this.ttlsService.sendToBackend(response);
-        if (ttlsJSON.inspected_date) {
-          ttlsJSON["inspected_date"] = this.ttlsService.formatInspectedDate(
-            ttlsJSON.inspected_date.toString()
-          );
-        }
-        primaryContactName = ttlsJSON.licence_holder_name;
-        ttlsJSON["interested_parties"] = [
+        ttlsJSON = await this.ttlsService.formatNFRData(response);
+        primaryContactName = ttlsJSON.licenceHolderName;
+        ttlsJSON["interestedParties"] = [
           {
-            first_name: "asdf",
-            middle_name: "fdsa",
-            last_name: "1234",
+            firstName: "First",
+            middleName: "Middle",
+            lastName: "Last",
             address: "123 fake street",
           },
           {
-            first_name: "uiop",
-            middle_name: "poiu",
-            last_name: "4321",
-            address: "555 fghj road",
+            firstName: "First2",
+            middleName: "Middle2",
+            lastName: "Last2",
+            address: "346 Miron Drive",
           },
         ];
         let selectedVariant = 0;
-        switch (variant) {
-          case NFR_VARIANTS.delayed: {
+        switch (variantName) {
+          case NFR_VARIANTS.default: {
             selectedVariant = 0;
             break;
           }
-          case NFR_VARIANTS.default: {
+          case NFR_VARIANTS.delayed: {
             selectedVariant = 1;
             break;
           }
@@ -355,8 +307,10 @@ export class AppController {
           message: ttlsJSON,
           groupMaxJsonArray: groupMaxJsonArray,
           documentTypes: NFR_VARIANTS_ARRAY,
+          nfrDataId: nfrData ? nfrData.id : -1,
           selectedVariant: selectedVariant,
-          prdid: ttlsJSON.id,
+          mandatoryProvisionList: mandatoryProvisionIds,
+          enabledProvisionList: enabledProvisions,
         };
       } catch (err) {
         console.log(err);
@@ -370,7 +324,8 @@ export class AppController {
           message: ttlsJSON ? ttlsJSON : null,
           groupMaxJsonArray: groupMaxJsonArray,
           documentTypes: NFR_VARIANTS_ARRAY,
-          prdid: ttlsJSON ? ttlsJSON.id : null,
+          nfrDataId: -1,
+          enabledProvisionList: [],
           error: err,
         };
       }
@@ -491,14 +446,37 @@ export class AppController {
     return this.appService.getHello();
   }
 
+  @Get("/nfr/dtid/:dtid")
+  @Render("nfr")
+  @UseFilters(AuthenticationFilter)
+  @UseGuards(AuthenticationGuard)
+  redirectNFR(@Res() res: Response, @Param("dtid") dtid: number) {
+    res.redirect(`/nfr/dtid/${dtid}/${encodeURI(NFR_VARIANTS.default)}`);
+    return {};
+  }
+
   @Get("/404")
   @Render("404")
   @UseFilters(AuthenticationFilter)
   @UseGuards(AuthenticationGuard)
-  notFound() {
+  notFound(@Session() session: { data?: SessionData }) {
+    let isAdmin = false;
+    if (
+      session.data &&
+      session.data.activeAccount &&
+      session.data.activeAccount.client_roles
+    ) {
+      for (let role of session.data.activeAccount.client_roles) {
+        if (role == "ticdi_admin") {
+          isAdmin = true;
+        }
+      }
+    }
+    const displayAdmin = isAdmin ? "Administration" : "-";
     return {
       title: "404 Not Found",
-      message: "Sorry, the page you are looking for does not exist.",
+      message: "Sorry, that page does not exist.",
+      displayAdmin: displayAdmin,
     };
   }
 }

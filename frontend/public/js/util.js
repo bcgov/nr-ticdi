@@ -1,9 +1,10 @@
 async function generateReport() {
   const tenureFileNumber = $("#tfn").text();
   const prdid = $("#prdid").text();
+  const dtid = $("#dtid").text();
   $("#genReport").prop("disabled", true);
   const reportName = await fetch(
-    `/report/get-report-name/${tenureFileNumber}`,
+    `/report/get-report-name/${dtid}/${tenureFileNumber}`,
     {
       method: "GET",
       headers: {

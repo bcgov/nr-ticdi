@@ -10,11 +10,11 @@ export const PAGE_TITLES = {
 export const REPORT_TYPES = ["Land Use Report", "Notice of Final Review"];
 
 export const NFR_VARIANTS_ARRAY = [
-  "NFR - DELAYED",
   "NOTICE OF FINAL REVIEW",
-  "NFR - NO FEES",
-  "NFR - SURVEY REQUIRED",
-  "NFR - TO OBTAIN SURVEY",
+  "NOTICE OF FINAL REVIEW (DELAYED)",
+  "NOTICE OF FINAL REVIEW (NO FEES)",
+  "NOTICE OF FINAL REVIEW (SURVEY REQUIRED)",
+  "NOTICE OF FINAL REVIEW (TO OBTAIN SURVEY)",
 ];
 export const NFR_VARIANTS = {
   delayed: "NOTICE OF FINAL REVIEW (DELAYED)",
@@ -23,3 +23,42 @@ export const NFR_VARIANTS = {
   survey_required: "NOTICE OF FINAL REVIEW (SURVEY REQUIRED)",
   to_obtain_survey: "NOTICE OF FINAL REVIEW (TO OBTAIN SURVEY)",
 };
+
+export const numberWords = [
+  "Zero",
+  "One",
+  "Two",
+  "Three",
+  "Four",
+  "Five",
+  "Six",
+  "Seven",
+  "Eight",
+  "Nine",
+  "Ten",
+  "Eleven",
+  "Twelve",
+  "Thirteen",
+  "Fourteen",
+  "Fifteen",
+  "Sixteen",
+  "Seventeen",
+  "Eighteen",
+  "Nineteen",
+  "Twenty",
+  "TwentyOne",
+  "TwentyTwo",
+  "TwentyThree",
+  "TwentyFour",
+  "TwentyFive",
+  "TwentySix",
+  "TwentySeven",
+  "TwentyEight",
+  "TwentyNine",
+  "Thirty",
+  "ThirtyOne",
+  "ThirtyTwo",
+  "ThirtyThree",
+  "ThirtyFour",
+  "ThirtyFive",
+];

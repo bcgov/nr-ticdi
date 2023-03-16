@@ -13,3 +13,17 @@ export type TrimmedDocumentTemplate = {
   create_userid?: string;
   update_userid?: string;
 };
+
+export type VariableJSON = {
+  variable_name: string;
+  variable_value: string;
+  provision_id: number;
+  variable_id: number;
+};
+
+export type ProvisionJSON = {
+  provision_name: string;
+  provision_group: number;
+  free_text: string;
+  provision_id: number;
+};

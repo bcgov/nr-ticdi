@@ -309,65 +309,6 @@ export class AdminService {
     return documents;
   }
 
-  async getNFRData() {
-    const nfrDataUrl = `${hostname}:${port}/nfr-data`;
-    const templateUrl = `${hostname}:${port}/document-template/nfr-template-info`;
-    const nfrData = await axios
-      .get(nfrDataUrl)
-      .then((res) => {
-        return res.data;
-      })
-      .catch((err) => console.log(err.response.data));
-    const templateIds = [];
-    for (let entry of nfrData) {
-      templateIds.push(entry.template_id);
-    }
-    const allTemplates: {
-      id: number;
-      file_name: string;
-      active_flag: boolean;
-      is_deleted: boolean;
-      template_version: number;
-    }[] = await axios
-      .post(templateUrl, templateIds)
-      .then((res) => {
-        return res.data;
-      })
-      .catch((err) => console.log(err.response.data));
-
-    // Combine the corresponding templates with the nfr data.
-    const combinedArray = [];
-
-    let i = 0;
-    let j = 0;
-
-    while (i < allTemplates.length && j < nfrData.length) {
-      const template = allTemplates[i];
-      const nfr = nfrData[j];
-
-      if (template.id === nfr.template_id) {
-        if (!template.is_deleted) {
-          combinedArray.push({
-            dtid: nfr.dtid,
-            version: template.template_version,
-            file_name: template.file_name,
-            updated_date: nfr.update_timestamp.split("T")[0],
-            status: nfr.status,
-            active: template.active_flag,
-            nfr_id: nfr.id,
-            variant_name: nfr.variant_name,
-          });
-        }
-        j++;
-      } else if (template.id < nfr.template_id) {
-        i++;
-      } else {
-        j++;
-      }
-    }
-    return combinedArray;
-  }
-
   async getDocumentTemplates(documentType: string): Promise<any> {
     const returnItems = [
       "id",
@@ -410,8 +351,11 @@ export class AdminService {
       "max",
       "provision_name",
       "free_text",
+      "help_text",
       "category",
       "active_flag",
+      "variants",
+      "mandatory",
     ];
     const url = `${hostname}:${port}/nfr-provision`;
     const nfrProvisions = await axios
@@ -461,8 +405,10 @@ export class AdminService {
       provision_group_text: string;
       max: number;
       provision: string;
-      freeText: string;
+      free_text: string;
+      help_text: string;
       category: string;
+      variants: number[];
     },
     create_userid: string
   ) {
@@ -482,8 +428,10 @@ export class AdminService {
       provision_group_text: string;
       max: number;
       provision: string;
-      freeText: string;
+      free_text: string;
+      help_text: string;
       category: string;
+      variants: number[];
     },
     update_userid: string
   ) {

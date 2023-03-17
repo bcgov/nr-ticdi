@@ -9,6 +9,8 @@ export class UpdateNFRProvisionDto extends PickType(NFRProvisionDto, [
   "max",
   "provision_name",
   "free_text",
+  "help_text",
   "category",
+  "variants",
   "update_userid",
 ] as const) {}

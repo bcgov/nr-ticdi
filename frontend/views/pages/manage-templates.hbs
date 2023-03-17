@@ -47,10 +47,13 @@
                                     <th>Max</th>
                                     <th style="min-width: 400px">Provision</th>
                                     <th style="min-width: 50px">Free Text</th>
+                                    <th></th> <!-- Help Text -->
                                     <th style="min-width: 200px">Category</th>
                                     <th>Active</th><!-- Active column -->
                                     <th></th><!-- Edit column -->
-                                    <th></th><!-- id column -->
+                                    <th></th><!-- ID column -->
+                                    <th></th><!-- Variants column -->
+                                    <th></th><!-- Mandatory column -->
                                 </thead>
                                 <tbody id="provisionTableBody"></tbody>
                             </table>
@@ -201,8 +204,44 @@
                                 <input type="text" class="form-control" id="editProvisionFreeText" name="free_text">
                             </div>
                             <div class="form-group">
+                                <label for="editProvisionHelpText">Help Text</label>
+                                <input type="text" class="form-control" id="editProvisionHelpText" name="help_text">
+                            </div>
+                            <div class="form-group">
                                 <label for="editProvisionCategory">Category</label>
                                 <input type="text" class="form-control" id="editProvisionCategory" name="type">
+                            </div>
+                            <div class="form-group">
+                                <label class="mb-2">Variants</label>
+                                {{#each variantJsonArray}}
+                                    <div class="row mb-2 pl-2">
+                                    <div class="col-sm-8">
+                                        <label class="form-check-label" for="editProvisionVariant-{{this.id}}" style="width:100%">
+                                        <span class="variant-name" style="width:100%">{{this.variant_name}} {{{dots this.variant_name }}}</span>
+                                        </label>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <div class="form-check">
+                                        <input type="checkbox" class="form-check-input editProvisionVariant" id="editProvisionVariant-{{this.id}}" data-id="{{this.id}}" name="variant-{{this.id}}">
+                                        </div>
+                                    </div>
+                                    </div>
+                                {{/each}}
+                            </div>
+                            <div class="form-group">
+                                <label class="mb-2">Mandatory</label>
+                                <div class="row mb-2">
+                                    <div class="col-sm-8">
+                                        <label class="form-check-label" for="editProvisionMandatory" style="width:100%">
+                                            <span class="variant-name" style="width:100%">Is this provision mandatory? {{{ dots "Is this provision mandatory?" }}}</span>
+                                        </label>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <div class="form-check">
+                                            <input type="checkbox" class="form-check-input" id="editProvisionMandatory">
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                             </form>
                         </div>
@@ -264,8 +303,44 @@
                                 <input type="text" class="form-control" id="addProvisionFreeText" name="free_text">
                             </div>
                             <div class="form-group">
+                                <label for="addProvisionHelpText">Help Text</label>
+                                <input type="text" class="form-control" id="addProvisionHelpText" name="help_text">
+                            </div>
+                            <div class="form-group">
                                 <label for="addProvisionCategory">Category</label>
                                 <input type="text" class="form-control" id="addProvisionCategory" name="type">
+                            </div>
+                            <div class="form-group">
+                                <label class="mb-2">Variants</label>
+                                {{#each variantJsonArray}}
+                                    <div class="row mb-2 pl-2">
+                                    <div class="col-sm-8">
+                                        <label class="form-check-label" for="addProvisionVariant-{{this.id}}" style="width:100%">
+                                        <span class="variant-name" style="width:100%">{{this.variant_name}} {{{dots this.variant_name }}}</span>
+                                        </label>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <div class="form-check">
+                                        <input type="checkbox" class="form-check-input addProvisionVariant" id="addProvisionVariant-{{this.id}}" data-id="{{this.id}}" name="variant-{{this.id}}">
+                                        </div>
+                                    </div>
+                                    </div>
+                                {{/each}}
+                            </div>
+                            <div class="form-group">
+                                <label class="mb-2">Mandatory</label>
+                                <div class="row mb-2">
+                                    <div class="col-sm-8">
+                                        <label class="form-check-label" for="addProvisionMandatory" style="width:100%">
+                                            <span class="variant-name" style="width:100%">Is this provision mandatory? {{{ dots "Is this provision mandatory?" }}}</span>
+                                        </label>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <div class="form-check">
+                                            <input type="checkbox" class="form-check-input" id="addProvisionMandatory">
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                             </form>
                         </div>
@@ -286,6 +361,7 @@
                 </div>
             </div>
         </div>
+        <div id="mandatoryProvisionIds" value=""></div>
     </main>
     <script src="/js/manage-templates.js"></script>
   {{/inline}}

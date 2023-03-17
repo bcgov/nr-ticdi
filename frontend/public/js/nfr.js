@@ -14,8 +14,6 @@ if (Array.isArray(groupMaxJsonArray) && groupMaxJsonArray.length > 0) {
 }
 let groupMaxTable;
 let provisionTable, variableTable, selectedProvisionsTable;
-// color css for provision group dropdown
-$("#group-select").find("option:first-child").addClass("viewed");
 
 const nfrDataId = $("#nfrDataId").val();
 $(".dataSection dd").each(function () {
@@ -91,10 +89,11 @@ provisionTable = $("#provisionTable").DataTable({
           if (columnType === "select") {
             const checked =
               enabledProvisions.includes(id) === true ? "checked" : "";
-            const mandatory =
-              checked == "checked" && mandatoryProvisions.includes(id) === true
-                ? "disabled"
-                : "";
+            // const mandatory =
+            //   checked == "checked" && mandatoryProvisions.includes(id) === true
+            //     ? "disabled"
+            //     : "";
+            const mandatory = "";
             return `<input type='checkbox' class='provisionSelect' id='active-${id}' data-id='${id}' data-group='${group}' data-max='${max}' ${checked} ${mandatory}>`;
           } else if (
             columnType === "max" ||
@@ -378,7 +377,8 @@ $("#documentVariantId").on("change", function () {
     .then((res) => res.json())
     .then((resJson) => {
       mandatoryProvisions = resJson;
-      enabledProvisions = mandatoryProvisions;
+      // enabledProvisions = mandatoryProvisions;
+      enabledProvisions = [];
       provisionTable.ajax.url(pUrl).load();
     });
 });
@@ -386,27 +386,37 @@ $("#documentVariantId").on("change", function () {
 // event listener for the Select A Group dropdown
 $("#group-select").on("change", function () {
   const selectedGroup = $(this).val();
-  const selectedOption = $(this).find("option:selected");
-  selectedOption.addClass("viewed");
-  provisionTable.rows().every(function () {
-    const provisionGroup = this.data().provision_group;
-    if (selectedGroup == "" || provisionGroup == selectedGroup) {
-      $(this.node()).show();
-    } else {
-      $(this.node()).hide();
+  if (selectedGroup != 0) {
+    const selectedOption = $(this).find("option:selected");
+    selectedOption.addClass("viewed");
+    provisionTable.rows().every(function () {
+      const provisionGroup = this.data().provision_group;
+      if (selectedGroup == "" || provisionGroup == selectedGroup) {
+        $(this.node()).show();
+      } else {
+        $(this.node()).hide();
+      }
+    });
+    if (Array.isArray(groupMaxJsonArray) && groupMaxJsonArray.length > 0) {
+      const groupMax = groupMaxJsonArray.find(
+        (element) => element.provision_group == selectedGroup
+      ).max;
+      $("#maxGroupNum").text(groupMax);
     }
-  });
-  if (Array.isArray(groupMaxJsonArray) && groupMaxJsonArray.length > 0) {
-    const groupMax = groupMaxJsonArray.find(
-      (element) => element.provision_group == selectedGroup
-    ).max;
-    $("#maxGroupNum").text(groupMax);
+  } else {
+    provisionTable.rows().every(function () {
+      $(this.node()).hide();
+    });
   }
 });
 
 function filterRows() {
   const selectedGroup = $("#group-select").val();
-  if (Array.isArray(groupMaxJsonArray) && groupMaxJsonArray.length > 0) {
+  if (
+    selectedGroup != 0 &&
+    Array.isArray(groupMaxJsonArray) &&
+    groupMaxJsonArray.length > 0
+  ) {
     const groupMax = groupMaxJsonArray.find(
       (element) => element.provision_group == selectedGroup
     ).max;
@@ -418,6 +428,10 @@ function filterRows() {
       } else {
         $(this.node()).hide();
       }
+    });
+  } else {
+    provisionTable.rows().every(function () {
+      $(this.node()).hide();
     });
   }
 }

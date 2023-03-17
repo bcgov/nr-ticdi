@@ -232,10 +232,10 @@ export class AppController {
           : [];
         const mandatoryProvisionIds =
           await this.reportService.getMandatoryProvisionsByVariant(variantName);
-        const combinedProvisions = provisionIds.concat(mandatoryProvisionIds);
-        const enabledProvisions = combinedProvisions.filter(
-          (item, index) => combinedProvisions.indexOf(item) === index
-        );
+        // const combinedProvisions = provisionIds.concat(mandatoryProvisionIds);
+        // const enabledProvisions = combinedProvisions.filter(
+        //   (item, index) => combinedProvisions.indexOf(item) === index
+        // );
         await this.ttlsService.setWebadeToken();
         const response: any = await firstValueFrom(
           this.ttlsService.callHttp(dtid)
@@ -298,7 +298,8 @@ export class AppController {
           nfrDataId: nfrData ? nfrData.id : -1,
           selectedVariant: selectedVariant,
           mandatoryProvisionList: mandatoryProvisionIds,
-          enabledProvisionList: enabledProvisions,
+          // enabledProvisionList: enabledProvisions,
+          enabledProvisionList: provisionIds,
         };
       } catch (err) {
         console.log(err);
@@ -382,6 +383,10 @@ export class AppController {
       process.env.ticdi_environment == "DEVELOPMENT"
         ? "DEVELOPMENT - " + PAGE_TITLES.MANAGE_TEMPLATES
         : PAGE_TITLES.MANAGE_TEMPLATES;
+    let variantJsonArray = [];
+    if (reportIndex == 2) {
+      variantJsonArray = await this.reportService.getVariantsWithIds();
+    }
     return {
       title: title,
       idirUsername: session.data.activeAccount
@@ -389,6 +394,7 @@ export class AppController {
         : "",
       primaryContactName: "",
       displayAdmin: displayAdmin,
+      variantJsonArray: variantJsonArray,
     };
   }
 
@@ -396,7 +402,6 @@ export class AppController {
   @Render("search")
   @UseFilters(AuthenticationFilter)
   @UseGuards(AuthenticationGuard)
-  @UseGuards(AdminGuard)
   async searchPage(@Session() session: { data?: SessionData }) {
     let isAdmin = false;
     if (

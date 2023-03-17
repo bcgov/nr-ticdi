@@ -6,7 +6,9 @@ export class NFRProvisionDto {
   max?: number;
   provision_name?: string;
   free_text?: string;
+  help_text?: string;
   category?: string;
+  variants?: number[];
   create_userid?: string;
   update_userid?: string;
 }

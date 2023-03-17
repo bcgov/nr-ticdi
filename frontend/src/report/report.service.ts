@@ -388,6 +388,13 @@ export class ReportService {
     }
   }
 
+  async getMandatoryProvisions() {
+    const url = `${hostname}:${port}/nfr-provision/get-all-mandatory-provisions/0`;
+    return await axios.get(url).then((res) => {
+      return res.data;
+    });
+  }
+
   async getMandatoryProvisionsByVariant(variantName: string) {
     const url = `${hostname}:${port}/nfr-provision/get-mandatory-provisions/variant/${variantName}`;
     return await axios.get(url).then((res) => {
@@ -395,18 +402,63 @@ export class ReportService {
     });
   }
 
-  async getNfrData(nfrDataId: number): Promise<any> {
-    const url = `${hostname}:${port}/nfr-data/${nfrDataId}`;
-    const data = await axios
-      .get(url, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      })
+  async getNFRData() {
+    const nfrDataUrl = `${hostname}:${port}/nfr-data`;
+    const templateUrl = `${hostname}:${port}/document-template/nfr-template-info`;
+    const nfrData = await axios
+      .get(nfrDataUrl)
       .then((res) => {
         return res.data;
-      });
-    return data;
+      })
+      .catch((err) => console.log(err.response.data));
+    const templateIds = [];
+    for (let entry of nfrData) {
+      templateIds.push(entry.template_id);
+    }
+    const allTemplates: {
+      id: number;
+      file_name: string;
+      active_flag: boolean;
+      is_deleted: boolean;
+      template_version: number;
+    }[] = await axios
+      .post(templateUrl, templateIds)
+      .then((res) => {
+        return res.data;
+      })
+      .catch((err) => console.log(err.response.data));
+
+    // Combine the corresponding templates with the nfr data.
+    const combinedArray = [];
+
+    let i = 0;
+    let j = 0;
+
+    while (i < allTemplates.length && j < nfrData.length) {
+      const template = allTemplates[i];
+      const nfr = nfrData[j];
+
+      if (template.id === nfr.template_id) {
+        if (!template.is_deleted) {
+          combinedArray.push({
+            dtid: nfr.dtid,
+            version: template.template_version,
+            file_name: template.file_name,
+            updated_date: nfr.update_timestamp.split("T")[0],
+            status: nfr.status,
+            active: template.active_flag,
+            nfr_id: nfr.id,
+            variant_name: nfr.variant_name,
+          });
+        }
+        j++;
+      } else if (template.id < nfr.template_id) {
+        i++;
+      } else {
+        j++;
+      }
+    }
+    return combinedArray;
   }
 
   async getNfrDataByDtid(dtid: number): Promise<any> {
@@ -458,6 +510,13 @@ export class ReportService {
 
   async getEnabledProvisionsByVariant(variantName: string) {
     const url = `${hostname}:${port}/nfr-provision/get-mandatory-provisions/variant/${variantName}`;
+    return axios.get(url).then((res) => {
+      return res.data;
+    });
+  }
+
+  async getVariantsWithIds() {
+    const url = `${hostname}:${port}/nfr-provision/get-variants-with-ids/0`;
     return axios.get(url).then((res) => {
       return res.data;
     });

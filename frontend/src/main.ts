@@ -19,6 +19,11 @@ async function bootstrap() {
   hbs.registerHelper("json", function (context) {
     return JSON.stringify(context);
   });
+  // used on the manage-templates page
+  hbs.registerHelper("dots", function (variant_name) {
+    const count = 100 - variant_name.length;
+    return ".".repeat(count);
+  });
 
   let sessionOptions: expressSession.SessionOptions;
   sessionOptions = {

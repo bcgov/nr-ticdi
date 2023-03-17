@@ -45,7 +45,7 @@
                 "paging": false,
                 "bFilter": false,
                 "ajax": {
-                    "url": "admin/search-nfr-data",
+                    "url": "report/search-nfr-data",
                     "dataSrc": ""
                 },
                 "columns": [
@@ -153,7 +153,7 @@
         async function openDocument() {
             const dtid = $('input[name="radioActive"]:checked').data('dtid');
             const variantName = $('input[name="radioActive"]:checked').data('variant_name');
-            window.location.href = `/nfr/dtid/${dtid}/${variantName}`
+            window.location.href = `/dtid/${dtid}/${variantName}`
         }
     </script>
   {{/inline}}

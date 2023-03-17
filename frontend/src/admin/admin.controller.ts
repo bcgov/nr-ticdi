@@ -187,11 +187,6 @@ export class AdminController {
     return this.adminService.getTemplates(reportId);
   }
 
-  @Get("search-nfr-data")
-  getNFRData(): Promise<any> {
-    return this.adminService.getNFRData();
-  }
-
   @Get("open-document/:nfr_id")
   setSessionDocument(
     @Session() session: { data?: SessionData },
@@ -234,8 +229,10 @@ export class AdminController {
       provision_group_text: string;
       max: number;
       provision: string;
-      freeText: string;
+      free_text: string;
+      help_text: string;
       category: string;
+      variants: number[];
     },
     @Session() session: { data?: SessionData }
   ) {
@@ -253,8 +250,10 @@ export class AdminController {
       provision_group_text: string;
       max: number;
       provision: string;
-      freeText: string;
+      free_text: string;
+      help_text: string;
       category: string;
+      variants: number[];
     },
     @Session() session: { data?: SessionData }
   ) {

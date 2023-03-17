@@ -95,7 +95,9 @@ export class NFRDataService {
         return nfrDataVariable;
       }
     );
-    await this.deleteDataVarsAndProvs(nfrData, provisionArray, variableArray);
+    if (nfrData) {
+      await this.deleteDataVarsAndProvs(nfrData, provisionArray, variableArray);
+    }
 
     await this.nfrDataProvisionRepository.save(nfrDataProvisions);
     await this.nfrDataVariableRepository.save(nfrDataVariables);
@@ -185,9 +187,11 @@ export class NFRDataService {
     variableArray: { variable_id: number; variable_value: string }[]
   ) {
     // Delete data provisions that have been removed by the user
-    const oldProvisionIds = nfrData.nfr_data_provisions.map(
-      (dataProvision) => dataProvision.nfr_provision.id
-    );
+    const oldProvisionIds = nfrData
+      ? nfrData.nfr_data_provisions.map(
+          (dataProvision) => dataProvision.nfr_provision.id
+        )
+      : [];
     const newProvisionIds = provisionArray.map(
       ({ provision_id }) => provision_id
     );
@@ -204,9 +208,11 @@ export class NFRDataService {
     }
 
     // Delete data variables that have been removed by the user
-    const oldVariableIds = nfrData.nfr_data_variables.map(
-      (dataVariable) => dataVariable.nfr_variable.id
-    );
+    const oldVariableIds = nfrData
+      ? nfrData.nfr_data_variables.map(
+          (dataVariable) => dataVariable.nfr_variable.id
+        )
+      : [];
     const newVariableIds = variableArray.map(({ variable_id }) => variable_id);
     const variablesToDelete = oldVariableIds.filter(
       (item) => !newVariableIds.includes(item)
@@ -277,14 +283,18 @@ export class NFRDataService {
           },
         },
       });
-      const existingDataProvisions = nfrData.nfr_data_provisions;
-      const provisionIds = existingDataProvisions.map(
-        (dataProvision) => dataProvision.nfr_provision.id
-      );
-      const existingDataVariables = nfrData.nfr_data_variables;
-      const variableIds = existingDataVariables.map(
-        (dataVariable) => dataVariable.nfr_variable.id
-      );
+      const provisionIds =
+        nfrData && nfrData.nfr_data_provisions
+          ? nfrData.nfr_data_provisions.map(
+              (dataProvision) => dataProvision.nfr_provision.id
+            )
+          : [];
+      const variableIds =
+        nfrData && nfrData.nfr_data_variables
+          ? nfrData.nfr_data_variables.map(
+              (dataVariable) => dataVariable.nfr_variable.id
+            )
+          : [];
       return { nfrData, provisionIds, variableIds };
     } catch (err) {
       console.log(err);

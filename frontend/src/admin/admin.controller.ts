@@ -187,11 +187,6 @@ export class AdminController {
     return this.adminService.getTemplates(reportId);
   }
 
-  @Get("search-nfr-data")
-  getNFRData(): Promise<any> {
-    return this.adminService.getNFRData();
-  }
-
   @Get("open-document/:nfr_id")
   setSessionDocument(
     @Session() session: { data?: SessionData },

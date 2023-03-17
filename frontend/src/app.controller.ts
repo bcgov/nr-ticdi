@@ -401,7 +401,6 @@ export class AppController {
   @Render("search")
   @UseFilters(AuthenticationFilter)
   @UseGuards(AuthenticationGuard)
-  @UseGuards(AdminGuard)
   async searchPage(@Session() session: { data?: SessionData }) {
     let isAdmin = false;
     if (

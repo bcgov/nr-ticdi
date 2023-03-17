@@ -174,4 +174,9 @@ export class ReportController {
   getEnabledProvisionsByVariant(@Param("variantName") variantName: string) {
     return this.reportService.getEnabledProvisionsByVariant(variantName);
   }
+
+  @Get("search-nfr-data")
+  getNFRData() {
+    return this.reportService.getNFRData();
+  }
 }

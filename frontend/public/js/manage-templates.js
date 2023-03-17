@@ -142,6 +142,7 @@ $(document).ready(function () {
               var group = row["provision_group"];
               var max = row["max"];
               var variants = JSON.stringify(row["variants"]);
+              const mandatoryProvision = mandatoryProvisionIds.includes(id);
 
               if (columnType === "active_flag") {
                 const checked = data === true ? "checked" : "";
@@ -153,7 +154,7 @@ $(document).ready(function () {
               ) {
                 return `<input type='hidden' id='${columnType}-${id}' value='${data}' />`;
               } else if (columnType === "edit") {
-                return `<a href="#" data-id="${id}" data-variants="${variants}" onclick="openEditModal.call(this)">Edit</a>`;
+                return `<a href="#" data-id="${id}" data-variants="${variants}" data-mandatory="${mandatory}" onclick="openEditModal.call(this)">Edit</a>`;
               } else {
                 return `<input type='text' id='${columnType}-${id}' value='${data}' readonly style='color: gray; width: 100%;' />`;
               }
@@ -174,7 +175,9 @@ $(document).ready(function () {
       ],
       drawCallback: function (settings) {
         // add event listeners to the provision checkboxes
-        const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+        const checkboxes = document.querySelectorAll(
+          'input[name="radioActive"]'
+        );
         if (checkboxes.length > 0) {
           checkboxes.forEach((checkbox) => {
             checkbox.addEventListener("click", function () {
@@ -372,6 +375,7 @@ function addProvision() {
       variants.push(checkbox.dataset.id);
     }
   });
+  const mandatory = $("#addProvisionMandatory").is(":checked");
   const data = JSON.stringify({
     type: type,
     provision_group: provision_group,
@@ -382,6 +386,7 @@ function addProvision() {
     help_text: help_text,
     category: category,
     variants: variants,
+    mandatory: mandatory,
   });
   const matchingRow = $("#groupMaxTable")
     .find("tr td:first-child")
@@ -456,6 +461,8 @@ function confirmAddProvision() {
       variants.push(checkbox.dataset.id);
     }
   });
+  const mandatory = $("#addProvisionMandatory").is(":checked");
+  console.log(mandatory);
   const data = JSON.stringify({
     type: type,
     provision_group: provision_group,
@@ -465,7 +472,8 @@ function confirmAddProvision() {
     free_text: free_text,
     help_text: help_text,
     category: category,
-    category: variants,
+    variants: variants,
+    mandatory: mandatory,
   });
   fetch("admin/add-provision", {
     method: "POST",
@@ -597,6 +605,8 @@ function editProvision() {
       variants.push(checkbox.dataset.id);
     }
   });
+  const mandatory = $("#editProvisionMandatory").is(":checked");
+  console.log("mandatory: " + mandatory);
   const data = JSON.stringify({
     id: id,
     type: type,
@@ -608,6 +618,7 @@ function editProvision() {
     help_text: help_text,
     category: category,
     variants: variants,
+    mandatory: mandatory,
   });
   const matchingRow = $("#groupMaxTable")
     .find("tr td:first-child")
@@ -683,6 +694,7 @@ function confirmEditProvision() {
       variants.push(checkbox.dataset.id);
     }
   });
+  const mandatory = $("#editProvisionMandatory").is(":checked");
   const data = JSON.stringify({
     id: id,
     type: type,
@@ -694,6 +706,7 @@ function confirmEditProvision() {
     help_text: help_text,
     category: category,
     variants: variants,
+    mandatory: mandatory,
   });
   fetch("admin/update-provision", {
     method: "POST",

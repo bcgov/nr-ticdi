@@ -232,6 +232,12 @@ export class NFRProvisionService {
     });
     return provisionVariables;
   }
+  async getMandatoryProvisions(): Promise<number[]> {
+    const provisions = await this.nfrProvisionRepository.find({
+      where: { mandatory: true },
+    });
+    return provisions.map((provision) => provision.id);
+  }
 
   async getMandatoryProvisionsByVariant(
     variantName: string

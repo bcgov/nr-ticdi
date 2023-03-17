@@ -388,6 +388,13 @@ export class ReportService {
     }
   }
 
+  async getMandatoryProvisions() {
+    const url = `${hostname}:${port}/nfr-provision/get-all-mandatory-provisions/0`;
+    return await axios.get(url).then((res) => {
+      return res.data;
+    });
+  }
+
   async getMandatoryProvisionsByVariant(variantName: string) {
     const url = `${hostname}:${port}/nfr-provision/get-mandatory-provisions/variant/${variantName}`;
     return await axios.get(url).then((res) => {

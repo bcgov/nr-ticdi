@@ -66,6 +66,11 @@ export class NFRProvisionController {
     return this.nfrProvisionService.getVariablesByVariant(variantName);
   }
 
+  @Get("get-all-mandatory-provisions/:id")
+  getMandatoryProvisions() {
+    return this.nfrProvisionService.getMandatoryProvisions();
+  }
+
   @Get("get-mandatory-provisions/variant/:variant")
   getMandatoryProvisionsByVariant(@Param("variant") variantName: string) {
     return this.nfrProvisionService.getMandatoryProvisionsByVariant(

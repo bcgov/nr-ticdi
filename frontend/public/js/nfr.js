@@ -636,7 +636,7 @@ function getVariableJson(provisionIds) {
 function updateGroupSelect(groupMaxJsonArray) {
   // repopulate the group select using the new groupMaxJsonArray
   const selectElement = document.getElementById("group-select");
-  selectElement.innerHTML = "";
+  selectElement.innerHTML = `<option value="0" class="defaultSelect">Select</option>`;
   groupMaxJsonArray.forEach((item) => {
     const optionElement = document.createElement("option");
     optionElement.value = item.provision_group;

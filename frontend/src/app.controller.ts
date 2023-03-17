@@ -232,10 +232,10 @@ export class AppController {
           : [];
         const mandatoryProvisionIds =
           await this.reportService.getMandatoryProvisionsByVariant(variantName);
-        const combinedProvisions = provisionIds.concat(mandatoryProvisionIds);
-        const enabledProvisions = combinedProvisions.filter(
-          (item, index) => combinedProvisions.indexOf(item) === index
-        );
+        // const combinedProvisions = provisionIds.concat(mandatoryProvisionIds);
+        // const enabledProvisions = combinedProvisions.filter(
+        //   (item, index) => combinedProvisions.indexOf(item) === index
+        // );
         await this.ttlsService.setWebadeToken();
         const response: any = await firstValueFrom(
           this.ttlsService.callHttp(dtid)
@@ -298,7 +298,8 @@ export class AppController {
           nfrDataId: nfrData ? nfrData.id : -1,
           selectedVariant: selectedVariant,
           mandatoryProvisionList: mandatoryProvisionIds,
-          enabledProvisionList: enabledProvisions,
+          // enabledProvisionList: enabledProvisions,
+          enabledProvisionList: provisionIds,
         };
       } catch (err) {
         console.log(err);

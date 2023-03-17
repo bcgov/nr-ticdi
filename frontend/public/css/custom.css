@@ -191,6 +191,10 @@ td input[type="checkbox"] {
   background-color: lightgreen;
 }
 
+#group-select option.defaultSelect {
+  background-color: white;
+}
+
 .variant-name {
   display: inline-block;
   width: 80%;

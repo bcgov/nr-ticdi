@@ -51,8 +51,9 @@
                                     <th style="min-width: 200px">Category</th>
                                     <th>Active</th><!-- Active column -->
                                     <th></th><!-- Edit column -->
-                                    <th></th><!-- id column -->
-                                    <th></th><!-- variants column -->
+                                    <th></th><!-- ID column -->
+                                    <th></th><!-- Variants column -->
+                                    <th></th><!-- Mandatory column -->
                                 </thead>
                                 <tbody id="provisionTableBody"></tbody>
                             </table>
@@ -363,8 +364,5 @@
         <div id="mandatoryProvisionIds" value=""></div>
     </main>
     <script src="/js/manage-templates.js"></script>
-    <script>
-        const mandatoryProvisionIds = [{{ this.mandatoryProvisionIds }}];
-    </script>
   {{/inline}}
 {{/template}}

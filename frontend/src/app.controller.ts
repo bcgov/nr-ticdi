@@ -383,11 +383,8 @@ export class AppController {
         ? "DEVELOPMENT - " + PAGE_TITLES.MANAGE_TEMPLATES
         : PAGE_TITLES.MANAGE_TEMPLATES;
     let variantJsonArray = [];
-    let mandatoryProvisionIds = [];
     if (reportIndex == 2) {
       variantJsonArray = await this.reportService.getVariantsWithIds();
-      mandatoryProvisionIds = await this.reportService.getMandatoryProvisions();
-      console.log(mandatoryProvisionIds);
     }
     return {
       title: title,
@@ -397,7 +394,6 @@ export class AppController {
       primaryContactName: "",
       displayAdmin: displayAdmin,
       variantJsonArray: variantJsonArray,
-      mandatoryProvisionIds: mandatoryProvisionIds,
     };
   }
 

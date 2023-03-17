@@ -118,10 +118,11 @@ $(document).ready(function () {
         { data: "edit" },
         { data: "id" },
         { data: "variants" },
+        { data: "mandatory" },
       ],
       columnDefs: [
         {
-          targets: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+          targets: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
           render: function (data, type, row, meta) {
             if (type === "display") {
               var columnTypes = [
@@ -136,13 +137,14 @@ $(document).ready(function () {
                 "edit",
                 "id",
                 "variants",
+                "mandatory",
               ];
               var columnType = columnTypes[meta.col];
               var id = row["id"];
               var group = row["provision_group"];
               var max = row["max"];
+              var mandatory = row["mandatory"];
               var variants = JSON.stringify(row["variants"]);
-              const mandatoryProvision = mandatoryProvisionIds.includes(id);
 
               if (columnType === "active_flag") {
                 const checked = data === true ? "checked" : "";
@@ -150,7 +152,8 @@ $(document).ready(function () {
               } else if (
                 columnType === "help_text" ||
                 columnType === "id" ||
-                columnType === "variants"
+                columnType === "variants" ||
+                columnType === "mandatory"
               ) {
                 return `<input type='hidden' id='${columnType}-${id}' value='${data}' />`;
               } else if (columnType === "edit") {
@@ -462,7 +465,6 @@ function confirmAddProvision() {
     }
   });
   const mandatory = $("#addProvisionMandatory").is(":checked");
-  console.log(mandatory);
   const data = JSON.stringify({
     type: type,
     provision_group: provision_group,
@@ -550,6 +552,8 @@ function openEditModal() {
   const help_text = $(`#help_text-${provisionId}`).val();
   const category = $(`#category-${provisionId}`).val();
   const variants = $(this).data("variants");
+  const mandatory = $(this).data("mandatory");
+
   let provision_group_text = "";
   const matchingRow = $("#groupMaxTable")
     .find("tr td:first-child")
@@ -586,6 +590,7 @@ function openEditModal() {
       checkbox.checked = false;
     }
   });
+  $("#editProvisionMandatory").prop("checked", mandatory);
   $("#editProvisionModal").modal("toggle");
 }
 function editProvision() {
@@ -606,7 +611,6 @@ function editProvision() {
     }
   });
   const mandatory = $("#editProvisionMandatory").is(":checked");
-  console.log("mandatory: " + mandatory);
   const data = JSON.stringify({
     id: id,
     type: type,

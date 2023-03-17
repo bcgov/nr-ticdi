@@ -414,6 +414,7 @@ export class AdminService {
       "category",
       "active_flag",
       "variants",
+      "mandatory",
     ];
     const url = `${hostname}:${port}/nfr-provision`;
     const nfrProvisions = await axios

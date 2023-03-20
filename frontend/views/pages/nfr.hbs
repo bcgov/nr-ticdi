@@ -117,7 +117,7 @@
                     <legend id="provisionLegend" style="cursor: pointer" class='togvis sectionTitle'><i class="fa fa-plus"></i>  Provisions</legend>
                     <div class="contents" style="display: none;">
                         <span>Select A Group:
-                            <select id="group-select"><option value="0" class="defaultSelect">Select</option>{{#each groupMaxJsonArray}}<option value="{{this.provision_group}}">{{this.provision_group}} - {{this.provision_group_text}}{{/each}}</option></select>     Max for this Group is <span id="maxGroupNum"></span></span>
+                            <select id="group-select"><option value="0" class="defaultSelect">Select</option>{{#each groupMaxJsonArray}}<option value="{{this.provision_group}}">{{this.provision_group}} - {{this.provision_group_text}}{{/each}}</option></select>     <span id="maxGroupNum"></span></span>
                         <table id="provisionTable" style="width:100%">
                             <thead>
                                 <th>Type</th>

@@ -202,3 +202,7 @@ td input[type="checkbox"] {
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
+.input-readonly {
+  color: grey;
+}

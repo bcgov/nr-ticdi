@@ -18,6 +18,9 @@ let provisionTable, variableTable, selectedProvisionsTable;
 const nfrDataId = $("#nfrDataId").val();
 $(".dataSection dd").each(function () {
   if ($(this).text() == "" || $(this).text() == "TBD") {
+    if ($(this).attr("id") == "address2" || $(this).attr("id") == "address3") {
+      $(this).hide();
+    }
     $(this).text(" ");
     $(this).css("border", "solid 1px orange");
   }
@@ -401,9 +404,12 @@ $("#group-select").on("change", function () {
       const groupMax = groupMaxJsonArray.find(
         (element) => element.provision_group == selectedGroup
       ).max;
-      $("#maxGroupNum").text(groupMax);
+      const groupMaxText =
+        groupMax == 999 ? "" : "Max for this Group is " + groupMax;
+      $("#maxGroupNum").text(groupMaxText);
     }
   } else {
+    $("#maxGroupNum").text("");
     provisionTable.rows().every(function () {
       $(this.node()).hide();
     });
@@ -420,7 +426,9 @@ function filterRows() {
     const groupMax = groupMaxJsonArray.find(
       (element) => element.provision_group == selectedGroup
     ).max;
-    $("#maxGroupNum").text(groupMax);
+    const groupMaxText =
+      groupMax == 999 ? "" : "Max for this Group is " + groupMax;
+    $("#maxGroupNum").text(groupMaxText);
     provisionTable.rows().every(function () {
       const provisionGroup = this.data().provision_group;
       if (selectedGroup == "" || provisionGroup == selectedGroup) {
@@ -430,6 +438,7 @@ function filterRows() {
       }
     });
   } else {
+    $("#maxGroupNum").text("");
     provisionTable.rows().every(function () {
       $(this.node()).hide();
     });

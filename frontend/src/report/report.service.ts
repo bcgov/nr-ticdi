@@ -307,6 +307,7 @@ export class ReportService {
       "category",
       "provision_group",
       "id",
+      "mandatory",
     ];
     let reduced, provisions;
     if (nfrId != -1) {

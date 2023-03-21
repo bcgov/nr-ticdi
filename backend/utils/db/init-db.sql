@@ -1,17 +1,17 @@
 -- Initialize Database Provisions
 -- Create groups
-INSERT INTO nfr_provision_group (provision_group, max, provision_group_text) VALUES (1,3,'pgt');
+INSERT INTO nfr_provision_group (provision_group, max, provision_group_text) VALUES (1,999,'pgt');
+INSERT INTO nfr_provision_group (provision_group, max, provision_group_text) VALUES (2,999,'pgt');
 INSERT INTO nfr_provision_group (provision_group, max, provision_group_text) VALUES (5,3,'pgt');
-INSERT INTO nfr_provision_group (provision_group, max, provision_group_text) VALUES (2,3,'pgt');
 INSERT INTO nfr_provision_group (provision_group, max, provision_group_text) VALUES (10,3,'pgt');
 INSERT INTO nfr_provision_group (provision_group, max, provision_group_text) VALUES (12,3,'pgt');
 INSERT INTO nfr_provision_group (provision_group, max, provision_group_text) VALUES (14,3,'pgt');
-INSERT INTO nfr_provision_group (provision_group, max, provision_group_text) VALUES (15,3,'pgt');
-INSERT INTO nfr_provision_group (provision_group, max, provision_group_text) VALUES (20,3,'pgt');
-INSERT INTO nfr_provision_group (provision_group, max, provision_group_text) VALUES (25,3,'pgt');
+INSERT INTO nfr_provision_group (provision_group, max, provision_group_text) VALUES (15,1,'pgt');
+INSERT INTO nfr_provision_group (provision_group, max, provision_group_text) VALUES (20,2,'pgt');
+INSERT INTO nfr_provision_group (provision_group, max, provision_group_text) VALUES (25,2,'pgt');
 INSERT INTO nfr_provision_group (provision_group, max, provision_group_text) VALUES (27,3,'pgt');
 INSERT INTO nfr_provision_group (provision_group, max, provision_group_text) VALUES (28,3,'pgt');
-INSERT INTO nfr_provision_group (provision_group, max, provision_group_text) VALUES (34,3,'pgt');
+INSERT INTO nfr_provision_group (provision_group, max, provision_group_text) VALUES (34,10,'pgt');
 
 -- Create variants
 INSERT INTO nfr_provision_variant (variant_name) VALUES ('NOTICE OF FINAL REVIEW');

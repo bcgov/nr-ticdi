@@ -158,6 +158,10 @@ $(document).ready(function () {
                 return `<input type='hidden' id='${columnType}-${id}' value='${data}' />`;
               } else if (columnType === "edit") {
                 return `<a href="#" data-id="${id}" data-variants="${variants}" data-mandatory="${mandatory}" onclick="openEditModal.call(this)">Edit</a>`;
+              } else if (columnType === "max") {
+                return `<input type='text' id='${columnType}-${id}' value='${
+                  data == 999 ? "-" : data
+                }' readonly style='color: gray; width: 100%;' />`;
               } else {
                 return `<input type='text' id='${columnType}-${id}' value='${data}' readonly style='color: gray; width: 100%;' />`;
               }
@@ -365,7 +369,9 @@ function uploadTemplate() {
 function addProvision() {
   const type = $("#addProvisionType").find(":selected").val();
   const provision_group = $("#addProvisionGroup").val();
-  const max = $("#addProvisionMax").val();
+  const max = $("#addProvisionMaxUnlimited").is(":checked")
+    ? 999
+    : $("#addProvisionMax").val();
   const provision_group_text = $("#addProvisionGroupText").val();
   const provision_name = $("#addProvisionName").val();
   const free_text = $("#addProvisionFreeText").val();
@@ -398,7 +404,9 @@ function addProvision() {
     })
     .closest("tr");
   if (matchingRow.length) {
-    const maxCellValue = matchingRow.find("td:eq(1)").text();
+    const maxCellValue = +matchingRow.find("td:eq(1)").text();
+    console.log(max);
+    console.log(maxCellValue);
     const groupTextCellValue = matchingRow.find("td:eq(2)").text();
     if (maxCellValue === max && groupTextCellValue == provision_group_text) {
       fetch("admin/add-provision", {
@@ -452,7 +460,9 @@ function confirmAddProvision() {
   const type = $("#addProvisionType").find(":selected").val();
   const provision_group = $("#addProvisionGroup").val();
   const provision_group_text = $("#addProvisionGroupText").val();
-  const max = $("#addProvisionMax").val();
+  const max = $("#addProvisionMaxUnlimited").is(":checked")
+    ? 999
+    : $("#addProvisionMax").val();
   const provision_name = $("#addProvisionName").val();
   const free_text = $("#addProvisionFreeText").val();
   const help_text = $("#addProvisionHelpText").val();
@@ -501,6 +511,18 @@ $("#addProvisionMax").on("input", function () {
   value = value.replace(/[^0-9]/g, "");
   $(this).val(value);
 });
+$("#addProvisionMaxUnlimited").on("change", function () {
+  if ($(this).is(":checked")) {
+    console.log("unlimited is checked");
+    $("#addProvisionMax").val("");
+    $("#addProvisionMax").prop("readonly", true);
+    $("#addProvisionMax").addClass("input-readonly");
+  } else {
+    console.log("unlimited is unchecked");
+    $("#addProvisionMax").prop("readonly", false);
+    $("#addProvisionMax").removeClass("input-readonly");
+  }
+});
 // auto-update the maximum value based on the selected group
 $("#addProvisionGroup").on("input", function () {
   var value = $(this).val();
@@ -514,9 +536,19 @@ $("#addProvisionGroup").on("input", function () {
     })
     .closest("tr");
   if (matchingRow.length) {
-    const maxCellValue = matchingRow.find("td:eq(1)").text();
+    const maxCellValue = +matchingRow.find("td:eq(1)").text();
     const groupTextCellValue = matchingRow.find("td:eq(2)").text();
-    $("#addProvisionMax").val(maxCellValue);
+    if (maxCellValue == 999) {
+      $("#addProvisionMax").val("");
+      $("#addProvisionMaxUnlimited").prop("checked", true);
+      $("#addProvisionMax").prop("readonly", true);
+      $("#addProvisionMax").addClass("input-readonly");
+    } else {
+      $("#addProvisionMax").val(maxCellValue);
+      $("#addProvisionMaxUnlimited").prop("checked", false);
+      $("#addProvisionMax").prop("readonly", false);
+      $("#addProvisionMax").removeClass("input-readonly");
+    }
     $("#addProvisionGroupText").val(groupTextCellValue);
   } else {
     $("#addProvisionMax").val("");
@@ -576,7 +608,17 @@ function openEditModal() {
   }
   $("#editProvisionGroup").val(provision_group);
   $("#editProvisionGroupText").val(provision_group_text);
-  $("#editProvisionMax").val(max);
+  if (max == "-") {
+    $("#editProvisionMax").val("");
+    $("#editProvisionMaxUnlimited").prop("checked", true);
+    $("#editProvisionMax").prop("readonly", true);
+    $("#editProvisionMax").addClass("input-readonly");
+  } else {
+    $("#editProvisionMax").val(max);
+    $("#editProvisionMaxUnlimited").prop("checked", false);
+    $("#editProvisionMax").prop("readonly", false);
+    $("#editProvisionMax").removeClass("input-readonly");
+  }
   $("#editProvisionName").val(provision_name);
   $("#editProvisionFreeText").val(free_text);
   $("#editProvisionHelpText").val(help_text);
@@ -598,7 +640,9 @@ function editProvision() {
   const type = $("#editProvisionType").find(":selected").val();
   const provision_group = $("#editProvisionGroup").val();
   const provision_group_text = $("#editProvisionGroupText").val();
-  const max = $("#editProvisionMax").val();
+  const max = $("#editProvisionMaxUnlimited").is(":checked")
+    ? 999
+    : $("#editProvisionMax").val();
   const provision_name = $("#editProvisionName").val();
   const free_text = $("#editProvisionFreeText").val();
   const help_text = $("#editProvisionHelpText").val();
@@ -631,7 +675,8 @@ function editProvision() {
     })
     .closest("tr");
   if (matchingRow.length) {
-    const maxCellValue = matchingRow.find("td:eq(1)").text();
+    const maxCellValue = +matchingRow.find("td:eq(1)").text();
+    console.log(maxCellValue);
     const groupTextCellValue = matchingRow.find("td:eq(2)").text();
     if (maxCellValue === max && provision_group_text == groupTextCellValue) {
       fetch("admin/update-provision", {
@@ -650,14 +695,17 @@ function editProvision() {
         });
     } else {
       if (maxCellValue != max && groupTextCellValue != provision_group_text) {
+        console.log("if");
         $("#editGroupConfirmationText").text(
           `This will change the maximum number of provisions and description for group ${provision_group}.`
         );
       } else if (maxCellValue != max) {
+        console.log("else if");
         $("#editGroupConfirmationText").text(
           `This will change the maximum number of provisions for group ${provision_group}.`
         );
       } else {
+        console.log("else");
         $("#editGroupConfirmationText").text(
           `This will change the description for group ${provision_group}.`
         );
@@ -686,7 +734,9 @@ function confirmEditProvision() {
   const type = $("#editProvisionType").find(":selected").val();
   const provision_group = $("#editProvisionGroup").val();
   const provision_group_text = $("#editProvisionGroupText").val();
-  const max = $("#editProvisionMax").val();
+  const max = $("#editProvisionMaxUnlimited").is(":checked")
+    ? 999
+    : $("#editProvisionMax").val();
   const provision_name = $("#editProvisionName").val();
   const free_text = $("#editProvisionFreeText").val();
   const help_text = $("#editProvisionHelpText").val();
@@ -737,6 +787,16 @@ $("#editProvisionMax").on("input", function () {
   value = value.replace(/[^0-9]/g, "");
   $(this).val(value);
 });
+$("#editProvisionMaxUnlimited").on("change", function () {
+  if ($(this).is(":checked")) {
+    $("#editProvisionMax").val("");
+    $("#editProvisionMax").prop("readonly", true);
+    $("#editProvisionMax").addClass("input-readonly");
+  } else {
+    $("#editProvisionMax").prop("readonly", false);
+    $("#editProvisionMax").removeClass("input-readonly");
+  }
+});
 // auto-update the maximum value based on the selected group
 $("#editProvisionGroup").on("input", function () {
   var value = $(this).val();
@@ -750,10 +810,20 @@ $("#editProvisionGroup").on("input", function () {
     })
     .closest("tr");
   if (matchingRow.length) {
-    const maxCellValue = matchingRow.find("td:eq(1)").text();
+    const maxCellValue = +matchingRow.find("td:eq(1)").text();
     const groupTextCellValue = matchingRow.find("td:eq(2)").text();
-    $("#editProvisionMax").val(maxCellValue);
     $("#editProvisionGroupText").val(groupTextCellValue);
+    if (maxCellValue == 999) {
+      $("#editProvisionMax").val("");
+      $("#editProvisionMaxUnlimited").prop("checked", true);
+      $("#editProvisionMax").prop("readonly", true);
+      $("#editProvisionMax").addClass("input-readonly");
+    } else {
+      $("#editProvisionMax").val(maxCellValue);
+      $("#editProvisionMaxUnlimited").prop("checked", false);
+      $("#editProvisionMax").prop("readonly", false);
+      $("#editProvisionMax").removeClass("input-readonly");
+    }
   } else {
     $("#editProvisionMax").val("");
   }

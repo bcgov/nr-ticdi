@@ -18,6 +18,9 @@ let provisionTable, variableTable, selectedProvisionsTable;
 const nfrDataId = $("#nfrDataId").val();
 $(".dataSection dd").each(function () {
   if ($(this).text() == "" || $(this).text() == "TBD") {
+    if ($(this).attr("id") == "address2" || $(this).attr("id") == "address3") {
+      $(this).hide();
+    }
     $(this).text(" ");
     $(this).css("border", "solid 1px orange");
   }
@@ -59,6 +62,7 @@ provisionTable = $("#provisionTable").DataTable({
     { data: "provision_name" },
     { data: "help_text" },
     { data: "category" },
+    { data: "mandatory" },
     { data: "select" },
     { data: "provision_group" },
     { data: "max" },
@@ -67,7 +71,7 @@ provisionTable = $("#provisionTable").DataTable({
   ],
   columnDefs: [
     {
-      targets: [0, 1, 2, 3, 4, 5, 6, 7, 8],
+      targets: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
       render: function (data, type, row, meta) {
         if (type === "display") {
           var columnTypes = [
@@ -75,6 +79,7 @@ provisionTable = $("#provisionTable").DataTable({
             "provision_name",
             "help_text",
             "category",
+            "mandatory",
             "select",
             "provision_group",
             "max",
@@ -85,25 +90,24 @@ provisionTable = $("#provisionTable").DataTable({
           var id = row["id"];
           var group = row["provision_group"];
           var max = row["max"];
+          var mandatory = row["mandatory"] == true ? "Yes" : "No";
 
           if (columnType === "select") {
             const checked =
               enabledProvisions.includes(id) === true ? "checked" : "";
-            // const mandatory =
-            //   checked == "checked" && mandatoryProvisions.includes(id) === true
-            //     ? "disabled"
-            //     : "";
-            const mandatory = "";
-            return `<input type='checkbox' class='provisionSelect' id='active-${id}' data-id='${id}' data-group='${group}' data-max='${max}' ${checked} ${mandatory}>`;
+            return `<input type='checkbox' class='provisionSelect' id='active-${id}' data-id='${id}' data-group='${group}' data-max='${max}' data-mandatory='${mandatory}' ${checked}>`;
           } else if (
             columnType === "max" ||
-            columnType === "provision_group" ||
             columnType === "id" ||
             columnType === "free_text"
           ) {
             return `<input type='hidden' id='${columnType}-${id}' value='${data}' />`;
           } else if (columnType === "help_text") {
             return `<input type='text' value='${data}' title='${data}' tabIndex='-1' readonly style='color: gray; width: 100%;' />`;
+          } else if (columnType === "provision_group") {
+            return `<input type='hidden' class='provisionGroupValue' value='${data}' />`;
+          } else if (columnType === "mandatory") {
+            return `<input type='text' class='isMandatory' value='${mandatory}' tabIndex='-1' readonly style='color: gray; width: 100%;' />`;
           } else {
             return `<input type='text' id='${columnType}-${id}' value='${data}' tabIndex='-1' readonly style='color: gray; width: 100%;' />`;
           }
@@ -113,12 +117,12 @@ provisionTable = $("#provisionTable").DataTable({
       },
     },
     {
-      targets: 4,
+      targets: 5,
       className: "text-center",
       orderDataType: "dom-checkbox",
     },
     {
-      targets: [5, 6, 7, 8],
+      targets: [6, 7, 8, 9],
       orderable: false,
     },
   ],
@@ -401,9 +405,12 @@ $("#group-select").on("change", function () {
       const groupMax = groupMaxJsonArray.find(
         (element) => element.provision_group == selectedGroup
       ).max;
-      $("#maxGroupNum").text(groupMax);
+      const groupMaxText =
+        groupMax == 999 ? "" : "Max for this Group is " + groupMax;
+      $("#maxGroupNum").text(groupMaxText);
     }
   } else {
+    $("#maxGroupNum").text("");
     provisionTable.rows().every(function () {
       $(this.node()).hide();
     });
@@ -420,7 +427,9 @@ function filterRows() {
     const groupMax = groupMaxJsonArray.find(
       (element) => element.provision_group == selectedGroup
     ).max;
-    $("#maxGroupNum").text(groupMax);
+    const groupMaxText =
+      groupMax == 999 ? "" : "Max for this Group is " + groupMax;
+    $("#maxGroupNum").text(groupMaxText);
     provisionTable.rows().every(function () {
       const provisionGroup = this.data().provision_group;
       if (selectedGroup == "" || provisionGroup == selectedGroup) {
@@ -430,6 +439,7 @@ function filterRows() {
       }
     });
   } else {
+    $("#maxGroupNum").text("");
     provisionTable.rows().every(function () {
       $(this.node()).hide();
     });
@@ -519,58 +529,82 @@ function saveForLater() {
 async function generateNFRReport() {
   const tenureFileNumber = $("#tfn").text();
   const dtid = $("#dtid").text();
-  $("#genReport").prop("disabled", true);
-  const reportName = await fetch(
-    `/report/get-nfr-report-name/${dtid}/${tenureFileNumber}`,
-    {
-      method: "GET",
+  const unselectedMandatoryGroups = [];
+  let allMandatorySelected = true;
+  // Check that all mandatory provisions have been selected
+  $("#provisionTable")
+    .find("tbody tr")
+    .each(function () {
+      var isMandatory = $(this).find(".isMandatory").val().trim();
+      var provisionGroup = $(this).find(".provisionGroupValue").val();
+      if (isMandatory === "Yes") {
+        var provisionSelect = $(this).find(".provisionSelect").prop("checked");
+        if (!provisionSelect) {
+          unselectedMandatoryGroups.push(provisionGroup);
+          allMandatorySelected = false;
+        }
+      }
+    });
+  if (allMandatorySelected) {
+    $("#genReport").prop("disabled", true);
+    const reportName = await fetch(
+      `/report/get-nfr-report-name/${dtid}/${tenureFileNumber}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        responseType: "application/json",
+      }
+    )
+      .then((res) => res.json())
+      .then((resJson) => {
+        return resJson.reportName;
+      })
+      .catch(() => {
+        location.reload();
+      });
+
+    const provisionIds = getEnabledProvisionIds();
+    const provisionJson = getProvisionJson(provisionIds);
+    const variableJson = getVariableJson(provisionIds);
+    const data = {
+      dtid: dtid,
+      variantName: variantName,
+      provisionJson: provisionJson,
+      variableJson: variableJson,
+    };
+    fetch(`/report/generate-nfr-report`, {
+      method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       responseType: "application/json",
-    }
-  )
-    .then((res) => res.json())
-    .then((resJson) => {
-      return resJson.reportName;
+      body: JSON.stringify(data),
     })
-    .catch(() => {
-      location.reload();
-    });
-
-  const provisionIds = getEnabledProvisionIds();
-  const provisionJson = getProvisionJson(provisionIds);
-  const variableJson = getVariableJson(provisionIds);
-  const data = {
-    dtid: dtid,
-    variantName: variantName,
-    provisionJson: provisionJson,
-    variableJson: variableJson,
-  };
-  fetch(`/report/generate-nfr-report`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    responseType: "application/json",
-    body: JSON.stringify(data),
-  })
-    .then((res) => res.blob())
-    .then((blob) => {
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.style.display = "none";
-      a.href = url;
-      a.download = reportName + ".docx";
-      document.body.appendChild(a);
-      a.click();
-      window.URL.revokeObjectURL(url);
-      $("#genReport").prop("disabled", false);
-    })
-    .catch(() => {
-      location.reload();
-      $("#genReport").prop("disabled", false);
-    });
+      .then((res) => res.blob())
+      .then((blob) => {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.style.display = "none";
+        a.href = url;
+        a.download = reportName + ".docx";
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        $("#genReport").prop("disabled", false);
+      })
+      .catch(() => {
+        location.reload();
+        $("#genReport").prop("disabled", false);
+      });
+  } else {
+    const uniqueProvisionGroups = [...new Set(unselectedMandatoryGroups)];
+    alert(
+      "There are unselected mandatory provisions the following groups: " +
+        uniqueProvisionGroups.join(", ")
+    );
+  }
 }
 
 function getEnabledProvisionIds() {

@@ -248,20 +248,19 @@ export class AppController {
           });
         ttlsJSON = await this.ttlsService.formatNFRData(response);
         primaryContactName = ttlsJSON.licenceHolderName;
-        ttlsJSON["interestedParties"] = [
-          {
-            firstName: "First",
-            middleName: "Middle",
-            lastName: "Last",
-            address: "123 fake street",
-          },
-          {
-            firstName: "First2",
-            middleName: "Middle2",
-            lastName: "Last2",
-            address: "346 Miron Drive",
-          },
-        ];
+        const interestedParties = [];
+        if (response.tenantAddr && response.tenantAddr.length > 0) {
+          response.tenantAddr.map((t) => {
+            const interestedParty = {
+              firstName: t.firstName,
+              middleName: t.middleName,
+              lastName: t.lastName,
+              address: this.ttlsService.getMailingAddress(t),
+            }
+            interestedParties.push(interestedParty);
+          })
+        }
+        ttlsJSON["interestedParties"] = interestedParties;
         let selectedVariant = 0;
         switch (variantName) {
           case NFR_VARIANTS.default: {

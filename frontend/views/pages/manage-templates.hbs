@@ -20,6 +20,7 @@
                                     <th></th> <!-- view -->
                                     <th></th> <!-- remove -->
                                     <th></th> <!-- id -->
+                                    <th></th> <!-- id -->
                                 </thead>
                                 <tbody id="documentTableBody"></tbody>
                             </table>
@@ -53,7 +54,6 @@
                                     <th></th><!-- Edit column -->
                                     <th></th><!-- ID column -->
                                     <th></th><!-- Variants column -->
-                                    <th></th><!-- Mandatory column -->
                                 </thead>
                                 <tbody id="provisionTableBody"></tbody>
                             </table>
@@ -181,6 +181,8 @@
                                 <select class="form-control" id="editProvisionType" name="type">
                                     <option value="O">O</option>
                                     <option value="V">V</option>
+                                    <option value="B">B</option>
+                                    <option value="M">M</option>
                                 </select>
                             </div>
                             <div class="form-group">
@@ -240,21 +242,6 @@
                                     </div>
                                 {{/each}}
                             </div>
-                            <div class="form-group">
-                                <label class="mb-2">Mandatory</label>
-                                <div class="row mb-2">
-                                    <div class="col-sm-8">
-                                        <label class="form-check-label" for="editProvisionMandatory" style="width:100%">
-                                            <span class="variant-name" style="width:100%">Is this provision mandatory? {{{ dots "Is this provision mandatory?" }}}</span>
-                                        </label>
-                                    </div>
-                                    <div class="col-sm-4">
-                                        <div class="form-check">
-                                            <input type="checkbox" class="form-check-input" id="editProvisionMandatory">
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
                             </form>
                         </div>
                         <div id="editProvisionConfirmationDiv" style="display: none">
@@ -292,6 +279,8 @@
                                 <select class="form-control" id="addProvisionType" name="type">
                                     <option value="O">O</option>
                                     <option value="V">V</option>
+                                    <option value="B">B</option>
+                                    <option value="M">M</option>
                                 </select>
                             </div>
                             <div class="form-group">
@@ -350,21 +339,6 @@
                                     </div>
                                     </div>
                                 {{/each}}
-                            </div>
-                            <div class="form-group">
-                                <label class="mb-2">Mandatory</label>
-                                <div class="row mb-2">
-                                    <div class="col-sm-8">
-                                        <label class="form-check-label" for="addProvisionMandatory" style="width:100%">
-                                            <span class="variant-name" style="width:100%">Is this provision mandatory? {{{ dots "Is this provision mandatory?" }}}</span>
-                                        </label>
-                                    </div>
-                                    <div class="col-sm-4">
-                                        <div class="form-check">
-                                            <input type="checkbox" class="form-check-input" id="addProvisionMandatory">
-                                        </div>
-                                    </div>
-                                </div>
                             </div>
                             </form>
                         </div>

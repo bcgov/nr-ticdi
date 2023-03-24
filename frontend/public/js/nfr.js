@@ -62,7 +62,6 @@ provisionTable = $("#provisionTable").DataTable({
     { data: "provision_name" },
     { data: "help_text" },
     { data: "category" },
-    { data: "mandatory" },
     { data: "select" },
     { data: "provision_group" },
     { data: "max" },
@@ -71,7 +70,7 @@ provisionTable = $("#provisionTable").DataTable({
   ],
   columnDefs: [
     {
-      targets: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+      targets: [0, 1, 2, 3, 4, 5, 6, 7, 8],
       render: function (data, type, row, meta) {
         if (type === "display") {
           var columnTypes = [
@@ -79,7 +78,6 @@ provisionTable = $("#provisionTable").DataTable({
             "provision_name",
             "help_text",
             "category",
-            "mandatory",
             "select",
             "provision_group",
             "max",
@@ -90,7 +88,7 @@ provisionTable = $("#provisionTable").DataTable({
           var id = row["id"];
           var group = row["provision_group"];
           var max = row["max"];
-          var mandatory = row["mandatory"] == true ? "Yes" : "No";
+          var mandatory = row["type"] == "M" ? true : false;
 
           if (columnType === "select") {
             const checked =
@@ -106,8 +104,6 @@ provisionTable = $("#provisionTable").DataTable({
             return `<input type='text' value='${data}' title='${data}' tabIndex='-1' readonly style='color: gray; width: 100%;' />`;
           } else if (columnType === "provision_group") {
             return `<input type='hidden' class='provisionGroupValue' value='${data}' />`;
-          } else if (columnType === "mandatory") {
-            return `<input type='text' class='isMandatory' value='${mandatory}' tabIndex='-1' readonly style='color: gray; width: 100%;' />`;
           } else {
             return `<input type='text' id='${columnType}-${id}' value='${data}' tabIndex='-1' readonly style='color: gray; width: 100%;' />`;
           }
@@ -117,12 +113,12 @@ provisionTable = $("#provisionTable").DataTable({
       },
     },
     {
-      targets: 5,
+      targets: 4,
       className: "text-center",
       orderDataType: "dom-checkbox",
     },
     {
-      targets: [6, 7, 8, 9],
+      targets: [5, 6, 7, 8],
       orderable: false,
     },
   ],
@@ -535,9 +531,9 @@ async function generateNFRReport() {
   $("#provisionTable")
     .find("tbody tr")
     .each(function () {
-      var isMandatory = $(this).find(".isMandatory").val().trim();
+      var isMandatory = $(this).find(".provisionSelect").data("mandatory");
       var provisionGroup = $(this).find(".provisionGroupValue").val();
-      if (isMandatory === "Yes") {
+      if (isMandatory === true) {
         var provisionSelect = $(this).find(".provisionSelect").prop("checked");
         if (!provisionSelect) {
           unselectedMandatoryGroups.push(provisionGroup);

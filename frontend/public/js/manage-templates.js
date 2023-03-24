@@ -118,11 +118,10 @@ $(document).ready(function () {
         { data: "edit" },
         { data: "id" },
         { data: "variants" },
-        { data: "mandatory" },
       ],
       columnDefs: [
         {
-          targets: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
+          targets: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
           render: function (data, type, row, meta) {
             if (type === "display") {
               var columnTypes = [
@@ -137,13 +136,13 @@ $(document).ready(function () {
                 "edit",
                 "id",
                 "variants",
-                "mandatory",
               ];
               var columnType = columnTypes[meta.col];
               var id = row["id"];
               var group = row["provision_group"];
               var max = row["max"];
-              var mandatory = row["mandatory"];
+              var provisionType = row["type"];
+              var mandatory = provisionType == "M" ? true : false;
               var variants = JSON.stringify(row["variants"]);
 
               if (columnType === "active_flag") {
@@ -152,8 +151,7 @@ $(document).ready(function () {
               } else if (
                 columnType === "help_text" ||
                 columnType === "id" ||
-                columnType === "variants" ||
-                columnType === "mandatory"
+                columnType === "variants"
               ) {
                 return `<input type='hidden' id='${columnType}-${id}' value='${data}' />`;
               } else if (columnType === "edit") {
@@ -384,7 +382,7 @@ function addProvision() {
       variants.push(checkbox.dataset.id);
     }
   });
-  const mandatory = $("#addProvisionMandatory").is(":checked");
+  // const mandatory = $("#addProvisionMandatory").is(":checked");
   const data = JSON.stringify({
     type: type,
     provision_group: provision_group,
@@ -395,7 +393,7 @@ function addProvision() {
     help_text: help_text,
     category: category,
     variants: variants,
-    mandatory: mandatory,
+    // mandatory: mandatory,
   });
   const matchingRow = $("#groupMaxTable")
     .find("tr td:first-child")
@@ -405,8 +403,6 @@ function addProvision() {
     .closest("tr");
   if (matchingRow.length) {
     const maxCellValue = +matchingRow.find("td:eq(1)").text();
-    console.log(max);
-    console.log(maxCellValue);
     const groupTextCellValue = matchingRow.find("td:eq(2)").text();
     if (maxCellValue === max && groupTextCellValue == provision_group_text) {
       fetch("admin/add-provision", {
@@ -474,7 +470,7 @@ function confirmAddProvision() {
       variants.push(checkbox.dataset.id);
     }
   });
-  const mandatory = $("#addProvisionMandatory").is(":checked");
+  // const mandatory = $("#addProvisionMandatory").is(":checked");
   const data = JSON.stringify({
     type: type,
     provision_group: provision_group,
@@ -485,7 +481,7 @@ function confirmAddProvision() {
     help_text: help_text,
     category: category,
     variants: variants,
-    mandatory: mandatory,
+    // mandatory: mandatory,
   });
   fetch("admin/add-provision", {
     method: "POST",
@@ -513,12 +509,10 @@ $("#addProvisionMax").on("input", function () {
 });
 $("#addProvisionMaxUnlimited").on("change", function () {
   if ($(this).is(":checked")) {
-    console.log("unlimited is checked");
     $("#addProvisionMax").val("");
     $("#addProvisionMax").prop("readonly", true);
     $("#addProvisionMax").addClass("input-readonly");
   } else {
-    console.log("unlimited is unchecked");
     $("#addProvisionMax").prop("readonly", false);
     $("#addProvisionMax").removeClass("input-readonly");
   }
@@ -654,7 +648,7 @@ function editProvision() {
       variants.push(checkbox.dataset.id);
     }
   });
-  const mandatory = $("#editProvisionMandatory").is(":checked");
+  // const mandatory = $("#editProvisionMandatory").is(":checked");
   const data = JSON.stringify({
     id: id,
     type: type,
@@ -666,7 +660,7 @@ function editProvision() {
     help_text: help_text,
     category: category,
     variants: variants,
-    mandatory: mandatory,
+    // mandatory: mandatory,
   });
   const matchingRow = $("#groupMaxTable")
     .find("tr td:first-child")
@@ -676,7 +670,6 @@ function editProvision() {
     .closest("tr");
   if (matchingRow.length) {
     const maxCellValue = +matchingRow.find("td:eq(1)").text();
-    console.log(maxCellValue);
     const groupTextCellValue = matchingRow.find("td:eq(2)").text();
     if (maxCellValue === max && provision_group_text == groupTextCellValue) {
       fetch("admin/update-provision", {
@@ -695,17 +688,14 @@ function editProvision() {
         });
     } else {
       if (maxCellValue != max && groupTextCellValue != provision_group_text) {
-        console.log("if");
         $("#editGroupConfirmationText").text(
           `This will change the maximum number of provisions and description for group ${provision_group}.`
         );
       } else if (maxCellValue != max) {
-        console.log("else if");
         $("#editGroupConfirmationText").text(
           `This will change the maximum number of provisions for group ${provision_group}.`
         );
       } else {
-        console.log("else");
         $("#editGroupConfirmationText").text(
           `This will change the description for group ${provision_group}.`
         );
@@ -748,7 +738,7 @@ function confirmEditProvision() {
       variants.push(checkbox.dataset.id);
     }
   });
-  const mandatory = $("#editProvisionMandatory").is(":checked");
+  // const mandatory = $("#editProvisionMandatory").is(":checked");
   const data = JSON.stringify({
     id: id,
     type: type,
@@ -760,7 +750,7 @@ function confirmEditProvision() {
     help_text: help_text,
     category: category,
     variants: variants,
-    mandatory: mandatory,
+    // mandatory: mandatory,
   });
   fetch("admin/update-provision", {
     method: "POST",

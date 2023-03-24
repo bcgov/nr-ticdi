@@ -256,9 +256,9 @@ export class AppController {
               middleName: t.middleName,
               lastName: t.lastName,
               address: this.ttlsService.getMailingAddress(t),
-            }
+            };
             interestedParties.push(interestedParty);
-          })
+          });
         }
         ttlsJSON["interestedParties"] = interestedParties;
         let selectedVariant = 0;

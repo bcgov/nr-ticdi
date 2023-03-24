@@ -261,8 +261,8 @@ selectedProvisionsTable = $("#selectedProvisionsTable").DataTable({
     { data: "type" },
     { data: "provision_group" },
     { data: "provision_name" },
-    { data: "free_text" },
     { data: "category" },
+    { data: "free_text" },
     { data: "max" },
     { data: "id" },
   ],
@@ -275,8 +275,8 @@ selectedProvisionsTable = $("#selectedProvisionsTable").DataTable({
             "type",
             "provision_group",
             "provision_name",
-            "free_text",
             "category",
+            "free_text",
             "max",
             "id",
           ];
@@ -286,7 +286,7 @@ selectedProvisionsTable = $("#selectedProvisionsTable").DataTable({
           if (columnType === "max" || columnType === "id") {
             return `<input type='hidden' value='${data}' />`;
           } else if (columnType === "free_text") {
-            return `<input type='text' value='${data}' class='${columnType}' style='width: 100%;' />`;
+            return `<input type='hidden' value='${data}' class='${columnType}' style='width: 100%;' />`;
           } else if (columnType === "provision_name") {
             return `<input type='text' value='${data}' title='${data}' class='${columnType}' tabIndex='-1' readonly style='color: gray; width: 100%;' />`;
           } else {
@@ -298,7 +298,7 @@ selectedProvisionsTable = $("#selectedProvisionsTable").DataTable({
       },
     },
     {
-      targets: [5, 6],
+      targets: [4, 5, 6],
       orderable: false,
     },
   ],

@@ -112,10 +112,10 @@ $(document).ready(function () {
         { data: "max" },
         { data: "provision_name" },
         { data: "free_text" },
-        { data: "help_text" },
         { data: "category" },
         { data: "active_flag" },
         { data: "edit" },
+        { data: "help_text" },
         { data: "id" },
         { data: "variants" },
       ],
@@ -130,10 +130,10 @@ $(document).ready(function () {
                 "max",
                 "provision_name",
                 "free_text",
-                "help_text",
                 "category",
                 "active_flag",
                 "edit",
+                "help_text",
                 "id",
                 "variants",
               ];
@@ -160,6 +160,8 @@ $(document).ready(function () {
                 return `<input type='text' id='${columnType}-${id}' value='${
                   data == 999 ? "-" : data
                 }' readonly style='color: gray; width: 100%;' />`;
+              } else if (columnType === "free_text") {
+                return `<input type='text' id='${columnType}-${id}' value='${data}' title='${data}' readonly style='color: gray; width: 100%;' />`;
               } else {
                 return `<input type='text' id='${columnType}-${id}' value='${data}' readonly style='color: gray; width: 100%;' />`;
               }

@@ -671,7 +671,7 @@ function editProvision() {
   if (matchingRow.length) {
     const maxCellValue = +matchingRow.find("td:eq(1)").text();
     const groupTextCellValue = matchingRow.find("td:eq(2)").text();
-    if (maxCellValue === max && provision_group_text == groupTextCellValue) {
+    if (maxCellValue == max && provision_group_text == groupTextCellValue) {
       fetch("admin/update-provision", {
         method: "POST",
         headers: {

@@ -87,11 +87,19 @@ provisionTable = $("#provisionTable").DataTable({
           var group = row["provision_group"];
           var max = row["max"];
           var mandatory = row["type"] == "M" ? true : false;
+          var provisionName = row["provision_name"];
+          var xor =
+            provisionName ==
+              "MONIES PAYABLE - NOTICE OF FINAL REVIEW - DELAYED" ||
+            provisionName ==
+              "ESTIMATED MONIES PAYABLE - NOTICE OF FINAL REVIEW - DELAYED"
+              ? 1
+              : 0;
 
           if (columnType === "select") {
             const checked =
               enabledProvisions.includes(id) === true ? "checked" : "";
-            return `<input type='checkbox' class='provisionSelect' id='active-${id}' data-id='${id}' data-group='${group}' data-max='${max}' data-mandatory='${mandatory}' ${checked}>`;
+            return `<input type='checkbox' class='provisionSelect' id='active-${id}' data-id='${id}' data-group='${group}' data-max='${max}' data-mandatory='${mandatory}' data-xor='${xor}' ${checked}>`;
           } else if (
             columnType === "max" ||
             columnType === "id" ||
@@ -138,6 +146,7 @@ provisionTable = $("#provisionTable").DataTable({
           const group = checkbox.dataset.group;
           const max = checkbox.dataset.max;
           const id = checkbox.dataset.id;
+          const xor = checkbox.dataset.xor;
           const active = document.querySelectorAll(
             `input[type="checkbox"][data-group="${group}"]:checked`
           ).length;
@@ -161,20 +170,40 @@ provisionTable = $("#provisionTable").DataTable({
           if (checkbox.checked) {
             $(`#selected-provision-row-${id}`).show();
             $(`.variable-provision-row-${id}`).show();
+            if (xor != 0) {
+              // disable the checkboxes that have the same xor
+              document
+                .querySelectorAll(
+                  `input[type="checkbox"][data-group="${group}"][data-xor="${xor}"]:not(#${checkbox.id})`
+                )
+                .forEach((checkbox) => {
+                  checkbox.disabled = true;
+                });
+            }
           } else {
             $(`#selected-provision-row-${id}`).hide();
             $(`.variable-provision-row-${id}`).hide();
+            if (xor != 0) {
+              // enable the checkboxes that have the same xor
+              document
+                .querySelectorAll(
+                  `input[type="checkbox"][data-group="${group}"][data-xor="${xor}"]:not(#${checkbox.id})`
+                )
+                .forEach((checkbox) => {
+                  checkbox.disabled = false;
+                });
+            }
           }
         });
-        const g = checkbox.dataset.group;
-        const m = checkbox.dataset.max;
-        const a = document.querySelectorAll(
-          `input[type="checkbox"][data-group="${g}"]:checked`
+        const grp = checkbox.dataset.group;
+        const mx = checkbox.dataset.max;
+        const act = document.querySelectorAll(
+          `input[type="checkbox"][data-group="${grp}"]:checked`
         ).length;
-        if (a >= m) {
+        if (act >= mx) {
           document
             .querySelectorAll(
-              `input[type="checkbox"][data-group="${g}"]:not(:checked)`
+              `input[type="checkbox"][data-group="${grp}"]:not(:checked)`
             )
             .forEach((checkbox) => {
               checkbox.disabled = true;
@@ -524,22 +553,29 @@ async function generateNFRReport() {
   const tenureFileNumber = $("#tfn").text();
   const dtid = $("#dtid").text();
   const unselectedMandatoryGroups = [];
-  let allMandatorySelected = true;
   // Check that all mandatory provisions have been selected
   $("#provisionTable")
     .find("tbody tr")
     .each(function () {
       var isMandatory = $(this).find(".provisionSelect").data("mandatory");
+      var xor = $(this).find(".provisionSelect").data("xor");
       var provisionGroup = $(this).find(".provisionGroupValue").val();
       if (isMandatory === true) {
         var provisionSelect = $(this).find(".provisionSelect").prop("checked");
-        if (!provisionSelect) {
+        if (!provisionSelect && xor != 0) {
+          // Check if any other provision with the same XOR value is selected
+          var otherSelected =
+            $(`input[data-xor="${xor}"][data-mandatory="true"]:checked`)
+              .length > 0;
+          if (!otherSelected) {
+            unselectedMandatoryGroups.push(provisionGroup);
+          }
+        } else if (!provisionSelect) {
           unselectedMandatoryGroups.push(provisionGroup);
-          allMandatorySelected = false;
         }
       }
     });
-  if (allMandatorySelected) {
+  if (unselectedMandatoryGroups.length == 0) {
     $("#genReport").prop("disabled", true);
     const reportName = await fetch(
       `/report/get-nfr-report-name/${dtid}/${tenureFileNumber}`,
@@ -593,7 +629,9 @@ async function generateNFRReport() {
         $("#genReport").prop("disabled", false);
       });
   } else {
-    const uniqueProvisionGroups = [...new Set(unselectedMandatoryGroups)];
+    const uniqueProvisionGroups = [...new Set(unselectedMandatoryGroups)].sort(
+      (a, b) => a - b
+    );
     alert(
       "There are unselected mandatory provisions the following groups: " +
         uniqueProvisionGroups.join(", ")

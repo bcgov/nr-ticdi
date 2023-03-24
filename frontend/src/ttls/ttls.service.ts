@@ -325,7 +325,7 @@ export class TTLSService {
     ) {
       return (area_code + phone_number).replace(
         /(\d{3})(\d{3})(\d{4})/,
-        "($1)$2-$3"
+        "($1) $2-$3"
       );
     } else {
       return "";

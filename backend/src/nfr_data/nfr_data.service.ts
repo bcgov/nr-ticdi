@@ -56,7 +56,7 @@ export class NFRDataService {
     }
     const documentTemplate =
       await this.documentTemplateService.findActiveByDocumentType(2); // 2 corresponds to NFR
-    nfrDataDto["template_id"] = documentTemplate.id;
+    nfrDataDto["template_id"] = documentTemplate ? documentTemplate.id : null;
     const newNfrData: NFRData = this.nfrDataRepository.create(nfrDataDto);
     const updatedNfrData = await this.nfrDataRepository.save(newNfrData);
 

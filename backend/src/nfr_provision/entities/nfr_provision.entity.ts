@@ -31,8 +31,6 @@ export class NFRProvision {
   @Column({ nullable: true })
   active_flag: boolean;
   @Column({ nullable: true })
-  mandatory: boolean;
-  @Column({ nullable: true })
   create_userid: string;
   @Column({ nullable: true })
   update_userid: string;
@@ -76,7 +74,6 @@ export class NFRProvision {
     free_text?: string,
     category?: string,
     active_flag?: boolean,
-    mandatory?: boolean,
     create_userid?: string,
     update_userid?: string,
     provision_group?: NFRProvisionGroup,
@@ -87,7 +84,6 @@ export class NFRProvision {
     this.free_text = free_text || "";
     this.category = category || "";
     this.active_flag = active_flag;
-    this.mandatory = mandatory;
     this.create_userid = create_userid || "";
     this.update_userid = update_userid || "";
     this.provision_group = provision_group || null;

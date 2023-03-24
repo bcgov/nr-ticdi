@@ -61,7 +61,6 @@ provisionTable = $("#provisionTable").DataTable({
     { data: "type" },
     { data: "provision_name" },
     { data: "help_text" },
-    { data: "category" },
     { data: "select" },
     { data: "provision_group" },
     { data: "max" },
@@ -70,14 +69,13 @@ provisionTable = $("#provisionTable").DataTable({
   ],
   columnDefs: [
     {
-      targets: [0, 1, 2, 3, 4, 5, 6, 7, 8],
+      targets: [0, 1, 2, 3, 4, 5, 6, 7],
       render: function (data, type, row, meta) {
         if (type === "display") {
           var columnTypes = [
             "type",
             "provision_name",
             "help_text",
-            "category",
             "select",
             "provision_group",
             "max",
@@ -113,12 +111,12 @@ provisionTable = $("#provisionTable").DataTable({
       },
     },
     {
-      targets: 4,
+      targets: 3,
       className: "text-center",
       orderDataType: "dom-checkbox",
     },
     {
-      targets: [5, 6, 7, 8],
+      targets: [4, 5, 6, 7],
       orderable: false,
     },
   ],

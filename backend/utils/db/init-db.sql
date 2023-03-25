@@ -1,17 +1,17 @@
 -- Initialize Database Provisions
 -- Create groups
-INSERT INTO nfr_provision_group (provision_group, max, provision_group_text) VALUES (1,999,'pgt');
-INSERT INTO nfr_provision_group (provision_group, max, provision_group_text) VALUES (2,999,'pgt');
-INSERT INTO nfr_provision_group (provision_group, max, provision_group_text) VALUES (5,3,'pgt');
-INSERT INTO nfr_provision_group (provision_group, max, provision_group_text) VALUES (10,3,'pgt');
-INSERT INTO nfr_provision_group (provision_group, max, provision_group_text) VALUES (12,3,'pgt');
-INSERT INTO nfr_provision_group (provision_group, max, provision_group_text) VALUES (14,3,'pgt');
-INSERT INTO nfr_provision_group (provision_group, max, provision_group_text) VALUES (15,1,'pgt');
-INSERT INTO nfr_provision_group (provision_group, max, provision_group_text) VALUES (20,2,'pgt');
-INSERT INTO nfr_provision_group (provision_group, max, provision_group_text) VALUES (25,2,'pgt');
-INSERT INTO nfr_provision_group (provision_group, max, provision_group_text) VALUES (27,3,'pgt');
-INSERT INTO nfr_provision_group (provision_group, max, provision_group_text) VALUES (28,3,'pgt');
-INSERT INTO nfr_provision_group (provision_group, max, provision_group_text) VALUES (34,10,'pgt');
+INSERT INTO nfr_provision_group (provision_group, max, provision_group_text) VALUES (1,999,'DOCUMENT TYPE');
+INSERT INTO nfr_provision_group (provision_group, max, provision_group_text) VALUES (2,999,'FEES');
+INSERT INTO nfr_provision_group (provision_group, max, provision_group_text) VALUES (5,3,'PREAMBLE');
+INSERT INTO nfr_provision_group (provision_group, max, provision_group_text) VALUES (10,3,'SURVEY REQUIREMENTS');
+INSERT INTO nfr_provision_group (provision_group, max, provision_group_text) VALUES (12,3,'SURVEY FEES');
+INSERT INTO nfr_provision_group (provision_group, max, provision_group_text) VALUES (14,3,'OBTAIN SURVEY');
+INSERT INTO nfr_provision_group (provision_group, max, provision_group_text) VALUES (15,1,'OCCUPATIONAL RENT');
+INSERT INTO nfr_provision_group (provision_group, max, provision_group_text) VALUES (20,2,'SECURITY');
+INSERT INTO nfr_provision_group (provision_group, max, provision_group_text) VALUES (25,2,'INSURANCE');
+INSERT INTO nfr_provision_group (provision_group, max, provision_group_text) VALUES (27,3,'ADDITIONAL REQUIREMENTS');
+INSERT INTO nfr_provision_group (provision_group, max, provision_group_text) VALUES (28,3,'ADDITIONAL REQUIREMENTS');
+INSERT INTO nfr_provision_group (provision_group, max, provision_group_text) VALUES (34,999,'ADDITIONAL REQUIREMENTS');
 
 -- Create variants
 INSERT INTO nfr_provision_variant (variant_name) VALUES ('NOTICE OF FINAL REVIEW');

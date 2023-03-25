@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { In, Repository, UpdateResult } from "typeorm";
+import { In, Repository } from "typeorm";
 import { CreateNFRProvisionDto } from "./dto/create-nfr_provision.dto";
 import { NFRProvision } from "./entities/nfr_provision.entity";
 import { UpdateNFRProvisionDto } from "./dto/update-nfr_provision.dto";
@@ -234,7 +234,7 @@ export class NFRProvisionService {
   }
   async getMandatoryProvisions(): Promise<number[]> {
     const provisions = await this.nfrProvisionRepository.find({
-      where: { mandatory: true },
+      where: { type: "M" },
     });
     return provisions.map((provision) => provision.id);
   }
@@ -251,7 +251,7 @@ export class NFRProvisionService {
       return [];
     }
     const provisions = await this.nfrProvisionRepository.find({
-      where: { provision_variant: variant, mandatory: true },
+      where: { provision_variant: variant, type: "M" },
     });
     return provisions.map((provision) => provision.id);
   }

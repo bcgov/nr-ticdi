@@ -5,14 +5,6 @@
             <h2>{{title}}</h2>
             <hr />
             <div class="row">
-                <div class="col-md-4">
-                    <input class="mt-1" type="text" id="searchInput" style="width: 100%">
-                </div>
-                <div class="col-md-2">
-                    <button class="btn btn-success ml-4" id="searchButton" onclick="searchRecords()">Search</button>
-                </div>
-            </div>
-            <div class="row">
                 <div>
                     <table id="documentTable">
                         <thead>
@@ -43,20 +35,44 @@
         $( document ).ready(function() {
             $('#documentTable').DataTable({
                 "paging": false,
-                "bFilter": false,
+                "bFilter": true,
                 "ajax": {
                     "url": "report/search-nfr-data",
                     "dataSrc": ""
                 },
                 "columns": [
-                    { data: "dtid"},
-                    { data: "version"},
-                    { data: "file_name"},
-                    { data: "updated_date"},
-                    { data: "status"},
-                    { data: "active"},
-                    { data: "nfr_id" },
-                    { data: "variant_name" }
+                    { 
+                        data: "dtid",
+                        "searchable": true,
+                    },
+                    { 
+                        data: "version",
+                        "searchable": false,
+                    },
+                    { 
+                        data: "file_name",
+                        "searchable": false,
+                    },
+                    { 
+                        data: "updated_date",
+                        "searchable": false,
+                    },
+                    { 
+                        data: "status",
+                        "searchable": false,
+                    },
+                    { 
+                        data: "active",
+                        "searchable": false,
+                    },
+                    { 
+                        data: "nfr_id",
+                        "searchable": false,
+                    },
+                    { 
+                        data: "variant_name",
+                        "searchable": false,
+                     }
                 ],
                 "columnDefs": [
                 {
@@ -156,5 +172,10 @@
             window.location.href = `/dtid/${dtid}/${variantName}`
         }
     </script>
+    <style>
+        .dataTables_wrapper .dataTables_filter {
+            float: left !important;
+        }
+    </style>
   {{/inline}}
 {{/template}}

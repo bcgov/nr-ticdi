@@ -103,8 +103,10 @@ export class ReportController {
   ) {
     // this should eventually check permissions and prevent unauthorized users from generating documents
     let idir_username = "";
+    let idir_name = "";
     if (session.data.activeAccount) {
       idir_username = session.data.activeAccount.idir_username;
+      idir_name = session.data.activeAccount.name;
       console.log("active account found");
     } else {
       console.log("no active account found");
@@ -114,6 +116,7 @@ export class ReportController {
         data.dtid,
         data.variantName,
         idir_username,
+        idir_name,
         data.variableJson,
         data.provisionJson
       )

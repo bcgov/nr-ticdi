@@ -5,6 +5,7 @@ import { firstValueFrom } from "rxjs";
 import { TTLSService } from "src/ttls/ttls.service";
 import { numberWords } from "utils/constants";
 import { ProvisionJSON, VariableJSON } from "utils/types";
+import { formatMoney } from "utils/util";
 const axios = require("axios");
 
 dotenv.config();
@@ -158,11 +159,14 @@ export class ReportService {
     dtid: number,
     variantName: string,
     idirUsername: string,
+    idirName: string,
     variableJson: VariableJSON[],
     provisionJson: ProvisionJSON[]
   ) {
     const templateUrl = `${hostname}:${port}/document-template/get-active-report/2`;
     const logUrl = `${hostname}:${port}/nfr-data-log/`;
+
+    // get raw ttls data for later
     await this.ttlsService.setWebadeToken();
     const rawData: any = await firstValueFrom(this.ttlsService.callHttp(dtid))
       .then((res) => {
@@ -171,38 +175,7 @@ export class ReportService {
       .catch((err) => {
         console.log(err);
       });
-    const tenantAddr = rawData.tenantAddr[0];
-    const interestParcel = rawData.interestParcel[0];
-    const DB_Address_Mailing_Tenant = `${
-      tenantAddr ? tenantAddr.legalName : ""
-    },\r\n ${tenantAddr ? tenantAddr.addrLine1 : ""},\r\n ${
-      tenantAddr ? tenantAddr.city : ""
-    }, ${tenantAddr ? tenantAddr.provAbbr : ""},\r\n ${
-      tenantAddr ? tenantAddr.postalCode : ""
-    },\r\n`;
-    const ttlsData = {
-      DB_Address_Regional_Office: `${rawData.regOfficeStreet},\r\n ${rawData.regOfficeCity},\r\n ${rawData.regOfficeProv},\r\n ${rawData.regOfficePostalCode}`,
-      DB_Name_BCAL_Contact: this.ttlsService.getContactAgent(
-        rawData.contactFirstName,
-        rawData.contactMiddleName,
-        rawData.contactLastName
-      ),
-      DB_File_Number: rawData.fileNum,
-      DB_Address_Mailing_Tenant: DB_Address_Mailing_Tenant,
-      DB_Tenure_Type: rawData.type,
-      DB_Legal_Description: interestParcel
-        ? interestParcel.legalDescription
-        : "",
-      DB_Fee_Payable_Type: rawData.feePayableType,
-      DB_Fee_Payable_Amount_GST: rawData.feePayableAmountGst,
-      DB_Fee_Payable_Amount: rawData.feePayableAmount,
-      DB_FP_Asterisk: "*",
-      DB_Total_GST_Amount: (rawData.gstRate / 100) * rawData.feePayableAmount,
-      DB_Total_Monies_Payable:
-        (rawData.gstRate / 100) * rawData.feePayableAmount +
-        rawData.feePayableAmount,
-      DB_Address_Line_Regional_Office: `${rawData.regOfficeStreet},\r\n ${rawData.regOfficeCity},\r\n ${rawData.regOfficeProv},\r\n ${rawData.regOfficePostalCode}`,
-    }; // parse out the rawData, variableJson, and provisionJson into something useable
+
     // get the document template
     const documentTemplateObject: { id: number; the_file: string } = await axios
       .get(templateUrl)
@@ -211,7 +184,7 @@ export class ReportService {
       });
 
     // Format variables with names that the document template expects
-    const variables = {};
+    const variables: any = {};
     variableJson.forEach(({ variable_name, variable_value }) => {
       const newVariableName = variable_name
         .replace(/_/g, " ")
@@ -237,6 +210,131 @@ export class ReportService {
       const showVarName = `showSection${groupText}_${index}`;
       showProvisionSections[showVarName] = 1;
     });
+
+    // Format the raw ttls data
+    const tenantAddr = rawData.tenantAddr[0];
+    const interestParcel = rawData.interestParcel[0];
+    const DB_Address_Mailing_Tenant = `${
+      tenantAddr ? tenantAddr.legalName : ""
+    }\r\n ${tenantAddr ? tenantAddr.addrLine1 : ""}\r\n ${
+      tenantAddr ? tenantAddr.city : ""
+    }, ${tenantAddr ? tenantAddr.provAbbr : ""}, ${
+      tenantAddr ? tenantAddr.postalCode : ""
+    }\r\n`;
+
+    // Update the formatting of certain money variables
+    const VAR_Fee_Documentation_Amount: number =
+      variables && variables.VAR_Fee_Documentation_Amount
+        ? !isNaN(variables.VAR_Fee_Documentation_Amount)
+          ? parseFloat(variables.VAR_Fee_Documentation_Amount)
+          : 0
+        : 0;
+    if (variables && variables.VAR_Fee_Documentation_Amount) {
+      !isNaN(variables.VAR_Fee_Documentation_Amount)
+        ? (variables.VAR_Fee_Documentation_Amount = formatMoney(
+            parseFloat(variables.VAR_Fee_Documentation_Amount)
+          ))
+        : (variables.VAR_Fee_Documentation_Amount = "0.00");
+    }
+
+    const VAR_Fee_Application_Amount: number =
+      variables && variables.VAR_Fee_Application_Amount
+        ? !isNaN(variables.VAR_Fee_Application_Amount)
+          ? parseFloat(variables.VAR_Fee_Application_Amount)
+          : 0
+        : 0;
+    if (variables && variables.VAR_Fee_Application_Amount) {
+      !isNaN(variables.VAR_Fee_Application_Amount)
+        ? (variables.VAR_Fee_Application_Amount = formatMoney(
+            parseFloat(variables.VAR_Fee_Application_Amount)
+          ))
+        : (variables.VAR_Fee_Application_Amount = "0.00");
+    }
+
+    const VAR_Fee_Occupational_Rental_Amount: number =
+      variables && variables.VAR_Fee_Occupational_Rental_Amount
+        ? !isNaN(variables.VAR_Fee_Occupational_Rental_Amount)
+          ? parseFloat(variables.VAR_Fee_Occupational_Rental_Amount)
+          : 0
+        : 0;
+    if (variables && variables.VAR_Fee_Occupational_Rental_Amount) {
+      if (
+        !isNaN(variables.VAR_Fee_Occupational_Rental_Amount) &&
+        parseFloat(variables.VAR_Fee_Occupational_Rental_Amount) != 0
+      ) {
+        variables.VAR_Fee_Occupational_Rental_Amount = formatMoney(
+          parseFloat(variables.VAR_Fee_Occupational_Rental_Amount)
+        );
+      } else {
+        variables.VAR_Fee_Occupational_Rental_Amount = "";
+      }
+    }
+
+    const VAR_Fee_Other_Credit_Amount: number =
+      variables && variables.VAR_Fee_Other_Credit_Amount
+        ? !isNaN(variables.VAR_Fee_Other_Credit_Amount)
+          ? parseFloat(variables.VAR_Fee_Other_Credit_Amount)
+          : 0
+        : 0;
+    if (variables && variables.VAR_Fee_Other_Credit_Amount) {
+      !isNaN(variables.VAR_Fee_Other_Credit_Amount)
+        ? (variables.VAR_Fee_Other_Credit_Amount = formatMoney(
+            parseFloat(variables.VAR_Fee_Other_Credit_Amount)
+          ))
+        : (variables.VAR_Fee_Other_Credit_Amount = "0.00");
+    }
+
+    const GST_Rate: number = rawData && rawData.gstRate ? rawData.gstRate : 0;
+    const DB_Fee_Payable_Type: number = rawData.feePayableType;
+    const DB_Fee_Payable_Amount: number = rawData.feePayableAmount;
+    const DB_Fee_Payable_Amount_GST: number = rawData.feePayableAmountGst;
+    let GST_Exempt;
+    GST_Exempt == "N";
+    const DB_Total_GST_Amount: number =
+      GST_Exempt == "Y"
+        ? ((DB_Fee_Payable_Amount_GST +
+            VAR_Fee_Documentation_Amount +
+            VAR_Fee_Application_Amount) *
+            GST_Rate) /
+          100.0
+        : ((DB_Fee_Payable_Amount_GST +
+            VAR_Fee_Documentation_Amount +
+            VAR_Fee_Occupational_Rental_Amount +
+            VAR_Fee_Application_Amount) *
+            GST_Rate) /
+          100.0;
+
+    const DB_Total_Monies_Payable =
+      DB_Total_GST_Amount +
+      DB_Fee_Payable_Amount_GST +
+      DB_Fee_Payable_Amount +
+      VAR_Fee_Documentation_Amount +
+      VAR_Fee_Occupational_Rental_Amount +
+      VAR_Fee_Application_Amount -
+      VAR_Fee_Other_Credit_Amount;
+
+    const ttlsData = {
+      DB_Address_Regional_Office: `${rawData.regOfficeStreet},\r\n ${rawData.regOfficeCity},\r\n ${rawData.regOfficeProv},\r\n ${rawData.regOfficePostalCode}`,
+      DB_Name_BCAL_Contact: idirName,
+      DB_File_Number: rawData.fileNum,
+      DB_Address_Mailing_Tenant: DB_Address_Mailing_Tenant,
+      DB_Tenure_Type: rawData.type,
+      DB_Legal_Description: interestParcel
+        ? interestParcel.legalDescription
+        : "",
+      DB_Fee_Payable_Type: DB_Fee_Payable_Type,
+      DB_Fee_Payable_Amount_GST:
+        DB_Fee_Payable_Amount_GST == 0
+          ? ""
+          : formatMoney(DB_Fee_Payable_Amount_GST),
+      DB_Fee_Payable_Amount: formatMoney(DB_Fee_Payable_Amount),
+      DB_FP_Asterisk: "*",
+      DB_Total_GST_Amount: formatMoney(DB_Total_GST_Amount),
+      DB_Total_Monies_Payable: formatMoney(DB_Total_Monies_Payable),
+      DB_Address_Line_Regional_Office: `${rawData.regOfficeStreet},\r\n ${rawData.regOfficeCity},\r\n ${rawData.regOfficeProv},\r\n ${rawData.regOfficePostalCode}`,
+    }; // parse out the rawData, variableJson, and provisionJson into something useable
+
+    // combine the formatted TTLS data, variables, and provision sections
     const data = Object.assign({}, ttlsData, variables, showProvisionSections);
 
     // Log the request

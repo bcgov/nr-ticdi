@@ -28,6 +28,7 @@ import { HttpService } from "@nestjs/axios";
 import { Req } from "@nestjs/common/decorators/http/route-params.decorator";
 import { Request, Response } from "express";
 import { ReportService } from "./report/report.service";
+import { nfrInterestedParties } from "utils/util";
 
 let requestUrl: string;
 let requestConfig: AxiosRequestConfig;
@@ -248,18 +249,7 @@ export class AppController {
           });
         ttlsJSON = await this.ttlsService.formatNFRData(response);
         primaryContactName = ttlsJSON.licenceHolderName;
-        const interestedParties = [];
-        if (response.tenantAddr && response.tenantAddr.length > 0) {
-          response.tenantAddr.map((t) => {
-            const interestedParty = {
-              firstName: t.firstName,
-              middleName: t.middleName,
-              lastName: t.lastName,
-              address: this.ttlsService.getMailingAddress(t),
-            };
-            interestedParties.push(interestedParty);
-          });
-        }
+        const interestedParties = nfrInterestedParties(response.tenantAddr);
         ttlsJSON["interestedParties"] = interestedParties;
         let selectedVariant = 0;
         switch (variantName) {

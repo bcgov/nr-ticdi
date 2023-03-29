@@ -115,12 +115,15 @@ export class AuthenticationService {
     const decodedToken: {
       sub: string;
       name: string;
+      given_name: string;
+      family_name: string;
       idir_username: string;
       client_roles: string[];
     } = jwt_decode(token);
     activeAccount = {
       client_roles: decodedToken.client_roles,
       name: decodedToken.name,
+      full_name: `${decodedToken.given_name} ${decodedToken.family_name}`,
       idir_username: decodedToken.idir_username,
     };
     return {

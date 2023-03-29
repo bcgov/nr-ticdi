@@ -10,6 +10,7 @@ export type SessionData = {
 
 export type AccountObject = {
   name: string;
+  full_name: string;
   idir_username: string;
   client_roles: string[];
 };

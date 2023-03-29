@@ -5,7 +5,7 @@ import { firstValueFrom } from "rxjs";
 import { TTLSService } from "src/ttls/ttls.service";
 import { numberWords } from "utils/constants";
 import { ProvisionJSON, VariableJSON } from "utils/types";
-import { formatMoney } from "utils/util";
+import { formatMoney, formatPostalCode, nfrAddressBuilder } from "utils/util";
 const axios = require("axios");
 
 dotenv.config();
@@ -214,13 +214,15 @@ export class ReportService {
     // Format the raw ttls data
     const tenantAddr = rawData.tenantAddr[0];
     const interestParcel = rawData.interestParcel[0];
-    const DB_Address_Mailing_Tenant = `${
-      tenantAddr ? tenantAddr.legalName : ""
-    }\r\n ${tenantAddr ? tenantAddr.addrLine1 : ""}\r\n ${
-      tenantAddr ? tenantAddr.city : ""
-    }, ${tenantAddr ? tenantAddr.provAbbr : ""}, ${
-      tenantAddr ? tenantAddr.postalCode : ""
-    }\r\n`;
+    const DB_Address_Mailing_Tenant = tenantAddr
+      ? nfrAddressBuilder(
+          tenantAddr.legalName,
+          tenantAddr.addrLine1,
+          tenantAddr.city,
+          tenantAddr.provAbbr,
+          tenantAddr.postalCode
+        )
+      : "";
 
     // Update the formatting of certain money variables
     const VAR_Fee_Documentation_Amount: number =
@@ -266,7 +268,7 @@ export class ReportService {
           parseFloat(variables.VAR_Fee_Occupational_Rental_Amount)
         );
       } else {
-        variables.VAR_Fee_Occupational_Rental_Amount = "";
+        variables.VAR_Fee_Occupational_Rental_Amount = "0.00";
       }
     }
 
@@ -314,7 +316,13 @@ export class ReportService {
       VAR_Fee_Other_Credit_Amount;
 
     const ttlsData = {
-      DB_Address_Regional_Office: `${rawData.regOfficeStreet},\r\n ${rawData.regOfficeCity},\r\n ${rawData.regOfficeProv},\r\n ${rawData.regOfficePostalCode}`,
+      DB_Address_Regional_Office: nfrAddressBuilder(
+        null,
+        rawData.regOfficeStreet,
+        rawData.regOfficeCity,
+        rawData.regOfficeProv,
+        rawData.regOfficePostalCode
+      ),
       DB_Name_BCAL_Contact: idirName,
       DB_File_Number: rawData.fileNum,
       DB_Address_Mailing_Tenant: DB_Address_Mailing_Tenant,
@@ -331,7 +339,13 @@ export class ReportService {
       DB_FP_Asterisk: "*",
       DB_Total_GST_Amount: formatMoney(DB_Total_GST_Amount),
       DB_Total_Monies_Payable: formatMoney(DB_Total_Monies_Payable),
-      DB_Address_Line_Regional_Office: `${rawData.regOfficeStreet},\r\n ${rawData.regOfficeCity},\r\n ${rawData.regOfficeProv},\r\n ${rawData.regOfficePostalCode}`,
+      DB_Address_Line_Regional_Office: nfrAddressBuilder(
+        null,
+        rawData.regOfficeStreet,
+        rawData.regOfficeCity,
+        rawData.regOfficeProv,
+        rawData.regOfficePostalCode
+      ),
     }; // parse out the rawData, variableJson, and provisionJson into something useable
 
     // combine the formatted TTLS data, variables, and provision sections

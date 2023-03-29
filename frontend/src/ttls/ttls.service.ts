@@ -6,6 +6,7 @@ import { map } from "rxjs/operators";
 import { URLSearchParams } from "url";
 import * as dotenv from "dotenv";
 import * as base64 from "base-64";
+import { formatPostalCode, getMailingAddress } from "utils/util";
 declare const Buffer;
 const axios = require("axios");
 
@@ -74,14 +75,14 @@ export class TTLSService {
       ),
       contactEmail: ttlsData.contactEmail,
       inspectionDate: ttlsData.inspectionDate,
-      mailingAddress: this.getMailingAddress(tenantAddr),
+      mailingAddress: getMailingAddress(tenantAddr),
       addrLine1: tenantAddr ? tenantAddr.addrLine1 : "",
       addrLine2: tenantAddr ? tenantAddr.addrLine2 : "",
       addrLine3: tenantAddr ? tenantAddr.addrLine3 : "",
       city: tenantAddr ? tenantAddr.city : "",
       regionCd: tenantAddr ? tenantAddr.regionCd : "",
-      postalCode: tenantAddr ? tenantAddr.postalCode : "",
-      provAndPostalCode: this.getProvAndPostalCode(tenantAddr),
+      postalCode: tenantAddr ? formatPostalCode(tenantAddr.postalCode) : "",
+      cityProvPostal: this.concatCityProvPostal(tenantAddr),
       zipCode: tenantAddr ? tenantAddr.zipCode : "",
       countryCd: tenantAddr ? tenantAddr.countryCd : "",
       country: tenantAddr ? tenantAddr.country : "",
@@ -140,7 +141,7 @@ export class TTLSService {
         ),
         contact_email_address: printRequestDetail.contactEmail,
         inspected_date: printRequestDetail.inspectionDate,
-        mailing_address: this.getMailingAddress(printRequestDetail.tenantAddr),
+        mailing_address: getMailingAddress(printRequestDetail.tenantAddr),
         mailing_address_line_1: printRequestDetail.tenantAddr.addrLine1,
         mailing_address_line_2: printRequestDetail.tenantAddr.addrLine2,
         mailing_address_line_3: printRequestDetail.tenantAddr.addrLine3,
@@ -269,37 +270,27 @@ export class TTLSService {
     return "";
   }
 
-  // if there are multiple addresses, concatenate them
-  getMailingAddress(tenantAddr: {
-    addrLine1: string;
-    addrLine2: string;
-    addrLine3: string;
-  }): string {
-    let mailingAddress = "";
-    if (tenantAddr && tenantAddr.addrLine1) {
-      mailingAddress = tenantAddr.addrLine1;
-    }
-    if (tenantAddr && tenantAddr.addrLine2) {
-      mailingAddress = mailingAddress.concat(", " + tenantAddr.addrLine2);
-    }
-    if (tenantAddr && tenantAddr.addrLine3) {
-      mailingAddress = mailingAddress.concat(", " + tenantAddr.addrLine3);
-    }
-    return mailingAddress;
-  }
-
-  getProvAndPostalCode(tenantAddr: {
+  concatCityProvPostal(tenantAddr: {
+    city: string;
     provAbbr: string;
     postalCode: string;
   }): string {
-    if (tenantAddr && tenantAddr.provAbbr && tenantAddr.postalCode) {
-      return tenantAddr.provAbbr + ", " + tenantAddr.postalCode;
-    } else if (tenantAddr && tenantAddr.provAbbr) {
-      return tenantAddr.provAbbr;
-    } else if (tenantAddr && tenantAddr.postalCode) {
-      return tenantAddr.postalCode;
+    const addressParts = [];
+    if (tenantAddr) {
+      if (tenantAddr.city) {
+        addressParts.push(tenantAddr.city);
+      }
+
+      if (tenantAddr.provAbbr) {
+        addressParts.push(tenantAddr.provAbbr);
+      }
+
+      if (tenantAddr.postalCode) {
+        addressParts.push(formatPostalCode(tenantAddr.postalCode));
+      }
     }
-    return "";
+
+    return addressParts.join(", ");
   }
 
   formatInspectedDate(inspected_date: string): string {

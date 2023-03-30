@@ -21,9 +21,48 @@ export class NFRProvisionController {
     return this.nfrProvisionService.update(id, nfrProvision);
   }
 
+  @Post("add-variable")
+  async addVariable(
+    @Body()
+    nfrVariable: {
+      variable_name: string;
+      variable_value: string;
+      help_text: string;
+      provision_id: number;
+    }
+  ) {
+    return this.nfrProvisionService.addVariable(nfrVariable);
+  }
+
+  @Post("update-variable")
+  async updateVariable(
+    @Body()
+    nfrVariable: {
+      variable_name: string;
+      variable_value: string;
+      help_text: string;
+      provision_id: number;
+      id: number;
+    }
+  ) {
+    const id = nfrVariable.id;
+    delete nfrVariable["id"];
+    return this.nfrProvisionService.updateVariable(id, nfrVariable);
+  }
+
+  @Get("remove-variable/:id")
+  async removeVariable(@Param("id") id: number) {
+    return this.nfrProvisionService.removeVariable(id);
+  }
+
   @Get()
   findAll() {
     return this.nfrProvisionService.findAll();
+  }
+
+  @Get("variables")
+  findAllVariables() {
+    return this.nfrProvisionService.findAllVariables();
   }
 
   @Get(":nfrProvisionId")

@@ -376,6 +376,34 @@ export class AdminService {
     );
   }
 
+  async getNFRVariables(): Promise<any> {
+    const returnItems = [
+      "variable_name",
+      "variable_value",
+      "help_text",
+      "id",
+      "provision_id",
+    ];
+    const url = `${hostname}:${port}/nfr-provision/variables`;
+    const nfrVariables = await axios
+      .get(url)
+      .then((res) => {
+        return res.data;
+      })
+      .catch((err) => console.log(err.response.data));
+    return nfrVariables.map((obj) =>
+      Object.keys(obj)
+        .filter((key) => returnItems.includes(key))
+        .reduce(
+          (acc, key) => {
+            acc[key] = obj[key];
+            return acc;
+          },
+          { edit: "edit", remove: "remove" }
+        )
+    );
+  }
+
   async enableProvision(id: number): Promise<any> {
     const url = `${hostname}:${port}/nfr-provision/enable/${id}`;
     return await axios.get(url).then((res) => {
@@ -440,6 +468,47 @@ export class AdminService {
       .then((res) => {
         return res.data;
       });
+  }
+
+  async addVariable(
+    variableParams: {
+      variable_name: string;
+      variable_value: string;
+      help_text: string;
+      provision_id: number;
+    },
+    create_userid: string
+  ) {
+    const url = `${hostname}:${port}/nfr-provision/add-variable`;
+    return await axios
+      .post(url, { ...variableParams, create_userid })
+      .then((res) => {
+        return res.data;
+      });
+  }
+
+  async updateVariable(
+    variableParams: {
+      variable_name: string;
+      variable_value: string;
+      help_text: string;
+      provision_id: number;
+    },
+    update_userid: string
+  ) {
+    const url = `${hostname}:${port}/nfr-provision/update-variable`;
+    return await axios
+      .post(url, { ...variableParams, update_userid })
+      .then((res) => {
+        return res.data;
+      });
+  }
+
+  async removeVariable(id: number) {
+    const url = `${hostname}:${port}/nfr-provision/remove-variable/${id}`;
+    return await axios.get(url).then((res) => {
+      return res.data;
+    });
   }
 
   /**

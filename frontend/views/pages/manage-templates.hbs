@@ -68,43 +68,6 @@
                     </form>
                 </div>
             </fieldset>
-            <fieldset class="form-group collapsible nofr-section">
-                <legend style="cursor: pointer" class='togvis sectionTitle'><i class="fa fa-plus"></i>  Manage NFR Variables</legend>
-                <div class="contents" style="display: none;">
-                    <hr />
-                    <div class="form-row">
-                        <div>
-                            <table id="variableTable">
-                                <thead>
-                                    <th style="width: 500px">Variable</th>
-                                    <th></th><!-- Edit column -->
-                                </thead>
-                                <tbody id="variableTableBody">
-                                    <tr>
-                                        <td><input type="text" style="color:gray; min-width: 100%" value="TEMPLATE VARIABLES - NOFR" readonly></td>
-                                        <td><u>Edit</u></td>
-                                    </tr>
-                                    <tr>
-                                        <td><input type="text" style="color:gray; min-width: 100%" value="FEES" readonly></td>
-                                        <td><u>Edit</u></td>
-                                    </tr>
-                                    <tr>
-                                        <td><input type="text" style="color:gray; min-width: 100%" value="REPLACEMENT STATEMENT" readonly></td>
-                                        <td><u>Edit</u></td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                    <form class="variable">
-                        <div class="form-group row">
-                            <div class="col-md-3">
-                                <button type="button" class="btn btn-success">Add a Variable</button>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-            </fieldset>
         </div>
         <div style="display: none">
             <table id="groupMaxTable"></table>
@@ -242,10 +205,58 @@
                                     </div>
                                 {{/each}}
                             </div>
+                            <div class="form-group">
+                                <label class="mb-2">Variables</label>
+                                <div>
+                                    <table id="editProvisionVariableTable" style="width:100%"></table>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-md-3">
+                                    <button type="button" class="btn btn-success" onclick="showAddVariable()">Add a Variable</button>
+                                </div>
+                            </div>
                             </form>
                         </div>
                         <div id="editProvisionConfirmationDiv" style="display: none">
                             <p id="editGroupConfirmationText"></p>
+                        </div>
+                        <div id="editProvisionAddVariableDiv" style="display: none">
+                            <form>
+                            <div class="form-group">
+                                <label for="addVariableName">Variable Name</label>
+                                <input type="text" class="form-control" id="addVariableName">
+                            </div>
+                            <div class="form-group">
+                                <label for="addVariableValue">Variable Value</label>
+                                <input type="text" class="form-control" id="addVariableValue">
+                            </div>
+                            <div class="form-group">
+                                <label for="addVariableHelpText">Help Text</label>
+                                <textarea class="form-control" id="addVariableHelpText"></textarea>
+                            </div>
+                            </form>
+                        </div>
+                        <div id="editProvisionEditVariableDiv" style="display: none">
+                            <form>
+                            <div class="form-group">
+                                <label for="editVariableName">Variable Name</label>
+                                <input type="text" class="form-control" id="editVariableName">
+                            </div>
+                            <div class="form-group">
+                                <label for="editVariableValue">Variable Value</label>
+                                <input type="text" class="form-control" id="editVariableValue">
+                            </div>
+                            <div class="form-group">
+                                <label for="editVariableHelpText">Help Text</label>
+                                <textarea class="form-control" id="editVariableHelpText"></textarea>
+                            </div>
+                            <input type="hidden" id="editVariableId" value="">
+                            </form>
+                        </div>
+                        <div id="removeVariableDiv" style="display: none">
+                            <p>Are you sure you would like to remove this variable: <span id="removeVariableName"></span></p>
+                            <input type="hidden" id="removeVariableId" value="">
                         </div>
                         <div id="editProvisionId" value="" style="display: none"></div>
                     </div>
@@ -257,6 +268,18 @@
                         <div id="editProvisionConfirmationFooter" style="display: none">
                             <button type="button" class="btn btn-secondary" onclick="editProvisionGoBack()">Go back</button>
                             <button type="button" class="btn btn-primary" id="editProvisionBtn" onclick="confirmEditProvision()">Save</button>
+                        </div>
+                        <div id="editProvisionAddVariableFooter" style="display: none">
+                            <button type="button" class="btn btn-secondary" onclick="editProvisionGoBack()">Go back</button>
+                            <button type="button" class="btn btn-primary" id="addVariableButton" onclick="addVariable()">Save</button>
+                        </div>
+                        <div id="editProvisionEditVariableFooter" style="display: none">
+                            <button type="button" class="btn btn-secondary" onclick="editProvisionGoBack()">Go back</button>
+                            <button type="button" class="btn btn-primary" id="updateVariableButton" onclick="updateVariable()">Save</button>
+                        </div>
+                        <div id="removeVariableFooter" style="display: none">
+                            <button type="button" class="btn btn-secondary" onclick="editProvisionGoBack()">Go back</button>
+                            <button type="button" class="btn btn-primary" id="updateVariableButton" onclick="removeVariable()">Remove</button>
                         </div>
                     </div>
                 </div>

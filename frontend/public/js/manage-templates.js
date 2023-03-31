@@ -1,4 +1,4 @@
-var documentTable, groupMaxTable, provisionTable;
+var documentTable, groupMaxTable, provisionTable, editProvisionVariableTable;
 $(document).ready(function () {
   const urlParams = new URLSearchParams(window.location.search);
   const reportIndex = parseInt(urlParams.get("report"));
@@ -199,27 +199,69 @@ $(document).ready(function () {
       },
       order: [[1, "asc"]],
     });
-    $("#variableTable").DataTable({
+    editProvisionVariableTable = $("#editProvisionVariableTable").DataTable({
+      ajax: {
+        url: "admin/nfr-variables",
+        dataSrc: "",
+      },
+      info: "",
       paging: false,
       bFilter: false,
+      autoWidth: false,
+      columns: [
+        { data: "variable_name", title: "Name", width: "40%" },
+        { data: "variable_value", title: "Value", width: "40%" },
+        { data: "edit", width: "10%" },
+        { data: "remove", width: "10%" },
+        { data: "help_text", visible: false },
+        { data: "id", visible: false },
+        { data: "provision_id", visible: false },
+      ],
       columnDefs: [
         {
-          targets: 0,
+          targets: [0, 1, 2, 3, 4, 5, 6],
           type: "string",
-          render: function (data, type, full, meta) {
-            if (type === "filter" || type === "sort") {
-              var api = new $.fn.dataTable.Api(meta.settings);
-              var td = api.cell({ row: meta.row, column: meta.col }).node();
-              data = $('select, input[type="text"]', td).val();
+          render: function (data, type, row, meta) {
+            if (type === "display") {
+              var columnTypes = [
+                "variable_name",
+                "variable_value",
+                "edit",
+                "remove",
+                "help_text",
+                "id",
+                "provision_id",
+              ];
+              var columnType = columnTypes[meta.col];
+              var id = row["id"];
+              var provisionId = row["provision_id"];
+
+              if (
+                columnType === "help_text" ||
+                columnType === "id" ||
+                columnType === "provision_id"
+              ) {
+                return `<input type='hidden' id='${columnType}-${id}' value='${data}' />`;
+              } else if (columnType === "edit") {
+                return `<a href="#" data-id="${id}" data-provision_id="${provisionId}" onclick="showEditVariable.call(this)">Edit</a>`;
+              } else if (columnType === "remove") {
+                return `<a href="#" data-id="${id}" data-provision_id="${provisionId}" onclick="showRemoveVariable.call(this)">Remove</a>`;
+              } else {
+                return `<input type='text' value='${data}' readonly style='color: gray; width: 100%;' />`;
+              }
+            } else {
+              return data;
             }
-            return data;
           },
         },
         {
-          targets: 1,
+          targets: [2, 3, 4, 5, 6],
           orderable: false,
         },
       ],
+      rowCallback: function (row, data) {
+        $(row).attr("data-provision_id", data.provision_id);
+      },
     });
   }
 });
@@ -272,9 +314,8 @@ function removeTemplate() {
     method: "GET",
   })
     .then((res) => res.json())
-    .then((resJson) => {
-      $(`#row-${id}`).remove();
-      $(`#radio-${resJson.id}`).prop("checked", true);
+    .then(() => {
+      documentTable.ajax.reload();
     })
     .catch(() => {
       console.log("Error removing the template");
@@ -306,7 +347,7 @@ $(document).on("click", ".remove-template-button", function () {
 // clear the modals on close
 $("#uploadModal").on("hidden.bs.modal", function () {
   $("#saveButton").prop("disabled", true);
-  $(this).find("input").val("");
+  $(this).find(".upload-input").val("");
 });
 // upload modal confirmation/save
 $("#uploadModal").on("hidden.bs.modal", function (e) {
@@ -551,7 +592,7 @@ $("#addProvisionGroup").on("input", function () {
   }
 });
 $("#addProvisionModal").on("hidden.bs.modal", function () {
-  $(this).find("input").val("");
+  $(this).find(".provision-input").val("");
   hideAddConfirm();
 });
 function hideAddConfirm() {
@@ -572,6 +613,14 @@ function showAddConfirm() {
  *********************************/
 function openEditModal() {
   const provisionId = $(this).data("id");
+  // Hide rows that do not match the selected provision_id
+  $("#editProvisionVariableTable tbody tr").each(function () {
+    if ($(this).data("provision_id") != provisionId) {
+      $(this).hide();
+    } else {
+      $(this).show();
+    }
+  });
   const type = $(`#type-${provisionId}`).val();
   const provision_group = $(`#provision_group-${provisionId}`).val();
   const max = $(`#max-${provisionId}`).val();
@@ -628,6 +677,7 @@ function openEditModal() {
       checkbox.checked = false;
     }
   });
+
   $("#editProvisionMandatory").prop("checked", mandatory);
   $("#editProvisionModal").modal("toggle");
 }
@@ -821,20 +871,152 @@ $("#editProvisionGroup").on("input", function () {
   }
 });
 $("#editProvisionModal").on("hidden.bs.modal", function () {
-  $(this).find("input").val("");
+  $(this).find(".provision-input").val("");
   hideEditConfirm();
 });
 function hideEditConfirm() {
+  $("#editProvisionModalTitle").show();
   $("#editProvisionDiv").show();
   $("#editProvisionFooter").show();
+  $("#editProvisionModalEditVarTitle").hide();
+  $("#editProvisionModalAddVarTitle").hide();
+  $("#editProvisionModalRemVarTitle").hide();
   $("#editProvisionConfirmationDiv").hide();
+  $("#editProvisionAddVariableDiv").hide();
+  $("#editProvisionEditVariableDiv").hide();
   $("#editProvisionConfirmationFooter").hide();
+  $("#editProvisionAddVariableFooter").hide();
+  $("#editProvisionEditVariableFooter").hide();
+  $("#removeVariableDiv").hide();
+  $("#removeVariableFooter").hide();
 }
 function showEditConfirm() {
   $("#editProvisionDiv").hide();
-  $("#editProvisionFooter").hide();
   $("#editProvisionConfirmationDiv").show();
   $("#editProvisionConfirmationFooter").show();
+}
+function showAddVariable() {
+  $("#editProvisionModalTitle").hide();
+  $("#editProvisionDiv").hide();
+  $("#editProvisionFooter").hide();
+  $("#editProvisionModalAddVarTitle").show();
+  $("#editProvisionAddVariableDiv").show();
+  $("#editProvisionAddVariableFooter").show();
+}
+function showEditVariable() {
+  $("#editProvisionModalTitle").hide();
+  $("#editProvisionDiv").hide();
+  $("#editProvisionFooter").hide();
+  var row = $("#editProvisionVariableTable")
+    .DataTable()
+    .row($(this).parents("tr"))
+    .data();
+  $("#editVariableName").val(row.variable_name);
+  $("#editVariableValue").val(row.variable_value);
+  $("#editVariableHelpText").val(row.help_text);
+  $("#editProvisionModalEditVarTitle").show();
+  $("#editProvisionEditVariableDiv").show();
+  $("#editProvisionEditVariableFooter").show();
+}
+function showRemoveVariable() {
+  $("#editProvisionModalTitle").hide();
+  $("#editProvisionDiv").hide();
+  $("#editProvisionFooter").hide();
+  var row = $("#editProvisionVariableTable")
+    .DataTable()
+    .row($(this).parents("tr"))
+    .data();
+  $("#removeVariableName").text(row.variable_name);
+  $("#removeVariableId").val(row.id);
+  $("#editProvisionModalRemVarTitle").show();
+  $("#removeVariableDiv").show();
+  $("#removeVariableFooter").show();
+}
+
+function addVariable() {
+  const provision_id = $("#editProvisionId").val();
+  const variable_name = $("#addVariableName").val();
+  const variable_value = $("#addVariableValue").val();
+  const help_text = $("#addVariableHelpText").val();
+  const data = JSON.stringify({
+    provision_id: provision_id,
+    variable_name: variable_name,
+    variable_value: variable_value,
+    help_text: help_text,
+  });
+  fetch("admin/add-variable", {
+    method: "POST",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+    body: data,
+  })
+    .then((res) => res.json())
+    .then(() => {
+      editProvisionVariableTable.ajax.reload(function () {
+        filterEditProvisionVariableTable();
+      });
+    });
+  hideEditConfirm();
+}
+function updateVariable() {
+  const id = $("#editVariableId").val();
+  const provision_id = $("#editProvisionId").val();
+  const variable_name = $("#editVariableName").val();
+  const variable_value = $("#editVariableValue").val();
+  const help_text = $("#editVariableHelpText").val();
+  const data = JSON.stringify({
+    id: id,
+    provision_id: provision_id,
+    variable_name: variable_name,
+    variable_value: variable_value,
+    help_text: help_text,
+  });
+  fetch("admin/update-variable", {
+    method: "POST",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+    body: data,
+  })
+    .then((res) => res.json())
+    .then(() => {
+      editProvisionVariableTable.ajax.reload(function () {
+        filterEditProvisionVariableTable();
+      });
+      // clear the inputs
+      $("#editVariableId").val("");
+      $("#editVariableName").val("");
+      $("#editVariableValue").val("");
+      $("#editVariableHelpText").val("");
+    });
+  hideEditConfirm();
+}
+function removeVariable() {
+  const id = $("#removeVariableId").val();
+  fetch(`admin/remove-variable/${id}`, {
+    method: "GET",
+  })
+    .then((res) => res.json())
+    .then(() => {
+      editProvisionVariableTable.ajax.reload(function () {
+        filterEditProvisionVariableTable();
+      });
+    });
+  hideEditConfirm();
+}
+
+function filterEditProvisionVariableTable() {
+  const provisionId = $("#editProvisionId").val();
+  $("#editProvisionVariableTable tbody tr").each(function () {
+    if ($(this).data("provision_id") != provisionId) {
+      $(this).hide();
+    } else {
+      $(this).show();
+    }
+  });
 }
 
 /***********************

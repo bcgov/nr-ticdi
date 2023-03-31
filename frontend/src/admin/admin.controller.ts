@@ -205,6 +205,11 @@ export class AdminController {
     return this.adminService.getNFRProvisions();
   }
 
+  @Get("nfr-variables")
+  getNFRVariables(): any {
+    return this.adminService.getNFRVariables();
+  }
+
   @Get("enable-provision/:provisionId")
   enableProvision(@Param("provisionId") id: number): any {
     return this.adminService.enableProvision(id);
@@ -259,5 +264,40 @@ export class AdminController {
   ) {
     const update_userid = session.data.activeAccount.idir_username;
     return this.adminService.updateProvision(provisionParams, update_userid);
+  }
+
+  @Post("add-variable")
+  addVariable(
+    @Body()
+    variableParams: {
+      variable_name: string;
+      variable_value: string;
+      help_text: string;
+      provision_id: number;
+    },
+    @Session() session: { data?: SessionData }
+  ) {
+    const create_userid = session.data.activeAccount.idir_username;
+    return this.adminService.addVariable(variableParams, create_userid);
+  }
+
+  @Post("update-variable")
+  updateVariable(
+    @Body()
+    variableParams: {
+      variable_name: string;
+      variable_value: string;
+      help_text: string;
+      provision_id: number;
+    },
+    @Session() session: { data?: SessionData }
+  ) {
+    const update_userid = session.data.activeAccount.idir_username;
+    return this.adminService.updateVariable(variableParams, update_userid);
+  }
+
+  @Get("remove-variable/:id")
+  removeVariable(@Param("id") id: number) {
+    return this.adminService.removeVariable(id);
   }
 }

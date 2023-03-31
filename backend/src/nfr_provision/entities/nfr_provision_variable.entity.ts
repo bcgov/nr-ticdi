@@ -5,6 +5,8 @@ import {
   PrimaryGeneratedColumn,
   ManyToOne,
   OneToMany,
+  CreateDateColumn,
+  UpdateDateColumn,
 } from "typeorm";
 import { NFRProvision } from "./nfr_provision.entity";
 
@@ -23,6 +25,14 @@ export class NFRProvisionVariable {
   variable_value: string;
   @Column({ nullable: true })
   help_text: string;
+  @Column({ nullable: true })
+  create_userid: string;
+  @Column({ nullable: true })
+  update_userid: string;
+  @CreateDateColumn()
+  create_timestamp: Date;
+  @UpdateDateColumn()
+  update_timestamp: Date;
   @ManyToOne(() => NFRProvision, (provision) => provision.provision_variables, {
     nullable: true,
   })

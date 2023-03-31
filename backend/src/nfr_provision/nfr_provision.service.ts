@@ -92,6 +92,42 @@ export class NFRProvisionService {
     return this.nfrProvisionRepository.save(updatedProvision);
   }
 
+  async addVariable(nfrVariable: {
+    variable_name: string;
+    variable_value: string;
+    help_text: string;
+    provision_id: number;
+  }) {
+    const nfrProvision = await this.findById(nfrVariable.provision_id);
+    delete nfrVariable["provision_id"];
+    const newVariable = this.nfrProvisionVariableRepository.create({
+      ...nfrVariable,
+      provision: nfrProvision,
+    });
+    return this.nfrProvisionVariableRepository.save(newVariable);
+  }
+
+  async updateVariable(
+    id: number,
+    nfrVariable: {
+      variable_name: string;
+      variable_value: string;
+      help_text: string;
+      provision_id: number;
+    }
+  ) {
+    const nfrProvision = await this.findById(nfrVariable.provision_id);
+    delete nfrVariable["provision_id"];
+    return this.nfrProvisionVariableRepository.update(id, {
+      ...nfrVariable,
+      provision: nfrProvision,
+    });
+  }
+
+  async removeVariable(id: number): Promise<any> {
+    return this.nfrProvisionVariableRepository.delete(id);
+  }
+
   async findAll(): Promise<any[]> {
     const nfrProvisions = await this.nfrProvisionRepository.find({
       relations: ["provision_group", "provision_variant"],
@@ -108,6 +144,18 @@ export class NFRProvisionService {
         ...nfrProvision,
         ...nfrProvision.provision_group,
         variants: provisionVariantIds,
+      };
+    });
+  }
+
+  async findAllVariables(): Promise<any[]> {
+    const nfrVariables = await this.nfrProvisionVariableRepository.find({
+      relations: ["provision"],
+    });
+    return nfrVariables.map((variable) => {
+      return {
+        ...variable,
+        provision_id: variable.provision.id,
       };
     });
   }

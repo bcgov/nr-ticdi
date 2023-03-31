@@ -84,13 +84,13 @@
                         <div id="uploadBody">
                             <div class="form-group row">
                                 <div class="col-md-12">
-                                    <input class="form-control-file" id="uploadFile" style="height: auto" type="file" accept=".docx">
+                                    <input class="form-control-file upload-input" id="uploadFile" style="height: auto" type="file" accept=".docx">
                                 </div>
                             </div>
                             <div class="form-group row">
                                 <div class="col-md-12">
                                     <label for="uploadTemplateName" style="font-weight:bold">Template Name:</label>
-                                    <input id="uploadTemplateName" type="text" class="border border-1 rounded pl-2 ml-2" style="min-width:400px" disabled>
+                                    <input id="uploadTemplateName" type="text" class="border border-1 rounded pl-2 ml-2 upload-input" style="min-width:400px" disabled>
                                 </div>
                             </div>
                         </div>
@@ -131,7 +131,9 @@
             <div class="modal-dialog modal-lg" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="editProvisionModalLabel">Edit Provision</h5>
+                        <h5 class="modal-title" id="editProvisionModalTitle">Edit Provision</h5>
+                        <h5 class="modal-title" id="editProvisionModalEditVarTitle" style="display: none">Edit Variable</h5>
+                        <h5 class="modal-title" id="editProvisionModalAddVarTitle" style="display: none">Add Variable</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                         </button>
@@ -150,15 +152,15 @@
                             </div>
                             <div class="form-group">
                                 <label for="editProvisionGroup">Group</label>
-                                <input type="number" class="form-control" id="editProvisionGroup" name="provision_group" pattern="[0-9]+">
+                                <input type="number" class="form-control provision-input" id="editProvisionGroup" name="provision_group" pattern="[0-9]+">
                             </div>
                             <div class="form-group">
                                 <label for="editProvisionGroupText">Group Description</label>
-                                <input type="text" class="form-control" id="editProvisionGroupText" name="provision_group">
+                                <input type="text" class="form-control provision-input" id="editProvisionGroupText" name="provision_group">
                             </div>
                             <div class="form-group">
                                 <label for="editProvisionMax">Max</label>
-                                <input type="number" class="form-control" id="editProvisionMax" name="max" pattern="[0-9]+">
+                                <input type="number" class="form-control provision-input" id="editProvisionMax" name="max" pattern="[0-9]+">
                             </div>
                             <div class="form-group">
                                 <div class="row mb-2 pl-2">
@@ -174,19 +176,19 @@
                             </div>
                             <div class="form-group">
                                 <label for="editProvisionName">Provision</label>
-                                <input type="text" class="form-control" id="editProvisionName" name="provision">
+                                <input type="text" class="form-control provision-input" id="editProvisionName" name="provision">
                             </div>
                             <div class="form-group">
                                 <label for="editProvisionFreeText">Free Text</label>
-                                <textarea class="form-control" id="editProvisionFreeText" name="free_text"></textarea>
+                                <textarea class="form-control provision-input" id="editProvisionFreeText" name="free_text"></textarea>
                             </div>
                             <div class="form-group">
                                 <label for="editProvisionHelpText">Help Text</label>
-                                <input type="text" class="form-control" id="editProvisionHelpText" name="help_text">
+                                <input type="text" class="form-control provision-input" id="editProvisionHelpText" name="help_text">
                             </div>
                             <div class="form-group">
                                 <label for="editProvisionCategory">Category</label>
-                                <input type="text" class="form-control" id="editProvisionCategory" name="type">
+                                <input type="text" class="form-control provision-input" id="editProvisionCategory" name="type">
                             </div>
                             <div class="form-group">
                                 <label class="mb-2">Variants</label>
@@ -308,15 +310,15 @@
                             </div>
                             <div class="form-group">
                                 <label for="addProvisionGroup">Group</label>
-                                <input type="number" class="form-control" id="addProvisionGroup" name="provision_group" pattern="[0-9]+">
+                                <input type="number" class="form-control provision-input" id="addProvisionGroup" name="provision_group" pattern="[0-9]+">
                             </div>
                             <div class="form-group">
                                 <label for="addProvisionGroup">Group Description</label>
-                                <input type="text" class="form-control" id="addProvisionGroupText" name="provision_group_text" >
+                                <input type="text" class="form-control provision-input" id="addProvisionGroupText" name="provision_group_text" >
                             </div>
                             <div class="form-group">
                                 <label for="addProvisionMax">Max</label>
-                                <input type="number" class="form-control" id="addProvisionMax" name="max" pattern="[0-9]+">
+                                <input type="number" class="form-control provision-input" id="addProvisionMax" name="max" pattern="[0-9]+">
                             </div>
                             <div class="form-group">
                                 <div class="row mb-2 pl-2">
@@ -332,19 +334,19 @@
                             </div>
                             <div class="form-group">
                                 <label for="addProvisionName">Provision</label>
-                                <input type="text" class="form-control" id="addProvisionName" name="provision">
+                                <input type="text" class="form-control provision-input" id="addProvisionName" name="provision">
                             </div>
                             <div class="form-group">
                                 <label for="addProvisionFreeText">Free Text</label>
-                                <textarea class="form-control" id="addProvisionFreeText" name="free_text"></textarea>
+                                <textarea class="form-control provision-input" id="addProvisionFreeText" name="free_text"></textarea>
                             </div>
                             <div class="form-group">
                                 <label for="addProvisionHelpText">Help Text</label>
-                                <input type="text" class="form-control" id="addProvisionHelpText" name="help_text">
+                                <input type="text" class="form-control provision-input" id="addProvisionHelpText" name="help_text">
                             </div>
                             <div class="form-group">
                                 <label for="addProvisionCategory">Category</label>
-                                <input type="text" class="form-control" id="addProvisionCategory" name="type">
+                                <input type="text" class="form-control provision-input" id="addProvisionCategory" name="type">
                             </div>
                             <div class="form-group">
                                 <label class="mb-2">Variants</label>

@@ -348,7 +348,7 @@ $(document).on("click", ".remove-template-button", function () {
 // clear the modals on close
 $("#uploadModal").on("hidden.bs.modal", function () {
   $("#saveButton").prop("disabled", true);
-  $(this).find("input").val("");
+  $(this).find(".upload-input").val("");
 });
 // upload modal confirmation/save
 $("#uploadModal").on("hidden.bs.modal", function (e) {
@@ -593,7 +593,7 @@ $("#addProvisionGroup").on("input", function () {
   }
 });
 $("#addProvisionModal").on("hidden.bs.modal", function () {
-  $(this).find("input").val("");
+  $(this).find(".provision-input").val("");
   hideAddConfirm();
 });
 function hideAddConfirm() {
@@ -872,12 +872,15 @@ $("#editProvisionGroup").on("input", function () {
   }
 });
 $("#editProvisionModal").on("hidden.bs.modal", function () {
-  $(this).find("input").val("");
+  $(this).find(".provision-input").val("");
   hideEditConfirm();
 });
 function hideEditConfirm() {
+  $("#editProvisionModalTitle").show();
   $("#editProvisionDiv").show();
   $("#editProvisionFooter").show();
+  $("#editProvisionModalEditVarTitle").hide();
+  $("#editProvisionModalAddVarTitle").hide();
   $("#editProvisionConfirmationDiv").hide();
   $("#editProvisionAddVariableDiv").hide();
   $("#editProvisionEditVariableDiv").hide();
@@ -889,17 +892,19 @@ function hideEditConfirm() {
 }
 function showEditConfirm() {
   $("#editProvisionDiv").hide();
-  $("#editProvisionFooter").hide();
   $("#editProvisionConfirmationDiv").show();
   $("#editProvisionConfirmationFooter").show();
 }
 function showAddVariable() {
+  $("#editProvisionModalTitle").hide();
   $("#editProvisionDiv").hide();
   $("#editProvisionFooter").hide();
+  $("#editProvisionModalAddVarTitle").show();
   $("#editProvisionAddVariableDiv").show();
   $("#editProvisionAddVariableFooter").show();
 }
 function showEditVariable() {
+  $("#editProvisionModalTitle").hide();
   $("#editProvisionDiv").hide();
   $("#editProvisionFooter").hide();
   var row = $("#editProvisionVariableTable")
@@ -909,6 +914,7 @@ function showEditVariable() {
   $("#editVariableName").val(row.variable_name);
   $("#editVariableValue").val(row.variable_value);
   $("#editVariableHelpText").val(row.help_text);
+  $("#editProvisionModalEditVarTitle").show();
   $("#editProvisionEditVariableDiv").show();
   $("#editProvisionEditVariableFooter").show();
 }

@@ -881,6 +881,7 @@ function hideEditConfirm() {
   $("#editProvisionFooter").show();
   $("#editProvisionModalEditVarTitle").hide();
   $("#editProvisionModalAddVarTitle").hide();
+  $("#editProvisionModalRemVarTitle").hide();
   $("#editProvisionConfirmationDiv").hide();
   $("#editProvisionAddVariableDiv").hide();
   $("#editProvisionEditVariableDiv").hide();
@@ -919,6 +920,7 @@ function showEditVariable() {
   $("#editProvisionEditVariableFooter").show();
 }
 function showRemoveVariable() {
+  $("#editProvisionModalTitle").hide();
   $("#editProvisionDiv").hide();
   $("#editProvisionFooter").hide();
   var row = $("#editProvisionVariableTable")
@@ -927,6 +929,7 @@ function showRemoveVariable() {
     .data();
   $("#removeVariableName").text(row.variable_name);
   $("#removeVariableId").val(row.id);
+  $("#editProvisionModalRemVarTitle").show();
   $("#removeVariableDiv").show();
   $("#removeVariableFooter").show();
 }

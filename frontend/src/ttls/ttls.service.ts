@@ -279,7 +279,7 @@ export class TTLSService {
       }
     }
 
-    return addressParts.join(", ");
+    return addressParts.join(" ");
   }
 
   formatInspectedDate(inspected_date: string): string {

@@ -314,9 +314,8 @@ function removeTemplate() {
     method: "GET",
   })
     .then((res) => res.json())
-    .then((resJson) => {
-      $(`#row-${id}`).remove();
-      $(`#radio-${resJson.id}`).prop("checked", true);
+    .then(() => {
+      documentTable.ajax.reload();
     })
     .catch(() => {
       console.log("Error removing the template");

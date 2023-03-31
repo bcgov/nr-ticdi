@@ -36,7 +36,7 @@ export function nfrAddressBuilder(
   if (postalCode) {
     parts.push(formatPostalCode(postalCode));
   }
-  const address = parts.join(", ");
+  const address = parts.join(" ");
 
   if (address) {
     addressParts.push(address);

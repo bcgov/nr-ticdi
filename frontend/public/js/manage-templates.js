@@ -1,10 +1,10 @@
 var documentTable, groupMaxTable, provisionTable, editProvisionVariableTable;
 var documentTable2, documentTable3, documentTable4, documentTable5;
 var reportType = "";
-var nfrDelayed = "Notice of Final Review (Delayed)";
-var nfrNoFees = "Notice of Final Review (No Fees)";
-var nfrSurveyReq = "Notice of Final Review (Survey Required)";
-var nfrToObtain = "Notice of Final Review (To Obtain Survey)";
+var nfrDelayed = "NOTICE OF FINAL REVIEW (DELAYED)";
+var nfrNoFees = "NOTICE OF FINAL REVIEW (NO FEES)";
+var nfrSurveyReq = "NOTICE OF FINAL REVIEW (SURVEY REQUIRED)";
+var nfrToObtain = "NOTICE OF FINAL REVIEW (TO OBTAIN SURVEY)";
 $(document).ready(function () {
   const urlParams = new URLSearchParams(window.location.search);
   const reportIndex = parseInt(urlParams.get("report"));
@@ -13,11 +13,17 @@ $(document).ready(function () {
   }
   reportType =
     reportIndex == 1
+      ? "LAND USE REPORT"
+      : reportIndex == 2
+      ? "NOTICE OF FINAL REVIEW"
+      : "";
+  $("#reportTitle").text(
+    reportIndex == 1
       ? "Land Use Report"
       : reportIndex == 2
       ? "Notice of Final Review"
-      : "";
-  $("#reportTitle").text(reportType);
+      : ""
+  );
   // used for sorting the radio buttons
   $.fn.dataTable.ext.order["dom-checkbox"] = function (settings, col) {
     return this.api()
@@ -573,9 +579,9 @@ function removeTemplate() {
   const reportIndex = parseInt(urlParams.get("report"));
   const reportType =
     reportIndex == 1
-      ? "Land Use Report"
+      ? "LAND USE REPORT"
       : reportIndex == 2
-      ? "Notice of Final Review"
+      ? "NOTICE OF FINAL REVIEW"
       : "";
   fetch(`/admin/remove-template/${reportType}/${id}`, {
     method: "GET",

@@ -173,14 +173,11 @@ export class DocumentTemplateService {
     });
   }
 
-  async findActiveByDocumentType(
-    documentType: string
-  ): Promise<DocumentTemplate> {
-    const doc = await this.documentTemplateRepository.findOneBy({
+  findActiveByDocumentType(documentType: string): Promise<DocumentTemplate> {
+    return this.documentTemplateRepository.findOneBy({
       document_type: documentType,
       active_flag: true,
     });
-    return doc;
   }
 
   findOne(id: number): Promise<DocumentTemplate> {

@@ -5,12 +5,7 @@ import { firstValueFrom } from "rxjs";
 import { TTLSService } from "src/ttls/ttls.service";
 import { REPORT_TYPES, numberWords } from "utils/constants";
 import { ProvisionJSON, VariableJSON } from "utils/types";
-import {
-  formatMoney,
-  formatPostalCode,
-  nfrAddressBuilder,
-  transformVariantName,
-} from "utils/util";
+import { formatMoney, formatPostalCode, nfrAddressBuilder } from "utils/util";
 const axios = require("axios");
 
 dotenv.config();
@@ -183,11 +178,13 @@ export class ReportService {
       });
 
     // get the document template
-    const documentTemplateObject: { id: number; the_file: string } = await axios
-      .get(templateUrl)
-      .then((res) => {
-        return res.data;
-      });
+    const documentTemplateObject: {
+      id: number;
+      the_file: string;
+      document_template: string;
+    } = await axios.get(templateUrl).then((res) => {
+      return res.data;
+    });
 
     // Format variables with names that the document template expects
     const variables: any = {};
@@ -410,8 +407,6 @@ export class ReportService {
     const response = await ax(conf).catch((error) => {
       console.log(error.response);
     });
-    console.log(response);
-    console.log();
     return response.data;
   }
 
@@ -603,8 +598,7 @@ export class ReportService {
     variableJsonArray: VariableJSON[],
     idir_username: string
   ) {
-    const transformedVariantName = transformVariantName(variant_name);
-    const templateUrl = `${hostname}:${port}/document-template/get-active-report/${transformedVariantName}`;
+    const templateUrl = `${hostname}:${port}/document-template/get-active-report/${variant_name}`;
     const documentTemplate = await axios.get(templateUrl).then((res) => {
       return res.data;
     });

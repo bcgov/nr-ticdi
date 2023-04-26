@@ -3,9 +3,14 @@ import { Injectable } from "@nestjs/common";
 import * as dotenv from "dotenv";
 import { firstValueFrom } from "rxjs";
 import { TTLSService } from "src/ttls/ttls.service";
-import { numberWords } from "utils/constants";
+import { REPORT_TYPES, numberWords } from "utils/constants";
 import { ProvisionJSON, VariableJSON } from "utils/types";
-import { formatMoney, formatPostalCode, nfrAddressBuilder } from "utils/util";
+import {
+  formatMoney,
+  formatPostalCode,
+  nfrAddressBuilder,
+  transformVariantName,
+} from "utils/util";
 const axios = require("axios");
 
 dotenv.config();
@@ -61,8 +66,9 @@ export class ReportService {
     document_type: string,
     username: string
   ) {
+    const documentType = REPORT_TYPES[0]; // Land Use Report
     const url = `${hostname}:${port}/print-request-detail/view/` + prdid;
-    const templateUrl = `${hostname}:${port}/document-template/get-active-report/1`;
+    const templateUrl = `${hostname}:${port}/document-template/get-active-report/${documentType}`;
     const logUrl = `${hostname}:${port}/print-request-log/`;
     // get the view given the print request detail id
     const data = await axios
@@ -163,7 +169,7 @@ export class ReportService {
     variableJson: VariableJSON[],
     provisionJson: ProvisionJSON[]
   ) {
-    const templateUrl = `${hostname}:${port}/document-template/get-active-report/2`;
+    const templateUrl = `${hostname}:${port}/document-template/get-active-report/${variantName}`;
     const logUrl = `${hostname}:${port}/nfr-data-log/`;
 
     // get raw ttls data for later
@@ -381,7 +387,7 @@ export class ReportService {
         cacheReport: false,
         convertTo: "docx",
         overwrite: true,
-        reportName: "lur-report",
+        reportName: "nfr-report",
       },
       template: {
         content: `${bufferBase64}`,
@@ -404,6 +410,8 @@ export class ReportService {
     const response = await ax(conf).catch((error) => {
       console.log(error.response);
     });
+    console.log(response);
+    console.log();
     return response.data;
   }
 
@@ -595,9 +603,8 @@ export class ReportService {
     variableJsonArray: VariableJSON[],
     idir_username: string
   ) {
-    const templateUrl = `${hostname}:${port}/document-template/get-active-report/${encodeURI(
-      "Notice of Final Review"
-    )}`;
+    const transformedVariantName = transformVariantName(variant_name);
+    const templateUrl = `${hostname}:${port}/document-template/get-active-report/${transformedVariantName}`;
     const documentTemplate = await axios.get(templateUrl).then((res) => {
       return res.data;
     });

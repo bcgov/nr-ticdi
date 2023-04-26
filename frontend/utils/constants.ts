@@ -16,12 +16,19 @@ export const NFR_VARIANTS_ARRAY = [
   "NOTICE OF FINAL REVIEW (SURVEY REQUIRED)",
   "NOTICE OF FINAL REVIEW (TO OBTAIN SURVEY)",
 ];
+export const NFR_VARIANTS_ARRAY_FORMATTED = [
+  "Notice of Final Review",
+  "Notice of Final Review (Delayed)",
+  "Notice of Final Review (No Fees)",
+  "Notice of Final Review (Survey Required)",
+  "Notice of Final Review (To Obtain Survey)",
+];
 export const NFR_VARIANTS = {
-  delayed: "NOTICE OF FINAL REVIEW (DELAYED)",
-  default: "NOTICE OF FINAL REVIEW",
-  no_fees: "NOTICE OF FINAL REVIEW (NO FEES)",
-  survey_required: "NOTICE OF FINAL REVIEW (SURVEY REQUIRED)",
-  to_obtain_survey: "NOTICE OF FINAL REVIEW (TO OBTAIN SURVEY)",
+  delayed: "Notice of Final Review (Delayed)",
+  default: "Notice of Final Review",
+  no_fees: "Notice of Final Review (No Fees)",
+  survey_required: "Notice of Final Review (Survey Required)",
+  to_obtain_survey: "Notice of Final Review (To Obtain Survey)",
 };
 
 export const numberWords = [

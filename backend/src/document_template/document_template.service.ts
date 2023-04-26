@@ -173,17 +173,14 @@ export class DocumentTemplateService {
     });
   }
 
-  findActiveByDocumentType(document: number): Promise<DocumentTemplate> {
-    const document_type =
-      document == 1
-        ? "Land Use Report"
-        : document == 2
-        ? "Notice of Final Review"
-        : "";
-    return this.documentTemplateRepository.findOneBy({
-      document_type: document_type,
+  async findActiveByDocumentType(
+    documentType: string
+  ): Promise<DocumentTemplate> {
+    const doc = await this.documentTemplateRepository.findOneBy({
+      document_type: documentType,
       active_flag: true,
     });
+    return doc;
   }
 
   findOne(id: number): Promise<DocumentTemplate> {

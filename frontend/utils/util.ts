@@ -1,3 +1,5 @@
+import { NFR_VARIANTS_ARRAY, NFR_VARIANTS_ARRAY_FORMATTED } from "./constants";
+
 export function formatMoney(value: number): string {
   return value.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, "$&,");
 }
@@ -90,4 +92,12 @@ export function nfrInterestedParties(
     });
   }
   return result;
+}
+
+export function transformVariantName(variantName: string) {
+  const index = NFR_VARIANTS_ARRAY.indexOf(variantName.toUpperCase());
+  if (index !== -1) {
+    return NFR_VARIANTS_ARRAY_FORMATTED[index];
+  }
+  return null;
 }

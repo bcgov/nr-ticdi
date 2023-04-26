@@ -252,24 +252,24 @@ export class AppController {
         const interestedParties = nfrInterestedParties(response.tenantAddr);
         ttlsJSON["interestedParties"] = interestedParties;
         let selectedVariant = 0;
-        switch (variantName) {
-          case NFR_VARIANTS.default: {
+        switch (variantName.toLowerCase()) {
+          case NFR_VARIANTS.default.toLowerCase(): {
             selectedVariant = 0;
             break;
           }
-          case NFR_VARIANTS.delayed: {
+          case NFR_VARIANTS.delayed.toLowerCase(): {
             selectedVariant = 1;
             break;
           }
-          case NFR_VARIANTS.no_fees: {
+          case NFR_VARIANTS.no_fees.toLowerCase(): {
             selectedVariant = 2;
             break;
           }
-          case NFR_VARIANTS.survey_required: {
+          case NFR_VARIANTS.survey_required.toLowerCase(): {
             selectedVariant = 3;
             break;
           }
-          case NFR_VARIANTS.to_obtain_survey: {
+          case NFR_VARIANTS.to_obtain_survey.toLowerCase(): {
             selectedVariant = 4;
             break;
           }

@@ -1,17 +1,29 @@
 var documentTable, groupMaxTable, provisionTable, editProvisionVariableTable;
+var documentTable2, documentTable3, documentTable4, documentTable5;
+var reportType = "";
+var nfrDelayed = "NOTICE OF FINAL REVIEW (DELAYED)";
+var nfrNoFees = "NOTICE OF FINAL REVIEW (NO FEES)";
+var nfrSurveyReq = "NOTICE OF FINAL REVIEW (SURVEY REQUIRED)";
+var nfrToObtain = "NOTICE OF FINAL REVIEW (TO OBTAIN SURVEY)";
 $(document).ready(function () {
   const urlParams = new URLSearchParams(window.location.search);
   const reportIndex = parseInt(urlParams.get("report"));
   if (reportIndex != 2) {
     $(".nofr-section").hide();
   }
-  const reportType =
+  reportType =
+    reportIndex == 1
+      ? "LAND USE REPORT"
+      : reportIndex == 2
+      ? "NOTICE OF FINAL REVIEW"
+      : "";
+  $("#reportTitle").text(
     reportIndex == 1
       ? "Land Use Report"
       : reportIndex == 2
       ? "Notice of Final Review"
-      : "";
-  $("#reportTitle").text(reportType);
+      : ""
+  );
   // used for sorting the radio buttons
   $.fn.dataTable.ext.order["dom-checkbox"] = function (settings, col) {
     return this.api()
@@ -56,7 +68,7 @@ $(document).ready(function () {
             const checked = data === true ? "checked" : "";
 
             if (columnType === "active_flag") {
-              return `<input type='radio' id='active-${id}' data-id='${id}' name='radioActive' onclick='activateTemplate.call(this)' ${checked}>`;
+              return `<input type='radio' name="dt1" data-id='${id}' onclick='activateTemplate.call(this)' ${checked}>`;
             } else if (columnType === "remove") {
               return `<button class='btn btn-warning remove-template-button' data-id='${id}' data-toggle='modal' data-target='#removeModal'>Remove`;
             } else if (columnType === "view") {
@@ -87,6 +99,267 @@ $(document).ready(function () {
     order: [[0, "asc"]],
   });
   if (reportIndex == 2) {
+    documentTable2 = $("#documentTable2").DataTable({
+      ajax: {
+        url: `admin/get-templates/${encodeURIComponent(nfrDelayed)}`,
+        dataSrc: "",
+      },
+      paging: true,
+      bFilter: true,
+      columns: [
+        { data: "template_version" },
+        { data: "file_name" },
+        { data: "update_timestamp" },
+        { data: "active_flag" },
+        { data: "view" },
+        { data: "remove" },
+        { data: "id" },
+      ],
+      columnDefs: [
+        {
+          targets: [0, 1, 2, 3, 4, 5, 6],
+          render: function (data, type, row, meta) {
+            if (type === "display") {
+              var columnTypes = [
+                "template_version",
+                "file_name",
+                "update_timestamp",
+                "active_flag",
+                "view",
+                "remove",
+                "id",
+              ];
+              var columnType = columnTypes[meta.col];
+              var id = row["id"];
+              const checked = data === true ? "checked" : "";
+
+              if (columnType === "active_flag") {
+                return `<input type='radio' name="dt2" data-id='${id}' data-variant='${nfrDelayed}' onclick='activateTemplate.call(this)' ${checked}>`;
+              } else if (columnType === "remove") {
+                return `<button class='btn btn-warning remove-template-button' data-id='${id}' data-toggle='modal' data-target='#removeModal'>Remove`;
+              } else if (columnType === "view") {
+                return `<button class='btn btn-info' id='view-${id}' onclick='downloadTemplate(${id})'>View`;
+              } else if (columnType === "id") {
+                return `<input type='hidden' id='template_id-${id}' value='${data}' />`;
+              } else {
+                return `<input type='text' id='${columnType}-${id}' value='${data}' readonly style='color: gray; width: 100%;' />`;
+              }
+            } else {
+              return data;
+            }
+          },
+        },
+        {
+          targets: [3],
+          className: "text-center",
+        },
+        {
+          targets: [4, 5, 6],
+          orderable: false,
+          searchable: false,
+        },
+      ],
+      createdRow: function (row, data, dataIndex) {
+        $(row).attr("id", "row-" + data["id"]);
+      },
+      order: [[0, "asc"]],
+    });
+    documentTable3 = $("#documentTable3").DataTable({
+      ajax: {
+        url: `admin/get-templates/${encodeURIComponent(nfrNoFees)}`,
+        dataSrc: "",
+      },
+      paging: true,
+      bFilter: true,
+      columns: [
+        { data: "template_version" },
+        { data: "file_name" },
+        { data: "update_timestamp" },
+        { data: "active_flag" },
+        { data: "view" },
+        { data: "remove" },
+        { data: "id" },
+      ],
+      columnDefs: [
+        {
+          targets: [0, 1, 2, 3, 4, 5, 6],
+          render: function (data, type, row, meta) {
+            if (type === "display") {
+              var columnTypes = [
+                "template_version",
+                "file_name",
+                "update_timestamp",
+                "active_flag",
+                "view",
+                "remove",
+                "id",
+              ];
+              var columnType = columnTypes[meta.col];
+              var id = row["id"];
+              const checked = data === true ? "checked" : "";
+
+              if (columnType === "active_flag") {
+                return `<input type='radio' name="dt3" data-id='${id}' data-variant='${nfrNoFees}' onclick='activateTemplate.call(this)' ${checked}>`;
+              } else if (columnType === "remove") {
+                return `<button class='btn btn-warning remove-template-button' data-id='${id}' data-toggle='modal' data-target='#removeModal'>Remove`;
+              } else if (columnType === "view") {
+                return `<button class='btn btn-info' id='view-${id}' onclick='downloadTemplate(${id})'>View`;
+              } else if (columnType === "id") {
+                return `<input type='hidden' id='template_id-${id}' value='${data}' />`;
+              } else {
+                return `<input type='text' id='${columnType}-${id}' value='${data}' readonly style='color: gray; width: 100%;' />`;
+              }
+            } else {
+              return data;
+            }
+          },
+        },
+        {
+          targets: [3],
+          className: "text-center",
+        },
+        {
+          targets: [4, 5, 6],
+          orderable: false,
+          searchable: false,
+        },
+      ],
+      createdRow: function (row, data, dataIndex) {
+        $(row).attr("id", "row-" + data["id"]);
+      },
+      order: [[0, "asc"]],
+    });
+    documentTable4 = $("#documentTable4").DataTable({
+      ajax: {
+        url: `admin/get-templates/${encodeURIComponent(nfrSurveyReq)}`,
+        dataSrc: "",
+      },
+      paging: true,
+      bFilter: true,
+      columns: [
+        { data: "template_version" },
+        { data: "file_name" },
+        { data: "update_timestamp" },
+        { data: "active_flag" },
+        { data: "view" },
+        { data: "remove" },
+        { data: "id" },
+      ],
+      columnDefs: [
+        {
+          targets: [0, 1, 2, 3, 4, 5, 6],
+          render: function (data, type, row, meta) {
+            if (type === "display") {
+              var columnTypes = [
+                "template_version",
+                "file_name",
+                "update_timestamp",
+                "active_flag",
+                "view",
+                "remove",
+                "id",
+              ];
+              var columnType = columnTypes[meta.col];
+              var id = row["id"];
+              const checked = data === true ? "checked" : "";
+
+              if (columnType === "active_flag") {
+                return `<input type='radio' name="dt4" data-id='${id}' data-variant='${nfrSurveyReq}' onclick='activateTemplate.call(this)' ${checked}>`;
+              } else if (columnType === "remove") {
+                return `<button class='btn btn-warning remove-template-button' data-id='${id}' data-toggle='modal' data-target='#removeModal'>Remove`;
+              } else if (columnType === "view") {
+                return `<button class='btn btn-info' id='view-${id}' onclick='downloadTemplate(${id})'>View`;
+              } else if (columnType === "id") {
+                return `<input type='hidden' id='template_id-${id}' value='${data}' />`;
+              } else {
+                return `<input type='text' id='${columnType}-${id}' value='${data}' readonly style='color: gray; width: 100%;' />`;
+              }
+            } else {
+              return data;
+            }
+          },
+        },
+        {
+          targets: [3],
+          className: "text-center",
+        },
+        {
+          targets: [4, 5, 6],
+          orderable: false,
+          searchable: false,
+        },
+      ],
+      createdRow: function (row, data, dataIndex) {
+        $(row).attr("id", "row-" + data["id"]);
+      },
+      order: [[0, "asc"]],
+    });
+    documentTable5 = $("#documentTable5").DataTable({
+      ajax: {
+        url: `admin/get-templates/${encodeURIComponent(nfrToObtain)}`,
+        dataSrc: "",
+      },
+      paging: true,
+      bFilter: true,
+      columns: [
+        { data: "template_version" },
+        { data: "file_name" },
+        { data: "update_timestamp" },
+        { data: "active_flag" },
+        { data: "view" },
+        { data: "remove" },
+        { data: "id" },
+      ],
+      columnDefs: [
+        {
+          targets: [0, 1, 2, 3, 4, 5, 6],
+          render: function (data, type, row, meta) {
+            if (type === "display") {
+              var columnTypes = [
+                "template_version",
+                "file_name",
+                "update_timestamp",
+                "active_flag",
+                "view",
+                "remove",
+                "id",
+              ];
+              var columnType = columnTypes[meta.col];
+              var id = row["id"];
+              const checked = data === true ? "checked" : "";
+
+              if (columnType === "active_flag") {
+                return `<input type='radio' name="dt5" data-id='${id}' data-variant='${nfrSurveyReq}' onclick='activateTemplate.call(this)' ${checked}>`;
+              } else if (columnType === "remove") {
+                return `<button class='btn btn-warning remove-template-button' data-id='${id}' data-toggle='modal' data-target='#removeModal'>Remove`;
+              } else if (columnType === "view") {
+                return `<button class='btn btn-info' id='view-${id}' onclick='downloadTemplate(${id})'>View`;
+              } else if (columnType === "id") {
+                return `<input type='hidden' id='template_id-${id}' value='${data}' />`;
+              } else {
+                return `<input type='text' id='${columnType}-${id}' value='${data}' readonly style='color: gray; width: 100%;' />`;
+              }
+            } else {
+              return data;
+            }
+          },
+        },
+        {
+          targets: [3],
+          className: "text-center",
+        },
+        {
+          targets: [4, 5, 6],
+          orderable: false,
+          searchable: false,
+        },
+      ],
+      createdRow: function (row, data, dataIndex) {
+        $(row).attr("id", "row-" + data["id"]);
+      },
+      order: [[0, "asc"]],
+    });
+
     groupMaxTable = $("#groupMaxTable").DataTable({
       ajax: {
         url: "admin/get-group-max",
@@ -147,7 +420,7 @@ $(document).ready(function () {
 
               if (columnType === "active_flag") {
                 const checked = data === true ? "checked" : "";
-                return `<input type='checkbox' id='active-${id}' data-id='${id}' data-group='${group}' data-max='${max}' name='radioActive' ${checked}>`;
+                return `<input type='checkbox' data-id='${id}' data-group='${group}' data-max='${max}' name='radioActive' ${checked}>`;
               } else if (
                 columnType === "help_text" ||
                 columnType === "id" ||
@@ -306,9 +579,9 @@ function removeTemplate() {
   const reportIndex = parseInt(urlParams.get("report"));
   const reportType =
     reportIndex == 1
-      ? "Land Use Report"
+      ? "LAND USE REPORT"
       : reportIndex == 2
-      ? "Notice of Final Review"
+      ? "NOTICE OF FINAL REVIEW"
       : "";
   fetch(`/admin/remove-template/${reportType}/${id}`, {
     method: "GET",
@@ -323,9 +596,13 @@ function removeTemplate() {
 }
 function activateTemplate() {
   const templateId = $(this).data("id");
+  let variantType = $(this).data("variant");
   const reportType = $("#reportTitle").text();
+  if (!variantType) {
+    variantType = reportType;
+  }
   fetch(
-    `/admin/activate-template/${templateId}/${encodeURIComponent(reportType)}`,
+    `/admin/activate-template/${templateId}/${encodeURIComponent(variantType)}`,
     {
       method: "GET",
       responseType: "application/json",
@@ -343,6 +620,18 @@ function activateTemplate() {
 $(document).on("click", ".remove-template-button", function () {
   const documentTemplateId = $(this).data("id");
   $(".modal-body #document-template-id").val(documentTemplateId);
+});
+$("#uploadModal").on("show.bs.modal", function (event) {
+  const button = $(event.relatedTarget);
+  const variantName = button.data("variant");
+  const modal = $(this);
+  if (variantName) {
+    modal.find("#uploadTitle").text("Upload Template: " + variantName);
+    modal.find("#uploadReportType").val(variantName);
+  } else {
+    modal.find("#uploadTitle").text("Upload Template: " + reportType);
+    modal.find("#uploadReportType").val(reportType);
+  }
 });
 // clear the modals on close
 $("#uploadModal").on("hidden.bs.modal", function () {
@@ -376,14 +665,7 @@ function uploadTemplate() {
   let f = document.getElementById("uploadFile");
   var input = document.querySelector('input[type="file"]');
   var formData = new FormData();
-  const urlParams = new URLSearchParams(window.location.search);
-  const reportIndex = parseInt(urlParams.get("report"));
-  const reportType =
-    reportIndex == 1
-      ? "Land Use Report"
-      : reportIndex == 2
-      ? "Notice of Final Review"
-      : "";
+  const reportType = $("#uploadReportType").val();
   formData.append("file", input.files[0]);
   formData.append("document_type", reportType);
   formData.append("active_flag", false);
@@ -399,7 +681,17 @@ function uploadTemplate() {
         alert(data.errors);
       } else {
         $("#uploadModal").modal("toggle");
-        documentTable.ajax.reload();
+        if (reportType === nfrDelayed) {
+          documentTable2.ajax.reload();
+        } else if (reportType === nfrNoFees) {
+          documentTable3.ajax.reload();
+        } else if (reportType === nfrSurveyReq) {
+          documentTable4.ajax.reload();
+        } else if (reportType === nfrToObtain) {
+          documentTable5.ajax.reload();
+        } else {
+          documentTable.ajax.reload();
+        }
       }
     });
 }

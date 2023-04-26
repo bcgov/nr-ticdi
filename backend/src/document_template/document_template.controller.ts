@@ -74,7 +74,7 @@ export class DocumentTemplateController {
 
   @Get("get-active-report/:document_type")
   findActiveByDocumentType(
-    @Param("document_type") document_type: number
+    @Param("document_type") document_type: string
   ): Promise<DocumentTemplate> {
     return this.templateService.findActiveByDocumentType(document_type);
   }

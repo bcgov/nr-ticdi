@@ -90,7 +90,7 @@ export class ReportController {
     "Content-Type",
     "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
   )
-  @Header("Content-Disposition", "attachment; filename=landusereport.docx")
+  @Header("Content-Disposition", "attachment; filename=nfr-report.docx")
   async generateNFRReport(
     @Session() session: { data: SessionData },
     @Body()

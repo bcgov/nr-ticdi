@@ -1,5 +1,4 @@
 import { Injectable } from "@nestjs/common";
-import { NotFoundException } from "@nestjs/common/exceptions";
 import { InjectRepository } from "@nestjs/typeorm";
 import { NFRProvision } from "src/nfr_provision/entities/nfr_provision.entity";
 import { NFRProvisionVariable } from "src/nfr_provision/entities/nfr_provision_variable.entity";
@@ -35,9 +34,9 @@ export class NFRDataService {
     provisionArray: { provision_id: number; free_text: string }[],
     variableArray: { variable_id: number; variable_value: string }[]
   ): Promise<NFRData> {
-    const { dtid } = nfrDataDto;
-    const nfrData = await this.nfrDataRepository.findOne({
-      where: { dtid },
+    const { dtid, variant_name } = nfrDataDto;
+    const nfrData: NFRData = await this.nfrDataRepository.findOne({
+      where: { dtid: dtid, variant_name: variant_name },
       relations: [
         "nfr_data_variables",
         "nfr_data_provisions",
@@ -57,6 +56,7 @@ export class NFRDataService {
       id: In(nfrVariableIds),
     });
 
+    // if nfrData for this dtid+template exists, update it
     if (nfrData) {
       return await this.updateNfrData(
         nfrDataDto,
@@ -67,6 +67,7 @@ export class NFRDataService {
         nfrVariables
       );
     }
+    // else create new nfrData
     const documentTemplate =
       await this.documentTemplateService.findActiveByDocumentType(
         nfrDataDto.variant_name
@@ -106,6 +107,8 @@ export class NFRDataService {
     await this.nfrDataProvisionRepository.save(nfrDataProvisions);
     await this.nfrDataVariableRepository.save(nfrDataVariables);
 
+    await this.makeActive(newNfrData.dtid, newNfrData.variant_name);
+
     return updatedNfrData;
   }
 
@@ -124,6 +127,7 @@ export class NFRDataService {
     nfrData.update_userid = nfrDataDto.create_userid;
 
     const updatedNfrData = await this.nfrDataRepository.save(nfrData);
+    await this.makeActive(nfrData.dtid, nfrData.variant_name);
 
     // Update NFRDataProvision entities
     for (const provision of provisionArray) {
@@ -391,5 +395,13 @@ export class NFRDataService {
     } catch (err) {
       return { deleted: false, message: err.message };
     }
+  }
+
+  async makeActive(dtid: number, variant_name: string): Promise<any> {
+    await this.nfrDataRepository.update({ dtid: dtid }, { active: false });
+    await this.nfrDataRepository.update(
+      { dtid: dtid, variant_name: variant_name },
+      { active: true }
+    );
   }
 }

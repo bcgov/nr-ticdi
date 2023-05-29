@@ -120,12 +120,15 @@ export class DocumentTemplateService {
       { is_deleted: true, active_flag: false }
     );
     if (templateToRemove.active_flag == true) {
-      const allTemplates = await this.findAll(document_type);
+      const allTemplates = await this.findAll(templateToRemove.document_type);
       if (allTemplates.length != 0) {
         let newestVersionTemplate: DocumentTemplate;
         let currentVersion = 0;
         for (let entry of allTemplates) {
-          if (entry.template_version > currentVersion) {
+          if (
+            entry.is_deleted == false &&
+            entry.template_version > currentVersion
+          ) {
             currentVersion = entry.template_version;
             newestVersionTemplate = entry;
           }

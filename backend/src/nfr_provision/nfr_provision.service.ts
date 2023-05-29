@@ -172,6 +172,20 @@ export class NFRProvisionService {
     }
   }
 
+  async getAllProvisions(): Promise<NFRProvision[]> {
+    try {
+      const provisions: NFRProvision[] = await this.nfrProvisionRepository.find(
+        {
+          relations: ["provision_group"],
+        }
+      );
+      return provisions;
+    } catch (err) {
+      console.log(err);
+      return null;
+    }
+  }
+
   async getProvisionsByVariant(variantName: string): Promise<NFRProvision[]> {
     try {
       const variant = await this.nfrProvisionVariantRepository.findOne({
@@ -280,6 +294,23 @@ export class NFRProvisionService {
     });
     return provisionVariables;
   }
+
+  async getVariablesByDtid(dtid: number): Promise<any> {
+    // gets ALL provisions
+    const provisions = await this.nfrProvisionRepository.find({
+      relations: ["provision_variables"],
+    });
+
+    const provisionVariables: NFRProvisionVariable[] = [];
+    provisions.forEach((provision) => {
+      provision.provision_variables.forEach((variable) => {
+        variable["provisionId"] = provision.id;
+        provisionVariables.push(variable);
+      });
+    });
+    return provisionVariables;
+  }
+
   async getMandatoryProvisions(): Promise<number[]> {
     const provisions = await this.nfrProvisionRepository.find({
       where: { type: "M" },

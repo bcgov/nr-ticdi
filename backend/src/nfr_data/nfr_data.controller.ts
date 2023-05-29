@@ -39,8 +39,8 @@ export class NFRDataController {
   }
 
   @Get("dtid/:dtid")
-  findByDtid(@Param("dtid") dtid: number) {
-    return this.nfrDataService.findByDtid(dtid);
+  findActiveByDtid(@Param("dtid") dtid: number) {
+    return this.nfrDataService.findActiveByDtid(dtid);
   }
 
   @Get("view/:nfrDataId")
@@ -48,14 +48,31 @@ export class NFRDataController {
     return this.nfrDataService.findViewByNFRDataId(+nfrDataId);
   }
 
-  @Get("variables/:nfrDataId")
-  getVariablesByNfrId(@Param("nfrDataId") id: number) {
-    return this.nfrDataService.getVariablesByNfrId(id);
+  @Get("variables/:variantName/:dtid")
+  getVariablesByVariantAndDtid(
+    @Param("variantName") variantName: string,
+    @Param("dtid") dtid: number
+  ) {
+    return this.nfrDataService.getVariablesByVariantAndDtid(variantName, dtid);
   }
 
-  @Get("provisions/:nfrDataId")
-  getProvisionsByNfrId(@Param("nfrDataId") id: number) {
-    return this.nfrDataService.getProvisionsByNfrId(id);
+  @Get("provisions/:variantName/:dtid")
+  getProvisionsByVariantAndDtid(
+    @Param("variantName") variantName: string,
+    @Param("dtid") dtid: number
+  ) {
+    return this.nfrDataService.getProvisionsByVariantAndDtid(variantName, dtid);
+  }
+
+  @Get("get-enabled-provisions/:variantName/:dtid")
+  getEnabledProvisionsByVariantAndDtid(
+    @Param("variantName") variantName: string,
+    @Param("dtid") dtid: number
+  ) {
+    return this.nfrDataService.getEnabledProvisionsByVariantAndDtid(
+      variantName,
+      dtid
+    );
   }
 
   @Delete(":dtid")

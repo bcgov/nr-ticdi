@@ -241,8 +241,14 @@ export class NFRDataService {
     return null;
   }
 
+  // Used by the search page.
+  // Variant data is persisted so only return the active variant foreach dtid.
   async findAll(): Promise<NFRData[]> {
-    return await this.nfrDataRepository.find();
+    return await this.nfrDataRepository.find({
+      where: {
+        active: true,
+      },
+    });
   }
 
   async findByNfrDataId(nfrDataId: number): Promise<{
@@ -278,14 +284,14 @@ export class NFRDataService {
     }
   }
 
-  async findByDtid(dtid: number): Promise<{
+  async findActiveByDtid(dtid: number): Promise<{
     nfrData: NFRData;
     provisionIds: number[];
     variableIds: number[];
   }> {
     try {
       const nfrData = await this.nfrDataRepository.findOne({
-        where: { dtid: dtid },
+        where: { dtid: dtid, active: true },
         join: {
           alias: "nfr_data",
           leftJoinAndSelect: {
@@ -321,9 +327,9 @@ export class NFRDataService {
     });
   }
 
-  async getVariablesByNfrId(id: number) {
+  async getVariablesByVariantAndDtid(variantName: string, dtid: number) {
     const nfrData: NFRData = await this.nfrDataRepository.findOne({
-      where: { id: id },
+      where: { dtid: dtid, variant_name: variantName },
       join: {
         alias: "nfr_data",
         leftJoinAndSelect: {
@@ -332,6 +338,10 @@ export class NFRDataService {
         },
       },
     });
+    // if the nfrData doesn't exist yet, return null. This null value is caught elsewhere.
+    if (!nfrData) {
+      return null;
+    }
     // saved variables attached to the nfrData entry
     const existingDataVariables: NFRDataVariable[] = nfrData.nfr_data_variables;
     // all variables associated with the variant
@@ -354,9 +364,9 @@ export class NFRDataService {
     return { variables, variableIds };
   }
 
-  async getProvisionsByNfrId(id: number) {
+  async getProvisionsByVariantAndDtid(variantName: string, dtid: number) {
     const nfrData: NFRData = await this.nfrDataRepository.findOne({
-      where: { id: id },
+      where: { dtid: dtid, variant_name: variantName },
       join: {
         alias: "nfr_data",
         leftJoinAndSelect: {
@@ -365,14 +375,29 @@ export class NFRDataService {
         },
       },
     });
-    // saved provisions attached to the nfrData entry
-    const existingDataProvisions: NFRDataProvision[] =
-      nfrData.nfr_data_provisions;
-    // all provisions associated with the variant
+    // if the nfrData doesn't exist yet, return null. This null value is caught elsewhere.
+    if (!nfrData) {
+      return null;
+    }
+    const fullNfrData: NFRData[] = await this.nfrDataRepository.find({
+      where: { dtid: nfrData.dtid },
+      join: {
+        alias: "nfr_data",
+        leftJoinAndSelect: {
+          nfr_data_provisions: "nfr_data.nfr_data_provisions",
+          nfr_provision: "nfr_data_provisions.nfr_provision",
+        },
+      },
+    });
+
+    // saved provisions attached to the dtid
+    const existingDataProvisions: NFRDataProvision[] = [];
+    fullNfrData.forEach((nfrData) => {
+      existingDataProvisions.push(...nfrData.nfr_data_provisions);
+    });
+    // all provisions
     const provisions: NFRProvision[] =
-      await this.nfrProvisionService.getProvisionsByVariant(
-        nfrData.variant_name
-      );
+      await this.nfrProvisionService.getAllProvisions();
     // inserting the existing free_text values to the set of all provisions
     for (const provision of provisions) {
       const existingDataProvision = existingDataProvisions.find(
@@ -386,6 +411,29 @@ export class NFRDataService {
       (dataProvision) => dataProvision.nfr_provision.id
     );
     return { provisions, provisionIds };
+  }
+
+  async getEnabledProvisionsByVariantAndDtid(
+    variantName: string,
+    dtid: number
+  ) {
+    const nfrData: NFRData = await this.nfrDataRepository.findOne({
+      where: { variant_name: variantName, dtid: dtid },
+      join: {
+        alias: "nfr_data",
+        leftJoinAndSelect: {
+          nfr_data_provisions: "nfr_data.nfr_data_provisions",
+          nfr_provision: "nfr_data_provisions.nfr_provision",
+        },
+      },
+    });
+    const provisionIds =
+      nfrData && nfrData.nfr_data_provisions
+        ? nfrData.nfr_data_provisions.map(
+            (dataProvision) => dataProvision.nfr_provision.id
+          )
+        : [];
+    return provisionIds;
   }
 
   async remove(dtid: number): Promise<{ deleted: boolean; message?: string }> {

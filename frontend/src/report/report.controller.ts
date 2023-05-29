@@ -128,20 +128,28 @@ export class ReportController {
     return this.reportService.getGroupMaxByVariant(variantName);
   }
 
-  @Get("nfr-provisions/:variant/:nfrId")
+  @Get("nfr-provisions/:variantName/:dtid")
   getNFRProvisionsByVariant(
-    @Param("variant") variantName: string,
-    @Param("nfrId") nfrId: number
+    @Param("variantName") variantName: string,
+    @Param("dtid") dtid: number
   ): any {
-    return this.reportService.getNFRProvisionsByVariant(variantName, nfrId);
+    return this.reportService.getNFRProvisionsByVariantAndDtid(
+      variantName,
+      dtid
+    );
   }
 
-  @Get("get-provision-variables/:variant/:nfrId")
-  getNFRVariablesByVariant(
-    @Param("variant") variantName: string,
-    @Param("nfrId") nfrId: number
+  @Get("get-provision-variables/:variantName/:dtid")
+  async getNFRVariablesByVariant(
+    @Param("variantName") variantName: string,
+    @Param("dtid") dtid: number
   ) {
-    return this.reportService.getNFRVariablesByVariant(variantName, nfrId);
+    console.log("getting variables");
+    const variables = await this.reportService.getNFRVariablesByVariantAndDtid(
+      variantName,
+      dtid
+    );
+    return variables;
   }
 
   @Post("save-nfr")
@@ -176,6 +184,17 @@ export class ReportController {
   @Get("enabled-provisions/:variantName")
   getEnabledProvisionsByVariant(@Param("variantName") variantName: string) {
     return this.reportService.getEnabledProvisionsByVariant(variantName);
+  }
+
+  @Get("enabled-provisions2/:variantName/:dtid")
+  getEnabledProvisionsByVariantAndDtid(
+    @Param("variantName") variantName: string,
+    @Param("dtid") dtid: number
+  ) {
+    return this.reportService.getEnabledProvisionsByVariantAndDtid(
+      variantName,
+      dtid
+    );
   }
 
   @Get("search-nfr-data")

@@ -216,10 +216,10 @@ provisionTable = $("#provisionTable").DataTable({
       const gmUrl = `${window.location.origin}/report/get-group-max/${variantName}`;
       const spUrl = `${
         window.location.origin
-      }/report/nfr-provisions/${encodeURI(variantName)}/-1`;
+      }/report/nfr-provisions/${encodeURI(variantName)}/${dtid}`;
       const vUrl = `${
         window.location.origin
-      }/report/get-provision-variables/${encodeURI(variantName)}/-1`;
+      }/report/get-provision-variables/${encodeURI(variantName)}/${dtid}`;
       fetch(`/report/get-group-max/${variantName}`)
         .then((res) => {
           return res.json();
@@ -244,8 +244,7 @@ provisionTable = $("#provisionTable").DataTable({
 
 let selectedProvisionsUrl = `${
   window.location.origin
-}/report/nfr-provisions/${encodeURI(variantName)}`;
-selectedProvisionsUrl += nfrDataId != "" ? `/${nfrDataId}` : "/-1";
+}/report/nfr-provisions/${encodeURI(variantName)}/${dtid}`;
 selectedProvisionsTable = $("#selectedProvisionsTable").DataTable({
   ajax: {
     url: selectedProvisionsUrl,
@@ -319,8 +318,7 @@ selectedProvisionsTable = $("#selectedProvisionsTable").DataTable({
 
 let variablesUrl = `${
   window.location.origin
-}/report/get-provision-variables/${encodeURI(variantName)}`;
-variablesUrl += nfrDataId != "" ? `/${nfrDataId}` : "/-1";
+}/report/get-provision-variables/${encodeURI(variantName)}/${dtid}`;
 variableTable = $("#variableTable").DataTable({
   ajax: {
     url: variablesUrl,
@@ -388,6 +386,8 @@ document.querySelector("#saveNfr").addEventListener("click", function (event) {
   event.preventDefault();
 });
 
+// When the selected variant changes, the tables need to be reloaded and
+// mandatory and enabled provisions need to be fetched
 $("#documentVariantId").on("change", function () {
   variantName = $(this).val();
   reloadingTables = true;
@@ -402,11 +402,22 @@ $("#documentVariantId").on("change", function () {
     responseType: "application/json",
   })
     .then((res) => res.json())
-    .then((resJson) => {
-      mandatoryProvisions = resJson;
-      // enabledProvisions = mandatoryProvisions;
-      enabledProvisions = [];
-      provisionTable.ajax.url(pUrl).load();
+    .then((newMandatoryProvisions) => {
+      mandatoryProvisions = newMandatoryProvisions;
+      fetch(`/report/enabled-provisions2/${encodeURI(variantName)}/${dtid}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        responseType: "application/json",
+      })
+        .then((res) => res.json())
+        .then((newEnabledProvisions) => {
+          enabledProvisions = newEnabledProvisions;
+        })
+        .then(() => {
+          provisionTable.ajax.url(pUrl).load();
+        });
     });
 });
 

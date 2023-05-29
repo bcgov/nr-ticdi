@@ -589,6 +589,10 @@ function removeTemplate() {
     .then((res) => res.json())
     .then(() => {
       documentTable.ajax.reload();
+      documentTable2.ajax.reload();
+      documentTable3.ajax.reload();
+      documentTable4.ajax.reload();
+      documentTable5.ajax.reload();
     })
     .catch(() => {
       console.log("Error removing the template");

@@ -58,7 +58,7 @@ export class DocumentTemplateService {
     document_type: string;
   }): Promise<any> {
     let allTemplates = await this.documentTemplateRepository.findBy({
-      document_type: data.document_type,
+      document_type: data.document_type.toUpperCase(),
     });
     for (let entry of allTemplates) {
       if (entry.active_flag == true) {
@@ -68,10 +68,12 @@ export class DocumentTemplateService {
         );
       }
     }
-    return await this.documentTemplateRepository.update(
+    const activatedTemplate = await this.documentTemplateRepository.update(
       { id: data.id },
       { active_flag: true }
     );
+    await this.updateNfrTemplates(data.document_type.toUpperCase());
+    return activatedTemplate;
   }
 
   async checkForActiveTemplates(data: {

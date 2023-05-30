@@ -1,15 +1,18 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { In, Repository, UpdateResult } from "typeorm";
+import { In, Repository } from "typeorm";
 import { CreateDocumentTemplateDto } from "./dto/create-document_template.dto";
 import { UpdateDocumentTemplateDto } from "./dto/update-document_template.dto";
 import { DocumentTemplate } from "./entities/document_template.entity";
+import { NFRData } from "src/nfr_data/entities/nfr_data.entity";
 
 @Injectable()
 export class DocumentTemplateService {
   constructor(
     @InjectRepository(DocumentTemplate)
-    private documentTemplateRepository: Repository<DocumentTemplate>
+    private documentTemplateRepository: Repository<DocumentTemplate>,
+    @InjectRepository(NFRData)
+    private nfrDataRepository: Repository<NFRData>
   ) {}
 
   async create(
@@ -115,6 +118,7 @@ export class DocumentTemplateService {
   async remove(document_type: string, id: number): Promise<{ id: number }> {
     // if the removed template was active, activate the highest version template
     const templateToRemove = await this.findOne(id);
+    const variantName = templateToRemove.document_type;
     await this.documentTemplateRepository.update(
       { id: id },
       { is_deleted: true, active_flag: false }
@@ -134,9 +138,11 @@ export class DocumentTemplateService {
           }
         }
         await this.activateTemplate(newestVersionTemplate);
+        await this.updateNfrTemplates(variantName);
         return { id: newestVersionTemplate.id };
       }
     }
+    await this.updateNfrTemplates(variantName);
     return { id: 0 };
   }
 
@@ -187,5 +193,27 @@ export class DocumentTemplateService {
     return this.documentTemplateRepository.findOneByOrFail({
       id: id,
     });
+  }
+
+  // after removing a template, this updates nfrData that is now tied to inactive templates
+  async updateNfrTemplates(variantName: string) {
+    const nfrData: NFRData[] = await this.nfrDataRepository.find({
+      where: {
+        variant_name: variantName,
+      },
+    });
+
+    const activeTemplate = await this.documentTemplateRepository.findOne({
+      where: { document_type: variantName, active_flag: true },
+    });
+
+    for (let item of nfrData) {
+      if (item.template_id != activeTemplate.id) {
+        await this.nfrDataRepository.update(item.id, {
+          template_id: activeTemplate.id,
+        });
+      }
+    }
+    return null;
   }
 }

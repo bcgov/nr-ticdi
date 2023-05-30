@@ -379,6 +379,7 @@ export class NFRDataService {
     if (!nfrData) {
       return null;
     }
+    // nfrData for all variants of this dtid
     const fullNfrData: NFRData[] = await this.nfrDataRepository.find({
       where: { dtid: nfrData.dtid },
       join: {
@@ -398,15 +399,6 @@ export class NFRDataService {
     // all provisions
     const provisions: NFRProvision[] =
       await this.nfrProvisionService.getAllProvisions();
-    // inserting the existing free_text values to the set of all provisions
-    for (const provision of provisions) {
-      const existingDataProvision = existingDataProvisions.find(
-        (dataProvision) => dataProvision.nfr_provision.id === provision.id
-      );
-      if (existingDataProvision) {
-        provision.free_text = existingDataProvision.provision_free_text;
-      }
-    }
     const provisionIds = existingDataProvisions.map(
       (dataProvision) => dataProvision.nfr_provision.id
     );

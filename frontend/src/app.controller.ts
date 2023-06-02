@@ -223,7 +223,7 @@ export class AppController {
       );
       let ttlsJSON, primaryContactName, nfrData;
       try {
-        const nfrDataObject = await this.reportService.getNfrDataByDtid(dtid);
+        const nfrDataObject = await this.reportService.getActiveNfrDataByDtid(dtid);
         nfrData = nfrDataObject.nfrData;
         const provisionIds = nfrDataObject.provisionIds
           ? nfrDataObject.provisionIds

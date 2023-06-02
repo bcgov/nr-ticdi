@@ -1,5 +1,4 @@
 import { Injectable } from "@nestjs/common";
-import { NotFoundException } from "@nestjs/common/exceptions";
 import { InjectRepository } from "@nestjs/typeorm";
 import { NFRProvision } from "src/nfr_provision/entities/nfr_provision.entity";
 import { NFRProvisionVariable } from "src/nfr_provision/entities/nfr_provision_variable.entity";
@@ -35,9 +34,9 @@ export class NFRDataService {
     provisionArray: { provision_id: number; free_text: string }[],
     variableArray: { variable_id: number; variable_value: string }[]
   ): Promise<NFRData> {
-    const { dtid } = nfrDataDto;
-    const nfrData = await this.nfrDataRepository.findOne({
-      where: { dtid },
+    const { dtid, variant_name } = nfrDataDto;
+    const nfrData: NFRData = await this.nfrDataRepository.findOne({
+      where: { dtid: dtid, variant_name: variant_name },
       relations: [
         "nfr_data_variables",
         "nfr_data_provisions",
@@ -57,6 +56,7 @@ export class NFRDataService {
       id: In(nfrVariableIds),
     });
 
+    // if nfrData for this dtid+template exists, update it
     if (nfrData) {
       return await this.updateNfrData(
         nfrDataDto,
@@ -67,6 +67,7 @@ export class NFRDataService {
         nfrVariables
       );
     }
+    // else create new nfrData
     const documentTemplate =
       await this.documentTemplateService.findActiveByDocumentType(
         nfrDataDto.variant_name
@@ -106,6 +107,8 @@ export class NFRDataService {
     await this.nfrDataProvisionRepository.save(nfrDataProvisions);
     await this.nfrDataVariableRepository.save(nfrDataVariables);
 
+    await this.makeActive(newNfrData.dtid, newNfrData.variant_name);
+
     return updatedNfrData;
   }
 
@@ -124,6 +127,7 @@ export class NFRDataService {
     nfrData.update_userid = nfrDataDto.create_userid;
 
     const updatedNfrData = await this.nfrDataRepository.save(nfrData);
+    await this.makeActive(nfrData.dtid, nfrData.variant_name);
 
     // Update NFRDataProvision entities
     for (const provision of provisionArray) {
@@ -237,8 +241,14 @@ export class NFRDataService {
     return null;
   }
 
+  // Used by the search page.
+  // Variant data is persisted so only return the active variant foreach dtid.
   async findAll(): Promise<NFRData[]> {
-    return await this.nfrDataRepository.find();
+    return await this.nfrDataRepository.find({
+      where: {
+        active: true,
+      },
+    });
   }
 
   async findByNfrDataId(nfrDataId: number): Promise<{
@@ -274,14 +284,14 @@ export class NFRDataService {
     }
   }
 
-  async findByDtid(dtid: number): Promise<{
+  async findActiveByDtid(dtid: number): Promise<{
     nfrData: NFRData;
     provisionIds: number[];
     variableIds: number[];
   }> {
     try {
       const nfrData = await this.nfrDataRepository.findOne({
-        where: { dtid: dtid },
+        where: { dtid: dtid, active: true },
         join: {
           alias: "nfr_data",
           leftJoinAndSelect: {
@@ -317,9 +327,9 @@ export class NFRDataService {
     });
   }
 
-  async getVariablesByNfrId(id: number) {
+  async getVariablesByVariantAndDtid(variantName: string, dtid: number) {
     const nfrData: NFRData = await this.nfrDataRepository.findOne({
-      where: { id: id },
+      where: { dtid: dtid, variant_name: variantName },
       join: {
         alias: "nfr_data",
         leftJoinAndSelect: {
@@ -328,6 +338,10 @@ export class NFRDataService {
         },
       },
     });
+    // if the nfrData doesn't exist yet, return null. This null value is caught elsewhere.
+    if (!nfrData) {
+      return null;
+    }
     // saved variables attached to the nfrData entry
     const existingDataVariables: NFRDataVariable[] = nfrData.nfr_data_variables;
     // all variables associated with the variant
@@ -350,9 +364,9 @@ export class NFRDataService {
     return { variables, variableIds };
   }
 
-  async getProvisionsByNfrId(id: number) {
+  async getProvisionsByVariantAndDtid(variantName: string, dtid: number) {
     const nfrData: NFRData = await this.nfrDataRepository.findOne({
-      where: { id: id },
+      where: { dtid: dtid, variant_name: variantName },
       join: {
         alias: "nfr_data",
         leftJoinAndSelect: {
@@ -361,27 +375,57 @@ export class NFRDataService {
         },
       },
     });
-    // saved provisions attached to the nfrData entry
-    const existingDataProvisions: NFRDataProvision[] =
-      nfrData.nfr_data_provisions;
-    // all provisions associated with the variant
-    const provisions: NFRProvision[] =
-      await this.nfrProvisionService.getProvisionsByVariant(
-        nfrData.variant_name
-      );
-    // inserting the existing free_text values to the set of all provisions
-    for (const provision of provisions) {
-      const existingDataProvision = existingDataProvisions.find(
-        (dataProvision) => dataProvision.nfr_provision.id === provision.id
-      );
-      if (existingDataProvision) {
-        provision.free_text = existingDataProvision.provision_free_text;
-      }
+    // if the nfrData doesn't exist yet, return null. This null value is caught elsewhere.
+    if (!nfrData) {
+      return null;
     }
+    // nfrData for all variants of this dtid
+    const fullNfrData: NFRData[] = await this.nfrDataRepository.find({
+      where: { dtid: nfrData.dtid },
+      join: {
+        alias: "nfr_data",
+        leftJoinAndSelect: {
+          nfr_data_provisions: "nfr_data.nfr_data_provisions",
+          nfr_provision: "nfr_data_provisions.nfr_provision",
+        },
+      },
+    });
+
+    // saved provisions attached to the dtid
+    const existingDataProvisions: NFRDataProvision[] = [];
+    fullNfrData.forEach((nfrData) => {
+      existingDataProvisions.push(...nfrData.nfr_data_provisions);
+    });
+    // all provisions
+    const provisions: NFRProvision[] =
+      await this.nfrProvisionService.getAllProvisions();
     const provisionIds = existingDataProvisions.map(
       (dataProvision) => dataProvision.nfr_provision.id
     );
     return { provisions, provisionIds };
+  }
+
+  async getEnabledProvisionsByVariantAndDtid(
+    variantName: string,
+    dtid: number
+  ) {
+    const nfrData: NFRData = await this.nfrDataRepository.findOne({
+      where: { variant_name: variantName, dtid: dtid },
+      join: {
+        alias: "nfr_data",
+        leftJoinAndSelect: {
+          nfr_data_provisions: "nfr_data.nfr_data_provisions",
+          nfr_provision: "nfr_data_provisions.nfr_provision",
+        },
+      },
+    });
+    const provisionIds =
+      nfrData && nfrData.nfr_data_provisions
+        ? nfrData.nfr_data_provisions.map(
+            (dataProvision) => dataProvision.nfr_provision.id
+          )
+        : [];
+    return provisionIds;
   }
 
   async remove(dtid: number): Promise<{ deleted: boolean; message?: string }> {
@@ -391,5 +435,13 @@ export class NFRDataService {
     } catch (err) {
       return { deleted: false, message: err.message };
     }
+  }
+
+  async makeActive(dtid: number, variant_name: string): Promise<any> {
+    await this.nfrDataRepository.update({ dtid: dtid }, { active: false });
+    await this.nfrDataRepository.update(
+      { dtid: dtid, variant_name: variant_name },
+      { active: true }
+    );
   }
 }

@@ -17,6 +17,7 @@ export class NFRData {
   dtid: number;
   @Column({ nullable: true })
   variant_name: string;
+
   @Column({ nullable: true })
   template_id: number;
   @Column({ nullable: true })
@@ -39,6 +40,8 @@ export class NFRData {
     }
   )
   nfr_data_variables: NFRDataVariable[];
+  @Column({ nullable: true })
+  active: boolean;
   @Column({ nullable: true })
   create_userid: string;
   @Column({ nullable: true })

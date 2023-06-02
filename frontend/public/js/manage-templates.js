@@ -329,7 +329,7 @@ $(document).ready(function () {
               const checked = data === true ? "checked" : "";
 
               if (columnType === "active_flag") {
-                return `<input type='radio' name="dt5" data-id='${id}' data-variant='${nfrSurveyReq}' onclick='activateTemplate.call(this)' ${checked}>`;
+                return `<input type='radio' name="dt5" data-id='${id}' data-variant='${nfrToObtain}' onclick='activateTemplate.call(this)' ${checked}>`;
               } else if (columnType === "remove") {
                 return `<button class='btn btn-warning remove-template-button' data-id='${id}' data-toggle='modal' data-target='#removeModal'>Remove`;
               } else if (columnType === "view") {
@@ -589,6 +589,10 @@ function removeTemplate() {
     .then((res) => res.json())
     .then(() => {
       documentTable.ajax.reload();
+      documentTable2.ajax.reload();
+      documentTable3.ajax.reload();
+      documentTable4.ajax.reload();
+      documentTable5.ajax.reload();
     })
     .catch(() => {
       console.log("Error removing the template");

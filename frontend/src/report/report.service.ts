@@ -410,9 +410,9 @@ export class ReportService {
     return response.data;
   }
 
-  async getNFRProvisionsByVariant(
+  async getNFRProvisionsByVariantAndDtid(
     variantName: string,
-    nfrId: number
+    dtid: number
   ): Promise<any> {
     const returnItems = [
       "type",
@@ -425,15 +425,15 @@ export class ReportService {
       "mandatory",
     ];
     let reduced, provisions;
-    if (nfrId != -1) {
-      // nfrDataId exists so return a list of provisions with pre-existing free_text data inserted, certain provisions preselected
-      const url = `${hostname}:${port}/nfr-data/provisions/${nfrId}`;
-      const nfrProvisions = await axios
-        .get(url)
-        .then((res) => {
-          return res.data;
-        })
-        .catch((err) => console.log(err.response.data));
+    // nfrDataId exists so return a list of provisions with pre-existing free_text data inserted, certain provisions preselected
+    const url = `${hostname}:${port}/nfr-data/provisions/${variantName}/${dtid}`;
+    const nfrProvisions = await axios
+      .get(url)
+      .then((res) => {
+        return res.data;
+      })
+      .catch((err) => console.log(err.response.data));
+    if (nfrProvisions) {
       const provisionIds = nfrProvisions.provisionIds;
       provisions = nfrProvisions.provisions;
       reduced = provisions.map((obj) => {
@@ -446,9 +446,9 @@ export class ReportService {
       });
     } else {
       // no nfrDataId so just return generic provisions with all of them deselected by default
-      const url = `${hostname}:${port}/nfr-provision/variant/${variantName}`;
+      const url2 = `${hostname}:${port}/nfr-provision/variant/${variantName}`;
       provisions = await axios
-        .get(url)
+        .get(url2)
         .then((res) => {
           return res.data;
         })
@@ -482,23 +482,24 @@ export class ReportService {
     });
   }
 
-  async getNFRVariablesByVariant(
+  async getNFRVariablesByVariantAndDtid(
     variantName: string,
-    nfrId: number
+    dtid: number
   ): Promise<any> {
-    if (nfrId != -1) {
-      // if an nfrId is provided, get the variables with any existing user specified values
-      const url = `${hostname}:${port}/nfr-data/variables/${nfrId}`;
-      return axios
-        .get(url)
-        .then((res) => {
-          return res.data.variables;
-        })
-        .catch((err) => console.log(err.response.data));
+    // if an nfrId is provided, get the variables with any existing user specified values
+    const url = `${hostname}:${port}/nfr-data/variables/${variantName}/${dtid}`;
+    const variables = await axios
+      .get(url)
+      .then((res) => {
+        return res.data.variables;
+      })
+      .catch((err) => console.log(err.response.data));
+    if (variables) {
+      return variables;
     } else {
       // grab the basic variable list corresponding to the variant
-      const url = `${hostname}:${port}/nfr-provision/get-provision-variables/variant/${variantName}`;
-      return axios.get(url).then((res) => {
+      const url2 = `${hostname}:${port}/nfr-provision/get-provision-variables/variant/${variantName}`;
+      return axios.get(url2).then((res) => {
         return res.data;
       });
     }
@@ -577,7 +578,7 @@ export class ReportService {
     return combinedArray;
   }
 
-  async getNfrDataByDtid(dtid: number): Promise<any> {
+  async getActiveNfrDataByDtid(dtid: number): Promise<any> {
     const url = `${hostname}:${port}/nfr-data/dtid/${dtid}`;
     return axios
       .get(url, {
@@ -624,6 +625,16 @@ export class ReportService {
 
   async getEnabledProvisionsByVariant(variantName: string) {
     const url = `${hostname}:${port}/nfr-provision/get-mandatory-provisions/variant/${variantName}`;
+    return axios.get(url).then((res) => {
+      return res.data;
+    });
+  }
+
+  async getEnabledProvisionsByVariantAndDtid(
+    variantName: string,
+    dtid: number
+  ) {
+    const url = `${hostname}:${port}/nfr-data/get-enabled-provisions/${variantName}/${dtid}`;
     return axios.get(url).then((res) => {
       return res.data;
     });

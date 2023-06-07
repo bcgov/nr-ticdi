@@ -118,10 +118,19 @@ export class NFRProvisionService {
   ) {
     const nfrProvision = await this.findById(nfrVariable.provision_id);
     delete nfrVariable["provision_id"];
-    return this.nfrProvisionVariableRepository.update(id, {
-      ...nfrVariable,
-      provision: nfrProvision,
+    const variableToUpdate = await this.nfrProvisionVariableRepository.findOne({
+      where: { id: id },
     });
+
+    if (!variableToUpdate) {
+      throw new Error("Variable not found");
+    }
+    variableToUpdate.variable_name = nfrVariable.variable_name;
+    variableToUpdate.variable_value = nfrVariable.variable_value;
+    variableToUpdate.help_text = nfrVariable.help_text;
+    variableToUpdate.provision = nfrProvision;
+
+    return this.nfrProvisionVariableRepository.save(variableToUpdate);
   }
 
   async removeVariable(id: number): Promise<any> {

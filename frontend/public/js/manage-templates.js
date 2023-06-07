@@ -1207,6 +1207,7 @@ function showEditVariable() {
     .DataTable()
     .row($(this).parents("tr"))
     .data();
+  $("#editVariableId").val(row.id);
   $("#editVariableName").val(row.variable_name);
   $("#editVariableValue").val(row.variable_value);
   $("#editVariableHelpText").val(row.help_text);

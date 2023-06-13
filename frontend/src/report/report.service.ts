@@ -196,6 +196,16 @@ export class ReportService {
         .replace(/\s/g, "_")
         .replace(/^(\w)/, (match) => match.toUpperCase());
       variables[`VAR_${newVariableName}`] = variable_value;
+      // workaround for template formatting
+      if (
+        newVariableName == "Occ_Rent_Details" ||
+        newVariableName == "Replacement_Tenure_Type" ||
+        newVariableName == "Why_Land_Differs" ||
+        newVariableName == "Sect5_Free_Field"
+      ) {
+        variables[`VAR_${newVariableName}`] =
+          variables[`VAR_${newVariableName}`] + "\r\n\r\n";
+      }
     });
 
     // Format provisions in a way that the document template expects
@@ -209,6 +219,17 @@ export class ReportService {
       const groupText = numberWords[group];
       const varName = `Section${groupText}_${index}_Text`;
       showProvisionSections[varName] = provision.free_text;
+      // workaround for template formatting
+      if (
+        showProvisionSections[varName] != "" &&
+        varName != "SectionFifteen_1_Text" &&
+        varName != "SectionFive_1_Text" &&
+        varName != "SectionFive_2_Text" &&
+        varName != "SectionFive_3_Text"
+      ) {
+        showProvisionSections[varName] =
+          showProvisionSections[varName] + "\r\n\r\n";
+      }
 
       const showVarName = `showSection${groupText}_${index}`;
       showProvisionSections[showVarName] = 1;

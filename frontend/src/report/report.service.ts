@@ -5,7 +5,12 @@ import { firstValueFrom } from "rxjs";
 import { TTLSService } from "src/ttls/ttls.service";
 import { REPORT_TYPES, numberWords } from "utils/constants";
 import { ProvisionJSON, VariableJSON } from "utils/types";
-import { formatMoney, formatPostalCode, nfrAddressBuilder } from "utils/util";
+import {
+  convertToSpecialCamelCase,
+  formatMoney,
+  formatPostalCode,
+  nfrAddressBuilder,
+} from "utils/util";
 const axios = require("axios");
 
 dotenv.config();
@@ -195,6 +200,18 @@ export class ReportService {
         .replace(/\b\w/g, (match) => match.toUpperCase())
         .replace(/\s/g, "_")
         .replace(/^(\w)/, (match) => match.toUpperCase());
+
+      if (variable_value.includes("«")) {
+        // regex which converts «DB_TENURE_TYPE» to {d.DB_Tenure_Type}, also works for VAR_
+        variable_value = variable_value.replace(
+          /«([^»]+)»/g,
+          function (match, innerText) {
+            innerText = convertToSpecialCamelCase(innerText);
+            return "{d." + innerText + "}";
+          }
+        );
+      }
+
       variables[`VAR_${newVariableName}`] = variable_value;
     });
 
@@ -208,6 +225,16 @@ export class ReportService {
 
       const groupText = numberWords[group];
       const varName = `Section${groupText}_${index}_Text`;
+      if (provision.free_text.includes("«")) {
+        // regex which converts «DB_TENURE_TYPE» to {d.DB_Tenure_Type}, also works for VAR_
+        provision.free_text = provision.free_text.replace(
+          /«([^»]+)»/g,
+          function (match, innerText) {
+            innerText = convertToSpecialCamelCase(innerText);
+            return "{d." + innerText + "}";
+          }
+        );
+      }
       showProvisionSections[varName] = provision.free_text;
 
       const showVarName = `showSection${groupText}_${index}`;
@@ -376,7 +403,7 @@ export class ReportService {
     // Generate the report
     const cdogsToken = await this.ttlsService.callGetToken();
     let bufferBase64 = documentTemplateObject.the_file;
-    const md = JSON.stringify({
+    let cdogsData = {
       data,
       formatters:
         '{"myFormatter":"_function_myFormatter|function(data) { return data.slice(1); }","myOtherFormatter":"_function_myOtherFormatter|function(data) {return data.slice(2);}"}',
@@ -391,9 +418,10 @@ export class ReportService {
         encodingType: "base64",
         fileType: "docx",
       },
-    });
+    };
+    const md = JSON.stringify(cdogsData);
 
-    const conf = {
+    let conf = {
       method: "post",
       url: process.env.cdogs_url,
       headers: {
@@ -407,7 +435,19 @@ export class ReportService {
     const response = await ax(conf).catch((error) => {
       console.log(error.response);
     });
-    return response.data;
+    // response.data is the docx file after the first insertions
+    const firstFile = response.data;
+    // convert the docx file buffer to base64 for a second cdogs conversion
+    const base64File = Buffer.from(firstFile).toString("base64");
+    cdogsData.template.content = base64File;
+    const md2 = JSON.stringify(cdogsData);
+    conf.data = md2;
+    const response2 = await ax(conf).catch((error) => {
+      console.log(error.response);
+    });
+    // response2.data is the docx file after the second insertions
+    // (anything nested in a variable or provision should be inserted at this point)
+    return response2.data;
   }
 
   async getNFRProvisionsByVariantAndDtid(

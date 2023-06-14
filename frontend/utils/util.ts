@@ -91,3 +91,16 @@ export function nfrInterestedParties(
   }
   return result;
 }
+
+// used by report service to convert strings to a specific format
+// such as «DB_TENURE_TYPE» to {d.DB_Tenure_Type}
+export function convertToSpecialCamelCase(str) {
+  return str
+    .toLowerCase()
+    .replace(/_([a-z])/g, function (match, letter) {
+      return "_" + letter.toUpperCase();
+    })
+    .replace(/^[a-z]*/g, function (match, letter) {
+      return match.toUpperCase();
+    });
+}

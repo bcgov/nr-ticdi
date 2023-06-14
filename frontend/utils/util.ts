@@ -95,12 +95,19 @@ export function nfrInterestedParties(
 // used by report service to convert strings to a specific format
 // such as «DB_TENURE_TYPE» to {d.DB_Tenure_Type}
 export function convertToSpecialCamelCase(str) {
-  return str
-    .toLowerCase()
-    .replace(/_([a-z])/g, function (match, letter) {
-      return "_" + letter.toUpperCase();
-    })
-    .replace(/^[a-z]*/g, function (match, letter) {
-      return match.toUpperCase();
-    });
+  if (
+    str.toLowerCase().startsWith("db_") ||
+    str.toLowerCase().startsWith("var_")
+  ) {
+    return str
+      .toLowerCase()
+      .replace(/_([a-z])/g, function (match, letter) {
+        return "_" + letter.toUpperCase();
+      })
+      .replace(/^[a-z]*/g, function (match, letter) {
+        return match.toUpperCase();
+      });
+  } else {
+    return str;
+  }
 }

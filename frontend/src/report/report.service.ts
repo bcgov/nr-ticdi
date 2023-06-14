@@ -213,6 +213,7 @@ export class ReportService {
       }
 
       variables[`VAR_${newVariableName}`] = variable_value;
+      variables[`${variable_name}`] = variable_value;
     });
 
     // Format provisions in a way that the document template expects

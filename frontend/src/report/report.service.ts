@@ -223,7 +223,8 @@ export class ReportService {
       ) {
         variables[`VAR_${newVariableName}`] =
           variables[`VAR_${newVariableName}`] + "\r\n\r\n";
-          variables[`${variable_name}`] = variables[`${variable_name}`] + "\r\n\r\n";
+        variables[`${variable_name}`] =
+          variables[`${variable_name}`] + "\r\n\r\n";
       }
     });
 
@@ -391,7 +392,10 @@ export class ReportService {
       DB_Name_BCAL_Contact: idirName,
       DB_File_Number: rawData.fileNum,
       DB_Address_Mailing_Tenant: DB_Address_Mailing_Tenant,
-      DB_Tenure_Type: rawData.type,
+      DB_Tenure_Type: rawData.type // convert a tenure type like LICENSE to License
+        ? rawData.type.toLowerCase().charAt(0).toUpperCase() +
+          rawData.type.toLowerCase().slice(1)
+        : "",
       DB_Legal_Description: interestParcel
         ? interestParcel.legalDescription
         : "",

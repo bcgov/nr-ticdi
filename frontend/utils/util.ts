@@ -11,27 +11,41 @@ export function formatPostalCode(value: string) {
   }
 }
 
-export function nfrAddressBuilder(
-  name: string | null,
-  addr1: string | null,
-  city: string | null,
-  province: string | null,
-  postalCode: string | null
-): string {
+export function nfrAddressBuilder(tenantAddr: any): string {
+  const {
+    legalName,
+    firstName,
+    middleName,
+    lastName,
+    addrLine1,
+    city,
+    provAbbr,
+    postalCode,
+  } = tenantAddr;
   const addressParts = [];
+  let name = null;
+  if (legalName) {
+    name = legalName;
+  } else if (firstName || middleName || lastName) {
+    const parts = [firstName, middleName, lastName];
+    const filteredParts = parts.filter(
+      (part) => part !== null && part !== undefined
+    );
+    name = filteredParts.join(" ");
+  }
   if (name) {
     addressParts.push(name);
   }
-  if (addr1) {
-    addressParts.push(addr1);
+  if (addrLine1) {
+    addressParts.push(addrLine1);
   }
 
   const parts = [];
   if (city) {
     parts.push(city);
   }
-  if (province) {
-    parts.push(province);
+  if (provAbbr) {
+    parts.push(provAbbr);
   }
   if (postalCode) {
     parts.push(formatPostalCode(postalCode));

@@ -269,13 +269,7 @@ export class ReportService {
     const tenantAddr = rawData.tenantAddr[0];
     const interestParcel = rawData.interestParcel[0];
     const DB_Address_Mailing_Tenant = tenantAddr
-      ? nfrAddressBuilder(
-          tenantAddr.legalName,
-          tenantAddr.addrLine1,
-          tenantAddr.city,
-          tenantAddr.provAbbr,
-          tenantAddr.postalCode
-        )
+      ? nfrAddressBuilder(tenantAddr)
       : "";
 
     // Update the formatting of certain money variables
@@ -382,13 +376,12 @@ export class ReportService {
       VAR_Fee_Other_Credit_Amount;
 
     const ttlsData = {
-      DB_Address_Regional_Office: nfrAddressBuilder(
-        null,
-        rawData.regOfficeStreet,
-        rawData.regOfficeCity,
-        rawData.regOfficeProv,
-        rawData.regOfficePostalCode
-      ),
+      DB_Address_Regional_Office: nfrAddressBuilder({
+        addrLine1: rawData.regOfficeStreet,
+        city: rawData.regOfficeCity,
+        provAbbr: rawData.regOfficeProv,
+        postalCode: rawData.regOfficePostalCode,
+      }),
       DB_Name_BCAL_Contact: idirName,
       DB_File_Number: rawData.fileNum,
       DB_Address_Mailing_Tenant: DB_Address_Mailing_Tenant,
@@ -408,13 +401,12 @@ export class ReportService {
       DB_FP_Asterisk: "*",
       DB_Total_GST_Amount: formatMoney(DB_Total_GST_Amount),
       DB_Total_Monies_Payable: formatMoney(DB_Total_Monies_Payable),
-      DB_Address_Line_Regional_Office: nfrAddressBuilder(
-        null,
-        rawData.regOfficeStreet,
-        rawData.regOfficeCity,
-        rawData.regOfficeProv,
-        rawData.regOfficePostalCode
-      ),
+      DB_Address_Line_Regional_Office: nfrAddressBuilder({
+        addrLine1: rawData.regOfficeStreet,
+        city: rawData.regOfficeCity,
+        provAbbr: rawData.regOfficeProv,
+        postalCode: rawData.regOfficePostalCode,
+      }),
     }; // parse out the rawData, variableJson, and provisionJson into something useable
 
     // combine the formatted TTLS data, variables, and provision sections

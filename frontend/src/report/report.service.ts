@@ -214,6 +214,17 @@ export class ReportService {
 
       variables[`VAR_${newVariableName}`] = variable_value;
       variables[`${variable_name}`] = variable_value;
+      // workaround for template formatting
+      if (
+        newVariableName == "Occ_Rent_Details" ||
+        newVariableName == "Replacement_Tenure_Type" ||
+        newVariableName == "Why_Land_Differs" ||
+        newVariableName == "Sect5_Free_Field"
+      ) {
+        variables[`VAR_${newVariableName}`] =
+          variables[`VAR_${newVariableName}`] + "\r\n\r\n";
+          variables[`${variable_name}`] = variables[`${variable_name}`] + "\r\n\r\n";
+      }
     });
 
     // Format provisions in a way that the document template expects
@@ -237,6 +248,17 @@ export class ReportService {
         );
       }
       showProvisionSections[varName] = provision.free_text;
+      // workaround for template formatting
+      if (
+        showProvisionSections[varName] != "" &&
+        varName != "SectionFifteen_1_Text" &&
+        varName != "SectionFive_1_Text" &&
+        varName != "SectionFive_2_Text" &&
+        varName != "SectionFive_3_Text"
+      ) {
+        showProvisionSections[varName] =
+          showProvisionSections[varName] + "\r\n\r\n";
+      }
 
       const showVarName = `showSection${groupText}_${index}`;
       showProvisionSections[showVarName] = 1;
@@ -319,25 +341,37 @@ export class ReportService {
 
     const GST_Rate: number = rawData && rawData.gstRate ? rawData.gstRate : 0;
     const DB_Fee_Payable_Type: number = rawData.feePayableType;
-    const DB_Fee_Payable_Amount: number = rawData.feePayableAmount;
-    const DB_Fee_Payable_Amount_GST: number = rawData.feePayableAmountGst;
-    let GST_Exempt;
-    GST_Exempt == "N";
-    const DB_Total_GST_Amount: number =
-      GST_Exempt == "Y"
-        ? ((DB_Fee_Payable_Amount_GST +
-            VAR_Fee_Documentation_Amount +
-            VAR_Fee_Application_Amount) *
-            GST_Rate) /
-          100.0
-        : ((DB_Fee_Payable_Amount_GST +
-            VAR_Fee_Documentation_Amount +
-            VAR_Fee_Occupational_Rental_Amount +
-            VAR_Fee_Application_Amount) *
-            GST_Rate) /
-          100.0;
+    const DB_Fee_Payable_Amount: number = rawData.feePayableAmount
+      ? rawData.feePayableAmount
+      : 0;
+    const DB_Fee_Payable_Amount_GST: number = rawData.feePayableAmountGst
+      ? rawData.feePayableAmountGst
+      : 0;
+    const DB_GST_Exempt: string = rawData.gstExempt ? rawData.gstExempt : "N";
+    // unused right now
+    const DB_GST_Exempt_Area: number = rawData.gstExemptArea
+      ? rawData.gstExemptArea
+      : 0;
+    let DB_Total_GST_Amount: number;
 
-    const DB_Total_Monies_Payable =
+    if (DB_GST_Exempt === "Y") {
+      DB_Total_GST_Amount =
+        ((DB_Fee_Payable_Amount_GST +
+          VAR_Fee_Documentation_Amount +
+          VAR_Fee_Application_Amount) *
+          GST_Rate) /
+        100.0;
+    } else {
+      DB_Total_GST_Amount =
+        ((DB_Fee_Payable_Amount_GST +
+          VAR_Fee_Documentation_Amount +
+          VAR_Fee_Occupational_Rental_Amount +
+          VAR_Fee_Application_Amount) *
+          GST_Rate) /
+        100.0;
+    }
+
+    const DB_Total_Monies_Payable: number =
       DB_Total_GST_Amount +
       DB_Fee_Payable_Amount_GST +
       DB_Fee_Payable_Amount +

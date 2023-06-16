@@ -3,7 +3,7 @@ import { Injectable } from "@nestjs/common";
 import * as dotenv from "dotenv";
 import { firstValueFrom } from "rxjs";
 import { TTLSService } from "src/ttls/ttls.service";
-import { REPORT_TYPES, numberWords } from "utils/constants";
+import { LUR_REPORT_TYPE, REPORT_TYPES, numberWords } from "utils/constants";
 import { ProvisionJSON, VariableJSON } from "utils/types";
 import {
   convertToSpecialCamelCase,
@@ -61,15 +61,12 @@ export class ReportService {
    * @param username
    * @returns
    */
-  async generateLURReport(
-    prdid: number,
-    document_type: string,
-    username: string
-  ) {
-    const documentType = REPORT_TYPES[0]; // Land Use Report
+  async generateLURReport(prdid: number, username: string) {
+    const documentType = LUR_REPORT_TYPE;
     const url = `${hostname}:${port}/print-request-detail/view/` + prdid;
     const templateUrl = `${hostname}:${port}/document-template/get-active-report/${documentType}`;
     const logUrl = `${hostname}:${port}/print-request-log/`;
+
     // get the view given the print request detail id
     const data = await axios
       .get(url, {
@@ -80,6 +77,7 @@ export class ReportService {
       .then((res) => {
         return res.data;
       });
+
     if (data.InspectionDate) {
       data["InspectionDate"] = this.ttlsService.formatInspectedDate(
         data.InspectionDate
@@ -103,7 +101,7 @@ export class ReportService {
     });
 
     const cdogsToken = await this.ttlsService.callGetToken();
-    let bufferBase64 = documentTemplateObject.the_file;
+    const bufferBase64 = documentTemplateObject.the_file;
     const md = JSON.stringify({
       data,
       formatters:

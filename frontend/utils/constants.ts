@@ -7,6 +7,9 @@ export const PAGE_TITLES = {
   SEARCH: "Search for NFR Record",
 };
 
+export const LUR_REPORT_TYPE = "LAND USE REPORT";
+
+// Used for admin page dropdown for manage templates page
 export const REPORT_TYPES = ["Land Use Report", "Notice of Final Review"];
 
 export const NFR_VARIANTS_ARRAY = [

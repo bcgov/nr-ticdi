@@ -124,7 +124,7 @@ provisionTable = $("#provisionTable").DataTable({
       orderDataType: "dom-checkbox",
     },
     {
-      targets: [4, 5, 6, 7],
+      targets: [0, 1, 2, 3, 4, 5, 6, 7],
       orderable: false,
     },
   ],
@@ -297,7 +297,7 @@ selectedProvisionsTable = $("#selectedProvisionsTable").DataTable({
       },
     },
     {
-      targets: [4, 5, 6],
+      targets: [0, 1, 2, 3, 4, 5, 6],
       orderable: false,
     },
   ],

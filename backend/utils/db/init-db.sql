@@ -224,7 +224,7 @@ INSERT INTO nfr_provision_variable (variable_name, variable_value, help_text, "p
 
 INSERT INTO nfr_provision (type, "provisionGroupId", provision_name, free_text, help_text, category, active_flag) VALUES ('V',get_provision_group_id(10),'SURVEY DEPOSIT - DELAYED','','Use to require payment of a deposit where Province is to pay for a survey.','OFFER SURVEY',true);
 INSERT INTO nfr_provision_provision_variant_nfr_provision_variant ("nfrProvisionId", "nfrProvisionVariantId") VALUES (get_current_provision_id(), get_variant_delayed());
-INSERT INTO nfr_provision_variable (variable_name, variable_value, help_text, "provisionId") VALUES ('SURVEY DEPOSIT - DELAYED','','Deadline to pay survey deposit. Enter Month, Day, Year',get_current_provision_id());
+INSERT INTO nfr_provision_variable (variable_name, variable_value, help_text, "provisionId") VALUES ('SURVEY_DEPOSIT_DELAYED','','Deadline to pay survey deposit. Enter Month, Day, Year',get_current_provision_id());
 INSERT INTO nfr_provision_variable (variable_name, variable_value, help_text, "provisionId") VALUES ('DEPOSIT_AMOUNT_SURVEY','','$"#.##" Enter amount of survey deposit.  Put in the decimal.',get_current_provision_id());
 INSERT INTO nfr_provision_variable (variable_name, variable_value, help_text, "provisionId") VALUES ('MAXIMUM_AREA','','# hectares',get_current_provision_id());
 INSERT INTO nfr_provision_variable (variable_name, variable_value, help_text, "provisionId") VALUES ('RATE_PER_METRE','','$"#.## per square metre/per hectare"  Put in the decimal.',get_current_provision_id());
@@ -288,9 +288,9 @@ INSERT INTO nfr_provision_provision_variant_nfr_provision_variant ("nfrProvision
 -- Variant 'NOTICE OF FINAL REVIEW (SURVEY REQUIRED)'
 INSERT INTO nfr_provision (type, "provisionGroupId", provision_name, free_text, help_text, category, active_flag) VALUES ('M',get_provision_group_id(1),'TEMPLATE VARIABLES - NOTICE OF FINAL REVIEW - SURVEY REQUIRED','','require message from POLICY','DOCUMENT TYPE',true);
 INSERT INTO nfr_provision_provision_variant_nfr_provision_variant ("nfrProvisionId", "nfrProvisionVariantId") VALUES (get_current_provision_id(), get_variant_surveyreq());
-INSERT INTO nfr_provision_variable (variable_name, variable_value, help_text, "provisionId") VALUES ('ATTENTION_LINE (Attention:  )','','Attention: "______" - MUST FILL A VALUE IN - IF NOT REQUIRED, DELETE AFTER MERGING PROCESS.',get_current_provision_id());
+INSERT INTO nfr_provision_variable (variable_name, variable_value, help_text, "provisionId") VALUES ('ATTENTION_LINE','','Attention: "______" - MUST FILL A VALUE IN - IF NOT REQUIRED, DELETE AFTER MERGING PROCESS.',get_current_provision_id());
 INSERT INTO nfr_provision_variable (variable_name, variable_value, help_text, "provisionId") VALUES ('CLIENT_FILE_NO','','Your file:  "______" - MUST FILL A VALUE IN - IF NOT REQUIRED, DELETE AFTER MERGING PROCESS.',get_current_provision_id());
-INSERT INTO nfr_provision_variable (variable_name, variable_value, help_text, "provisionId") VALUES ('DATE_OF_NOTICE (July 23,2022)','','Date of letter: Month Day ,Year',get_current_provision_id());
+INSERT INTO nfr_provision_variable (variable_name, variable_value, help_text, "provisionId") VALUES ('DATE_OF_NOTICE','','Date of letter: Month Day ,Year',get_current_provision_id());
 INSERT INTO nfr_provision_variable (variable_name, variable_value, help_text, "provisionId") VALUES ('DAYS_TO_DELIVER_DOCUMENTS','','# days in the sentence: We will forward the documents to you within ___of the survey being completed.....',get_current_provision_id());
 INSERT INTO nfr_provision_variable (variable_name, variable_value, help_text, "provisionId") VALUES ('DAYS_TO_RETURN_DOCUMENTS','','__ days - You must sign and return them to us within _____ of our letter to you .......',get_current_provision_id());
 INSERT INTO nfr_provision_variable (variable_name, variable_value, help_text, "provisionId") VALUES ('DEADLINE_COMPLETION_REQUIREMENTS','','Enter the date (month day, year) for completion of requirements',get_current_provision_id());

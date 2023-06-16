@@ -92,66 +92,66 @@ export class TTLSService {
   }
 
   // sends json data to the backend to be inserted into the database
-  async sendToBackend(jdf: any): Promise<any> {
+  async sendToBackend(ttlsData: any): Promise<any> {
     const url = `${hostname}:${port}/print-request-detail`;
-    if (jdf) {
-      const { ...printRequestDetail } = jdf;
+    if (ttlsData) {
+      const tenantAddr = ttlsData.tenantAddr[0];
 
       const tenure = [];
-      for (let entry of printRequestDetail.interestParcel) {
+      for (let entry of ttlsData.interestParcel) {
         tenure.push({
           Area: entry.areaInHectares,
           LegalDescription: entry.legalDescription,
         });
       }
       const mappedData = {
-        dtid: printRequestDetail.dtid,
-        tenure_file_number: printRequestDetail.fileNum,
-        incorporation_number: printRequestDetail.tenantAddr.incorporationNum,
-        organization_unit: printRequestDetail.orgUnit,
-        purpose_name: printRequestDetail.purpose,
-        sub_purpose_name: printRequestDetail.subPurpose,
-        type_name: printRequestDetail.type,
-        sub_type_name: printRequestDetail.subType,
-        first_name: printRequestDetail.tenantAddr.firstName,
-        middle_name: printRequestDetail.tenantAddr.middleName,
-        last_name: printRequestDetail.tenantAddr.lastName,
-        legal_name: printRequestDetail.tenantAddr.legalName,
-        licence_holder_name: this.getLicenceHolderName(
-          printRequestDetail.tenantAddr
-        ),
-        email_address: printRequestDetail.tenantAddr.emailAddress,
+        dtid: ttlsData.dtid,
+        tenure_file_number: ttlsData.fileNum,
+        incorporation_number: tenantAddr ? tenantAddr.incorporationNum : "",
+        organization_unit: ttlsData.orgUnit,
+        purpose_name: ttlsData.purpose,
+        sub_purpose_name: ttlsData.subPurpose,
+        type_name: ttlsData.type,
+        sub_type_name: ttlsData.subType,
+        first_name: tenantAddr ? tenantAddr.firstName : "",
+        middle_name: tenantAddr ? tenantAddr.middleName : "",
+        last_name: tenantAddr ? tenantAddr.lastName : "",
+        legal_name: tenantAddr ? tenantAddr.legalName : "",
+        licence_holder_name: this.getLicenceHolderName(tenantAddr),
+        email_address: tenantAddr ? tenantAddr.emailAddress : "",
         phone_number: this.formatPhoneNumber(
-          printRequestDetail.tenantAddr.phoneNumber,
-          printRequestDetail.tenantAddr.areaCode
+          tenantAddr ? tenantAddr.phoneNumber : "",
+          tenantAddr ? tenantAddr.areaCode : ""
         ),
-        licence_holder: this.getLicenceHolder(printRequestDetail.tenantAddr),
+        licence_holder: this.getLicenceHolder(tenantAddr),
         contact_agent: this.getContactAgent(
-          printRequestDetail.contactFirstName,
-          printRequestDetail.contactMiddleName,
-          printRequestDetail.contactLastName
+          ttlsData.contactFirstName,
+          ttlsData.contactMiddleName,
+          ttlsData.contactLastName
         ),
-        contact_company_name: printRequestDetail.contactCompanyName,
-        contact_first_name: printRequestDetail.contactFirstName,
-        contact_middle_name: printRequestDetail.contactMiddleName,
-        contact_last_name: printRequestDetail.contactLastName,
+        contact_company_name: ttlsData.contactCompanyName,
+        contact_first_name: ttlsData.contactFirstName,
+        contact_middle_name: ttlsData.contactMiddleName,
+        contact_last_name: ttlsData.contactLastName,
         contact_phone_number: this.formatPhoneNumber(
-          printRequestDetail.contactPhoneNumber,
+          ttlsData.contactPhoneNumber,
           null
         ),
-        contact_email_address: printRequestDetail.contactEmail,
-        inspected_date: printRequestDetail.inspectionDate,
-        mailing_address: getMailingAddress(printRequestDetail.tenantAddr),
-        mailing_address_line_1: printRequestDetail.tenantAddr.addrLine1,
-        mailing_address_line_2: printRequestDetail.tenantAddr.addrLine2,
-        mailing_address_line_3: printRequestDetail.tenantAddr.addrLine3,
-        mailing_city: printRequestDetail.tenantAddr.city,
-        mailing_province_state_code: printRequestDetail.tenantAddr.regionCd,
-        mailing_postal_code: printRequestDetail.tenantAddr.postalCode,
-        mailing_zip: printRequestDetail.tenantAddr.zipCode,
-        mailing_country_code: printRequestDetail.tenantAddr.countryCd,
-        mailing_country: printRequestDetail.tenantAddr.country,
-        location_description: printRequestDetail.locLand,
+        contact_email_address: ttlsData.contactEmail,
+        inspected_date: ttlsData.inspectionDate,
+        mailing_address: getMailingAddress(tenantAddr),
+        mailing_address_line_1: tenantAddr ? tenantAddr.addrLine1 : "",
+        mailing_address_line_2: tenantAddr ? tenantAddr.addrLine2 : "",
+        mailing_address_line_3: tenantAddr ? tenantAddr.addrLine3 : "",
+        mailing_city: tenantAddr ? tenantAddr.city : "",
+        mailing_province_state_code: tenantAddr ? tenantAddr.regionCd : "",
+        mailing_postal_code: tenantAddr
+          ? formatPostalCode(tenantAddr.postalCode)
+          : "",
+        mailing_zip: tenantAddr ? tenantAddr.zipCode : "",
+        mailing_country_code: tenantAddr ? tenantAddr.countryCd : "",
+        mailing_country: tenantAddr ? tenantAddr.country : "",
+        location_description: ttlsData.locLand,
         tenure: tenure ? JSON.stringify(tenure) : "",
       };
 

@@ -105,7 +105,7 @@ INSERT INTO nfr_provision_variable (variable_name, variable_value, help_text, "p
 INSERT INTO nfr_provision_variable (variable_name, variable_value, help_text, "provisionId") VALUES ('FACSIMILE_NUMBER','','Type in your facsimile number - "250 ___-____"',get_current_provision_id());
 INSERT INTO nfr_provision_variable (variable_name, variable_value, help_text, "provisionId") VALUES ('NUMBER_OF_COPIES','','three copies of tenure documents which are being forwarded to client to sign.  The number should be typed as a word, not a number.',get_current_provision_id());
 INSERT INTO nfr_provision_variable (variable_name, variable_value, help_text, "provisionId") VALUES ('PURPOSE_GENERIC','','used for "_________" purposes.',get_current_provision_id());
-INSERT INTO nfr_provision_variable (variable_name, variable_value, help_text, "provisionId") VALUES ('SALUTATION','','Dear "______":  Type in the person’’s name or Sir or Madam.',get_current_provision_id());
+INSERT INTO nfr_provision_variable (variable_name, variable_value, help_text, "provisionId") VALUES ('SALUTATION','','Dear "______":  Type in the person’s name or Sir or Madam.',get_current_provision_id());
 INSERT INTO nfr_provision_variable (variable_name, variable_value, help_text, "provisionId") VALUES ('TELEPHONE_NUMBER','','Type in your telephone number - "250 ___-____"',get_current_provision_id());
 
 INSERT INTO nfr_provision (type, "provisionGroupId", provision_name, free_text, help_text, category, active_flag) VALUES ('M',get_provision_group_id(2),'FEES','','Use this to create a table listing all the fees to be paid. Table is unprotected, so you will be able to modify text ','FEES',true);
@@ -150,39 +150,39 @@ INSERT INTO nfr_provision_provision_variant_nfr_provision_variant ("nfrProvision
 INSERT INTO nfr_provision (type, "provisionGroupId", provision_name, free_text, help_text, category, active_flag) VALUES ('V',get_provision_group_id(25),'FREE FIELD FOR INSURANCE','','Use where you want to enter additonal information on insurance','OFFER - INSURANCE',true);
 INSERT INTO nfr_provision_provision_variant_nfr_provision_variant ("nfrProvisionId", "nfrProvisionVariantId") VALUES (get_current_provision_id(), get_variant_default()), (get_current_provision_id(), get_variant_delayed()), (get_current_provision_id(), get_variant_nofees()), (get_current_provision_id(), get_variant_toobtain()), (get_current_provision_id(), get_variant_surveyreq());
 
-INSERT INTO nfr_provision (type, "provisionGroupId", provision_name, free_text, help_text, category, active_flag) VALUES ('V',get_provision_group_id(34),'FREE FIELD - ADDITIONAL REQUIREMENTS','','Use where you want to state additional conditions of the offer','ADDITIONAL REQUIREMENTS',true);
-INSERT INTO nfr_provision_provision_variant_nfr_provision_variant ("nfrProvisionId", "nfrProvisionVariantId") VALUES (get_current_provision_id(), get_variant_default()), (get_current_provision_id(), get_variant_delayed()), (get_current_provision_id(), get_variant_nofees());
+INSERT INTO nfr_provision (type, "provisionGroupId", provision_name, free_text, help_text, category, active_flag) VALUES ('V',get_provision_group_id(27),'FREE FIELD - ADDITIONAL REQUIREMENTS','','Use where you want to state additional conditions of the offer','ADDITIONAL REQUIREMENTS',true);
+INSERT INTO nfr_provision_provision_variant_nfr_provision_variant ("nfrProvisionId", "nfrProvisionVariantId") VALUES (get_current_provision_id(), get_variant_default()), (get_current_provision_id(), get_variant_delayed()), (get_current_provision_id(), get_variant_nofees()), (get_current_provision_id(), get_variant_toobtain()), (get_current_provision_id(), get_variant_surveyreq());
 
-INSERT INTO nfr_provision (type, "provisionGroupId", provision_name, free_text, help_text, category, active_flag) VALUES ('V',get_provision_group_id(34),'FREE FIELD - ADDITIONAL REQUIREMENTS - 2','','Use where you want to state additional conditions of the offer','ADDITIONAL REQUIREMENTS',true);
-INSERT INTO nfr_provision_provision_variant_nfr_provision_variant ("nfrProvisionId", "nfrProvisionVariantId") VALUES (get_current_provision_id(), get_variant_default()), (get_current_provision_id(), get_variant_nofees());
+INSERT INTO nfr_provision (type, "provisionGroupId", provision_name, free_text, help_text, category, active_flag) VALUES ('V',get_provision_group_id(27),'FREE FIELD - ADDITIONAL REQUIREMENTS - 2','','Use where you want to state additional conditions of the offer','ADDITIONAL REQUIREMENTS',true);
+INSERT INTO nfr_provision_provision_variant_nfr_provision_variant ("nfrProvisionId", "nfrProvisionVariantId") VALUES (get_current_provision_id(), get_variant_default()), (get_current_provision_id(), get_variant_nofees()), (get_current_provision_id(), get_variant_toobtain()), (get_current_provision_id(), get_variant_surveyreq());
 
-INSERT INTO nfr_provision (type, "provisionGroupId", provision_name, free_text, help_text, category, active_flag) VALUES ('V',get_provision_group_id(34),'ADDITIONAL REQUIREMENTS - MANAGEMENT PLAN','','Use to require delivery of a management plan.','ADDITIONAL REQUIREMENTS',true);
-INSERT INTO nfr_provision_provision_variant_nfr_provision_variant ("nfrProvisionId", "nfrProvisionVariantId") VALUES (get_current_provision_id(), get_variant_default()), (get_current_provision_id(), get_variant_delayed()), (get_current_provision_id(), get_variant_nofees());
+INSERT INTO nfr_provision (type, "provisionGroupId", provision_name, free_text, help_text, category, active_flag) VALUES ('V',get_provision_group_id(27),'ADDITIONAL REQUIREMENTS - MANAGEMENT PLAN','','Use to require delivery of a management plan.','ADDITIONAL REQUIREMENTS',true);
+INSERT INTO nfr_provision_provision_variant_nfr_provision_variant ("nfrProvisionId", "nfrProvisionVariantId") VALUES (get_current_provision_id(), get_variant_default()), (get_current_provision_id(), get_variant_delayed()), (get_current_provision_id(), get_variant_nofees()), (get_current_provision_id(), get_variant_toobtain()), (get_current_provision_id(), get_variant_surveyreq());
 
-INSERT INTO nfr_provision (type, "provisionGroupId", provision_name, free_text, help_text, category, active_flag) VALUES ('V',get_provision_group_id(34),'ADDITIONAL REQUIREMENTS - ZONING APPROVAL','','Use to require confirmation that a zoning bylaw permitting use of the Land for the intended purposes has been adopted.','ADDITIONAL REQUIREMENTS',true);
-INSERT INTO nfr_provision_provision_variant_nfr_provision_variant ("nfrProvisionId", "nfrProvisionVariantId") VALUES (get_current_provision_id(), get_variant_default()), (get_current_provision_id(), get_variant_delayed()), (get_current_provision_id(), get_variant_nofees());
+INSERT INTO nfr_provision (type, "provisionGroupId", provision_name, free_text, help_text, category, active_flag) VALUES ('V',get_provision_group_id(27),'ADDITIONAL REQUIREMENTS - ZONING APPROVAL','','Use to require confirmation that a zoning bylaw permitting use of the Land for the intended purposes has been adopted.','ADDITIONAL REQUIREMENTS',true);
+INSERT INTO nfr_provision_provision_variant_nfr_provision_variant ("nfrProvisionId", "nfrProvisionVariantId") VALUES (get_current_provision_id(), get_variant_default()), (get_current_provision_id(), get_variant_delayed()), (get_current_provision_id(), get_variant_nofees()), (get_current_provision_id(), get_variant_toobtain()), (get_current_provision_id(), get_variant_surveyreq());
 INSERT INTO nfr_provision_variable (variable_name, variable_value, help_text, "provisionId") VALUES ('LOCAL_GOVERNMENT','','Type in the name of the local government.',get_current_provision_id());
 INSERT INTO nfr_provision_variable (variable_name, variable_value, help_text, "provisionId") VALUES ('PURPOSE_GENERIC','','used for "_________" purposes.',get_current_provision_id());
 
-INSERT INTO nfr_provision (type, "provisionGroupId", provision_name, free_text, help_text, category, active_flag) VALUES ('V',get_provision_group_id(34),'ADDITIONAL REQUIREMENTS - IMPROVEMENTS STAT DEC','','Use this when a statutory declaration is required regarding ownership of improvements.','ADDITIONAL REQUIREMENTS',true);
-INSERT INTO nfr_provision_provision_variant_nfr_provision_variant ("nfrProvisionId", "nfrProvisionVariantId") VALUES (get_current_provision_id(), get_variant_default()), (get_current_provision_id(), get_variant_delayed()), (get_current_provision_id(), get_variant_nofees());
+INSERT INTO nfr_provision (type, "provisionGroupId", provision_name, free_text, help_text, category, active_flag) VALUES ('V',get_provision_group_id(27),'ADDITIONAL REQUIREMENTS - IMPROVEMENTS STAT DEC','','Use this when a statutory declaration is required regarding ownership of improvements.','ADDITIONAL REQUIREMENTS',true);
+INSERT INTO nfr_provision_provision_variant_nfr_provision_variant ("nfrProvisionId", "nfrProvisionVariantId") VALUES (get_current_provision_id(), get_variant_default()), (get_current_provision_id(), get_variant_delayed()), (get_current_provision_id(), get_variant_nofees()), (get_current_provision_id(), get_variant_toobtain()), (get_current_provision_id(), get_variant_surveyreq());
 
-INSERT INTO nfr_provision (type, "provisionGroupId", provision_name, free_text, help_text, category, active_flag) VALUES ('V',get_provision_group_id(34),'ADDITIONAL REQUIREMENTS - TAX CLEARANCE CERTIFICATE','','Use when a tax clearance certificate is required verifying that there are no arrears of taxes.','ADDITIONAL REQUIREMENTS',true);
-INSERT INTO nfr_provision_provision_variant_nfr_provision_variant ("nfrProvisionId", "nfrProvisionVariantId") VALUES (get_current_provision_id(), get_variant_default()), (get_current_provision_id(), get_variant_delayed()), (get_current_provision_id(), get_variant_nofees());
-INSERT INTO nfr_provision_variable (variable_name, variable_value, help_text, "provisionId") VALUES ('TAX_COLLECTOR_OFFICE','','Type in the address of the local Provincial Tax Collector''s office.',get_current_provision_id());
+INSERT INTO nfr_provision (type, "provisionGroupId", provision_name, free_text, help_text, category, active_flag) VALUES ('V',get_provision_group_id(27),'ADDITIONAL REQUIREMENTS - TAX CLEARANCE CERTIFICATE','','Use when a tax clearance certificate is required verifying that there are no arrears of taxes.','ADDITIONAL REQUIREMENTS',true);
+INSERT INTO nfr_provision_provision_variant_nfr_provision_variant ("nfrProvisionId", "nfrProvisionVariantId") VALUES (get_current_provision_id(), get_variant_default()), (get_current_provision_id(), get_variant_delayed()), (get_current_provision_id(), get_variant_nofees()), (get_current_provision_id(), get_variant_toobtain()), (get_current_provision_id(), get_variant_surveyreq());
+INSERT INTO nfr_provision_variable (variable_name, variable_value, help_text, "provisionId") VALUES ('TAX_COLLECTOR_OFFICE','','Type in the address of the local Provincial Tax Collector’s office.',get_current_provision_id());
 
-INSERT INTO nfr_provision (type, "provisionGroupId", provision_name, free_text, help_text, category, active_flag) VALUES ('V',get_provision_group_id(34),'ADDITIONAL REQUIREMENTS - AFFILIATE STATUS CERTIFICATE','','Use when a certificate of affiliate status is required for each affiliate of your company using the communication site.','ADDITIONAL REQUIREMENTS',true);
-INSERT INTO nfr_provision_provision_variant_nfr_provision_variant ("nfrProvisionId", "nfrProvisionVariantId") VALUES (get_current_provision_id(), get_variant_default()), (get_current_provision_id(), get_variant_delayed()), (get_current_provision_id(), get_variant_nofees());
+INSERT INTO nfr_provision (type, "provisionGroupId", provision_name, free_text, help_text, category, active_flag) VALUES ('V',get_provision_group_id(27),'ADDITIONAL REQUIREMENTS - AFFILIATE STATUS CERTIFICATE','','Use when a certificate of affiliate status is required for each affiliate of your company using the communication site.','ADDITIONAL REQUIREMENTS',true);
+INSERT INTO nfr_provision_provision_variant_nfr_provision_variant ("nfrProvisionId", "nfrProvisionVariantId") VALUES (get_current_provision_id(), get_variant_default()), (get_current_provision_id(), get_variant_delayed()), (get_current_provision_id(), get_variant_nofees()), (get_current_provision_id(), get_variant_toobtain()), (get_current_provision_id(), get_variant_surveyreq());
 
-INSERT INTO nfr_provision (type, "provisionGroupId", provision_name, free_text, help_text, category, active_flag) VALUES ('V',get_provision_group_id(34),'ADDITIONAL REQUIREMENTS - OBTAIN AND DELIVER','','Use when you require immediate delivery of documentation.','ADDITIONAL REQUIREMENTS',true);
-INSERT INTO nfr_provision_provision_variant_nfr_provision_variant ("nfrProvisionId", "nfrProvisionVariantId") VALUES (get_current_provision_id(), get_variant_default()), (get_current_provision_id(), get_variant_delayed()), (get_current_provision_id(), get_variant_nofees());
+INSERT INTO nfr_provision (type, "provisionGroupId", provision_name, free_text, help_text, category, active_flag) VALUES ('V',get_provision_group_id(27),'ADDITIONAL REQUIREMENTS - OBTAIN AND DELIVER','','Use when you require immediate delivery of documentation.','ADDITIONAL REQUIREMENTS',true);
+INSERT INTO nfr_provision_provision_variant_nfr_provision_variant ("nfrProvisionId", "nfrProvisionVariantId") VALUES (get_current_provision_id(), get_variant_default()), (get_current_provision_id(), get_variant_delayed()), (get_current_provision_id(), get_variant_nofees()), (get_current_provision_id(), get_variant_toobtain()), (get_current_provision_id(), get_variant_surveyreq());
 INSERT INTO nfr_provision_variable (variable_name, variable_value, help_text, "provisionId") VALUES ('DEADLINE_TO_DELIVER','','Enter "on or before [date]" OR "within [45] days from the date of this letter.',get_current_provision_id());
 INSERT INTO nfr_provision_variable (variable_name, variable_value, help_text, "provisionId") VALUES ('DOCUMENT_TO_OBTAIN','','You must obtain the [specify the name of the document(s)] and ....',get_current_provision_id());
 
-INSERT INTO nfr_provision (type, "provisionGroupId", provision_name, free_text, help_text, category, active_flag) VALUES ('V',get_provision_group_id(34),'ADDITIONAL REQUIREMENTS - FISHERIES AND OCEANS APPROVAL','','Use to require delivery of a copy of a permit from Fisheries and Oceans for aquaculture purposes.','ADDITIONAL REQUIREMENTS',true);
+INSERT INTO nfr_provision (type, "provisionGroupId", provision_name, free_text, help_text, category, active_flag) VALUES ('V',get_provision_group_id(27),'ADDITIONAL REQUIREMENTS - FISHERIES AND OCEANS APPROVAL','','Use to require delivery of a copy of a permit from Fisheries and Oceans for aquaculture purposes.','ADDITIONAL REQUIREMENTS',true);
 INSERT INTO nfr_provision_provision_variant_nfr_provision_variant ("nfrProvisionId", "nfrProvisionVariantId") VALUES (get_current_provision_id(), get_variant_default());
 
-INSERT INTO nfr_provision (type, "provisionGroupId", provision_name, free_text, help_text, category, active_flag) VALUES ('V',get_provision_group_id(34),'ADDITIONAL REQUIREMENTS - COAST GUARD APPROVAL','','Use to require delivery of a letter of approval from the Canadian Coast Guard for the proposed construction.','ADDITIONAL REQUIREMENTS',true);
+INSERT INTO nfr_provision (type, "provisionGroupId", provision_name, free_text, help_text, category, active_flag) VALUES ('V',get_provision_group_id(27),'ADDITIONAL REQUIREMENTS - COAST GUARD APPROVAL','','Use to require delivery of a letter of approval from the Canadian Coast Guard for the proposed construction.','ADDITIONAL REQUIREMENTS',true);
 INSERT INTO nfr_provision_provision_variant_nfr_provision_variant ("nfrProvisionId", "nfrProvisionVariantId") VALUES (get_current_provision_id(), get_variant_default());
 INSERT INTO nfr_provision_variable (variable_name, variable_value, help_text, "provisionId") VALUES ('COAST_GUARD_ADDRESS','','Type in the address of the Canadian Coast Guard office.',get_current_provision_id());
 
@@ -197,7 +197,7 @@ INSERT INTO nfr_provision_variable (variable_name, variable_value, help_text, "p
 INSERT INTO nfr_provision_variable (variable_name, variable_value, help_text, "provisionId") VALUES ('NUMBER_OF_COPIES','','three copies of tenure documents which are being forwarded to client to sign.  The number should be typed as a word, not a number.',get_current_provision_id());
 INSERT INTO nfr_provision_variable (variable_name, variable_value, help_text, "provisionId") VALUES ('PURPOSE_GENERIC','','used for "_________" purposes.',get_current_provision_id());
 INSERT INTO nfr_provision_variable (variable_name, variable_value, help_text, "provisionId") VALUES ('REPLACEMENT_TENURE_TYPE','','____No. #. Use to specify type and number of tenure being replaced e.g. lease No. 999.',get_current_provision_id());
-INSERT INTO nfr_provision_variable (variable_name, variable_value, help_text, "provisionId") VALUES ('SALUTATION','','Dear "______":  Type in the person’’s name or Sir or Madam.',get_current_provision_id());
+INSERT INTO nfr_provision_variable (variable_name, variable_value, help_text, "provisionId") VALUES ('SALUTATION','','Dear "______":  Type in the person’s name or Sir or Madam.',get_current_provision_id());
 INSERT INTO nfr_provision_variable (variable_name, variable_value, help_text, "provisionId") VALUES ('TELEPHONE_NUMBER','','Type in your telephone number - "250 ___-____"',get_current_provision_id());
 
 
@@ -211,7 +211,7 @@ INSERT INTO nfr_provision_variable (variable_name, variable_value, help_text, "p
 INSERT INTO nfr_provision_variable (variable_name, variable_value, help_text, "provisionId") VALUES ('FACSIMILE_NUMBER','','Type in your facsimile number - "250 ___-____"',get_current_provision_id());
 INSERT INTO nfr_provision_variable (variable_name, variable_value, help_text, "provisionId") VALUES ('NUMBER_OF_COPIES','','three copies of tenure documents which are being forwarded to client to sign.  The number should be typed as a word, not a number.',get_current_provision_id());
 INSERT INTO nfr_provision_variable (variable_name, variable_value, help_text, "provisionId") VALUES ('PURPOSE_GENERIC','','used for "_________" purposes.',get_current_provision_id());
-INSERT INTO nfr_provision_variable (variable_name, variable_value, help_text, "provisionId") VALUES ('SALUTATION','','Dear "______":  Type in the person’’s name or Sir or Madam.',get_current_provision_id());
+INSERT INTO nfr_provision_variable (variable_name, variable_value, help_text, "provisionId") VALUES ('SALUTATION','','Dear "______":  Type in the person’s name or Sir or Madam.',get_current_provision_id());
 INSERT INTO nfr_provision_variable (variable_name, variable_value, help_text, "provisionId") VALUES ('TELEPHONE_NUMBER','','Type in your telephone number - "250 ___-____"',get_current_provision_id());
 INSERT INTO nfr_provision_variable (variable_name, variable_value, help_text, "provisionId") VALUES ('TENURE_TYPE','','Type in the tenure type. e.g. Lease',get_current_provision_id());
 
@@ -253,7 +253,7 @@ INSERT INTO nfr_provision_variable (variable_name, variable_value, help_text, "p
 INSERT INTO nfr_provision_variable (variable_name, variable_value, help_text, "provisionId") VALUES ('INTERIM_TENURE_TYPE','','Insert the type of tenure now being used. e.g. Licence.',get_current_provision_id());
 INSERT INTO nfr_provision_variable (variable_name, variable_value, help_text, "provisionId") VALUES ('NUMBER_OF_COPIES','','three copies of tenure documents which are being forwarded to client to sign.  The number should be typed as a word, not a number.',get_current_provision_id());
 INSERT INTO nfr_provision_variable (variable_name, variable_value, help_text, "provisionId") VALUES ('PURPOSE_GENERIC','','used for "_________" purposes.',get_current_provision_id());
-INSERT INTO nfr_provision_variable (variable_name, variable_value, help_text, "provisionId") VALUES ('SALUTATION','','Dear "______":  Type in the person’’s name or Sir or Madam.',get_current_provision_id());
+INSERT INTO nfr_provision_variable (variable_name, variable_value, help_text, "provisionId") VALUES ('SALUTATION','','Dear "______":  Type in the person’s name or Sir or Madam.',get_current_provision_id());
 INSERT INTO nfr_provision_variable (variable_name, variable_value, help_text, "provisionId") VALUES ('TELEPHONE_NUMBER','','Type in your telephone number - "250 ___-____"',get_current_provision_id());
 
 INSERT INTO nfr_provision (type, "provisionGroupId", provision_name, free_text, help_text, category, active_flag) VALUES ('V',get_provision_group_id(10),'BOUNDARY SURVEY (WE PAY)','','Use where we will pay a B.C.L.S. to prepare a boundary survey','OFFER PREAMBLE',true);
@@ -268,7 +268,7 @@ INSERT INTO nfr_provision (type, "provisionGroupId", provision_name, free_text, 
 INSERT INTO nfr_provision_provision_variant_nfr_provision_variant ("nfrProvisionId", "nfrProvisionVariantId") VALUES (get_current_provision_id(), get_variant_toobtain());
 INSERT INTO nfr_provision_variable (variable_name, variable_value, help_text, "provisionId") VALUES ('DEADLINE_CONFIRM_SURVEY','','Enter "On or before [date]" OR "Within [45] days from the date of this letter".  Capitalize first character as this is the start of a sentence.',get_current_provision_id());
 
-INSERT INTO nfr_provision (type, "provisionGroupId", provision_name, free_text, help_text, category, active_flag) VALUES ('V',get_provision_group_id(14),'LETTER AFFIRMING BOUNDARY SURVEY','','Use to remind client that surveyor’’s letter must confirm that location of improvements will be on boundary plan','OFFER - OBTAIN SURVEY',true);
+INSERT INTO nfr_provision (type, "provisionGroupId", provision_name, free_text, help_text, category, active_flag) VALUES ('V',get_provision_group_id(14),'LETTER AFFIRMING BOUNDARY SURVEY','','Use to remind client that surveyor’s letter must confirm that location of improvements will be on boundary plan','OFFER - OBTAIN SURVEY',true);
 INSERT INTO nfr_provision_provision_variant_nfr_provision_variant ("nfrProvisionId", "nfrProvisionVariantId") VALUES (get_current_provision_id(), get_variant_toobtain());
 
 INSERT INTO nfr_provision (type, "provisionGroupId", provision_name, free_text, help_text, category, active_flag) VALUES ('V',get_provision_group_id(20),'DELIVER SECURITY DEPOSIT - OS','','require message from POLICY','OFFER - SECURITY',true);
@@ -284,35 +284,6 @@ INSERT INTO nfr_provision_variable (variable_name, variable_value, help_text, "p
 INSERT INTO nfr_provision (type, "provisionGroupId", provision_name, free_text, help_text, category, active_flag) VALUES ('V',get_provision_group_id(25),'INSURANCE REQUIRED - NOTICE OF FINAL REVIEW - OTHER - OS','','Use when insurance is required for other tenures eg. homeowners','OFFER - INSURANCE',true);
 INSERT INTO nfr_provision_provision_variant_nfr_provision_variant ("nfrProvisionId", "nfrProvisionVariantId") VALUES (get_current_provision_id(), get_variant_toobtain());
 
-INSERT INTO nfr_provision (type, "provisionGroupId", provision_name, free_text, help_text, category, active_flag) VALUES ('V',get_provision_group_id(28),'FREE FIELD - ADDITIONAL REQUIREMENTS','','Use where you want to state additional conditions of the offer','ADDITIONAL REQUIREMENTS',true);
-INSERT INTO nfr_provision_provision_variant_nfr_provision_variant ("nfrProvisionId", "nfrProvisionVariantId") VALUES (get_current_provision_id(), get_variant_toobtain());
-
-INSERT INTO nfr_provision (type, "provisionGroupId", provision_name, free_text, help_text, category, active_flag) VALUES ('V',get_provision_group_id(28),'FREE FIELD - ADDITIONAL REQUIREMENTS - 2','','Use where you want to state additional conditions of the offer','ADDITIONAL REQUIREMENTS',true);
-INSERT INTO nfr_provision_provision_variant_nfr_provision_variant ("nfrProvisionId", "nfrProvisionVariantId") VALUES (get_current_provision_id(), get_variant_toobtain());
-
-INSERT INTO nfr_provision (type, "provisionGroupId", provision_name, free_text, help_text, category, active_flag) VALUES ('V',get_provision_group_id(28),'ADDITIONAL REQUIREMENTS - MANAGEMENT PLAN','','Use to require delivery of a management plan.','ADDITIONAL REQUIREMENTS',true);
-INSERT INTO nfr_provision_provision_variant_nfr_provision_variant ("nfrProvisionId", "nfrProvisionVariantId") VALUES (get_current_provision_id(), get_variant_toobtain());
-
-INSERT INTO nfr_provision (type, "provisionGroupId", provision_name, free_text, help_text, category, active_flag) VALUES ('V',get_provision_group_id(28),'ADDITIONAL REQUIREMENTS - ZONING APPROVAL','','Use to require confirmation that a zoning bylaw permitting use of the Land for the intended purposes has been adopted.','ADDITIONAL REQUIREMENTS',true);
-INSERT INTO nfr_provision_provision_variant_nfr_provision_variant ("nfrProvisionId", "nfrProvisionVariantId") VALUES (get_current_provision_id(), get_variant_toobtain());
-INSERT INTO nfr_provision_variable (variable_name, variable_value, help_text, "provisionId") VALUES ('LOCAL_GOVERNMENT','','Type in the name of the local government.',get_current_provision_id());
-INSERT INTO nfr_provision_variable (variable_name, variable_value, help_text, "provisionId") VALUES ('PURPOSE_GENERIC','','used for "_________" purposes.',get_current_provision_id());
-
-INSERT INTO nfr_provision (type, "provisionGroupId", provision_name, free_text, help_text, category, active_flag) VALUES ('V',get_provision_group_id(28),'ADDITIONAL REQUIREMENTS - IMPROVEMENTS STAT DEC','','Use this when a statutory declaration is required regarding ownership of improvements.','ADDITIONAL REQUIREMENTS',true);
-INSERT INTO nfr_provision_provision_variant_nfr_provision_variant ("nfrProvisionId", "nfrProvisionVariantId") VALUES (get_current_provision_id(), get_variant_toobtain());
-
-INSERT INTO nfr_provision (type, "provisionGroupId", provision_name, free_text, help_text, category, active_flag) VALUES ('V',get_provision_group_id(28),'ADDITIONAL REQUIREMENTS - TAX CLEARANCE CERTIFICATE','','Use when a tax clearance certificate is required verifying that there are no arrears of taxes.','ADDITIONAL REQUIREMENTS',true);
-INSERT INTO nfr_provision_provision_variant_nfr_provision_variant ("nfrProvisionId", "nfrProvisionVariantId") VALUES (get_current_provision_id(), get_variant_toobtain());
-INSERT INTO nfr_provision_variable (variable_name, variable_value, help_text, "provisionId") VALUES ('TAX_COLLECTOR_OFFICE','','Type in the address of the local Provincial Tax Collector’’s office.',get_current_provision_id());
-
-INSERT INTO nfr_provision (type, "provisionGroupId", provision_name, free_text, help_text, category, active_flag) VALUES ('V',get_provision_group_id(28),'ADDITIONAL REQUIREMENTS - AFFILIATE STATUS CERTIFICATE','','Use when a certificate of affiliate status is required for each affiliate of your company using the communication site.','ADDITIONAL REQUIREMENTS',true);
-INSERT INTO nfr_provision_provision_variant_nfr_provision_variant ("nfrProvisionId", "nfrProvisionVariantId") VALUES (get_current_provision_id(), get_variant_toobtain());
-
-INSERT INTO nfr_provision (type, "provisionGroupId", provision_name, free_text, help_text, category, active_flag) VALUES ('V',get_provision_group_id(28),'ADDITIONAL REQUIREMENTS - OBTAIN AND DELIVER','','Use when you require immediate delivery of documentation.','ADDITIONAL REQUIREMENTS',true);
-INSERT INTO nfr_provision_provision_variant_nfr_provision_variant ("nfrProvisionId", "nfrProvisionVariantId") VALUES (get_current_provision_id(), get_variant_toobtain());
-INSERT INTO nfr_provision_variable (variable_name, variable_value, help_text, "provisionId") VALUES ('DEADLINE_TO_DELIVER','','Enter "on or before [date]" OR "within [45] days from the date of this letter.',get_current_provision_id());
-INSERT INTO nfr_provision_variable (variable_name, variable_value, help_text, "provisionId") VALUES ('DOCUMENT_TO_OBTAIN','','You must obtain the [specify the name of the document(s)] and ....',get_current_provision_id());
-
 
 -- Variant 'NOTICE OF FINAL REVIEW (SURVEY REQUIRED)'
 INSERT INTO nfr_provision (type, "provisionGroupId", provision_name, free_text, help_text, category, active_flag) VALUES ('M',get_provision_group_id(1),'TEMPLATE VARIABLES - NOTICE OF FINAL REVIEW - SURVEY REQUIRED','','require message from POLICY','DOCUMENT TYPE',true);
@@ -320,7 +291,7 @@ INSERT INTO nfr_provision_provision_variant_nfr_provision_variant ("nfrProvision
 INSERT INTO nfr_provision_variable (variable_name, variable_value, help_text, "provisionId") VALUES ('ATTENTION_LINE (Attention:  )','','Attention: "______" - MUST FILL A VALUE IN - IF NOT REQUIRED, DELETE AFTER MERGING PROCESS.',get_current_provision_id());
 INSERT INTO nfr_provision_variable (variable_name, variable_value, help_text, "provisionId") VALUES ('CLIENT_FILE_NO','','Your file:  "______" - MUST FILL A VALUE IN - IF NOT REQUIRED, DELETE AFTER MERGING PROCESS.',get_current_provision_id());
 INSERT INTO nfr_provision_variable (variable_name, variable_value, help_text, "provisionId") VALUES ('DATE_OF_NOTICE (July 23,2022)','','Date of letter: Month Day ,Year',get_current_provision_id());
-INSERT INTO nfr_provision_variable (variable_name, variable_value, help_text, "provisionId") VALUES ('DAYS_TO_DELIVER_DOCUMENTS','','# days in the sentence: We will forward the documents to you within ___of the survey being completed.....’’',get_current_provision_id());
+INSERT INTO nfr_provision_variable (variable_name, variable_value, help_text, "provisionId") VALUES ('DAYS_TO_DELIVER_DOCUMENTS','','# days in the sentence: We will forward the documents to you within ___of the survey being completed.....',get_current_provision_id());
 INSERT INTO nfr_provision_variable (variable_name, variable_value, help_text, "provisionId") VALUES ('DAYS_TO_RETURN_DOCUMENTS','','__ days - You must sign and return them to us within _____ of our letter to you .......',get_current_provision_id());
 INSERT INTO nfr_provision_variable (variable_name, variable_value, help_text, "provisionId") VALUES ('DEADLINE_COMPLETION_REQUIREMENTS','','Enter the date (month day, year) for completion of requirements',get_current_provision_id());
 INSERT INTO nfr_provision_variable (variable_name, variable_value, help_text, "provisionId") VALUES ('FACSIMILE_NUMBER','','Type in your facsimile number - "250 ___-____"',get_current_provision_id());
@@ -328,7 +299,7 @@ INSERT INTO nfr_provision_variable (variable_name, variable_value, help_text, "p
 INSERT INTO nfr_provision_variable (variable_name, variable_value, help_text, "provisionId") VALUES ('NUMBER_OF_COPIES','','three copies of tenure documents which are being forwarded to client to sign.  The number should be typed as a word, not a number.',get_current_provision_id());
 INSERT INTO nfr_provision_variable (variable_name, variable_value, help_text, "provisionId") VALUES ('PURPOSE_GENERIC','','used for "_________" purposes.',get_current_provision_id());
 INSERT INTO nfr_provision_variable (variable_name, variable_value, help_text, "provisionId") VALUES ('RATE_PER_METRE','','$"#.## per square metre/per hectare"  Put in the decimal.',get_current_provision_id());
-INSERT INTO nfr_provision_variable (variable_name, variable_value, help_text, "provisionId") VALUES ('SALUTATION','','Dear "______":  Type in the person’’s name or Sir or Madam.',get_current_provision_id());
+INSERT INTO nfr_provision_variable (variable_name, variable_value, help_text, "provisionId") VALUES ('SALUTATION','','Dear "______":  Type in the person’s name or Sir or Madam.',get_current_provision_id());
 INSERT INTO nfr_provision_variable (variable_name, variable_value, help_text, "provisionId") VALUES ('TELEPHONE_NUMBER','','Type in your telephone number - "250 ___-____"',get_current_provision_id());
 
 INSERT INTO nfr_provision (type, "provisionGroupId", provision_name, free_text, help_text, category, active_flag) VALUES ('V',get_provision_group_id(10),'SURVEY - MINISTRY PAYS','','Use where ministry pays fro survey','OFFER SURVEY',true);
@@ -347,33 +318,3 @@ INSERT INTO nfr_provision_variable (variable_name, variable_value, help_text, "p
 INSERT INTO nfr_provision (type, "provisionGroupId", provision_name, free_text, help_text, category, active_flag) VALUES ('V',get_provision_group_id(20),'DELIVER SECURITY DEPOSIT (& SURVEY DEPOSIT) - NOTICE OF FINAL REVIEW','','Use this where 2 deposits are to be delivered: one for the survey and another for clean-up under the terms of the tenure to be issued','OFFER - SECURITY',true);
 INSERT INTO nfr_provision_provision_variant_nfr_provision_variant ("nfrProvisionId", "nfrProvisionVariantId") VALUES (get_current_provision_id(), get_variant_surveyreq());
 INSERT INTO nfr_provision_variable (variable_name, variable_value, help_text, "provisionId") VALUES ('SECURITY_AMOUNT','','#.## to post as security - indicate an amount even if blanket bond applies. Put in Decimal.',get_current_provision_id());
-
-INSERT INTO nfr_provision (type, "provisionGroupId", provision_name, free_text, help_text, category, active_flag) VALUES ('V',get_provision_group_id(27),'FREE FIELD - ADDITIONAL REQUIREMENTS','','Use where you want to state additional conditions of the offer','ADDITIONAL REQUIREMENTS',true);
-INSERT INTO nfr_provision_provision_variant_nfr_provision_variant ("nfrProvisionId", "nfrProvisionVariantId") VALUES (get_current_provision_id(), get_variant_surveyreq());
-
-INSERT INTO nfr_provision (type, "provisionGroupId", provision_name, free_text, help_text, category, active_flag) VALUES ('V',get_provision_group_id(27),'FREE FIELD - ADDITIONAL REQUIREMENTS - 2','','Use where you want to state additional conditions of the offer','ADDITIONAL REQUIREMENTS',true);
-INSERT INTO nfr_provision_provision_variant_nfr_provision_variant ("nfrProvisionId", "nfrProvisionVariantId") VALUES (get_current_provision_id(), get_variant_surveyreq());
-INSERT INTO nfr_provision_variable (variable_name, variable_value, help_text, "provisionId") VALUES ('no document variables (can this be removed)','','',get_current_provision_id());
-
-INSERT INTO nfr_provision (type, "provisionGroupId", provision_name, free_text, help_text, category, active_flag) VALUES ('V',get_provision_group_id(27),'ADDITIONAL REQUIREMENTS - MANAGEMENT PLAN','','Use to require delivery of a management plan.','ADDITIONAL REQUIREMENTS',true);
-INSERT INTO nfr_provision_provision_variant_nfr_provision_variant ("nfrProvisionId", "nfrProvisionVariantId") VALUES (get_current_provision_id(), get_variant_surveyreq());
-
-INSERT INTO nfr_provision (type, "provisionGroupId", provision_name, free_text, help_text, category, active_flag) VALUES ('V',get_provision_group_id(27),'ADDITIONAL REQUIREMENTS - ZONING APPROVAL','','Use to require confirmation that a zoning bylaw permitting use of the Land for the intended purposes has been adopted.','ADDITIONAL REQUIREMENTS',true);
-INSERT INTO nfr_provision_provision_variant_nfr_provision_variant ("nfrProvisionId", "nfrProvisionVariantId") VALUES (get_current_provision_id(), get_variant_surveyreq());
-INSERT INTO nfr_provision_variable (variable_name, variable_value, help_text, "provisionId") VALUES ('LOCAL_GOVERNMENT','','Type in the name of the local government.',get_current_provision_id());
-INSERT INTO nfr_provision_variable (variable_name, variable_value, help_text, "provisionId") VALUES ('PURPOSE_GENERIC','','used for "_________" purposes.',get_current_provision_id());
-
-INSERT INTO nfr_provision (type, "provisionGroupId", provision_name, free_text, help_text, category, active_flag) VALUES ('V',get_provision_group_id(27),'ADDITIONAL REQUIREMENTS - IMPROVEMENTS STAT DEC','','Use this when a statutory declaration is required regarding ownership of improvements.','ADDITIONAL REQUIREMENTS',true);
-INSERT INTO nfr_provision_provision_variant_nfr_provision_variant ("nfrProvisionId", "nfrProvisionVariantId") VALUES (get_current_provision_id(), get_variant_surveyreq());
-
-INSERT INTO nfr_provision (type, "provisionGroupId", provision_name, free_text, help_text, category, active_flag) VALUES ('V',get_provision_group_id(27),'ADDITIONAL REQUIREMENTS - TAX CLEARANCE CERTIFICATE','','Use when a tax clearance certificate is required verifying that there are no arrears of taxes.','ADDITIONAL REQUIREMENTS',true);
-INSERT INTO nfr_provision_provision_variant_nfr_provision_variant ("nfrProvisionId", "nfrProvisionVariantId") VALUES (get_current_provision_id(), get_variant_surveyreq());
-INSERT INTO nfr_provision_variable (variable_name, variable_value, help_text, "provisionId") VALUES ('TAX_COLLECTOR_OFFICE','','Type in the address of the local Provincial Tax Collector’’s office.',get_current_provision_id());
-
-INSERT INTO nfr_provision (type, "provisionGroupId", provision_name, free_text, help_text, category, active_flag) VALUES ('V',get_provision_group_id(27),'ADDITIONAL REQUIREMENTS - AFFILIATE STATUS CERTIFICATE','','Use when a certificate of affiliate status is required for each affiliate of your company using the communication site.','ADDITIONAL REQUIREMENTS',true);
-INSERT INTO nfr_provision_provision_variant_nfr_provision_variant ("nfrProvisionId", "nfrProvisionVariantId") VALUES (get_current_provision_id(), get_variant_surveyreq());
-
-INSERT INTO nfr_provision (type, "provisionGroupId", provision_name, free_text, help_text, category, active_flag) VALUES ('V',get_provision_group_id(27),'ADDITIONAL REQUIREMENTS - OBTAIN AND DELIVER','','Use when you require immediate delivery of documentation.','ADDITIONAL REQUIREMENTS',true);
-INSERT INTO nfr_provision_provision_variant_nfr_provision_variant ("nfrProvisionId", "nfrProvisionVariantId") VALUES (get_current_provision_id(), get_variant_surveyreq());
-INSERT INTO nfr_provision_variable (variable_name, variable_value, help_text, "provisionId") VALUES ('DEADLINE_TO_DELIVER','','Enter "on or before [date]" OR "within [45] days from the date of this letter.',get_current_provision_id());
-INSERT INTO nfr_provision_variable (variable_name, variable_value, help_text, "provisionId") VALUES ('DOCUMENT_TO_OBTAIN','','You must obtain the [specify the name of the document(s)] and ....',get_current_provision_id());

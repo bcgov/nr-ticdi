@@ -72,3 +72,9 @@ export const numberWords = [
   "ThirtyFour",
   "ThirtyFive",
 ];
+
+export const sectionTitles = {
+  Twenty: "Security\r\n\r\n",
+  TwentyFive: "Insurance\r\n\r\n",
+  TwentySeven: "Additional Requirements\r\n\r\n",
+};

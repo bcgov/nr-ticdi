@@ -3,7 +3,12 @@ import { Injectable } from "@nestjs/common";
 import * as dotenv from "dotenv";
 import { firstValueFrom } from "rxjs";
 import { TTLSService } from "src/ttls/ttls.service";
-import { LUR_REPORT_TYPE, REPORT_TYPES, numberWords } from "utils/constants";
+import {
+  LUR_REPORT_TYPE,
+  REPORT_TYPES,
+  numberWords,
+  sectionTitles,
+} from "utils/constants";
 import { ProvisionJSON, VariableJSON } from "utils/types";
 import {
   convertToSpecialCamelCase,
@@ -262,6 +267,23 @@ export class ReportService {
       const showVarName = `showSection${groupText}_${index}`;
       showProvisionSections[showVarName] = 1;
     });
+
+    // Logic for including section titles based on which sections are displaying information
+    for (const key in showProvisionSections) {
+      if (key.startsWith("showSection")) {
+        const number = key.match(/Section(\w+)_\d+/)[1];
+        if (
+          number === "Twenty" ||
+          number === "TwentyFive" ||
+          number === "TwentySeven"
+        ) {
+          const titleKey = `Section${number}_Title`; // titleKey = Section<Number>_Title
+          showProvisionSections[key] = showProvisionSections[key]; // key = showSection<Number>_<#>
+          showProvisionSections[titleKey] = sectionTitles[number]; // set title text
+          showProvisionSections[`show${titleKey}`] = 1; // set show title to true
+        }
+      }
+    }
 
     // Format the raw ttls data
     const tenantAddr = rawData.tenantAddr[0];

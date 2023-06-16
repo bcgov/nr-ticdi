@@ -139,6 +139,9 @@ export class AppController {
             console.log(err.response.data);
           });
         ttlsJSON = await this.ttlsService.sendToBackend(response);
+        ttlsJSON["cityProvPostal"] = this.ttlsService.concatCityProvPostal(
+          response.tenantAddr ? response.tenantAddr[0] : null
+        );
         if (ttlsJSON.inspected_date) {
           ttlsJSON["inspected_date"] = this.ttlsService.formatInspectedDate(
             ttlsJSON.inspected_date.toString()
@@ -223,20 +226,15 @@ export class AppController {
       );
       let ttlsJSON, primaryContactName, nfrData;
       try {
-        const nfrDataObject = await this.reportService.getActiveNfrDataByDtid(dtid);
+        const nfrDataObject = await this.reportService.getActiveNfrDataByDtid(
+          dtid
+        );
         nfrData = nfrDataObject.nfrData;
         const provisionIds = nfrDataObject.provisionIds
           ? nfrDataObject.provisionIds
           : [];
-        const variableIds = nfrDataObject.variableIds
-          ? nfrDataObject.variableIds
-          : [];
         const mandatoryProvisionIds =
           await this.reportService.getMandatoryProvisionsByVariant(variantName);
-        // const combinedProvisions = provisionIds.concat(mandatoryProvisionIds);
-        // const enabledProvisions = combinedProvisions.filter(
-        //   (item, index) => combinedProvisions.indexOf(item) === index
-        // );
         await this.ttlsService.setWebadeToken();
         const response: any = await firstValueFrom(
           this.ttlsService.callHttp(dtid)
@@ -245,7 +243,7 @@ export class AppController {
             return res;
           })
           .catch((err) => {
-            console.log(err);
+            console.log(err.response.data);
           });
         ttlsJSON = await this.ttlsService.formatNFRData(response);
         primaryContactName = ttlsJSON.licenceHolderName;

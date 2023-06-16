@@ -3,7 +3,12 @@ import { Injectable } from "@nestjs/common";
 import * as dotenv from "dotenv";
 import { firstValueFrom } from "rxjs";
 import { TTLSService } from "src/ttls/ttls.service";
-import { REPORT_TYPES, numberWords } from "utils/constants";
+import {
+  LUR_REPORT_TYPE,
+  REPORT_TYPES,
+  numberWords,
+  sectionTitles,
+} from "utils/constants";
 import { ProvisionJSON, VariableJSON } from "utils/types";
 import {
   convertToSpecialCamelCase,
@@ -61,15 +66,12 @@ export class ReportService {
    * @param username
    * @returns
    */
-  async generateLURReport(
-    prdid: number,
-    document_type: string,
-    username: string
-  ) {
-    const documentType = REPORT_TYPES[0]; // Land Use Report
+  async generateLURReport(prdid: number, username: string) {
+    const documentType = LUR_REPORT_TYPE;
     const url = `${hostname}:${port}/print-request-detail/view/` + prdid;
     const templateUrl = `${hostname}:${port}/document-template/get-active-report/${documentType}`;
     const logUrl = `${hostname}:${port}/print-request-log/`;
+
     // get the view given the print request detail id
     const data = await axios
       .get(url, {
@@ -80,6 +82,7 @@ export class ReportService {
       .then((res) => {
         return res.data;
       });
+
     if (data.InspectionDate) {
       data["InspectionDate"] = this.ttlsService.formatInspectedDate(
         data.InspectionDate
@@ -103,7 +106,7 @@ export class ReportService {
     });
 
     const cdogsToken = await this.ttlsService.callGetToken();
-    let bufferBase64 = documentTemplateObject.the_file;
+    const bufferBase64 = documentTemplateObject.the_file;
     const md = JSON.stringify({
       data,
       formatters:
@@ -223,7 +226,8 @@ export class ReportService {
       ) {
         variables[`VAR_${newVariableName}`] =
           variables[`VAR_${newVariableName}`] + "\r\n\r\n";
-          variables[`${variable_name}`] = variables[`${variable_name}`] + "\r\n\r\n";
+        variables[`${variable_name}`] =
+          variables[`${variable_name}`] + "\r\n\r\n";
       }
     });
 
@@ -264,17 +268,28 @@ export class ReportService {
       showProvisionSections[showVarName] = 1;
     });
 
+    // Logic for including section titles based on which sections are displaying information
+    for (const key in showProvisionSections) {
+      if (key.startsWith("showSection")) {
+        const number = key.match(/Section(\w+)_\d+/)[1];
+        if (
+          number === "Twenty" ||
+          number === "TwentyFive" ||
+          number === "TwentySeven"
+        ) {
+          const titleKey = `Section${number}_Title`; // titleKey = Section<Number>_Title
+          showProvisionSections[key] = showProvisionSections[key]; // key = showSection<Number>_<#>
+          showProvisionSections[titleKey] = sectionTitles[number]; // set title text
+          showProvisionSections[`show${titleKey}`] = 1; // set show title to true
+        }
+      }
+    }
+
     // Format the raw ttls data
     const tenantAddr = rawData.tenantAddr[0];
     const interestParcel = rawData.interestParcel[0];
     const DB_Address_Mailing_Tenant = tenantAddr
-      ? nfrAddressBuilder(
-          tenantAddr.legalName,
-          tenantAddr.addrLine1,
-          tenantAddr.city,
-          tenantAddr.provAbbr,
-          tenantAddr.postalCode
-        )
+      ? nfrAddressBuilder(tenantAddr)
       : "";
 
     // Update the formatting of certain money variables
@@ -381,17 +396,19 @@ export class ReportService {
       VAR_Fee_Other_Credit_Amount;
 
     const ttlsData = {
-      DB_Address_Regional_Office: nfrAddressBuilder(
-        null,
-        rawData.regOfficeStreet,
-        rawData.regOfficeCity,
-        rawData.regOfficeProv,
-        rawData.regOfficePostalCode
-      ),
+      DB_Address_Regional_Office: nfrAddressBuilder({
+        addrLine1: rawData.regOfficeStreet,
+        city: rawData.regOfficeCity,
+        provAbbr: rawData.regOfficeProv,
+        postalCode: rawData.regOfficePostalCode,
+      }),
       DB_Name_BCAL_Contact: idirName,
       DB_File_Number: rawData.fileNum,
       DB_Address_Mailing_Tenant: DB_Address_Mailing_Tenant,
-      DB_Tenure_Type: rawData.type,
+      DB_Tenure_Type: rawData.type // convert a tenure type like LICENSE to License
+        ? rawData.type.toLowerCase().charAt(0).toUpperCase() +
+          rawData.type.toLowerCase().slice(1)
+        : "",
       DB_Legal_Description: interestParcel
         ? interestParcel.legalDescription
         : "",
@@ -404,13 +421,12 @@ export class ReportService {
       DB_FP_Asterisk: "*",
       DB_Total_GST_Amount: formatMoney(DB_Total_GST_Amount),
       DB_Total_Monies_Payable: formatMoney(DB_Total_Monies_Payable),
-      DB_Address_Line_Regional_Office: nfrAddressBuilder(
-        null,
-        rawData.regOfficeStreet,
-        rawData.regOfficeCity,
-        rawData.regOfficeProv,
-        rawData.regOfficePostalCode
-      ),
+      DB_Address_Line_Regional_Office: nfrAddressBuilder({
+        addrLine1: rawData.regOfficeStreet,
+        city: rawData.regOfficeCity,
+        provAbbr: rawData.regOfficeProv,
+        postalCode: rawData.regOfficePostalCode,
+      }),
     }; // parse out the rawData, variableJson, and provisionJson into something useable
 
     // combine the formatted TTLS data, variables, and provision sections

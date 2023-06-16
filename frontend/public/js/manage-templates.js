@@ -434,7 +434,7 @@ $(document).ready(function () {
                   data == 999 ? "-" : data
                 }' readonly style='color: gray; width: 100%;' />`;
               } else if (columnType === "free_text") {
-                return `<input type='text' id='${columnType}-${id}' value='${data}' title='${data}' readonly style='color: gray; width: 100%;' />`;
+                return `<input type='text' id='${columnType}-${id}' data-fullval='${data}' value='${data}' title='${data}' readonly style='color: gray; width: 100%; white-space: pre-wrap;' />`;
               } else {
                 return `<input type='text' id='${columnType}-${id}' value='${data}' readonly style='color: gray; width: 100%;' />`;
               }
@@ -921,7 +921,7 @@ function openEditModal() {
   const provision_group = $(`#provision_group-${provisionId}`).val();
   const max = $(`#max-${provisionId}`).val();
   const provision_name = $(`#provision_name-${provisionId}`).val();
-  const free_text = $(`#free_text-${provisionId}`).val();
+  const free_text = $(`#free_text-${provisionId}`).data('fullval')
   const help_text = $(`#help_text-${provisionId}`).val();
   const category = $(`#category-${provisionId}`).val();
   const variants = $(this).data("variants");

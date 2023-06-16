@@ -64,7 +64,7 @@ export class ReportController {
     "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
   )
   @Header("Content-Disposition", "attachment; filename=landusereport.docx")
-  async generateReport(
+  async generateLURReport(
     @Session() session: { data: SessionData },
     @Body() data: { prdid: string; document_type: string }
   ) {
@@ -76,12 +76,9 @@ export class ReportController {
     } else {
       console.log("no active account found");
     }
+
     return new StreamableFile(
-      await this.reportService.generateLURReport(
-        +data.prdid,
-        data.document_type,
-        idir_username
-      )
+      await this.reportService.generateLURReport(+data.prdid, idir_username)
     );
   }
 

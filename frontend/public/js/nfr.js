@@ -362,6 +362,7 @@ variableTable = $("#variableTable").DataTable({
           return data;
         }
       },
+      orderable: false,
     },
   ],
   rowCallback: function (row, data, index) {

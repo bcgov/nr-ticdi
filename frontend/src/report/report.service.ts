@@ -395,6 +395,38 @@ export class ReportService {
       VAR_Fee_Application_Amount -
       VAR_Fee_Other_Credit_Amount;
 
+    const Show_Fee_Payable_Amount_GST = DB_Fee_Payable_Amount_GST
+      ? DB_Fee_Payable_Amount_GST > 0
+        ? 1
+        : 0
+      : 0;
+    const Show_Fee_Payable_Amount = DB_Fee_Payable_Amount
+      ? DB_Fee_Payable_Amount > 0
+        ? 1
+        : 0
+      : 0;
+    const Show_Fee_Documentation_Amount = VAR_Fee_Documentation_Amount
+      ? VAR_Fee_Documentation_Amount > 0
+        ? 1
+        : 0
+      : 0;
+    const Show_Fee_Occupational_Rental_Amount =
+      VAR_Fee_Occupational_Rental_Amount
+        ? VAR_Fee_Occupational_Rental_Amount > 0
+          ? 1
+          : 0
+        : 0;
+    const Show_Fee_Application_Amount = VAR_Fee_Application_Amount
+      ? VAR_Fee_Application_Amount > 0
+        ? 1
+        : 0
+      : 0;
+    const Show_Fee_Other_Credit_Amount = VAR_Fee_Other_Credit_Amount
+      ? VAR_Fee_Other_Credit_Amount > 0
+        ? 1
+        : 0
+      : 0;
+
     const ttlsData = {
       DB_Address_Regional_Office: nfrAddressBuilder({
         addrLine1: rawData.regOfficeStreet,
@@ -427,6 +459,12 @@ export class ReportService {
         provAbbr: rawData.regOfficeProv,
         postalCode: rawData.regOfficePostalCode,
       }),
+      Show_Fee_Payable_Amount_GST: Show_Fee_Payable_Amount_GST,
+      Show_Fee_Payable_Amount: Show_Fee_Payable_Amount,
+      Show_Fee_Documentation_Amount: Show_Fee_Documentation_Amount,
+      Show_Fee_Occupational_Rental_Amount: Show_Fee_Occupational_Rental_Amount,
+      Show_Fee_Application_Amount: Show_Fee_Application_Amount,
+      Show_Fee_Other_Credit_Amount: Show_Fee_Other_Credit_Amount,
     }; // parse out the rawData, variableJson, and provisionJson into something useable
 
     // combine the formatted TTLS data, variables, and provision sections

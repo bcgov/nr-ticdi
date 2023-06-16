@@ -39,7 +39,7 @@ export class TTLSService {
   }
 
   formatNFRData(ttlsData: any): any {
-    const tenantAddr = ttlsData.tenantAddr[0];
+    const tenantAddr = ttlsData.tenantAddr ? ttlsData.tenantAddr[0] : null;
     const mappedData = {
       dtid: ttlsData.dtid,
       fileNum: ttlsData.fileNum,

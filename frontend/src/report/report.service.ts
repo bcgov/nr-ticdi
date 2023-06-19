@@ -207,7 +207,16 @@ export class ReportService {
       if (variable_value.includes("«")) {
         // regex which converts «DB_TENURE_TYPE» to {d.DB_Tenure_Type}, also works for VAR_
         variable_value = variable_value.replace(
-          /«([^»]+)»/g,
+          /<<([^>>]+)>>/g,
+          function (match, innerText) {
+            innerText = convertToSpecialCamelCase(innerText);
+            return "{d." + innerText + "}";
+          }
+        );
+      } else if (variable_value.includes("<<")) {
+        // regex which converts <<DB_TENURE_TYPE>> to {d.DB_Tenure_Type}, also works for VAR_
+        variable_value = variable_value.replace(
+          /<<([^>>]+)>>/g,
           function (match, innerText) {
             innerText = convertToSpecialCamelCase(innerText);
             return "{d." + innerText + "}";

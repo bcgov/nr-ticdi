@@ -227,12 +227,7 @@ export class ReportService {
       variables[`VAR_${newVariableName}`] = variable_value;
       variables[`${variable_name}`] = variable_value;
       // workaround for template formatting
-      if (
-        newVariableName == "Occ_Rent_Details" ||
-        newVariableName == "Replacement_Tenure_Type" ||
-        newVariableName == "Why_Land_Differs" ||
-        newVariableName == "Sect5_Free_Field"
-      ) {
+      if (newVariableName == "Occ_Rent_Details") {
         variables[`VAR_${newVariableName}`] =
           variables[`VAR_${newVariableName}`] + "\r\n\r\n";
         variables[`${variable_name}`] =
@@ -264,10 +259,7 @@ export class ReportService {
       // workaround for template formatting
       if (
         showProvisionSections[varName] != "" &&
-        varName != "SectionFifteen_1_Text" &&
-        varName != "SectionFive_1_Text" &&
-        varName != "SectionFive_2_Text" &&
-        varName != "SectionFive_3_Text"
+        varName != "SectionFifteen_1_Text"
       ) {
         showProvisionSections[varName] =
           showProvisionSections[varName] + "\r\n\r\n";

@@ -356,7 +356,7 @@ export class ReportService {
     }
 
     const GST_Rate: number = rawData && rawData.gstRate ? rawData.gstRate : 0;
-    const DB_Fee_Payable_Type: number = rawData.feePayableType;
+    const DB_Fee_Payable_Type: string = rawData.feePayableType;
     const DB_Fee_Payable_Amount: number = rawData.feePayableAmount
       ? rawData.feePayableAmount
       : 0;

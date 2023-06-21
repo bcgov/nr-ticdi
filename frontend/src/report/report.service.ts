@@ -360,6 +360,7 @@ export class ReportService {
     const DB_Fee_Payable_Amount: number = rawData.feePayableAmount
       ? rawData.feePayableAmount
       : 0;
+    // this value gets reduced later if gstExemptArea is greater than 0
     const DB_Fee_Payable_Amount_GST: number = rawData.feePayableAmountGst
       ? rawData.feePayableAmountGst
       : 0;
@@ -379,45 +380,25 @@ export class ReportService {
     // Take the total area in hectares and subtract the exempt amount to get the taxable area
     const taxableArea = totalArea - DB_GST_Exempt_Area;
     // Get the ratio of the taxable are to the totalArea
-    const areaRatio = taxableArea / totalArea;
-    // Multiply that ratio with the total fee payable amount to get the new taxable fee amount
-    const taxableFeePayableAmount = DB_Fee_Payable_Amount * areaRatio;
+    const areaRatio = totalArea !== 0 ? taxableArea / totalArea : 0;
 
     if (DB_GST_Exempt === "Y") {
       DB_Total_GST_Amount =
-        ((taxableFeePayableAmount +
+        ((DB_Fee_Payable_Amount_GST * areaRatio +
           VAR_Fee_Documentation_Amount +
           VAR_Fee_Application_Amount) *
           GST_Rate) /
         100.0;
     } else {
       DB_Total_GST_Amount =
-        ((taxableFeePayableAmount +
+        ((DB_Fee_Payable_Amount_GST * areaRatio +
           VAR_Fee_Documentation_Amount +
           VAR_Fee_Occupational_Rental_Amount +
           VAR_Fee_Application_Amount) *
           GST_Rate) /
         100.0;
     }
-    // calculation which was giving incorrect values
-    // if (DB_GST_Exempt === "Y") {
-    //   console.log("if");
-    //   DB_Total_GST_Amount =
-    //     ((DB_Fee_Payable_Amount_GST +
-    //       VAR_Fee_Documentation_Amount +
-    //       VAR_Fee_Application_Amount) *
-    //       GST_Rate) /
-    //     100.0;
-    // } else {
-    //   console.log("else");
-    //   DB_Total_GST_Amount =
-    //     ((DB_Fee_Payable_Amount_GST +
-    //       VAR_Fee_Documentation_Amount +
-    //       VAR_Fee_Occupational_Rental_Amount +
-    //       VAR_Fee_Application_Amount) *
-    //       GST_Rate) /
-    //     100.0;
-    // }
+    console.log("DB_Total_GST_Amount: " + DB_Total_GST_Amount);
 
     const DB_Total_Monies_Payable: number =
       DB_Total_GST_Amount +

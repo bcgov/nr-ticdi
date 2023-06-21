@@ -360,12 +360,10 @@ export class ReportService {
     const DB_Fee_Payable_Amount: number = rawData.feePayableAmount
       ? rawData.feePayableAmount
       : 0;
-    // this value gets reduced later if gstExemptArea is greater than 0
     const DB_Fee_Payable_Amount_GST: number = rawData.feePayableAmountGst
       ? rawData.feePayableAmountGst
       : 0;
     const DB_GST_Exempt: string = rawData.gstExempt ? rawData.gstExempt : "N";
-    // unused right now
     const DB_GST_Exempt_Area: number = rawData.gstExemptArea
       ? rawData.gstExemptArea
       : 0;
@@ -398,7 +396,6 @@ export class ReportService {
           GST_Rate) /
         100.0;
     }
-    console.log("DB_Total_GST_Amount: " + DB_Total_GST_Amount);
 
     const DB_Total_Monies_Payable: number =
       DB_Total_GST_Amount +

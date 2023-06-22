@@ -250,10 +250,7 @@ export class ReportService {
       }
       showProvisionSections[varName] = provision.free_text;
       // workaround for template formatting
-      if (
-        showProvisionSections[varName] != "" &&
-        varName != "SectionFifteen_1_Text"
-      ) {
+      if (showProvisionSections[varName] != "") {
         showProvisionSections[varName] =
           showProvisionSections[varName] + "\r\n\r\n";
       }
@@ -285,21 +282,6 @@ export class ReportService {
     const DB_Address_Mailing_Tenant = tenantAddr
       ? nfrAddressBuilder(tenantAddr)
       : "";
-
-    // Update the formatting of certain money variables
-    const VAR_Fee_Documentation_Amount: number =
-      variables && variables.VAR_Fee_Documentation_Amount
-        ? !isNaN(variables.VAR_Fee_Documentation_Amount)
-          ? parseFloat(variables.VAR_Fee_Documentation_Amount)
-          : 0
-        : 0;
-    if (variables && variables.VAR_Fee_Documentation_Amount) {
-      !isNaN(variables.VAR_Fee_Documentation_Amount)
-        ? (variables.VAR_Fee_Documentation_Amount = formatMoney(
-            parseFloat(variables.VAR_Fee_Documentation_Amount)
-          ))
-        : (variables.VAR_Fee_Documentation_Amount = "0.00");
-    }
 
     const VAR_Fee_Application_Amount: number =
       variables && variables.VAR_Fee_Application_Amount
@@ -375,15 +357,12 @@ export class ReportService {
 
     if (DB_GST_Exempt === "Y") {
       DB_Total_GST_Amount =
-        ((DB_Fee_Payable_Amount_GST * areaRatio +
-          VAR_Fee_Documentation_Amount +
-          VAR_Fee_Application_Amount) *
+        ((DB_Fee_Payable_Amount_GST * areaRatio + VAR_Fee_Application_Amount) *
           GST_Rate) /
         100.0;
     } else {
       DB_Total_GST_Amount =
         ((DB_Fee_Payable_Amount_GST * areaRatio +
-          VAR_Fee_Documentation_Amount +
           VAR_Fee_Occupational_Rental_Amount +
           VAR_Fee_Application_Amount) *
           GST_Rate) /
@@ -394,7 +373,6 @@ export class ReportService {
       DB_Total_GST_Amount +
       DB_Fee_Payable_Amount_GST +
       DB_Fee_Payable_Amount +
-      VAR_Fee_Documentation_Amount +
       VAR_Fee_Occupational_Rental_Amount +
       VAR_Fee_Application_Amount -
       VAR_Fee_Other_Credit_Amount;
@@ -417,11 +395,6 @@ export class ReportService {
         : 0;
     const Show_Fee_Application_Amount = VAR_Fee_Application_Amount
       ? VAR_Fee_Application_Amount > 0
-        ? 1
-        : 0
-      : 0;
-    const Show_Fee_Documentation_Amount = VAR_Fee_Documentation_Amount
-      ? VAR_Fee_Documentation_Amount > 0
         ? 1
         : 0
       : 0;
@@ -465,7 +438,6 @@ export class ReportService {
       }),
       Show_Fee_Payable_Amount_GST: Show_Fee_Payable_Amount_GST,
       Show_Fee_Payable_Amount: Show_Fee_Payable_Amount,
-      Show_Fee_Documentation_Amount: Show_Fee_Documentation_Amount,
       Show_Fee_Occupational_Rental_Amount: Show_Fee_Occupational_Rental_Amount,
       Show_Fee_Application_Amount: Show_Fee_Application_Amount,
       Show_Fee_Other_Credit_Amount: Show_Fee_Other_Credit_Amount,

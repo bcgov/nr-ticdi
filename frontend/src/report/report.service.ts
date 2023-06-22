@@ -226,13 +226,6 @@ export class ReportService {
 
       variables[`VAR_${newVariableName}`] = variable_value;
       variables[`${variable_name}`] = variable_value;
-      // workaround for template formatting
-      if (newVariableName == "Occ_Rent_Details") {
-        variables[`VAR_${newVariableName}`] =
-          variables[`VAR_${newVariableName}`] + "\r\n\r\n";
-        variables[`${variable_name}`] =
-          variables[`${variable_name}`] + "\r\n\r\n";
-      }
     });
 
     // Format provisions in a way that the document template expects
@@ -416,11 +409,6 @@ export class ReportService {
         ? 1
         : 0
       : 0;
-    const Show_Fee_Documentation_Amount = VAR_Fee_Documentation_Amount
-      ? VAR_Fee_Documentation_Amount > 0
-        ? 1
-        : 0
-      : 0;
     const Show_Fee_Occupational_Rental_Amount =
       VAR_Fee_Occupational_Rental_Amount
         ? VAR_Fee_Occupational_Rental_Amount > 0
@@ -429,6 +417,11 @@ export class ReportService {
         : 0;
     const Show_Fee_Application_Amount = VAR_Fee_Application_Amount
       ? VAR_Fee_Application_Amount > 0
+        ? 1
+        : 0
+      : 0;
+    const Show_Fee_Documentation_Amount = VAR_Fee_Documentation_Amount
+      ? VAR_Fee_Documentation_Amount > 0
         ? 1
         : 0
       : 0;

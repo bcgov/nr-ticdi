@@ -475,7 +475,7 @@ export class ReportService {
     if (Show_Fee_Other_Credit_Amount === 1) {
       monies.push({
         description: "Other (credit)",
-        dollarSign: "*$",
+        dollarSign: "$",
         value: formatMoney(VAR_Fee_Other_Credit_Amount),
       });
     }

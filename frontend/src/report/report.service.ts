@@ -247,6 +247,15 @@ export class ReportService {
             return "{d." + innerText + "}";
           }
         );
+      } else if (provision.free_text.includes("<<")) {
+        // regex which converts <<DB_TENURE_TYPE>> to {d.DB_Tenure_Type}, also works for VAR_
+        provision.free_text = provision.free_text.replace(
+          /<<([^>>]+)>>/g,
+          function (match, innerText) {
+            innerText = convertToSpecialCamelCase(innerText);
+            return "{d." + innerText + "}";
+          }
+        );
       }
       showProvisionSections[varName] = provision.free_text;
       // workaround for template formatting

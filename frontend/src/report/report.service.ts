@@ -226,13 +226,6 @@ export class ReportService {
 
       variables[`VAR_${newVariableName}`] = variable_value;
       variables[`${variable_name}`] = variable_value;
-      // workaround for template formatting
-      if (newVariableName == "Occ_Rent_Details") {
-        variables[`VAR_${newVariableName}`] =
-          variables[`VAR_${newVariableName}`] + "\r\n\r\n";
-        variables[`${variable_name}`] =
-          variables[`${variable_name}`] + "\r\n\r\n";
-      }
     });
 
     // Format provisions in a way that the document template expects
@@ -254,13 +247,19 @@ export class ReportService {
             return "{d." + innerText + "}";
           }
         );
+      } else if (provision.free_text.includes("<<")) {
+        // regex which converts <<DB_TENURE_TYPE>> to {d.DB_Tenure_Type}, also works for VAR_
+        provision.free_text = provision.free_text.replace(
+          /<<([^>>]+)>>/g,
+          function (match, innerText) {
+            innerText = convertToSpecialCamelCase(innerText);
+            return "{d." + innerText + "}";
+          }
+        );
       }
       showProvisionSections[varName] = provision.free_text;
       // workaround for template formatting
-      if (
-        showProvisionSections[varName] != "" &&
-        varName != "SectionFifteen_1_Text"
-      ) {
+      if (showProvisionSections[varName] != "") {
         showProvisionSections[varName] =
           showProvisionSections[varName] + "\r\n\r\n";
       }
@@ -292,21 +291,6 @@ export class ReportService {
     const DB_Address_Mailing_Tenant = tenantAddr
       ? nfrAddressBuilder(tenantAddr)
       : "";
-
-    // Update the formatting of certain money variables
-    const VAR_Fee_Documentation_Amount: number =
-      variables && variables.VAR_Fee_Documentation_Amount
-        ? !isNaN(variables.VAR_Fee_Documentation_Amount)
-          ? parseFloat(variables.VAR_Fee_Documentation_Amount)
-          : 0
-        : 0;
-    if (variables && variables.VAR_Fee_Documentation_Amount) {
-      !isNaN(variables.VAR_Fee_Documentation_Amount)
-        ? (variables.VAR_Fee_Documentation_Amount = formatMoney(
-            parseFloat(variables.VAR_Fee_Documentation_Amount)
-          ))
-        : (variables.VAR_Fee_Documentation_Amount = "0.00");
-    }
 
     const VAR_Fee_Application_Amount: number =
       variables && variables.VAR_Fee_Application_Amount
@@ -368,6 +352,7 @@ export class ReportService {
       ? rawData.gstExemptArea
       : 0;
     let DB_Total_GST_Amount: number;
+    const DB_FP_Asterisk: string = DB_GST_Exempt === "Y" ? "" : "*";
 
     let totalArea = 0;
     if (rawData.interestParcel && rawData.interestParcel[0]) {
@@ -382,15 +367,12 @@ export class ReportService {
 
     if (DB_GST_Exempt === "Y") {
       DB_Total_GST_Amount =
-        ((DB_Fee_Payable_Amount_GST * areaRatio +
-          VAR_Fee_Documentation_Amount +
-          VAR_Fee_Application_Amount) *
+        ((DB_Fee_Payable_Amount_GST * areaRatio + VAR_Fee_Application_Amount) *
           GST_Rate) /
         100.0;
     } else {
       DB_Total_GST_Amount =
         ((DB_Fee_Payable_Amount_GST * areaRatio +
-          VAR_Fee_Documentation_Amount +
           VAR_Fee_Occupational_Rental_Amount +
           VAR_Fee_Application_Amount) *
           GST_Rate) /
@@ -401,44 +383,86 @@ export class ReportService {
       DB_Total_GST_Amount +
       DB_Fee_Payable_Amount_GST +
       DB_Fee_Payable_Amount +
-      VAR_Fee_Documentation_Amount +
       VAR_Fee_Occupational_Rental_Amount +
       VAR_Fee_Application_Amount -
       VAR_Fee_Other_Credit_Amount;
 
+    let monies = [];
     const Show_Fee_Payable_Amount_GST = DB_Fee_Payable_Amount_GST
       ? DB_Fee_Payable_Amount_GST > 0
         ? 1
         : 0
       : 0;
+    if (Show_Fee_Payable_Amount_GST === 1) {
+      monies.push({
+        description: DB_Fee_Payable_Type,
+        dollarSign: "*$",
+        value: formatMoney(DB_Fee_Payable_Amount_GST),
+      });
+    }
     const Show_Fee_Payable_Amount = DB_Fee_Payable_Amount
       ? DB_Fee_Payable_Amount > 0
         ? 1
         : 0
       : 0;
-    const Show_Fee_Documentation_Amount = VAR_Fee_Documentation_Amount
-      ? VAR_Fee_Documentation_Amount > 0
-        ? 1
-        : 0
-      : 0;
+    if (Show_Fee_Payable_Amount === 1) {
+      monies.push({
+        description: DB_Fee_Payable_Type,
+        dollarSign: "$",
+        value: formatMoney(DB_Fee_Payable_Amount),
+      });
+    }
     const Show_Fee_Occupational_Rental_Amount =
       VAR_Fee_Occupational_Rental_Amount
         ? VAR_Fee_Occupational_Rental_Amount > 0
           ? 1
           : 0
         : 0;
+    if (Show_Fee_Occupational_Rental_Amount === 1) {
+      monies.push({
+        description: "Occupational Rental Amount",
+        dollarSign: `${DB_FP_Asterisk}$`,
+        value: formatMoney(VAR_Fee_Occupational_Rental_Amount),
+      });
+    }
     const Show_Fee_Application_Amount = VAR_Fee_Application_Amount
       ? VAR_Fee_Application_Amount > 0
         ? 1
         : 0
       : 0;
+    if (Show_Fee_Application_Amount === 1) {
+      monies.push({
+        description: "Application Amount",
+        dollarSign: "*$",
+        value: formatMoney(VAR_Fee_Application_Amount),
+      });
+    }
     const Show_Fee_Other_Credit_Amount = VAR_Fee_Other_Credit_Amount
       ? VAR_Fee_Other_Credit_Amount > 0
         ? 1
         : 0
       : 0;
+    if (Show_Fee_Other_Credit_Amount === 1) {
+      monies.push({
+        description: "Other (credit)",
+        dollarSign: "*$",
+        value: formatMoney(VAR_Fee_Other_Credit_Amount),
+      });
+    }
+    monies.push({
+      description: "GST Total",
+      dollarSign: "$",
+      value: formatMoney(DB_Total_GST_Amount),
+    });
+    const moniesTotal = {
+      description: "Total Fees Payable",
+      dollarSign: "$",
+      value: formatMoney(DB_Total_Monies_Payable),
+    };
 
     const ttlsData = {
+      monies: monies,
+      moniesTotal: moniesTotal,
       DB_Address_Regional_Office: nfrAddressBuilder({
         addrLine1: rawData.regOfficeStreet,
         city: rawData.regOfficeCity,
@@ -461,7 +485,7 @@ export class ReportService {
           ? ""
           : formatMoney(DB_Fee_Payable_Amount_GST),
       DB_Fee_Payable_Amount: formatMoney(DB_Fee_Payable_Amount),
-      DB_FP_Asterisk: "*",
+      DB_FP_Asterisk: DB_FP_Asterisk,
       DB_Total_GST_Amount: formatMoney(DB_Total_GST_Amount),
       DB_Total_Monies_Payable: formatMoney(DB_Total_Monies_Payable),
       DB_Address_Line_Regional_Office: nfrAddressBuilder({
@@ -472,7 +496,6 @@ export class ReportService {
       }),
       Show_Fee_Payable_Amount_GST: Show_Fee_Payable_Amount_GST,
       Show_Fee_Payable_Amount: Show_Fee_Payable_Amount,
-      Show_Fee_Documentation_Amount: Show_Fee_Documentation_Amount,
       Show_Fee_Occupational_Rental_Amount: Show_Fee_Occupational_Rental_Amount,
       Show_Fee_Application_Amount: Show_Fee_Application_Amount,
       Show_Fee_Other_Credit_Amount: Show_Fee_Other_Credit_Amount,

@@ -292,6 +292,20 @@ export class ReportService {
       ? nfrAddressBuilder(tenantAddr)
       : "";
 
+    const VAR_Fee_Documentation_Amount: number =
+      variables && variables.VAR_Fee_Documentation_Amount
+        ? !isNaN(variables.VAR_Fee_Documentation_Amount)
+          ? parseFloat(variables.VAR_Fee_Documentation_Amount)
+          : 0
+        : 0;
+    if (variables && variables.VAR_Fee_Documentation_Amount) {
+      !isNaN(variables.VAR_Fee_Documentation_Amount)
+        ? (variables.VAR_Fee_Documentation_Amount = formatMoney(
+            parseFloat(variables.VAR_Fee_Documentation_Amount)
+          ))
+        : (variables.VAR_Fee_Documentation_Amount = "0.00");
+    }
+
     const VAR_Fee_Application_Amount: number =
       variables && variables.VAR_Fee_Application_Amount
         ? !isNaN(variables.VAR_Fee_Application_Amount)
@@ -367,13 +381,16 @@ export class ReportService {
 
     if (DB_GST_Exempt === "Y") {
       DB_Total_GST_Amount =
-        ((DB_Fee_Payable_Amount_GST * areaRatio + VAR_Fee_Application_Amount) *
+        ((DB_Fee_Payable_Amount_GST * areaRatio +
+          VAR_Fee_Documentation_Amount +
+          VAR_Fee_Application_Amount) *
           GST_Rate) /
         100.0;
     } else {
       DB_Total_GST_Amount =
         ((DB_Fee_Payable_Amount_GST * areaRatio +
           VAR_Fee_Occupational_Rental_Amount +
+          VAR_Fee_Documentation_Amount +
           VAR_Fee_Application_Amount) *
           GST_Rate) /
         100.0;
@@ -383,6 +400,7 @@ export class ReportService {
       DB_Total_GST_Amount +
       DB_Fee_Payable_Amount_GST +
       DB_Fee_Payable_Amount +
+      VAR_Fee_Documentation_Amount +
       VAR_Fee_Occupational_Rental_Amount +
       VAR_Fee_Application_Amount -
       VAR_Fee_Other_Credit_Amount;
@@ -423,6 +441,18 @@ export class ReportService {
         description: "Occupational Rental Amount",
         dollarSign: `${DB_FP_Asterisk}$`,
         value: formatMoney(VAR_Fee_Occupational_Rental_Amount),
+      });
+    }
+    const Show_Fee_Documentation_Amount = VAR_Fee_Documentation_Amount
+      ? VAR_Fee_Documentation_Amount > 0
+        ? 1
+        : 0
+      : 0;
+    if (Show_Fee_Documentation_Amount === 1) {
+      monies.push({
+        description: "Documentation Amount",
+        dollarSign: "*$",
+        value: formatMoney(VAR_Fee_Documentation_Amount),
       });
     }
     const Show_Fee_Application_Amount = VAR_Fee_Application_Amount
@@ -494,11 +524,6 @@ export class ReportService {
         provAbbr: rawData.regOfficeProv,
         postalCode: rawData.regOfficePostalCode,
       }),
-      Show_Fee_Payable_Amount_GST: Show_Fee_Payable_Amount_GST,
-      Show_Fee_Payable_Amount: Show_Fee_Payable_Amount,
-      Show_Fee_Occupational_Rental_Amount: Show_Fee_Occupational_Rental_Amount,
-      Show_Fee_Application_Amount: Show_Fee_Application_Amount,
-      Show_Fee_Other_Credit_Amount: Show_Fee_Other_Credit_Amount,
     }; // parse out the rawData, variableJson, and provisionJson into something useable
 
     // combine the formatted TTLS data, variables, and provision sections

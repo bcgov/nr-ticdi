@@ -286,9 +286,10 @@ export class ReportService {
     }
 
     // Format the raw ttls data
-    const tenantAddr = rawData.tenantAddr[0];
+    const tenantAddr = rawData.tenantAddr;
     const interestParcel = rawData.interestParcel[0];
-    const DB_Address_Mailing_Tenant = tenantAddr
+
+    const DB_Address_Mailing_Tenant = tenantAddr[0]
       ? nfrAddressBuilder(tenantAddr)
       : "";
 
@@ -493,12 +494,14 @@ export class ReportService {
     const ttlsData = {
       monies: monies,
       moniesTotal: moniesTotal,
-      DB_Address_Regional_Office: nfrAddressBuilder({
-        addrLine1: rawData.regOfficeStreet,
-        city: rawData.regOfficeCity,
-        provAbbr: rawData.regOfficeProv,
-        postalCode: rawData.regOfficePostalCode,
-      }),
+      DB_Address_Regional_Office: nfrAddressBuilder([
+        {
+          addrLine1: rawData.regOfficeStreet,
+          city: rawData.regOfficeCity,
+          provAbbr: rawData.regOfficeProv,
+          postalCode: rawData.regOfficePostalCode,
+        },
+      ]),
       DB_Name_BCAL_Contact: idirName,
       DB_File_Number: rawData.fileNum,
       DB_Address_Mailing_Tenant: DB_Address_Mailing_Tenant,
@@ -518,12 +521,14 @@ export class ReportService {
       DB_FP_Asterisk: DB_FP_Asterisk,
       DB_Total_GST_Amount: formatMoney(DB_Total_GST_Amount),
       DB_Total_Monies_Payable: formatMoney(DB_Total_Monies_Payable),
-      DB_Address_Line_Regional_Office: nfrAddressBuilder({
-        addrLine1: rawData.regOfficeStreet,
-        city: rawData.regOfficeCity,
-        provAbbr: rawData.regOfficeProv,
-        postalCode: rawData.regOfficePostalCode,
-      }),
+      DB_Address_Line_Regional_Office: nfrAddressBuilder([
+        {
+          addrLine1: rawData.regOfficeStreet,
+          city: rawData.regOfficeCity,
+          provAbbr: rawData.regOfficeProv,
+          postalCode: rawData.regOfficePostalCode,
+        },
+      ]),
     }; // parse out the rawData, variableJson, and provisionJson into something useable
 
     // combine the formatted TTLS data, variables, and provision sections

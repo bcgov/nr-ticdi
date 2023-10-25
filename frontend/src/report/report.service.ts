@@ -100,6 +100,7 @@ export class ReportService {
     await axios.post(logUrl, {
       document_template_id: document_template_id,
       print_request_detail_id: prdid,
+      document_type: documentType,
       dtid: data.DTID,
       request_app_user: username,
       request_json: JSON.stringify(data),

@@ -1,6 +1,8 @@
-var documentTable, groupMaxTable, provisionTable, editProvisionVariableTable;
-var documentTable2, documentTable3, documentTable4, documentTable5;
+var documentTable; // main template upload table
+var groupMaxTable, provisionTable, editProvisionVariableTable;
+var documentTable2, documentTable3, documentTable4, documentTable5; // nfr variants
 var reportType = "";
+var reportTitle = "";
 var nfrDelayed = "NOTICE OF FINAL REVIEW (DELAYED)";
 var nfrNoFees = "NOTICE OF FINAL REVIEW (NO FEES)";
 var nfrSurveyReq = "NOTICE OF FINAL REVIEW (SURVEY REQUIRED)";
@@ -11,19 +13,23 @@ $(document).ready(function () {
   if (reportIndex != 2) {
     $(".nofr-section").hide();
   }
-  reportType =
-    reportIndex == 1
-      ? "LAND USE REPORT"
-      : reportIndex == 2
-      ? "NOTICE OF FINAL REVIEW"
-      : "";
-  $("#reportTitle").text(
-    reportIndex == 1
-      ? "Land Use Report"
-      : reportIndex == 2
-      ? "Notice of Final Review"
-      : ""
-  );
+  switch (reportIndex) {
+    case 1:
+      reportType = "LAND USE REPORT";
+      reportTitle = "Land Use Report";
+      break;
+    case 2:
+      reportType = "NOTICE OF FINAL REVIEW";
+      reportTitle = "Notice of Final Review";
+      break;
+    case 3:
+      reportType = "GRAZING LEASE";
+      reportTitle = "Grazing Lease";
+      break;
+    default:
+      break;
+  }
+  $("#reportTitle").text(reportTitle);
   // used for sorting the radio buttons
   $.fn.dataTable.ext.order["dom-checkbox"] = function (settings, col) {
     return this.api()
@@ -98,6 +104,7 @@ $(document).ready(function () {
     },
     order: [[0, "asc"]],
   });
+  // nfr section
   if (reportIndex == 2) {
     documentTable2 = $("#documentTable2").DataTable({
       ajax: {
@@ -577,12 +584,20 @@ function removeTemplate() {
   const id = $("#document-template-id").val();
   const urlParams = new URLSearchParams(window.location.search);
   const reportIndex = parseInt(urlParams.get("report"));
-  const reportType =
-    reportIndex == 1
-      ? "LAND USE REPORT"
-      : reportIndex == 2
-      ? "NOTICE OF FINAL REVIEW"
-      : "";
+  let reportType = "";
+  switch (reportIndex) {
+    case 1:
+      reportType = "LAND USE REPORT";
+      break;
+    case 2:
+      reportType = "NOTICE OF FINAL REVIEW";
+      break;
+    case 3:
+      reportType = "GRAZING LEASE";
+      break;
+    default:
+      break;
+  }
   fetch(`/admin/remove-template/${reportType}/${id}`, {
     method: "GET",
   })
@@ -921,7 +936,7 @@ function openEditModal() {
   const provision_group = $(`#provision_group-${provisionId}`).val();
   const max = $(`#max-${provisionId}`).val();
   const provision_name = $(`#provision_name-${provisionId}`).val();
-  const free_text = $(`#free_text-${provisionId}`).data('fullval')
+  const free_text = $(`#free_text-${provisionId}`).data("fullval");
   const help_text = $(`#help_text-${provisionId}`).val();
   const category = $(`#category-${provisionId}`).val();
   const variants = $(this).data("variants");

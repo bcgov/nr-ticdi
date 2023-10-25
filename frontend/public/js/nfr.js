@@ -33,6 +33,7 @@ $(".legalDesc").each(function () {
 });
 if ($("#adminLink").text() == "-") {
   $("#adminLink").hide();
+  $("#adminLink").text("");
 }
 groupMaxTable = $("#groupMaxTable").DataTable({
   ajax: {

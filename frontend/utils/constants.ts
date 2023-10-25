@@ -1,6 +1,7 @@
 export const PAGE_TITLES = {
   INDEX: "TICDI",
   NOFR: "Notice of Final Review",
+  GRAZING_LEASE: "Grazing Lease",
   ADMIN: "System Administration",
   MANAGE_TEMPLATES: "Manage Templates",
   MANAGE_USERS: "Manage Users",
@@ -10,7 +11,11 @@ export const PAGE_TITLES = {
 export const LUR_REPORT_TYPE = "LAND USE REPORT";
 
 // Used for admin page dropdown for manage templates page
-export const REPORT_TYPES = ["Land Use Report", "Notice of Final Review"];
+export const REPORT_TYPES = [
+  "Land Use Report",
+  "Notice of Final Review",
+  "Grazing Lease",
+];
 
 export const NFR_VARIANTS_ARRAY = [
   "NOTICE OF FINAL REVIEW",

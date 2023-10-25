@@ -10,7 +10,6 @@ import {
   Res,
 } from "@nestjs/common";
 import { AppService } from "./app.service";
-import { AdminService } from "./admin/admin.service";
 import {
   NFR_VARIANTS,
   NFR_VARIANTS_ARRAY,
@@ -24,7 +23,6 @@ import { TTLSService } from "./ttls/ttls.service";
 import { AdminGuard } from "./admin/admin.guard";
 import { AxiosRequestConfig } from "axios";
 import { firstValueFrom } from "rxjs";
-import { HttpService } from "@nestjs/axios";
 import { Req } from "@nestjs/common/decorators/http/route-params.decorator";
 import { Request, Response } from "express";
 import { ReportService } from "./report/report.service";
@@ -89,7 +87,6 @@ export class AppController {
    *
    * @param session
    * @param id
-   * @param docname
    * @returns
    */
   @Get("dtid/:id")
@@ -102,6 +99,7 @@ export class AppController {
     @Req() request: Request,
     @Res() response: Response
   ) {
+    console.log("LUR");
     const hasParams = request.originalUrl.includes("?session_state");
     if (hasParams) {
       const urlWithoutParams = request.path;
@@ -156,7 +154,11 @@ export class AppController {
           primaryContactName: primaryContactName,
           displayAdmin: displayAdmin,
           message: ttlsJSON,
-          documentTypes: ["Land Use Report", "Notice of Final Review"],
+          documentTypes: [
+            "Land Use Report",
+            "Notice of Final Review",
+            "Grazing Lease",
+          ],
           prdid: ttlsJSON.id,
         };
       } catch (err) {
@@ -169,7 +171,11 @@ export class AppController {
           primaryContactName: primaryContactName ? primaryContactName : null,
           displayAdmin: displayAdmin,
           message: ttlsJSON ? ttlsJSON : null,
-          documentTypes: ["Land Use Report", "Notice of Final Review"],
+          documentTypes: [
+            "Land Use Report",
+            "Notice of Final Review",
+            "Grazing Lease",
+          ],
           prdid: ttlsJSON ? ttlsJSON.id : null,
           error: err,
         };
@@ -178,132 +184,42 @@ export class AppController {
   }
 
   /**
-   * Renders the NFR report page
+   * Renders the survey required NFR report page
    *
    * @param session
-   * @param id
-   * @param docname
+   * @param dtid
    * @returns
    */
-  @Get("dtid/:dtid/:variant")
+  @Get("dtid/:dtid/:documentType")
   @UseFilters(AuthenticationFilter)
   @UseGuards(AuthenticationGuard)
-  @Render("nfr")
-  async findNofr(
+  async reportPage(
     @Session() session: { data?: SessionData },
     @Param("dtid") dtid: number,
-    @Param("variant") variantName: string,
+    @Param("documentType") documentType: string,
     @Req() req: Request,
     @Res() res: Response
   ) {
+    const decodedDocumentType = decodeURIComponent(documentType).toUpperCase();
+    console.log(decodedDocumentType);
+    console.log("888");
+    console.log(documentType);
+    console.log("888");
     const hasParams = req.originalUrl.includes("?session_state");
     if (hasParams) {
       const urlWithoutParams = req.path;
       res.redirect(301, urlWithoutParams);
-    } else if (!NFR_VARIANTS_ARRAY.includes(variantName)) {
+    } else if (
+      !NFR_VARIANTS_ARRAY.includes(decodedDocumentType) &&
+      decodedDocumentType != "GRAZINGLEASE"
+    ) {
       const redirectUrl = `/dtid/${dtid}`;
       res.redirect(301, redirectUrl);
     } else {
-      let isAdmin = false;
-      if (
-        session.data &&
-        session.data.activeAccount &&
-        session.data.activeAccount.client_roles
-      ) {
-        for (let role of session.data.activeAccount.client_roles) {
-          if (role == "ticdi_admin") {
-            isAdmin = true;
-          }
-        }
-      }
-      const title =
-        process.env.ticdi_environment == "DEVELOPMENT"
-          ? "DEVELOPMENT - " + PAGE_TITLES.NOFR
-          : PAGE_TITLES.NOFR;
-      const displayAdmin = isAdmin ? "Administration" : "-";
-      const groupMaxJsonArray = await this.reportService.getGroupMaxByVariant(
-        variantName
-      );
-      let ttlsJSON, primaryContactName, nfrData;
-      try {
-        const nfrDataObject = await this.reportService.getActiveNfrDataByDtid(
-          dtid
-        );
-        nfrData = nfrDataObject.nfrData;
-        const provisionIds = nfrDataObject.provisionIds
-          ? nfrDataObject.provisionIds
-          : [];
-        const mandatoryProvisionIds =
-          await this.reportService.getMandatoryProvisionsByVariant(variantName);
-        await this.ttlsService.setWebadeToken();
-        const response: any = await firstValueFrom(
-          this.ttlsService.callHttp(dtid)
-        )
-          .then((res) => {
-            return res;
-          })
-          .catch((err) => {
-            console.log(err.response.data);
-          });
-        ttlsJSON = await this.ttlsService.formatNFRData(response);
-        primaryContactName = ttlsJSON.licenceHolderName;
-        const interestedParties = nfrInterestedParties(response.tenantAddr);
-        ttlsJSON["interestedParties"] = interestedParties;
-        let selectedVariant = 0;
-        switch (variantName.toLowerCase()) {
-          case NFR_VARIANTS.default.toLowerCase(): {
-            selectedVariant = 0;
-            break;
-          }
-          case NFR_VARIANTS.delayed.toLowerCase(): {
-            selectedVariant = 1;
-            break;
-          }
-          case NFR_VARIANTS.no_fees.toLowerCase(): {
-            selectedVariant = 2;
-            break;
-          }
-          case NFR_VARIANTS.survey_required.toLowerCase(): {
-            selectedVariant = 3;
-            break;
-          }
-          case NFR_VARIANTS.to_obtain_survey.toLowerCase(): {
-            selectedVariant = 4;
-            break;
-          }
-        }
-        return {
-          title: title,
-          idirUsername: session.data.activeAccount
-            ? session.data.activeAccount.idir_username
-            : "",
-          primaryContactName: primaryContactName,
-          displayAdmin: displayAdmin,
-          message: ttlsJSON,
-          groupMaxJsonArray: groupMaxJsonArray,
-          documentTypes: NFR_VARIANTS_ARRAY,
-          nfrDataId: nfrData ? nfrData.id : -1,
-          selectedVariant: selectedVariant,
-          mandatoryProvisionList: mandatoryProvisionIds,
-          // enabledProvisionList: enabledProvisions,
-          enabledProvisionList: provisionIds,
-        };
-      } catch (err) {
-        console.log(err);
-        return {
-          title: title,
-          idirUsername: session.data.activeAccount
-            ? session.data.activeAccount.idir_username
-            : "",
-          primaryContactName: primaryContactName ? primaryContactName : null,
-          displayAdmin: displayAdmin,
-          message: ttlsJSON ? ttlsJSON : null,
-          groupMaxJsonArray: groupMaxJsonArray,
-          documentTypes: NFR_VARIANTS_ARRAY,
-          nfrDataId: -1,
-          enabledProvisionList: [],
-          error: err,
-        };
+      if (decodedDocumentType == "GRAZINGLEASE") {
+        return this.getGrazingLeaseDisplayData(session, dtid, res);
+      } else {
+        return this.getNfrDisplayData(session, dtid, documentType, res);
       }
     }
   }
@@ -340,6 +256,7 @@ export class AppController {
       reportTypes: [
         { reportType: REPORT_TYPES[0], reportIndex: 1 },
         { reportType: REPORT_TYPES[1], reportIndex: 2 },
+        { reportType: REPORT_TYPES[2], reportIndex: 3 },
       ],
     };
   }
@@ -458,5 +375,178 @@ export class AppController {
       message: "Sorry, that page does not exist.",
       displayAdmin: displayAdmin,
     };
+  }
+
+  // grabs Grazing Lease display data and displays the grazing lease report page
+  async getGrazingLeaseDisplayData(session, dtid, res) {
+    let isAdmin = false;
+    if (
+      session.data &&
+      session.data.activeAccount &&
+      session.data.activeAccount.client_roles
+    ) {
+      for (let role of session.data.activeAccount.client_roles) {
+        if (role == "ticdi_admin") {
+          isAdmin = true;
+        }
+      }
+    }
+    const title =
+      process.env.ticdi_environment == "DEVELOPMENT"
+        ? "DEVELOPMENT - " + PAGE_TITLES.GRAZING_LEASE
+        : PAGE_TITLES.GRAZING_LEASE;
+    const displayAdmin = isAdmin ? "Administration" : "-";
+    await this.ttlsService.setWebadeToken();
+    let ttlsJSON, primaryContactName;
+    try {
+      const response: any = await firstValueFrom(
+        this.ttlsService.callHttp(dtid)
+      )
+        .then((res) => {
+          return res;
+        })
+        .catch((err) => {
+          console.log("callHttp failed");
+          console.log(err);
+          console.log(err.response.data);
+        });
+      ttlsJSON = await this.ttlsService.sendToBackend(response);
+      ttlsJSON["cityProvPostal"] = this.ttlsService.concatCityProvPostal(
+        response.tenantAddr ? response.tenantAddr[0] : null
+      );
+      if (ttlsJSON.inspected_date) {
+        ttlsJSON["inspected_date"] = this.ttlsService.formatInspectedDate(
+          ttlsJSON.inspected_date.toString()
+        );
+      }
+      primaryContactName = ttlsJSON.licence_holder_name;
+      return res.render("grazing-lease", {
+        title: title,
+        idirUsername: session.data.activeAccount
+          ? session.data.activeAccount.idir_username
+          : "",
+        primaryContactName: primaryContactName,
+        displayAdmin: displayAdmin,
+        message: ttlsJSON,
+        prdid: ttlsJSON.id,
+      });
+    } catch (err) {
+      console.log(err);
+      return res.render("grazing-lease", {
+        title: title,
+        idirUsername: session.data.activeAccount
+          ? session.data.activeAccount.idir_username
+          : "",
+        primaryContactName: primaryContactName ? primaryContactName : null,
+        displayAdmin: displayAdmin,
+        message: ttlsJSON ? ttlsJSON : null,
+        prdid: ttlsJSON ? ttlsJSON.id : null,
+        error: err,
+      });
+    }
+  }
+
+  // grabs NFR data and displays the correct NFR page
+  async getNfrDisplayData(session, dtid, variantName, res) {
+    let ttlsJSON, primaryContactName, nfrData;
+    let isAdmin = false;
+    if (
+      session.data &&
+      session.data.activeAccount &&
+      session.data.activeAccount.client_roles
+    ) {
+      for (let role of session.data.activeAccount.client_roles) {
+        if (role == "ticdi_admin") {
+          isAdmin = true;
+        }
+      }
+    }
+    const title =
+      process.env.ticdi_environment == "DEVELOPMENT"
+        ? "DEVELOPMENT - " + PAGE_TITLES.NOFR
+        : PAGE_TITLES.NOFR;
+    const displayAdmin = isAdmin ? "Administration" : "-";
+    const groupMaxJsonArray = await this.reportService.getGroupMaxByVariant(
+      "NOTICE OF FINAL REVIEW"
+    );
+    try {
+      const nfrDataObject = await this.reportService.getActiveNfrDataByDtid(
+        dtid
+      );
+      nfrData = nfrDataObject.nfrData;
+      const provisionIds = nfrDataObject.provisionIds
+        ? nfrDataObject.provisionIds
+        : [];
+      const mandatoryProvisionIds =
+        await this.reportService.getMandatoryProvisionsByVariant(variantName);
+      await this.ttlsService.setWebadeToken();
+      const response: any = await firstValueFrom(
+        this.ttlsService.callHttp(dtid)
+      )
+        .then((res) => {
+          return res;
+        })
+        .catch((err) => {
+          console.log(err.response.data);
+        });
+      ttlsJSON = await this.ttlsService.formatNFRData(response);
+      primaryContactName = ttlsJSON.licenceHolderName;
+      const interestedParties = nfrInterestedParties(response.tenantAddr);
+      ttlsJSON["interestedParties"] = interestedParties;
+      let selectedVariant = 0;
+      switch (variantName.toLowerCase()) {
+        case NFR_VARIANTS.default.toLowerCase(): {
+          selectedVariant = 0;
+          break;
+        }
+        case NFR_VARIANTS.delayed.toLowerCase(): {
+          selectedVariant = 1;
+          break;
+        }
+        case NFR_VARIANTS.no_fees.toLowerCase(): {
+          selectedVariant = 2;
+          break;
+        }
+        case NFR_VARIANTS.survey_required.toLowerCase(): {
+          selectedVariant = 3;
+          break;
+        }
+        case NFR_VARIANTS.to_obtain_survey.toLowerCase(): {
+          selectedVariant = 4;
+          break;
+        }
+      }
+      return res.render("nfr", {
+        title: title,
+        idirUsername: session.data.activeAccount
+          ? session.data.activeAccount.idir_username
+          : "",
+        primaryContactName: primaryContactName,
+        displayAdmin: displayAdmin,
+        message: ttlsJSON,
+        groupMaxJsonArray: groupMaxJsonArray,
+        documentTypes: NFR_VARIANTS_ARRAY,
+        nfrDataId: nfrData ? nfrData.id : -1,
+        selectedVariant: selectedVariant,
+        mandatoryProvisionList: mandatoryProvisionIds,
+        enabledProvisionList: provisionIds,
+      });
+    } catch (err) {
+      console.log(err);
+      return res.render("nfr", {
+        title: title,
+        idirUsername: session.data.activeAccount
+          ? session.data.activeAccount.idir_username
+          : "",
+        primaryContactName: primaryContactName ? primaryContactName : null,
+        displayAdmin: displayAdmin,
+        message: ttlsJSON ? ttlsJSON : null,
+        groupMaxJsonArray: groupMaxJsonArray,
+        documentTypes: NFR_VARIANTS_ARRAY,
+        nfrDataId: -1,
+        enabledProvisionList: [],
+        error: err,
+      });
+    }
   }
 }

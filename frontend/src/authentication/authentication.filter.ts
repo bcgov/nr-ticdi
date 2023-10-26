@@ -18,7 +18,6 @@ export class AuthenticationFilter implements ExceptionFilter {
       keycloak_login_baseurl + "?" + keycloak_login_params;
   }
   catch(exception: any, host: ArgumentsHost) {
-    console.log(exception);
     if (exception.status == HttpStatus.UNAUTHORIZED) {
       console.log("unauth");
       const ctx = host.switchToHttp();

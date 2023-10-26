@@ -38,10 +38,23 @@ export class PrintRequestLogService {
     });
   }
 
-  async findNextVersion(dtid: number): Promise<string> {
+  async findNextVersion(dtid: number, documentType: string): Promise<string> {
+    let fullDocumentType = "";
+    switch (documentType) {
+      case ("LUR"):
+        fullDocumentType = "LAND USE REPORT";
+        break;
+      case ("GL"):
+        fullDocumentType = "GRAZING LEASE";
+        break;
+      default:
+        fullDocumentType = "LAND USE REPORT";
+        break;
+    }
     const requestLogs = await this.printRequestLogRepository.findAndCount({
       where: {
         dtid: dtid,
+        document_type: fullDocumentType
       },
     });
     let version = (requestLogs[1] + 1).toString();

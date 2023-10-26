@@ -9,6 +9,7 @@ export const PAGE_TITLES = {
 };
 
 export const LUR_REPORT_TYPE = "LAND USE REPORT";
+export const GL_REPORT_TYPE = "GRAZING LEASE"
 
 // Used for admin page dropdown for manage templates page
 export const REPORT_TYPES = [
@@ -24,6 +25,14 @@ export const NFR_VARIANTS_ARRAY = [
   "NOTICE OF FINAL REVIEW (SURVEY REQUIRED)",
   "NOTICE OF FINAL REVIEW (TO OBTAIN SURVEY)",
 ];
+export const REPORT_URLS = [
+  "NOTICE OF FINAL REVIEW",
+  "NOTICE OF FINAL REVIEW (DELAYED)",
+  "NOTICE OF FINAL REVIEW (NO FEES)",
+  "NOTICE OF FINAL REVIEW (SURVEY REQUIRED)",
+  "NOTICE OF FINAL REVIEW (TO OBTAIN SURVEY)",
+  "GRAZING LEASE"
+]
 export const NFR_VARIANTS_ARRAY_FORMATTED = [
   "Notice of Final Review",
   "Notice of Final Review (Delayed)",

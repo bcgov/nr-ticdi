@@ -15,6 +15,7 @@ import {
   NFR_VARIANTS_ARRAY,
   PAGE_TITLES,
   REPORT_TYPES,
+  REPORT_URLS,
 } from "utils/constants";
 import { SessionData } from "utils/types";
 import { AuthenticationGuard } from "./authentication/authentication.guard";
@@ -99,7 +100,6 @@ export class AppController {
     @Req() request: Request,
     @Res() response: Response
   ) {
-    console.log("LUR");
     const hasParams = request.originalUrl.includes("?session_state");
     if (hasParams) {
       const urlWithoutParams = request.path;
@@ -201,22 +201,16 @@ export class AppController {
     @Res() res: Response
   ) {
     const decodedDocumentType = decodeURIComponent(documentType).toUpperCase();
-    console.log(decodedDocumentType);
-    console.log("888");
-    console.log(documentType);
-    console.log("888");
     const hasParams = req.originalUrl.includes("?session_state");
     if (hasParams) {
       const urlWithoutParams = req.path;
       res.redirect(301, urlWithoutParams);
     } else if (
-      !NFR_VARIANTS_ARRAY.includes(decodedDocumentType) &&
-      decodedDocumentType != "GRAZINGLEASE"
-    ) {
+      !REPORT_URLS.includes(decodedDocumentType)    ) {
       const redirectUrl = `/dtid/${dtid}`;
       res.redirect(301, redirectUrl);
     } else {
-      if (decodedDocumentType == "GRAZINGLEASE") {
+      if (decodedDocumentType == "GRAZING LEASE") {
         return this.getGrazingLeaseDisplayData(session, dtid, res);
       } else {
         return this.getNfrDisplayData(session, dtid, documentType, res);

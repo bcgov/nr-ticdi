@@ -42,12 +42,13 @@ export class ReportController {
     };
   }
 
-  @Get("get-report-name/:dtid/:tfn")
+  @Get("get-report-name/:dtid/:tfn/:documentType")
   getReportName(
     @Param("dtid") dtid: number,
-    @Param("tfn") tenureFileNumber: string
+    @Param("tfn") tenureFileNumber: string,
+    @Param("documentType") documentType: string
   ): Promise<{ reportName: string }> {
-    return this.reportService.generateReportName(dtid, tenureFileNumber);
+    return this.reportService.generateReportName(dtid, tenureFileNumber, documentType);
   }
 
   @Get("get-nfr-report-name/:dtid/:tfn")
@@ -58,15 +59,15 @@ export class ReportController {
     return this.reportService.generateNFRReportName(dtid, tenureFileNumber);
   }
 
-  @Post("generate-lur-report")
+  @Post("generate-report")
   @Header(
     "Content-Type",
     "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
   )
   @Header("Content-Disposition", "attachment; filename=landusereport.docx")
-  async generateLURReport(
+  async generateReport(
     @Session() session: { data: SessionData },
-    @Body() data: { prdid: string; document_type: string }
+    @Body() data: { prdid: string; document_type: string, dtid: number }
   ) {
     // this should eventually check permissions and prevent unauthorized users from generating documents
     let idir_username = "";
@@ -76,10 +77,15 @@ export class ReportController {
     } else {
       console.log("no active account found");
     }
-
-    return new StreamableFile(
-      await this.reportService.generateLURReport(+data.prdid, idir_username)
-    );
+    if (data.document_type == 'GL') {
+      return new StreamableFile(
+        await this.reportService.generateGLReport(+data.dtid, idir_username)
+      );
+    } else {
+      return new StreamableFile(
+        await this.reportService.generateLURReport(+data.prdid, idir_username)
+      );
+    }
   }
 
   @Post("generate-nfr-report")

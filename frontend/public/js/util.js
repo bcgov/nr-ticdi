@@ -1,10 +1,10 @@
-async function generateReport() {
+async function generateReport(documentType) {
   const tenureFileNumber = $("#tfn").text();
   const prdid = $("#prdid").text();
   const dtid = $("#dtid").text();
   $("#genReport").prop("disabled", true);
   const reportName = await fetch(
-    `/report/get-report-name/${dtid}/${tenureFileNumber}`,
+    `/report/get-report-name/${dtid}/${tenureFileNumber}/${documentType}`,
     {
       method: "GET",
       headers: {
@@ -20,12 +20,13 @@ async function generateReport() {
     .catch(() => {
       location.reload();
     });
-  const document_type = $("#document_type_id option:selected").text();
+  console.log(reportName)
   const data = {
     prdid: prdid,
-    document_type: document_type,
+    dtid: dtid,
+    document_type: documentType,
   };
-  fetch(`/report/generate-lur-report`, {
+  fetch(`/report/generate-report`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

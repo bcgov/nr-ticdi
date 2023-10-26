@@ -27,8 +27,8 @@ export class PrintRequestLogController {
     return this.printRequestLogService.findByDtid(+dtid);
   }
 
-  @Get("version/:dtid")
-  findNextVersion(@Param("dtid") dtid: string): Promise<string> {
-    return this.printRequestLogService.findNextVersion(+dtid);
+  @Get("version/:dtid/:documentType")
+  findNextVersion(@Param("dtid") dtid: string, @Param("documentType") documentType: string): Promise<string> {
+    return this.printRequestLogService.findNextVersion(+dtid, documentType);
   }
 }

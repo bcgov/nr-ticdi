@@ -33,7 +33,7 @@ export function formatPostalCode(value: string) {
  * <city prov postalCode>
  */
 export function nfrAddressBuilder(tenantAddr: any[]): string {
-  const formattedAddresses: string[] = []
+  const formattedAddresses: string[] = [];
   for (const addressObj of tenantAddr) {
     const {
       legalName,
@@ -47,10 +47,9 @@ export function nfrAddressBuilder(tenantAddr: any[]): string {
       provAbbr,
       postalCode,
     } = addressObj;
-    console.log(addressObj)
+    const formattedAddress: string[] = [];
 
     let name = null;
-
     if (legalName) {
       name = legalName;
     } else if (firstName || middleName || lastName) {
@@ -59,16 +58,6 @@ export function nfrAddressBuilder(tenantAddr: any[]): string {
         (part) => part !== null && part !== undefined
       );
       name = filteredParts.join(" ");
-    }
-    let addrLines = '';
-    if (addrLine1 && addrLine1.length > 0) {
-      addrLines = addrLine1;
-    }
-    if (addrLine2 && addrLine2.length > 0) {
-      addrLines = [addrLines, addrLine2].join('\n');
-    }
-    if (addrLine3 && addrLine3.length > 0) {
-      addrLines = [addrLines, addrLine3].join('\n');
     }
 
     const parts = [];
@@ -83,8 +72,12 @@ export function nfrAddressBuilder(tenantAddr: any[]): string {
     }
     const address = parts.join(" ");
 
-    // combine name, addrLines, and address
-    formattedAddresses.push([name, addrLines, address].join('\n'));
+    formattedAddress.push(name);
+    if (addrLine1) formattedAddress.push(addrLine1);
+    if (addrLine2) formattedAddress.push(addrLine2);
+    if (addrLine3) formattedAddress.push(addrLine3);
+    formattedAddress.push(address);
+    formattedAddresses.push(formattedAddress.join("\n"));
   }
   return formattedAddresses.join("\n");
 }

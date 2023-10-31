@@ -33,7 +33,7 @@ export function formatPostalCode(value: string) {
  * <city prov postalCode>
  */
 export function nfrAddressBuilder(tenantAddr: any[]): string {
-  const addressMap = new Map<string, string[]>();
+  const formattedAddresses: string[] = []
   for (const addressObj of tenantAddr) {
     const {
       legalName,
@@ -41,10 +41,13 @@ export function nfrAddressBuilder(tenantAddr: any[]): string {
       middleName,
       lastName,
       addrLine1,
+      addrLine2,
+      addrLine3,
       city,
       provAbbr,
       postalCode,
     } = addressObj;
+    console.log(addressObj)
 
     let name = null;
 
@@ -57,6 +60,17 @@ export function nfrAddressBuilder(tenantAddr: any[]): string {
       );
       name = filteredParts.join(" ");
     }
+    let addrLines = '';
+    if (addrLine1 && addrLine1.length > 0) {
+      addrLines = addrLine1;
+    }
+    if (addrLine2 && addrLine2.length > 0) {
+      addrLines = [addrLines, addrLine2].join('\n');
+    }
+    if (addrLine3 && addrLine3.length > 0) {
+      addrLines = [addrLines, addrLine3].join('\n');
+    }
+
     const parts = [];
     if (city) {
       parts.push(city);
@@ -69,24 +83,121 @@ export function nfrAddressBuilder(tenantAddr: any[]): string {
     }
     const address = parts.join(" ");
 
-    const key = [addrLine1, address].join(",");
-    if (!addressMap.has(key)) {
-      addressMap.set(key, []);
-    }
-
-    const addressParts = [];
-    if (name) {
-      addressParts.push(name);
-    }
-    addressMap.get(key)?.push(addressParts.join("\n"));
-  }
-
-  const formattedAddresses: string[] = [];
-  for (const [key, addresses] of addressMap.entries()) {
-    const [addrLine1, cityProvAbbrPostalCode] = key.split(",");
-    formattedAddresses.push(...addresses, addrLine1, cityProvAbbrPostalCode);
+    // combine name, addrLines, and address
+    formattedAddresses.push([name, addrLines, address].join('\n'));
   }
   return formattedAddresses.join("\n");
+}
+
+export function grazingLeaseVariables(tenantAddr: [{
+  addrLine1: string;
+  addrLine2: string;
+  addrLine3: string;
+  addrType: string;
+  firstName: string;
+  middleName: string;
+  lastName: string;
+  legalName: string;
+}], interestParcel: [{
+  legalDescription: string;
+}], regVars: {regOfficeStreet: string, regOfficeCity: string, regOfficeProv: string, regOfficePostalCode: string}): 
+{streetAddress: string; streetName: string; streetCorp: string; mailingAddress: string; mailingName: string; mailingCorp: string; legalDescription: string; addressRegionalOffice: string} {
+  let streetAddress = '';
+  let streetName = '';
+  let streetCorp = '';
+  let mailingAddress = '';
+  let mailingName = '';
+  let mailingCorp = '';
+  let legalDescription = '';
+  let addressRegionalOffice = '';
+
+  if (tenantAddr) {
+    for (let tenant of tenantAddr) {
+      if (tenant.addrType == 'MAILING') {
+        const tempMailingAddress = getMailingAddress(tenant);
+        mailingAddress = mailingAddress.length > 0 ? [mailingAddress, tempMailingAddress].join('\n ') : tempMailingAddress;
+        const tempMailingName = getFullName(tenant);
+        mailingName = mailingName.length > 0 ? [mailingName, tempMailingName].join('\n ') : tempMailingName;
+        const tempMailingCorp = getCorp(tenant);
+        mailingCorp = mailingCorp.length > 0 ? [mailingCorp, tempMailingCorp].join('\n ') : tempMailingCorp;
+      } else if (tenant.addrType == 'STREET') {
+        const tempStreetAddress = getMailingAddress(tenant);
+        streetAddress = streetAddress.length > 0 ? [streetAddress, tempStreetAddress].join('\n ') : tempStreetAddress;
+        const tempStreetName = getFullName(tenant);
+        streetName = streetName.length > 0 ? [streetName, tempStreetName].join('\n ') : tempStreetName;
+        const tempStreetCorp = getCorp(tenant);
+        streetCorp = streetCorp.length > 0 ? [streetCorp, tempStreetCorp].join('\n ') : tempStreetCorp;
+      }
+    }
+  
+    // if either address is empty, set it to the other
+    if (mailingAddress.length == 0) {
+      mailingAddress = streetAddress;
+    }
+    if (streetAddress.length == 0) {
+      streetAddress = mailingAddress;
+    }
+    // if either name is empty, set it to the other
+    if (mailingName.length == 0) {
+      mailingName = streetName;
+    }
+    if (streetName.length == 0) {
+      streetName = mailingName;
+    }
+    // if either corp is empty, set it to the other
+    if (mailingCorp.length == 0) {
+      mailingCorp = streetCorp;
+    }
+    if (streetCorp.length == 0) {
+      streetCorp = mailingCorp;
+    }
+  }
+  if (interestParcel) {
+    for (let parcel of interestParcel) {
+      const tempLegalDescription = parcel.legalDescription;
+      legalDescription = legalDescription.length > 0 ? [legalDescription, tempLegalDescription].join('\n ') : tempLegalDescription;
+    }
+  }
+  if (regVars.regOfficeStreet.length > 0) {
+    addressRegionalOffice = regVars.regOfficeStreet;
+  }
+  if (regVars.regOfficeCity.length > 0) {
+    addressRegionalOffice = [addressRegionalOffice, regVars.regOfficeCity].join(', ');
+  }
+  if (regVars.regOfficeProv.length > 0) {
+    addressRegionalOffice = [addressRegionalOffice, regVars.regOfficeProv].join(', ');
+  }
+  if (regVars.regOfficePostalCode.length > 0) {
+    addressRegionalOffice = [addressRegionalOffice, regVars.regOfficePostalCode].join(', ');
+  }
+
+  return {streetAddress, streetName, streetCorp, mailingAddress, mailingName, mailingCorp, legalDescription, addressRegionalOffice}
+}
+
+function getFullName(tenant: {
+  firstName: string;
+  middleName: string;
+  lastName: string;
+}): string {
+  const nameParts = [];
+  if (tenant.firstName !== null) {
+    nameParts.push(tenant.firstName);
+  }
+  if (tenant.middleName !== null) {
+    nameParts.push(tenant.middleName);
+  }
+  if (tenant.lastName !== null) {
+    nameParts.push(tenant.lastName);
+  }
+  const fullName = nameParts.join(' ');
+
+  return fullName;
+}
+
+function getCorp(tenant: {
+  legalName: string;
+}): string {
+  return tenant.legalName??'';
 }
 
 export function getMailingAddress(tenantAddr: {

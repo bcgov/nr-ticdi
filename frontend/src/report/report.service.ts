@@ -13,6 +13,7 @@ import { ProvisionJSON, VariableJSON } from "utils/types";
 import {
   convertToSpecialCamelCase,
   formatMoney,
+  grazingLeaseVariables,
   nfrAddressBuilder,
 } from "utils/util";
 const axios = require("axios");
@@ -167,30 +168,27 @@ export class ReportService {
       .then((res) => {
         return res.data;
       });
-    const interestParcel = rawData.interestParcel[0];
+    const interestParcel = rawData.interestParcel;
     const tenantAddr = rawData.tenantAddr;
+    const regVars =  
+      {
+        regOfficeStreet: rawData && rawData.regOfficeStreet ? rawData.regOfficeStreet : '',
+        regOfficeCity: rawData && rawData.regOfficeCity ? rawData.regOfficeCity : '',
+        regOfficeProv: rawData && rawData.regOfficeProv ? rawData.regOfficeProv : '',
+        regOfficePostalCode: rawData && rawData.regOfficePostalCode ? rawData.regOfficePostalCode : ''
+      }
+    const glVariables = grazingLeaseVariables(tenantAddr, interestParcel, regVars);
 
     // TODO get these variables
     const data = {
       DB_File_Number: rawData.fileNum,
       DB_Document_Number: dtid,
-      DB_Address_Street_Tenant: "PLACEHOLDER",
-      DB_Address_Regional_Office: nfrAddressBuilder([
-        {
-          addrLine1: rawData.regOfficeStreet,
-          city: rawData.regOfficeCity,
-          provAbbr: rawData.regOfficeProv,
-          postalCode: rawData.regOfficePostalCode,
-        },
-      ]),
-      DB_Address_Mailing_Tenant: tenantAddr[0]
-        ? nfrAddressBuilder(tenantAddr)
-        : "",
-      DB_Name_Tenant: this.ttlsService.getLicenceHolder(tenantAddr),
-      DB_Name_Corporation: tenantAddr.contactCompanyName,
-      DB_Legal_Description: interestParcel
-        ? interestParcel.legalDescription
-        : "",
+      DB_Address_Street_Tenant: glVariables.streetAddress,
+      DB_Address_Regional_Office: glVariables.addressRegionalOffice,
+      DB_Address_Mailing_Tenant: glVariables.mailingAddress,
+      DB_Name_Tenant: glVariables.mailingName,
+      DB_Name_Corporation: glVariables.mailingCorp,
+      DB_Legal_Description: glVariables.legalDescription,
     };
 
     // log the request

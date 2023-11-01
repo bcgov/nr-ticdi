@@ -18,6 +18,7 @@ export class PrintRequestLogService {
     newItem.document_template_id = printRequestLog.document_template_id;
     newItem.print_request_detail_id = printRequestLog.print_request_detail_id;
     newItem.dtid = printRequestLog.dtid;
+    newItem.document_type = printRequestLog.document_type;
     newItem.request_app_user = printRequestLog.request_app_user;
     newItem.request_json = printRequestLog.request_json;
     newItem.create_userid = printRequestLog.request_app_user; // same as request_app_user
@@ -37,10 +38,23 @@ export class PrintRequestLogService {
     });
   }
 
-  async findNextVersion(dtid: number): Promise<string> {
+  async findNextVersion(dtid: number, documentType: string): Promise<string> {
+    let fullDocumentType = "";
+    switch (documentType) {
+      case ("LUR"):
+        fullDocumentType = "LAND USE REPORT";
+        break;
+      case ("GL"):
+        fullDocumentType = "GRAZING LEASE";
+        break;
+      default:
+        fullDocumentType = "LAND USE REPORT";
+        break;
+    }
     const requestLogs = await this.printRequestLogRepository.findAndCount({
       where: {
         dtid: dtid,
+        document_type: fullDocumentType
       },
     });
     let version = (requestLogs[1] + 1).toString();

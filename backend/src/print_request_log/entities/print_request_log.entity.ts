@@ -16,6 +16,8 @@ export class PrintRequestLog {
   print_request_detail_id: number;
   @Column({ nullable: true })
   dtid: number;
+  @Column({nullable: true})
+  document_type: string;
   @Column({ nullable: true })
   request_app_user: string;
   @Column({ nullable: true })
@@ -33,6 +35,7 @@ export class PrintRequestLog {
     document_template_id?: number,
     print_request_detail_id?: number,
     dtid?: number,
+    document_type?: string,
     request_app_user?: string,
     request_json?: string,
     create_userid?: string,
@@ -41,6 +44,7 @@ export class PrintRequestLog {
     this.document_template_id = document_template_id || null;
     this.print_request_detail_id = print_request_detail_id || null;
     this.dtid = dtid || null;
+    this.document_type = document_type || "";
     this.request_app_user = request_app_user || "";
     this.request_json = request_json || "";
     this.create_userid = create_userid || "";

@@ -4,8 +4,8 @@ import * as dotenv from "dotenv";
 import { firstValueFrom } from "rxjs";
 import { TTLSService } from "src/ttls/ttls.service";
 import {
+  GL_REPORT_TYPE,
   LUR_REPORT_TYPE,
-  REPORT_TYPES,
   numberWords,
   sectionTitles,
 } from "utils/constants";
@@ -13,7 +13,7 @@ import { ProvisionJSON, VariableJSON } from "utils/types";
 import {
   convertToSpecialCamelCase,
   formatMoney,
-  formatPostalCode,
+  grazingLeaseVariables,
   nfrAddressBuilder,
 } from "utils/util";
 const axios = require("axios");
@@ -25,7 +25,6 @@ let port: number;
 @Injectable()
 export class ReportService {
   constructor(
-    private readonly httpService: HttpService,
     private readonly ttlsService: TTLSService
   ) {
     hostname = process.env.backend_url
@@ -43,8 +42,8 @@ export class ReportService {
    * @param tenureFileNumber
    * @returns
    */
-  async generateReportName(dtid: number, tenureFileNumber: string) {
-    const url = `${hostname}:${port}/print-request-log/version/` + dtid;
+  async generateReportName(dtid: number, tenureFileNumber: string, documentType:string) {
+    const url = `${hostname}:${port}/print-request-log/version/${dtid}/${documentType}`;
     // grab the next version string for the dtid
     const version = await axios
       .get(url, {
@@ -55,20 +54,19 @@ export class ReportService {
       .then((res) => {
         return res.data;
       });
-    return { reportName: "LUR_" + tenureFileNumber + "_" + version };
+    return { reportName: documentType + "_" + tenureFileNumber + "_" + version };
   }
 
   /**
-   * Generates the Land use Report using CDOGS
+   * Generates the Land Use Report using CDOGS
    *
    * @param prdid
-   * @param document_type
    * @param username
    * @returns
    */
   async generateLURReport(prdid: number, username: string) {
     const documentType = LUR_REPORT_TYPE;
-    const url = `${hostname}:${port}/print-request-detail/view/` + prdid;
+    const url = `${hostname}:${port}/print-request-detail/view/${prdid}`;
     const templateUrl = `${hostname}:${port}/document-template/get-active-report/${documentType}`;
     const logUrl = `${hostname}:${port}/print-request-log/`;
 
@@ -100,6 +98,7 @@ export class ReportService {
     await axios.post(logUrl, {
       document_template_id: document_template_id,
       print_request_detail_id: prdid,
+      document_type: documentType,
       dtid: data.DTID,
       request_app_user: username,
       request_json: JSON.stringify(data),
@@ -115,7 +114,105 @@ export class ReportService {
         cacheReport: false,
         convertTo: "docx",
         overwrite: true,
-        reportName: "lur-report",
+        reportName: "ticdi-report",
+      },
+      template: {
+        content: `${bufferBase64}`,
+        encodingType: "base64",
+        fileType: "docx",
+      },
+    });
+
+    const conf = {
+      method: "post",
+      url: process.env.cdogs_url,
+      headers: {
+        Authorization: `Bearer ${cdogsToken}`,
+        "Content-Type": "application/json",
+      },
+      responseType: "arraybuffer",
+      data: md,
+    };
+    const ax = require("axios");
+    const response = await ax(conf).catch((error) => {
+      console.log(error.response);
+    });
+    return response.data;
+  }
+
+  /**
+   * Generates the Land Use Report using CDOGS
+   *
+   * @param prdid
+   * @param username
+   * @returns
+   */
+  async generateGLReport(dtid: number, username: string) {
+    const documentType = GL_REPORT_TYPE;
+    const templateUrl = `${hostname}:${port}/document-template/get-active-report/${documentType}`;
+    const logUrl = `${hostname}:${port}/print-request-log/`;
+
+    // get raw ttls data for later
+    await this.ttlsService.setWebadeToken();
+    const rawData: any = await firstValueFrom(this.ttlsService.callHttp(dtid))
+      .then((res) => {
+        return res;
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+
+    // get the document template
+    const documentTemplateObject: { id: number; the_file: string } = await axios
+      .get(templateUrl)
+      .then((res) => {
+        return res.data;
+      });
+    const interestParcel = rawData.interestParcel;
+    const tenantAddr = rawData.tenantAddr;
+    const regVars =  
+      {
+        regOfficeStreet: rawData && rawData.regOfficeStreet ? rawData.regOfficeStreet : '',
+        regOfficeCity: rawData && rawData.regOfficeCity ? rawData.regOfficeCity : '',
+        regOfficeProv: rawData && rawData.regOfficeProv ? rawData.regOfficeProv : '',
+        regOfficePostalCode: rawData && rawData.regOfficePostalCode ? rawData.regOfficePostalCode : ''
+      }
+    const glVariables = grazingLeaseVariables(tenantAddr, interestParcel, regVars);
+
+    // TODO get these variables
+    const data = {
+      DB_File_Number: rawData.fileNum,
+      DB_Document_Number: dtid,
+      DB_Address_Street_Tenant: glVariables.streetAddress,
+      DB_Address_Regional_Office: glVariables.addressRegionalOffice,
+      DB_Address_Mailing_Tenant: glVariables.mailingAddress,
+      DB_Name_Tenant: glVariables.mailingName,
+      DB_Name_Corporation: glVariables.mailingCorp,
+      DB_Legal_Description: glVariables.legalDescription,
+    };
+
+    // log the request
+    const document_template_id = documentTemplateObject.id;
+    await axios.post(logUrl, {
+      document_template_id: document_template_id,
+      print_request_detail_id: null,
+      document_type: documentType,
+      dtid: dtid,
+      request_app_user: username,
+      request_json: JSON.stringify(data),
+    });
+
+    const cdogsToken = await this.ttlsService.callGetToken();
+    const bufferBase64 = documentTemplateObject.the_file;
+    const md = JSON.stringify({
+      data,
+      formatters:
+        '{"myFormatter":"_function_myFormatter|function(data) { return data.slice(1); }","myOtherFormatter":"_function_myOtherFormatter|function(data) {return data.slice(2);}"}',
+      options: {
+        cacheReport: false,
+        convertTo: "docx",
+        overwrite: true,
+        reportName: "ticdi-report",
       },
       template: {
         content: `${bufferBase64}`,

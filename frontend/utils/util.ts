@@ -73,9 +73,12 @@ export function nfrAddressBuilder(tenantAddr: any[]): string {
     const address = parts.join(" ");
 
     formattedAddress.push(name);
-    if (addrLine1) formattedAddress.push(addrLine1);
-    if (addrLine2) formattedAddress.push(addrLine2);
-    if (addrLine3) formattedAddress.push(addrLine3);
+    let addressLines = [];
+    if (addrLine1) addressLines.push(addrLine1);
+    if (addrLine2) addressLines.push(addrLine2);
+    if (addrLine3) addressLines.push(addrLine3);
+    let joinedAddressLines = addressLines.join(', ');
+    formattedAddress.push(joinedAddressLines);
     formattedAddress.push(address);
     formattedAddresses.push(formattedAddress.join("\n"));
   }

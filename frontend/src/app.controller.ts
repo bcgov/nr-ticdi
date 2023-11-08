@@ -205,12 +205,11 @@ export class AppController {
     if (hasParams) {
       const urlWithoutParams = req.path;
       res.redirect(301, urlWithoutParams);
-    } else if (
-      !REPORT_URLS.includes(decodedDocumentType)    ) {
+    } else if (!REPORT_URLS.includes(decodedDocumentType)) {
       const redirectUrl = `/dtid/${dtid}`;
       res.redirect(301, redirectUrl);
     } else {
-      if (decodedDocumentType == "GRAZING LEASE") {
+      if (decodedDocumentType == "GRAZING LEASE" || "AGRICULTURAL LEASE - U - GRAZING – MP") {
         return this.getGrazingLeaseDisplayData(session, dtid, res);
       } else {
         return this.getNfrDisplayData(session, dtid, documentType, res);

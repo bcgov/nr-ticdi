@@ -372,6 +372,7 @@ export class AppController {
 
   // grabs Grazing Lease display data and displays the grazing lease report page
   async getGrazingLeaseDisplayData(session, dtid, res) {
+    console.log("grazing lease");
     let isAdmin = false;
     if (
       session.data &&

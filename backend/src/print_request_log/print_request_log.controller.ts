@@ -14,6 +14,7 @@ export class PrintRequestLogController {
     @Body()
     printRequestLog: CreatePrintRequestLogDto
   ): Promise<PrintRequestLog> {
+    console.log('Creating log entry for requested document.')
     return this.printRequestLogService.create(printRequestLog);
   }
 

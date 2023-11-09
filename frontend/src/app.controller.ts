@@ -184,10 +184,11 @@ export class AppController {
   }
 
   /**
-   * Renders the survey required NFR report page
+   * Renders the non-LUR report pages
    *
    * @param session
    * @param dtid
+   * @param documentType
    * @returns
    */
   @Get("dtid/:dtid/:documentType")
@@ -200,6 +201,7 @@ export class AppController {
     @Req() req: Request,
     @Res() res: Response
   ) {
+    console.log('rendering NFR / GL page')
     const decodedDocumentType = decodeURIComponent(documentType).toUpperCase();
     const hasParams = req.originalUrl.includes("?session_state");
     if (hasParams) {

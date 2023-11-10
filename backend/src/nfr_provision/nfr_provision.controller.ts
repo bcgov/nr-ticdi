@@ -102,6 +102,7 @@ export class NFRProvisionController {
 
   @Get("get-provision-variables/variant/:variant")
   getVariablesByVariant(@Param("variant") variantName: string) {
+    console.log('get-provision-variables')
     return this.nfrProvisionService.getVariablesByVariant(variantName);
   }
 

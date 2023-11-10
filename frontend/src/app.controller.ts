@@ -83,6 +83,43 @@ export class AppController {
     };
   }
 
+  
+  /**
+   * Renders the non-LUR report pages
+   *
+   * @param session
+   * @param dtid
+   * @param documentType
+   * @returns
+   */
+  @Get("dtid/:dtid/:documentType")
+  @UseFilters(AuthenticationFilter)
+  @UseGuards(AuthenticationGuard)
+  async reportPage(
+    @Session() session: { data?: SessionData },
+    @Param("dtid") dtid: number,
+    @Param("documentType") documentType,
+    @Req() req: Request,
+    @Res() res: Response
+  ) {
+    console.log('rendering NFR / GL page!!!')
+    const decodedDocumentType = decodeURIComponent(documentType).toUpperCase();
+    const hasParams = req.originalUrl.includes("?session_state");
+    if (hasParams) {
+      const urlWithoutParams = req.path;
+      res.redirect(301, urlWithoutParams);
+    } else if (!REPORT_URLS.includes(decodedDocumentType)) {
+      const redirectUrl = `/dtid/${dtid}`;
+      res.redirect(301, redirectUrl);
+    } else {
+      if (decodedDocumentType == "GRAZING LEASE" || "AGRICULTURAL LEASE - U - GRAZING – MP") {
+        return this.getGrazingLeaseDisplayData(session, dtid, res);
+      } else {
+        return this.getNfrDisplayData(session, dtid, documentType, res);
+      }
+    }
+  }
+
   /**
    * Renders the LUR report page
    *
@@ -100,6 +137,7 @@ export class AppController {
     @Req() request: Request,
     @Res() response: Response
   ) {
+    console.log('lur report')
     const hasParams = request.originalUrl.includes("?session_state");
     if (hasParams) {
       const urlWithoutParams = request.path;
@@ -179,42 +217,6 @@ export class AppController {
           prdid: ttlsJSON ? ttlsJSON.id : null,
           error: err,
         };
-      }
-    }
-  }
-
-  /**
-   * Renders the non-LUR report pages
-   *
-   * @param session
-   * @param dtid
-   * @param documentType
-   * @returns
-   */
-  @Get("dtid/:dtid/:documentType")
-  @UseFilters(AuthenticationFilter)
-  @UseGuards(AuthenticationGuard)
-  async reportPage(
-    @Session() session: { data?: SessionData },
-    @Param("dtid") dtid: number,
-    @Param("documentType") documentType: string,
-    @Req() req: Request,
-    @Res() res: Response
-  ) {
-    console.log('rendering NFR / GL page')
-    const decodedDocumentType = decodeURIComponent(documentType).toUpperCase();
-    const hasParams = req.originalUrl.includes("?session_state");
-    if (hasParams) {
-      const urlWithoutParams = req.path;
-      res.redirect(301, urlWithoutParams);
-    } else if (!REPORT_URLS.includes(decodedDocumentType)) {
-      const redirectUrl = `/dtid/${dtid}`;
-      res.redirect(301, redirectUrl);
-    } else {
-      if (decodedDocumentType == "GRAZING LEASE" || "AGRICULTURAL LEASE - U - GRAZING – MP") {
-        return this.getGrazingLeaseDisplayData(session, dtid, res);
-      } else {
-        return this.getNfrDisplayData(session, dtid, documentType, res);
       }
     }
   }

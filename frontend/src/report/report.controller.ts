@@ -147,7 +147,7 @@ export class ReportController {
     @Param("variantName") variantName: string,
     @Param("dtid") dtid: number
   ) {
-    console.log("getting variables");
+    console.log("getting variables for NFR");
     const variables = await this.reportService.getNFRVariablesByVariantAndDtid(
       variantName,
       dtid

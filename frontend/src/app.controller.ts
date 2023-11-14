@@ -104,19 +104,10 @@ export class AppController {
   ) {
     console.log('rendering NFR / GL page!!!')
     const decodedDocumentType = decodeURIComponent(documentType).toUpperCase();
-    const hasParams = req.originalUrl.includes("?session_state");
-    if (hasParams) {
-      const urlWithoutParams = req.path;
-      res.redirect(301, urlWithoutParams);
-    } else if (!REPORT_URLS.includes(decodedDocumentType)) {
-      const redirectUrl = `/dtid/${dtid}`;
-      res.redirect(301, redirectUrl);
+    if (decodedDocumentType == "GRAZING LEASE" || decodedDocumentType == "AGRICULTURAL LEASE - U - GRAZING – MP") {
+      return this.getGrazingLeaseDisplayData(session, dtid, res);
     } else {
-      if (decodedDocumentType == "GRAZING LEASE" || "AGRICULTURAL LEASE - U - GRAZING – MP") {
-        return this.getGrazingLeaseDisplayData(session, dtid, res);
-      } else {
-        return this.getNfrDisplayData(session, dtid, documentType, res);
-      }
+      return this.getNfrDisplayData(session, dtid, documentType, res);
     }
   }
 
@@ -138,86 +129,80 @@ export class AppController {
     @Res() response: Response
   ) {
     console.log('lur report')
-    const hasParams = request.originalUrl.includes("?session_state");
-    if (hasParams) {
-      const urlWithoutParams = request.path;
-      response.redirect(301, urlWithoutParams);
-    } else {
-      let isAdmin = false;
-      if (
-        session.data &&
-        session.data.activeAccount &&
-        session.data.activeAccount.client_roles
-      ) {
-        for (let role of session.data.activeAccount.client_roles) {
-          if (role == "ticdi_admin") {
-            isAdmin = true;
-          }
+    let isAdmin = false;
+    if (
+      session.data &&
+      session.data.activeAccount &&
+      session.data.activeAccount.client_roles
+    ) {
+      for (let role of session.data.activeAccount.client_roles) {
+        if (role == "ticdi_admin") {
+          isAdmin = true;
         }
       }
-      const title =
-        process.env.ticdi_environment == "DEVELOPMENT"
-          ? "DEVELOPMENT - " + PAGE_TITLES.INDEX
-          : PAGE_TITLES.INDEX;
-      const displayAdmin = isAdmin ? "Administration" : "-";
-      await this.ttlsService.setWebadeToken();
-      let ttlsJSON, primaryContactName;
-      try {
-        const response: any = await firstValueFrom(
-          this.ttlsService.callHttp(id)
-        )
-          .then((res) => {
-            return res;
-          })
-          .catch((err) => {
-            console.log("callHttp failed");
-            console.log(err);
-            console.log(err.response.data);
-          });
-        ttlsJSON = await this.ttlsService.sendToBackend(response);
-        ttlsJSON["cityProvPostal"] = this.ttlsService.concatCityProvPostal(
-          response.tenantAddr ? response.tenantAddr[0] : null
+    }
+    const title =
+      process.env.ticdi_environment == "DEVELOPMENT"
+        ? "DEVELOPMENT - " + PAGE_TITLES.INDEX
+        : PAGE_TITLES.INDEX;
+    const displayAdmin = isAdmin ? "Administration" : "-";
+    await this.ttlsService.setWebadeToken();
+    let ttlsJSON, primaryContactName;
+    try {
+      const response: any = await firstValueFrom(
+        this.ttlsService.callHttp(id)
+      )
+        .then((res) => {
+          return res;
+        })
+        .catch((err) => {
+          console.log("callHttp failed");
+          console.log(err);
+          console.log(err.response.data);
+        });
+      ttlsJSON = await this.ttlsService.sendToBackend(response);
+      ttlsJSON["cityProvPostal"] = this.ttlsService.concatCityProvPostal(
+        response.tenantAddr ? response.tenantAddr[0] : null
+      );
+      if (ttlsJSON.inspected_date) {
+        ttlsJSON["inspected_date"] = this.ttlsService.formatInspectedDate(
+          ttlsJSON.inspected_date.toString()
         );
-        if (ttlsJSON.inspected_date) {
-          ttlsJSON["inspected_date"] = this.ttlsService.formatInspectedDate(
-            ttlsJSON.inspected_date.toString()
-          );
-        }
-        primaryContactName = ttlsJSON.licence_holder_name;
-        return {
-          title: title,
-          idirUsername: session.data.activeAccount
-            ? session.data.activeAccount.idir_username
-            : "",
-          primaryContactName: primaryContactName,
-          displayAdmin: displayAdmin,
-          message: ttlsJSON,
-          documentTypes: [
-            "Land Use Report",
-            "Notice of Final Review",
-            "Grazing Lease",
-          ],
-          prdid: ttlsJSON.id,
-        };
-      } catch (err) {
-        console.log(err);
-        return {
-          title: title,
-          idirUsername: session.data.activeAccount
-            ? session.data.activeAccount.idir_username
-            : "",
-          primaryContactName: primaryContactName ? primaryContactName : null,
-          displayAdmin: displayAdmin,
-          message: ttlsJSON ? ttlsJSON : null,
-          documentTypes: [
-            "Land Use Report",
-            "Notice of Final Review",
-            "Grazing Lease",
-          ],
-          prdid: ttlsJSON ? ttlsJSON.id : null,
-          error: err,
-        };
       }
+      primaryContactName = ttlsJSON.licence_holder_name;
+      return {
+        title: title,
+        idirUsername: session.data.activeAccount
+          ? session.data.activeAccount.idir_username
+          : "",
+        primaryContactName: primaryContactName,
+        displayAdmin: displayAdmin,
+        message: ttlsJSON,
+        documentTypes: [
+          "Land Use Report",
+          "Notice of Final Review",
+          "Grazing Lease",
+        ],
+        prdid: ttlsJSON.id,
+      };
+    } catch (err) {
+      console.log(err);
+      return {
+        title: title,
+        idirUsername: session.data.activeAccount
+          ? session.data.activeAccount.idir_username
+          : "",
+        primaryContactName: primaryContactName ? primaryContactName : null,
+        displayAdmin: displayAdmin,
+        message: ttlsJSON ? ttlsJSON : null,
+        documentTypes: [
+          "Land Use Report",
+          "Notice of Final Review",
+          "Grazing Lease",
+        ],
+        prdid: ttlsJSON ? ttlsJSON.id : null,
+        error: err,
+      };
     }
   }
 

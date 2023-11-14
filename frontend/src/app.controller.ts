@@ -102,7 +102,7 @@ export class AppController {
     @Req() req: Request,
     @Res() res: Response
   ) {
-    console.log('rendering NFR / GL page!!!')
+    console.log('Rendering NFR / GL page!')
     const decodedDocumentType = decodeURIComponent(documentType).toUpperCase();
     const hasParams = req.originalUrl.includes("?session_state");
     if (hasParams) {

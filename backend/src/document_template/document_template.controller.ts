@@ -26,6 +26,7 @@ export class DocumentTemplateController {
     file: Express.Multer.File,
     @Body() params: CreateDocumentTemplateDto
   ): Promise<any> {
+    console.log('Uploading new file!')
     const params2 = {
       document_type: params.document_type,
       template_author: params.template_author,

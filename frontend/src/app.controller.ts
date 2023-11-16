@@ -103,8 +103,10 @@ export class AppController {
     @Res() res: Response
   ) {
     console.log('rendering NFR / GL page!!!')
-    const decodedDocumentType = decodeURIComponent(documentType).toUpperCase();
-    if (decodedDocumentType == "GRAZING LEASE" || decodedDocumentType == "AGRICULTURAL LEASE - U - GRAZING – MP") {
+    let decodedDocumentType = decodeURIComponent(documentType)
+    decodedDocumentType = decodedDocumentType.toUpperCase().replace(/\s+/g, "").replace(/-/g, "").replace(/–/g,"");
+    console.log(decodedDocumentType)
+    if (decodedDocumentType == "GRAZINGLEASE" || decodedDocumentType == "AGRICULTURALLEASEUGRAZINGMP") {
       return this.getGrazingLeaseDisplayData(session, dtid, res);
     } else {
       return this.getNfrDisplayData(session, dtid, documentType, res);

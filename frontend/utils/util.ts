@@ -33,7 +33,8 @@ export function formatPostalCode(value: string) {
  * <city prov postalCode>
  */
 export function nfrAddressBuilder(tenantAddr: any[]): string {
-  const formattedAddresses: string[] = [];
+  const uniqueAddresses = new Map<string, { names: string[], addressLines: string, cityProvPostal: string }>();
+
   for (const addressObj of tenantAddr) {
     const {
       legalName,
@@ -47,7 +48,6 @@ export function nfrAddressBuilder(tenantAddr: any[]): string {
       provAbbr,
       postalCode,
     } = addressObj;
-    const formattedAddress: string[] = [];
 
     let name = null;
     if (legalName) {
@@ -70,18 +70,30 @@ export function nfrAddressBuilder(tenantAddr: any[]): string {
     if (postalCode) {
       parts.push(formatPostalCode(postalCode));
     }
-    const address = parts.join(" ");
+    const cityProvPostal = parts.join(" ");
 
-    formattedAddress.push(name);
     let addressLines = [];
     if (addrLine1) addressLines.push(addrLine1);
     if (addrLine2) addressLines.push(addrLine2);
     if (addrLine3) addressLines.push(addrLine3);
     let joinedAddressLines = addressLines.join(', ');
-    formattedAddress.push(joinedAddressLines);
-    formattedAddress.push(address);
-    formattedAddresses.push(formattedAddress.join("\n"));
+
+    const key = joinedAddressLines + cityProvPostal;
+
+    if (uniqueAddresses.has(key)) {
+      const existingEntry = uniqueAddresses.get(key);
+      existingEntry.names.push(name);
+    } else {
+      uniqueAddresses.set(key, { names: [name], addressLines: joinedAddressLines, cityProvPostal });
+    }
   }
+
+  const formattedAddresses: string[] = [];
+  for (const { names, addressLines, cityProvPostal } of uniqueAddresses.values()) {
+    const formattedNames = names.join("\n");
+    formattedAddresses.push(`${formattedNames}\n${addressLines}\n${cityProvPostal}\n`);
+  }
+
   return formattedAddresses.join("\n");
 }
 

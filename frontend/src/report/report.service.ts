@@ -179,7 +179,6 @@ export class ReportService {
       }
     const glVariables = grazingLeaseVariables(tenantAddr, interestParcel, regVars);
 
-    // TODO get these variables
     const data = {
       DB_File_Number: rawData.fileNum,
       DB_Document_Number: dtid,
@@ -187,6 +186,7 @@ export class ReportService {
       DB_Address_Regional_Office: glVariables.addressRegionalOffice,
       DB_Address_Mailing_Tenant: glVariables.mailingAddress,
       DB_Name_Tenant: glVariables.mailingName,
+      DB_Name_Tenant_List: glVariables.mailingNameList,
       DB_Name_Corporation: glVariables.mailingCorp,
       DB_Legal_Description: glVariables.legalDescription,
     };

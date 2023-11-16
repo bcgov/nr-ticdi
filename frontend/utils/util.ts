@@ -109,12 +109,14 @@ export function grazingLeaseVariables(tenantAddr: [{
 }], interestParcel: [{
   legalDescription: string;
 }], regVars: {regOfficeStreet: string, regOfficeCity: string, regOfficeProv: string, regOfficePostalCode: string}): 
-{streetAddress: string; streetName: string; streetCorp: string; mailingAddress: string; mailingName: string; mailingCorp: string; legalDescription: string; addressRegionalOffice: string} {
+{streetAddress: string; streetName: string; streetCorp: string; mailingAddress: string; mailingName: string; mailingNameList: {name: string}[]; mailingCorp: string; legalDescription: string; addressRegionalOffice: string} {
   let streetAddress = '';
   let streetName = '';
+  let streetNameList = [];
   let streetCorp = '';
   let mailingAddress = '';
   let mailingName = '';
+  let mailingNameList = [];
   let mailingCorp = '';
   let legalDescription = '';
   let addressRegionalOffice = '';
@@ -125,6 +127,7 @@ export function grazingLeaseVariables(tenantAddr: [{
         const tempMailingAddress = getMailingAddress(tenant);
         mailingAddress = mailingAddress.length > 0 ? [mailingAddress, tempMailingAddress].join('\n ') : tempMailingAddress;
         const tempMailingName = getFullName(tenant);
+        mailingNameList.push({name: tempMailingName});
         mailingName = mailingName.length > 0 ? [mailingName, tempMailingName].join('\n ') : tempMailingName;
         const tempMailingCorp = getCorp(tenant);
         mailingCorp = mailingCorp.length > 0 ? [mailingCorp, tempMailingCorp].join('\n ') : tempMailingCorp;
@@ -132,6 +135,7 @@ export function grazingLeaseVariables(tenantAddr: [{
         const tempStreetAddress = getMailingAddress(tenant);
         streetAddress = streetAddress.length > 0 ? [streetAddress, tempStreetAddress].join('\n ') : tempStreetAddress;
         const tempStreetName = getFullName(tenant);
+        streetNameList.push({name: tempStreetName});
         streetName = streetName.length > 0 ? [streetName, tempStreetName].join('\n ') : tempStreetName;
         const tempStreetCorp = getCorp(tenant);
         streetCorp = streetCorp.length > 0 ? [streetCorp, tempStreetCorp].join('\n ') : tempStreetCorp;
@@ -159,6 +163,10 @@ export function grazingLeaseVariables(tenantAddr: [{
     if (streetCorp.length == 0) {
       streetCorp = mailingCorp;
     }
+    // if either list of names is empty, set it to the other
+    if (mailingNameList.length == 0) {
+      mailingNameList = streetNameList;
+    }
   }
   if (interestParcel) {
     for (let parcel of interestParcel) {
@@ -179,7 +187,7 @@ export function grazingLeaseVariables(tenantAddr: [{
     addressRegionalOffice = [addressRegionalOffice, regVars.regOfficePostalCode].join(', ');
   }
 
-  return {streetAddress, streetName, streetCorp, mailingAddress, mailingName, mailingCorp, legalDescription, addressRegionalOffice}
+  return {streetAddress, streetName, streetCorp, mailingAddress, mailingName, mailingNameList, mailingCorp, legalDescription, addressRegionalOffice}
 }
 
 function getFullName(tenant: {

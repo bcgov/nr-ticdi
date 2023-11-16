@@ -33,7 +33,7 @@ export function formatPostalCode(value: string) {
  * <city prov postalCode>
  */
 export function nfrAddressBuilder(tenantAddr: any[]): string {
-  const uniqueAddresses = new Map<string, { names: string[], addressLines: string, cityProvPostal: string }>();
+  const uniqueAddresses = new Map<string, { names: Set<string>, addressLines: string, cityProvPostal: string }>();
 
   for (const addressObj of tenantAddr) {
     const {
@@ -82,15 +82,15 @@ export function nfrAddressBuilder(tenantAddr: any[]): string {
 
     if (uniqueAddresses.has(key)) {
       const existingEntry = uniqueAddresses.get(key);
-      existingEntry.names.push(name);
+      existingEntry.names.add(name);
     } else {
-      uniqueAddresses.set(key, { names: [name], addressLines: joinedAddressLines, cityProvPostal });
+      uniqueAddresses.set(key, { names: new Set([name]), addressLines: joinedAddressLines, cityProvPostal });
     }
   }
 
   const formattedAddresses: string[] = [];
   for (const { names, addressLines, cityProvPostal } of uniqueAddresses.values()) {
-    const formattedNames = names.join("\n");
+    const formattedNames = Array.from(names).join("\n");
     formattedAddresses.push(`${formattedNames}\n${addressLines}\n${cityProvPostal}\n`);
   }
 

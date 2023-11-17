@@ -238,6 +238,8 @@ export function nfrInterestedParties(
   }[]
 ) {
   const result: { clientName: string; address: string }[] = [];
+  const seenCombinations = new Set<string>();
+
   for (const client of tenantAddr) {
     let clientName: string;
     if (client.legalName) {
@@ -247,11 +249,19 @@ export function nfrInterestedParties(
         .filter(Boolean)
         .join(" ");
     }
-    result.push({
-      clientName,
-      address: getMailingAddress(client),
-    });
+
+    const address = getMailingAddress(client);
+    const combination = `${clientName}-${address}`;
+
+    if (!seenCombinations.has(combination)) {
+      result.push({
+        clientName,
+        address,
+      });
+      seenCombinations.add(combination);
+    }
   }
+
   return result;
 }
 

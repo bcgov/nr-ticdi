@@ -6,7 +6,7 @@ import { map } from "rxjs/operators";
 import { URLSearchParams } from "url";
 import * as dotenv from "dotenv";
 import * as base64 from "base-64";
-import { formatPostalCode, getMailingAddress } from "utils/util";
+import { formatPostalCode, getNFRMailingAddress } from "utils/util";
 declare const Buffer;
 const axios = require("axios");
 
@@ -79,7 +79,7 @@ export class TTLSService {
       ),
       contactEmail: ttlsData.contactEmail,
       inspectionDate: ttlsData.inspectionDate,
-      mailingAddress: getMailingAddress(tenantAddr),
+      mailingAddress: getNFRMailingAddress(tenantAddr),
       addrLine1: tenantAddr ? tenantAddr.addrLine1 : "",
       addrLine2: tenantAddr ? tenantAddr.addrLine2 : "",
       addrLine3: tenantAddr ? tenantAddr.addrLine3 : "",
@@ -143,7 +143,7 @@ export class TTLSService {
         ),
         contact_email_address: ttlsData.contactEmail,
         inspected_date: ttlsData.inspectionDate,
-        mailing_address: getMailingAddress(tenantAddr),
+        mailing_address: getNFRMailingAddress(tenantAddr),
         mailing_address_line_1: tenantAddr ? tenantAddr.addrLine1 : "",
         mailing_address_line_2: tenantAddr ? tenantAddr.addrLine2 : "",
         mailing_address_line_3: tenantAddr ? tenantAddr.addrLine3 : "",

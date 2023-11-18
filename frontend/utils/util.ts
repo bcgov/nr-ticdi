@@ -106,6 +106,10 @@ export function grazingLeaseVariables(tenantAddr: [{
   middleName: string;
   lastName: string;
   legalName: string;
+  city: string;
+  country: string;
+  provAbbr: string;
+  postalCode: string;
 }], interestParcel: [{
   legalDescription: string;
 }], regVars: {regOfficeStreet: string, regOfficeCity: string, regOfficeProv: string, regOfficePostalCode: string}): 
@@ -220,6 +224,41 @@ export function getMailingAddress(tenantAddr: {
   addrLine1: string;
   addrLine2: string;
   addrLine3: string;
+  city: string;
+  country: string;
+  provAbbr: string;
+  postalCode: string;
+}): string {
+  const addressComponents = [
+    tenantAddr.addrLine1,
+    tenantAddr.addrLine2,
+    tenantAddr.addrLine3
+  ];
+
+  const combinedAddress = addressComponents
+    .filter(component => !!component) // Filter out undefined or empty components
+    .join(', ');
+
+  const remainingComponents = [
+    tenantAddr.city,
+    tenantAddr.provAbbr,
+    tenantAddr.country,
+    tenantAddr.postalCode
+  ];
+
+  const spaceSeparated = remainingComponents
+    .filter(component => !!component) // Filter out undefined or empty components
+    .join(' ');
+
+  const mailingAddress = [combinedAddress, spaceSeparated].filter(part => !!part).join(', ');
+
+  return mailingAddress;
+}
+
+export function getNFRMailingAddress(tenantAddr: {
+  addrLine1: string;
+  addrLine2: string;
+  addrLine3: string;
 }): string {
   let mailingAddress = "";
   if (tenantAddr && tenantAddr.addrLine1) {
@@ -243,6 +282,10 @@ export function nfrInterestedParties(
     addrLine1: string;
     addrLine2: string;
     addrLine3: string;
+    city: string;
+    country: string;
+    provAbbr: string;
+    postalCode: string;
   }[]
 ) {
   const result: { clientName: string; address: string }[] = [];

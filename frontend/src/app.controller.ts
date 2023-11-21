@@ -130,7 +130,7 @@ export class AppController {
     @Req() request: Request,
     @Res() response: Response
   ) {
-    console.log('lur report')
+    console.log('LUR report!')
     let isAdmin = false;
     if (
       session.data &&

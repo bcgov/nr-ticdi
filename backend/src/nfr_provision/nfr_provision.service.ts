@@ -164,7 +164,7 @@ export class NFRProvisionService {
     return nfrVariables.map((variable) => {
       return {
         ...variable,
-        provision_id: variable.provision.id,
+        provision_id: variable.provision?.id ?? null,
       };
     });
   }

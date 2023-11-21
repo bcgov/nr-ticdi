@@ -1,3 +1,27 @@
+BEGIN;
+SET CLIENT_ENCODING TO 'utf8';
+ALTER TABLE public.nfr_provision_group DISABLE TRIGGER ALL;
+ALTER TABLE public.nfr_provision DISABLE TRIGGER ALL;
+ALTER TABLE public.nfr_provision_variable DISABLE TRIGGER ALL;
+ALTER TABLE public.nfr_provision_variant DISABLE TRIGGER ALL;
+ALTER TABLE public.nfr_provision_provision_variant_nfr_provision_variant DISABLE TRIGGER ALL;
+
+-- nfr_provision_group
+INSERT INTO public.nfr_provision_group (provision_group,provision_group_text,max) VALUES
+	 (1,'DOCUMENT TYPE',999),
+	 (2,'FEES',999),
+	 (5,'PREAMBLE',3),
+	 (15,'OCCUPATIONAL RENT',1),
+	 (20,'SECURITY',2),
+	 (25,'INSURANCE',2),
+	 (28,'',3),
+	 (27,'ADDITIONAL REQUIREMENTS',999),
+	 (34,'ADDITIONAL REQUIREMENTS',999),
+	 (10,'SURVEY REQUIREMENTS',999);
+INSERT INTO public.nfr_provision_group (provision_group,provision_group_text,max) VALUES
+	 (14,'OBTAIN SURVEY',999),
+	 (12,'SURVEY FEES',1);
+
 --nfr_provision
 INSERT INTO public.nfr_provision ("type",provision_name,free_text,help_text,category,active_flag,create_userid,update_userid,create_timestamp,update_timestamp,"provisionGroupId") VALUES
 	 ('O','INSURANCE REQUIRED - NFR OBTAIN SURVEY- OTHER','You must at your expense, effect and keep in force insurance as described in the enclosed «INTERIM_TENURE_TYPE».','Use when insurance is required on the interim tenure and may be covered under homeowners insurance etc.','OFFER - INSURANCE',true,NULL,'BSALL','2023-06-02 15:57:07.279427','2023-06-22 16:38:55.979829',9),
@@ -58,22 +82,6 @@ INSERT INTO public.nfr_provision ("type",provision_name,free_text,help_text,cate
 
 If you choose not to proceed with the «DB_TENURE_TYPE» after the survey has been started, the deposit will be forfeited to the Province as liquidated damages.  Please make your cheque or money order payable to the Minister of Finance and deliver it to «DB_ADDRESS_LINE_REGIONAL_OFFICE».','Use to require payment of a deposit where Province is to pay for a survey.','OFFER SURVEY',true,NULL,'BSALL','2023-06-02 15:57:07.364365','2023-06-27 20:35:35.371359',4),
 	 ('O','DELIVER SECURITY DEPOSIT & SURVEY DEPOSIT','In addition to the deposit referred to in the “Survey” portion of this letter, you must deliver to us a security deposit in the amount of $«SECURITY_AMOUNT» to guarantee the performance of your obligations under the «DB_TENURE_TYPE».  Please see attached information regarding acceptable types of security.','Use this where 2 deposits are to be delivered: one for the survey and another for clean-up under the terms of the tenure to be issued','OFFER - SECURITY',true,NULL,'BSALL','2023-06-02 15:57:07.364365','2023-06-30 15:22:22.442357',8);
-
--- nfr_provision_group
-INSERT INTO public.nfr_provision_group (provision_group,provision_group_text,max) VALUES
-	 (1,'DOCUMENT TYPE',999),
-	 (2,'FEES',999),
-	 (5,'PREAMBLE',3),
-	 (15,'OCCUPATIONAL RENT',1),
-	 (20,'SECURITY',2),
-	 (25,'INSURANCE',2),
-	 (28,'',3),
-	 (27,'ADDITIONAL REQUIREMENTS',999),
-	 (34,'ADDITIONAL REQUIREMENTS',999),
-	 (10,'SURVEY REQUIREMENTS',999);
-INSERT INTO public.nfr_provision_group (provision_group,provision_group_text,max) VALUES
-	 (14,'OBTAIN SURVEY',999),
-	 (12,'SURVEY FEES',1);
 
 -- nfr_provision_variable
 INSERT INTO public.nfr_provision_variable (variable_name,variable_value,help_text,create_userid,update_userid,create_timestamp,update_timestamp,"provisionId") VALUES
@@ -321,3 +329,11 @@ INSERT INTO public.nfr_provision_provision_variant_nfr_provision_variant ("nfrPr
 	 (113,2),
 	 (113,3),
 	 (113,5);
+
+ALTER TABLE public.nfr_provision_group ENABLE TRIGGER ALL;
+ALTER TABLE public.nfr_provision ENABLE TRIGGER ALL;
+ALTER TABLE public.nfr_provision_variable ENABLE TRIGGER ALL;
+ALTER TABLE public.nfr_provision_variant ENABLE TRIGGER ALL;
+ALTER TABLE public.nfr_provision_provision_variant_nfr_provision_variant ENABLE TRIGGER ALL;
+
+COMMIT;

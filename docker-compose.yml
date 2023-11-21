@@ -13,26 +13,7 @@ services:
     restart: always
     volumes:
       - /pgdata
-    healthcheck:
-      test: [ "CMD", "pg_isready", "-q", "-d", "default", "-U", "default" ]
-  database-migrations:
-    image: flyway/flyway:9.10-alpine
-    container_name: backend-migrations
-    command:
-      - info
-      - migrate
-      - -outOfOrder=true
-    volumes:
-      - "./backend/db/migrations:/flyway/sql"
-    environment:
-      - FLYWAY_URL=jdbc:postgresql://database:5432/postgres
-      - FLYWAY_USER=default
-      - FLYWAY_PASSWORD=default
-      - FLYWAY_BASELINE_ON_MIGRATE=true
-      - FLYWAY_DEFAULT_SCHEMA=public
-    depends_on:
-      database:
-        condition: service_healthy
+
   backend:
     container_name: backend
     entrypoint:
@@ -89,3 +70,12 @@ services:
       - ./frontend:/app:z
       - /app/node_modules
     working_dir: "/app"
+
+  flyway:
+    container_name: flyway
+    image: flyway/flyway:latest
+    command: ["-url=jdbc:postgresql://database:5432/default", "-user=default", "-password=default", "baseline", "migrate"]
+    volumes:
+      - ./backend/db/migrations:/flyway/sql
+    depends_on:
+      - database

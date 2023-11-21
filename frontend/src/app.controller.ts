@@ -102,14 +102,16 @@ export class AppController {
     @Req() req: Request,
     @Res() res: Response
   ) {
-    console.log('rendering NFR / GL page!!!')
+    console.log('Report page document type: '+documentType);
     let decodedDocumentType = decodeURIComponent(documentType)
     decodedDocumentType = decodedDocumentType.toUpperCase().replace(/\s+/g, "").replace(/-/g, "").replace(/–/g,"");
     console.log(decodedDocumentType)
     if (decodedDocumentType == "GRAZINGLEASE" || decodedDocumentType == "AGRICULTURALLEASEUGRAZINGMP") {
       return this.getGrazingLeaseDisplayData(session, dtid, res);
-    } else {
+    } else if (decodedDocumentType.includes("NOTICEOFFINALREVIEW")){
       return this.getNfrDisplayData(session, dtid, documentType, res);
+    } else {
+      return this.landUseReportPage(session, dtid, req, res);
     }
   }
 
@@ -120,15 +122,24 @@ export class AppController {
    * @param id
    * @returns
    */
-  @Get("dtid/:id")
+  @Get("dtid/:dtid")
   @UseFilters(AuthenticationFilter)
   @UseGuards(AuthenticationGuard)
-  @Render("index")
-  async findOne(
+  async landUserReportRedirect(@Session() session: {data?:SessionData},
+    @Param("dtid") dtid,
+    @Req() req: Request,
+    @Res() res: Response
+  ) {
+    return this.landUseReportPage(session, dtid, req, res);
+  }
+
+  @UseFilters(AuthenticationFilter)
+  @UseGuards(AuthenticationGuard)
+  async landUseReportPage(
     @Session() session: { data?: SessionData },
-    @Param("id") id,
-    @Req() request: Request,
-    @Res() response: Response
+    @Param("dtid") dtid,
+    @Req() req: Request,
+    @Res() res: Response
   ) {
     console.log('lur report')
     let isAdmin = false;
@@ -152,7 +163,7 @@ export class AppController {
     let ttlsJSON, primaryContactName;
     try {
       const response: any = await firstValueFrom(
-        this.ttlsService.callHttp(id)
+        this.ttlsService.callHttp(dtid)
       )
         .then((res) => {
           return res;
@@ -172,7 +183,7 @@ export class AppController {
         );
       }
       primaryContactName = ttlsJSON.licence_holder_name;
-      return {
+      return res.render("index", {
         title: title,
         idirUsername: session.data.activeAccount
           ? session.data.activeAccount.idir_username
@@ -186,10 +197,10 @@ export class AppController {
           "Grazing Lease",
         ],
         prdid: ttlsJSON.id,
-      };
+      });
     } catch (err) {
       console.log(err);
-      return {
+      return res.render("index",{
         title: title,
         idirUsername: session.data.activeAccount
           ? session.data.activeAccount.idir_username
@@ -204,7 +215,7 @@ export class AppController {
         ],
         prdid: ttlsJSON ? ttlsJSON.id : null,
         error: err,
-      };
+      });
     }
   }
 

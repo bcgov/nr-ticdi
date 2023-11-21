@@ -141,7 +141,7 @@ export class AppController {
     @Req() req: Request,
     @Res() res: Response
   ) {
-    console.log('lur report')
+    console.log('LUR report!')
     let isAdmin = false;
     if (
       session.data &&

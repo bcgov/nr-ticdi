@@ -20,7 +20,6 @@ async function generateReport(documentType) {
     .catch(() => {
       location.reload();
     });
-  console.log(reportName)
   const data = {
     prdid: prdid,
     dtid: dtid,

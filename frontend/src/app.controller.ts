@@ -406,16 +406,10 @@ export class AppController {
           console.log(err);
           console.log(err.response.data);
         });
-      ttlsJSON = await this.ttlsService.sendToBackend(response);
-      ttlsJSON["cityProvPostal"] = this.ttlsService.concatCityProvPostal(
-        response.tenantAddr ? response.tenantAddr[0] : null
-      );
-      if (ttlsJSON.inspected_date) {
-        ttlsJSON["inspected_date"] = this.ttlsService.formatInspectedDate(
-          ttlsJSON.inspected_date.toString()
-        );
-      }
-      primaryContactName = ttlsJSON.licence_holder_name;
+      ttlsJSON = await this.ttlsService.formatNFRData(response);
+      primaryContactName = ttlsJSON.licenceHolderName;
+      const interestedParties = nfrInterestedParties(response.tenantAddr);
+      ttlsJSON["interestedParties"] = interestedParties;
       return res.render("grazing-lease", {
         title: title,
         idirUsername: session.data.activeAccount

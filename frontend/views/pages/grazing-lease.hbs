@@ -7,7 +7,7 @@
                 <hr />
 
                 <div class="titleSpacing dataSection"><b>DTID:</b> <span id="dtid">{{message.dtid}}</span></div>
-                <div class="titleSpacing dataSection"><b>Tenure File Number:</b> <span id="tfn">{{message.tenure_file_number}}</span></div>
+                <div class="titleSpacing dataSection"><b>Tenure File Number:</b> <span id="tfn">{{message.fileNum}}</span></div>
                 <div class="titleSpacing dataSection"><b>Primary Contact Name:</b> {{primaryContactName}}</div>
                 
                 <fieldset class="form-group collapsible">
@@ -15,43 +15,22 @@
                     <div class="contents" style="display: none;">
                         <div class="form-row">
                             <div class="form-group col-md-5 dataSection dataSection">
-                                <dt>Contact/Agent Name</dt>
-                                <dd>{{message.contact_agent}}</dd>
-                            </div>
-                            <div class="form-group col-md-5 dataSection dataSection">
                                 <dt>Organization Unit</dt>
-                                <dd id="orgUnit">{{ message.organization_unit }}</dd>
+                                <dd id="orgUnit">{{ message.orgUnit }}</dd>
                             </div>
-                            
-                        </div>
-                        <div class="form-row">
                             <div class="form-group col-md-5 dataSection dataSection">
                                 <dt>Primary Contact Email Address</dt>
-                                <dd>{{ message.email_address }}</dd>
-                            </div>
-                            <div class="form-group col-md-5 dataSection dataSection">
-                                <dt>Primary Contact Phone Number</dt>
-                                <dd id="phoneNumber">{{ message.phone_number }}</dd>
-                            </div>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group col-md-5 dataSection dataSection">
-                                <dt>Contact/Agent Email Address</dt>
-                                <dd>{{ message.contact_email_address }}</dd>
-                            </div>
-                            <div class="form-group col-md-5 dataSection dataSection">
-                                <dt>Contact/Agent Phone Number</dt>
-                                <dd id="phoneNumber2">{{ message.contact_phone_number }}</dd>
+                                <dd>{{ message.emailAddress }}</dd>
                             </div>
                         </div>
                         <div class="form-row">
                             <div class="form-group col-md-5 dataSection dataSection">
                                 <dt>Incorporation Number</dt>
-                                <dd>{{ message.incorporation_number }}</dd>
+                                <dd id="orgUnit">{{ message.incorporationNum }}</dd>
                             </div>
                             <div class="form-group col-md-5 dataSection dataSection">
-                                <dt>Inspected Date</dt>
-                                <dd>{{ message.inspected_date }}</dd>
+                                <dt>Primary Contact Phone Number</dt>
+                                <dd id="phoneNumber">{{ message.phoneNumber }}</dd>
                             </div>
                         </div>
                     </div>
@@ -62,49 +41,51 @@
                         <div class="form-row">
                             <div class="form-group col-md-5 dataSection">
                                 <dt>Type</dt>
-                                <dd id="type">{{ message.type_name }}</dd>
+                                <dd id="type">{{ message.type }}</dd>
                             </div>
                             <div class="form-group col-md-5 dataSection">
                                 <dt>Subtype</dt>
-                                <dd id="subType">{{message.sub_type_name}}</dd>
+                                <dd id="subType">{{message.subType}}</dd>
                             </div>
                         </div>
                         <div class="form-row">
                             <div class="form-group col-md-5 dataSection">
                                 <dt>Purpose</dt>
-                                <dd id="purpose">{{ message.purpose_name }}</dd>
+                                <dd id="purpose">{{ message.purpose }}</dd>
                             </div>
                             <div class="form-group col-md-5 dataSection">
                                 <dt>Subpurpose</dt>
-                                <dd id="subPurpose">{{message.sub_purpose_name}}</dd>
+                                <dd id="subPurpose">{{message.subPurpose}}</dd>
                             </div>
                         </div>
                         <div class="form-row">
                             <div class="form-group col-md-5 dataSection">
                                 <dt>Mailing Address</dt>
-                                <dd id="address">{{message.mailing_address}}</dd>
+                                <dd id="address1">{{message.addrLine1}}</dd>
+                                <dd id="address2">{{message.addrLine2}}</dd>
+                                <dd id="address3">{{message.addrLine3}}</dd>
                                 <dd id="cityProvPostal">{{message.cityProvPostal}}</dd>
-                                <dd id="postalCode">{{message.mailing_country}}</dd>
+                                <dd id="county">{{message.country}}</dd>
                             </div>
                             <div class="form-group col-md-5 dataSection">
                                 <dt>Location of Land</dt>
-                                <dd id="locLand">{{message.location_description}}</dd>
+                                <dd id="locLand">{{message.locLand}}</dd>
                             </div>
                         </div>
                     </div>
                 </fieldset>
                 <fieldset class="form-group collapsible">
-                    <legend style="cursor: pointer" class='togvis sectionTitle'><i class="fa fa-plus"></i>  Area</legend>
+                    <legend style="cursor: pointer" class='togvis sectionTitle'><i class="fa fa-plus"></i>  Interested Parties</legend>
                     <div class="contents" style="display: none;">
-                        {{#each message.tenure}}
+                        {{#each message.interestedParties}}
                         <div class="form-row">
-                            <div class="form-group col-md-2 dataSection">
-                                <dt>Area</dt>
-                                <dd id="area">{{ this.Area }}</dd>
+                            <div class="form-group col-md-5 dataSection">
+                                <dt>Client Name</dt>
+                                <dd id="clientName">{{ this.clientName }}</dd>
                             </div>
-                            <div class="form-group col-md-10">
-                                <dt>Legal Description</dt>
-                                <dd class="legalDesc" title="{{this.LegalDescription}}">{{this.LegalDescription}}</dd>
+                            <div class="form-group col-md-5 dataSection">
+                                <dt>Address</dt>
+                                <dd id="address">{{this.address}}</dd>
                             </div>
                         </div>
                         {{/each}}
@@ -123,7 +104,7 @@
         $( document ).ready(function() {
             console.log({{message.err}});
             $("#prdid").text("{{this.prdid}}");
-            $("#tfn").text("{{message.tenure_file_number}}");
+            $("#tfn").text("{{message.fileNum}}");
 
             $(".dataSection dd").each(function(){
                 if ($(this).text() == "" || $(this).text() == "TBD") {

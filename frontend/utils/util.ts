@@ -14,22 +14,22 @@ export function formatPostalCode(value: string) {
 /**
  * Outputs a string:
  * <Name 1>
- * <addrLine1>
+ * <addrLine1>, <addrLine2>, <addrLine3>
  * <city prov postalCode>
  *
  * If there are two individuals that share an address, then:
  * <Name 1>
  * <Name 2>
- * <addrLine1>
+ * <addrLine1>, <addrLine2>, <addrLine3>
  * <city prov postalCode>
  *
  * Combined example:
  * <Name 1> - different address from Name 2/3
- * <addrLine1>
+ * <addrLine1>, <addrLine2>, <addrLine3>
  * <city prov postalCode>
  * <Name 2>
  * <Name 3> - same address as Name 2
- * <addrLine1>
+ * <addrLine1>, <addrLine2>, <addrLine3>
  * <city prov postalCode>
  */
 export function nfrAddressBuilder(tenantAddr: any[]): string {
@@ -97,6 +97,128 @@ export function nfrAddressBuilder(tenantAddr: any[]): string {
   return formattedAddresses.join("\n");
 }
 
+/**
+ * Similar to nfrAddressBuilder, slightly modified for gl
+ * Outputs a string:
+ * <Name 1>
+ * <addrLine1>, <addrLine2>, <addrLine3>
+ * <city prov postalCode>
+ *
+ * If there are two individuals that share an address, then:
+ * <Name 1>
+ * <Name 2>
+ * <addrLine1>, <addrLine2>, <addrLine3>
+ * <city prov postalCode>
+ *
+ * Combined example:
+ * <Name 1> - different address from Name 2/3
+ * <addrLine1>, <addrLine2>, <addrLine3>
+ * <city prov postalCode>
+ * <Name 2>
+ * <Name 3> - same address as Name 2
+ * <addrLine1>, <addrLine2>, <addrLine3>
+ * <city prov postalCode>
+ */
+export function glAddressBuilder(tenantAddr: {
+  addrLine1: string;
+  addrLine2: string;
+  addrLine3: string;
+  addrType: string;
+  firstName: string;
+  middleName: string;
+  lastName: string;
+  legalName: string;
+  city: string;
+  country: string;
+  provAbbr: string;
+  postalCode: string;
+}[]): { glMailingAddress: string; glStreetAddress: string } {
+  if (!tenantAddr) {
+    return {glMailingAddress: '', glStreetAddress: ''};
+  }
+  const uniqueMailingAddresses = new Map<string, { names: Set<string>; addressLines: string; cityProvPostal: string }>();
+  const uniqueStreetAddresses = new Map<string, { names: Set<string>; addressLines: string; cityProvPostal: string }>();
+
+  for (const addressObj of tenantAddr) {
+    const {
+      legalName,
+      firstName,
+      middleName,
+      lastName,
+      addrLine1,
+      addrLine2,
+      addrLine3,
+      addrType,
+      city,
+      provAbbr,
+      postalCode,
+    } = addressObj;
+
+    let name = null;
+    if (legalName) {
+      name = legalName;
+    } else if (firstName || middleName || lastName) {
+      const parts = [firstName, middleName, lastName];
+      const filteredParts = parts.filter((part) => part !== null && part !== undefined);
+      name = filteredParts.join(" ");
+    }
+
+    const parts = [];
+    if (city) {
+      parts.push(city);
+    }
+    if (provAbbr) {
+      parts.push(provAbbr);
+    }
+    if (postalCode) {
+      parts.push(formatPostalCode(postalCode));
+    }
+    const cityProvPostal = parts.join(" ");
+
+    let addressLines = [];
+    if (addrLine1) addressLines.push(addrLine1);
+    if (addrLine2) addressLines.push(addrLine2);
+    if (addrLine3) addressLines.push(addrLine3);
+    let joinedAddressLines = addressLines.join(', ');
+
+    const key = joinedAddressLines + cityProvPostal;
+
+    if (addrType === 'MAILING') {
+      if (uniqueMailingAddresses.has(key)) {
+        const existingEntry = uniqueMailingAddresses.get(key);
+        existingEntry.names.add(name);
+      } else {
+        uniqueMailingAddresses.set(key, { names: new Set([name]), addressLines: joinedAddressLines, cityProvPostal });
+      }
+    } else if (addrType === 'STREET') {
+      if (uniqueStreetAddresses.has(key)) {
+        const existingEntry = uniqueStreetAddresses.get(key);
+        existingEntry.names.add(name);
+      } else {
+        uniqueStreetAddresses.set(key, { names: new Set([name]), addressLines: joinedAddressLines, cityProvPostal });
+      }
+    }
+  }
+
+  const formattedMailingAddresses: string[] = [];
+  for (const { names, addressLines, cityProvPostal } of uniqueMailingAddresses.values()) {
+    const formattedNames = Array.from(names).join("\n");
+    formattedMailingAddresses.push(`${formattedNames}\n${addressLines}\n${cityProvPostal}\n`);
+  }
+
+  const formattedStreetAddresses: string[] = [];
+  for (const { names, addressLines, cityProvPostal } of uniqueStreetAddresses.values()) {
+    const formattedNames = Array.from(names).join("\n");
+    formattedStreetAddresses.push(`${formattedNames}\n${addressLines}\n${cityProvPostal}\n`);
+  }
+
+  return {
+    glMailingAddress: formattedMailingAddresses.join("\n"),
+    glStreetAddress: formattedStreetAddresses.join("\n"),
+  };
+}
+
+
 export function grazingLeaseVariables(tenantAddr: [{
   addrLine1: string;
   addrLine2: string;
@@ -113,7 +235,8 @@ export function grazingLeaseVariables(tenantAddr: [{
 }], interestParcel: [{
   legalDescription: string;
 }], regVars: {regOfficeStreet: string, regOfficeCity: string, regOfficeProv: string, regOfficePostalCode: string}): 
-{streetAddress: string; streetName: string; streetCorp: string; mailingAddress: string; mailingName: string; mailingNameList: {name: string}[]; mailingCorp: string; legalDescription: string; addressRegionalOffice: string} {
+{streetAddress: string; streetName: string; streetCorp: string; mailingAddress: string; mailingName: string; mailingNameList: {name: string}[]; 
+  mailingCorp: string; legalDescription: string; addressRegionalOffice: string, glMailingAddress: string, glStreetAddress: string} {
   let streetAddress = '';
   let streetName = '';
   let streetNameList = [];
@@ -124,6 +247,7 @@ export function grazingLeaseVariables(tenantAddr: [{
   let mailingCorp = '';
   let legalDescription = '';
   let addressRegionalOffice = '';
+  const {glMailingAddress, glStreetAddress} = glAddressBuilder(tenantAddr);
 
   if (tenantAddr) {
     for (let tenant of tenantAddr) {
@@ -191,7 +315,7 @@ export function grazingLeaseVariables(tenantAddr: [{
     addressRegionalOffice = [addressRegionalOffice, regVars.regOfficePostalCode].join(', ');
   }
 
-  return {streetAddress, streetName, streetCorp, mailingAddress, mailingName, mailingNameList, mailingCorp, legalDescription, addressRegionalOffice}
+  return {streetAddress, streetName, streetCorp, mailingAddress, mailingName, mailingNameList, mailingCorp, legalDescription, addressRegionalOffice, glMailingAddress, glStreetAddress}
 }
 
 function getFullName(tenant: {
@@ -220,7 +344,20 @@ function getCorp(tenant: {
   return tenant.legalName??'';
 }
 
+/**
+ * Used by grazingLeaseVariables, formats and returns a mailing address
+ * 
+ * @param tenantAddr: {addrLine1, addrLine2, addrLine3, city, country, provAbbr, postalCode}
+ * @returns
+ * 
+ * addrLine1, addrLine2, addrLine3
+ * city, provAbbr postalCode
+ */
 export function getMailingAddress(tenantAddr: {
+  firstName: string;
+  middleName: string;
+  lastName: string;
+  legalName: string;
   addrLine1: string;
   addrLine2: string;
   addrLine3: string;
@@ -239,18 +376,15 @@ export function getMailingAddress(tenantAddr: {
     .filter(component => !!component) // Filter out undefined or empty components
     .join(', ');
 
-  const remainingComponents = [
-    tenantAddr.city,
-    tenantAddr.provAbbr,
-    tenantAddr.country,
-    tenantAddr.postalCode
-  ];
+    const cityPostalCode = [
+      tenantAddr.city,
+      tenantAddr.provAbbr,
+      tenantAddr.postalCode
+    ]
+      .filter(component => !!component)
+      .join(' ');
 
-  const spaceSeparated = remainingComponents
-    .filter(component => !!component) // Filter out undefined or empty components
-    .join(' ');
-
-  const mailingAddress = [combinedAddress, spaceSeparated].filter(part => !!part).join(', ');
+    const mailingAddress = [combinedAddress, cityPostalCode].filter(part => !!part).join('\n');
 
   return mailingAddress;
 }

@@ -182,9 +182,9 @@ export class ReportService {
     const data = {
       DB_File_Number: rawData.fileNum,
       DB_Document_Number: dtid,
-      DB_Address_Street_Tenant: glVariables.streetAddress,
+      DB_Address_Street_Tenant: glVariables.glStreetAddress || glVariables.glMailingAddress,
       DB_Address_Regional_Office: glVariables.addressRegionalOffice,
-      DB_Address_Mailing_Tenant: glVariables.mailingAddress,
+      DB_Address_Mailing_Tenant: glVariables.glMailingAddress || glVariables.glStreetAddress,
       DB_Name_Tenant: glVariables.mailingName,
       DB_Name_Tenant_List: glVariables.mailingNameList,
       DB_Name_Corporation: glVariables.mailingCorp,

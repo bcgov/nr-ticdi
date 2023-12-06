@@ -107,9 +107,11 @@
             $("#tfn").text("{{message.fileNum}}");
 
             $(".dataSection dd").each(function(){
-                if ($(this).text() == "" || $(this).text() == "TBD") {
-                    $(this).text(" ");
-                    $(this).css("border", "solid 1px orange");
+                if ($(this).attr("id") != "address2" && $(this).attr("id") != "address3") {
+                    if ($(this).text() == "" || $(this).text() == "TBD") {
+                        $(this).text(" ");
+                        $(this).css("border", "solid 1px orange");
+                    }
                 }
             })
 

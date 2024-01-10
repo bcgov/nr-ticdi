@@ -1,0 +1,20 @@
+.inlineDiv {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.collapsibleTitle {
+  font-size: 1.2rem;
+  font-family: Verdana, Geneva, sans-serif !important;
+  cursor: pointer;
+}
+
+.container {
+  width: 100%;
+  padding-right: 25px;
+  padding-left: 25px;
+  margin-right: auto;
+  margin-left: auto;
+  padding-top: 10px;
+  padding-bottom: 10px;
+}

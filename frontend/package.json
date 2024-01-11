@@ -5,17 +5,19 @@
   "dependencies": {
     "@fortawesome/fontawesome-free-solid": "^5.0.13",
     "@fortawesome/react-fontawesome": "^0.2.0",
+    "@reduxjs/toolkit": "^2.0.1",
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-redux": "^9.0.4",
     "react-scripts": "5.0.1",
+    "redux": "^5.0.1",
     "web-vitals": "^2.1.4"
   },
   "scripts": {
     "start": "react-scripts start",
-    "tw": "npx tailwindcss -i ./src/App.css -o ./src/styles/output.css --watch",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
@@ -38,7 +40,5 @@
       "last 1 safari version"
     ]
   },
-  "devDependencies": {
-    "tailwindcss": "^3.4.1"
-  }
+  "devDependencies": {}
 }

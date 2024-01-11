@@ -1,10 +1,16 @@
-import React from "react";
+import { FC } from "react";
+import { DispositionTransactionResource } from "../../app/types/types";
 
-function AreaDetails({ data }) {
+interface AreaDetailsProps {
+  data: DispositionTransactionResource;
+}
+
+// need to verify that this works
+const AreaDetails: FC<AreaDetailsProps> = ({ data }) => {
   return (
     <div className="container mx-auto">
       <div className="grid grid-cols-3 gap-1">
-        {data.tenure.map((item, index) => (
+        {data.interestParcel.map((item, index) => (
           <div key={index} className="pt-2 pb-2">
             <div className="font-semibold">Area</div>
             <div className="mt-1">{item.area}</div>
@@ -20,6 +26,6 @@ function AreaDetails({ data }) {
       </div>
     </div>
   );
-}
+};
 
 export default AreaDetails;

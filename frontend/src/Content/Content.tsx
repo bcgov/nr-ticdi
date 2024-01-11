@@ -1,6 +1,6 @@
 import React from "react";
 import IndexPage from "./Pages/Index/IndexPage";
-import { rawData, testData } from "./constants";
+import { rawData, testData } from "../app/constants/constants";
 
 function Content({ page }) {
   return (

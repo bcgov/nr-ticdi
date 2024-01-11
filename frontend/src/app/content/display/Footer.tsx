@@ -1,10 +1,10 @@
-import React from "react";
+import { FC } from "react";
 
-function Footer() {
+const Footer: FC = () => {
   return (
     <footer className="footer">
       <nav className="navbar navbar-expand-lg navbar-dark">
-        <div className="container mx-auto max-w-screen-xl p-0">
+        <div className="container">
           <ul className="navbar-nav">
             <li className="nav-item">
               <a
@@ -62,6 +62,6 @@ function Footer() {
       </nav>
     </footer>
   );
-}
+};
 
 export default Footer;

@@ -1,8 +1,7 @@
-import React, { FC } from "react";
-import "./App.css";
-import Header from "../Content/Header/Header";
-import Footer from "../Content/Footer/Footer";
-import Content from "../Content/Content";
+import { FC } from "react";
+import Header from "./content/display/Header";
+import Footer from "./content/display/Footer";
+import Content from "./content/Content";
 
 const App: FC = () => {
   return (

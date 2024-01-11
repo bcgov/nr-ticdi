@@ -18,8 +18,8 @@ const Collapsible: FC<CollapsibleProps> = ({ title, children }) => {
   const icon = isOpen ? faMinus : (faPlus as IconProp);
 
   return (
-    <div onClick={toggleCollapsible}>
-      <div className="pb-2 pt-2 pl-3 d-flex align-items-center">
+    <div className="form-group" onClick={toggleCollapsible}>
+      <div className="mb-2 d-flex align-items-center">
         <FontAwesomeIcon icon={icon as IconProp} className="inlineDiv" />
         <div className="ml-2 inlineDiv collapsibleTitle">{title}</div>
       </div>

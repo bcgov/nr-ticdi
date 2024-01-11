@@ -1,10 +1,15 @@
-import React from "react";
+import { FC } from "react";
 
-function Header({ isAdmin, idirUsername }) {
+interface HeaderProps {
+  isAdmin: Boolean;
+  idirUsername: String;
+}
+
+const Header: FC<HeaderProps> = ({ isAdmin, idirUsername }) => {
   return (
     <header className="header">
       <nav className="navbar navbar-expand-lg navbar-dark">
-        <div className="container mx-auto max-w-screen-xl p-0">
+        <div className="container">
           <a className="navbar-brand" href="https://www2.gov.bc.ca">
             <img
               className="img-fluid d-none d-md-block"
@@ -60,6 +65,6 @@ function Header({ isAdmin, idirUsername }) {
       </nav>
     </header>
   );
-}
+};
 
 export default Header;

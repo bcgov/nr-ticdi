@@ -219,11 +219,13 @@ export class TTLSService {
     lastName: string;
     legalName: string;
   }): string {
-    return tenantAddr ? tenantAddr.legalName
+    return tenantAddr
       ? tenantAddr.legalName
-      : [tenantAddr.firstName, tenantAddr.middleName, tenantAddr.lastName]
-          .filter(Boolean)
-          .join(" ") : '';
+        ? tenantAddr.legalName
+        : [tenantAddr.firstName, tenantAddr.middleName, tenantAddr.lastName]
+            .filter(Boolean)
+            .join(" ")
+      : "";
   }
 
   // returns the individual name

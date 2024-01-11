@@ -1,24 +1,24 @@
 import { FC } from "react";
-import { DispositionTransactionResource } from "../../app/types/types";
+import { DTRDisplayObject } from "../../../app/types/types";
 
-interface AreaDetailsProps {
-  data: DispositionTransactionResource;
+interface InterestedPartiesProps {
+  data: DTRDisplayObject;
 }
 
-// need to verify that this works
-const AreaDetails: FC<AreaDetailsProps> = ({ data }) => {
+// TODO
+const InterestedParties: FC<InterestedPartiesProps> = ({ data }) => {
   return (
     <div className="container mx-auto">
       <div className="grid grid-cols-3 gap-1">
-        {data.interestParcel.map((item, index) => (
+        {data.areaList.map((item, index) => (
           <div key={index} className="pt-2 pb-2">
             <div className="font-semibold">Area</div>
-            <div className="mt-1">{item.area}</div>
+            <div className="mt-1">{item.areaInHectares}</div>
 
             <div className="pb-2">
               <div className="font-semibold">Legal Description</div>
               <div className="mt-1" id="orgUnit">
-                {item.legal_description}
+                {item.legalDescription}
               </div>
             </div>
           </div>
@@ -28,4 +28,4 @@ const AreaDetails: FC<AreaDetailsProps> = ({ data }) => {
   );
 };
 
-export default AreaDetails;
+export default InterestedParties;

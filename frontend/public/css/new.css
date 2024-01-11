@@ -9,12 +9,11 @@
   cursor: pointer;
 }
 
-.container {
-  width: 100%;
-  padding-right: 25px;
-  padding-left: 25px;
-  margin-right: auto;
-  margin-left: auto;
-  padding-top: 10px;
-  padding-bottom: 10px;
+hr {
+  border: 0;
+  clear: both;
+  display: block;
+  width: 96%;
+  background-color: #000000;
+  height: 1px;
 }

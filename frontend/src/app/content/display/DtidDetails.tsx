@@ -19,7 +19,7 @@ const DtidDetails: FC<DtidDetailsProps> = ({ data }) => {
           <DataSection content={data.orgUnit} id="orgUnit" />
         </div>
       </div>
-      <div className="form-row ml-2">
+      <div className="form-row">
         <div className="col-md-5 form-group">
           <div className="font-weight-bold">Primary Contact Email Address</div>
           <DataSection
@@ -35,7 +35,7 @@ const DtidDetails: FC<DtidDetailsProps> = ({ data }) => {
           />
         </div>
       </div>
-      <div className="form-row ml-2">
+      <div className="form-row">
         <div className="col-md-5 form-group">
           <div className="font-weight-bold">Contact/Agent Email Address</div>
           <DataSection content={data.contactEmail} id="contactEmail" />
@@ -48,7 +48,7 @@ const DtidDetails: FC<DtidDetailsProps> = ({ data }) => {
           />
         </div>
       </div>
-      <div className="form-row ml-2">
+      <div className="form-row">
         <div className="col-md-5 form-group">
           <div className="font-weight-bold">Incorporation Number</div>
           <DataSection content={data.incorporationNum} id="incorporationNum" />

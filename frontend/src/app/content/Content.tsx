@@ -1,12 +1,17 @@
 import { FC } from "react";
-import IndexPage from "./pages/IndexPage";
 import { rawData2 } from "../../app/constants/constants";
 import { DTRDisplayObject } from "../types/types";
 import { buildDTRDisplayData } from "../util/util";
+import ReportPage from "./pages/ReportPage";
 
 interface ContentProps {
   page: string;
 }
+
+const reportInfo = {
+  id: 1,
+  name: "Land Use Report",
+};
 
 const Content: FC<ContentProps> = ({ page }) => {
   const data: DTRDisplayObject = buildDTRDisplayData(rawData2);
@@ -17,7 +22,15 @@ const Content: FC<ContentProps> = ({ page }) => {
           <form>
             <div className="main">
               <div className="container">
-                {page === "index" && <IndexPage data={data} />}
+                {page === "report" && (
+                  <ReportPage data={data} reportType={reportInfo.name} />
+                )}
+                {/* {page === "search" && (
+                  <SearchPage />
+                )}
+                {page === "admin" && (
+                  <AdminPage />
+                )} */}
               </div>
             </div>
           </form>

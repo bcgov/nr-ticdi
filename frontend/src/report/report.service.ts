@@ -1,22 +1,11 @@
-import { HttpService } from "@nestjs/axios";
-import { Injectable } from "@nestjs/common";
-import * as dotenv from "dotenv";
-import { firstValueFrom } from "rxjs";
-import { TTLSService } from "src/ttls/ttls.service";
-import {
-  GL_REPORT_TYPE,
-  LUR_REPORT_TYPE,
-  numberWords,
-  sectionTitles,
-} from "utils/constants";
-import { ProvisionJSON, VariableJSON } from "utils/types";
-import {
-  convertToSpecialCamelCase,
-  formatMoney,
-  grazingLeaseVariables,
-  nfrAddressBuilder,
-} from "utils/util";
-const axios = require("axios");
+import { Injectable } from '@nestjs/common';
+import * as dotenv from 'dotenv';
+import { firstValueFrom } from 'rxjs';
+import { TTLSService } from 'src/ttls/ttls.service';
+import { GL_REPORT_TYPE, LUR_REPORT_TYPE, numberWords, sectionTitles } from 'utils/constants';
+import { ProvisionJSON, VariableJSON } from 'utils/types';
+import { convertToSpecialCamelCase, formatMoney, grazingLeaseVariables, nfrAddressBuilder } from 'utils/util';
+const axios = require('axios');
 
 dotenv.config();
 let hostname: string;
@@ -24,12 +13,8 @@ let port: number;
 
 @Injectable()
 export class ReportService {
-  constructor(
-    private readonly ttlsService: TTLSService
-  ) {
-    hostname = process.env.backend_url
-      ? process.env.backend_url
-      : `http://localhost`;
+  constructor(private readonly ttlsService: TTLSService) {
+    hostname = process.env.backend_url ? process.env.backend_url : `http://localhost`;
     // local development backend port is 3001, docker backend port is 3000
     port = process.env.backend_url ? 3000 : 3001;
   }
@@ -42,19 +27,21 @@ export class ReportService {
    * @param tenureFileNumber
    * @returns
    */
-  async generateReportName(dtid: number, tenureFileNumber: string, documentType:string) {
+  async generateReportName(dtid: number, tenureFileNumber: string, documentType: string) {
     const url = `${hostname}:${port}/print-request-log/version/${dtid}/${documentType}`;
     // grab the next version string for the dtid
     const version = await axios
       .get(url, {
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
       })
       .then((res) => {
         return res.data;
       });
-    return { reportName: documentType + "_" + tenureFileNumber + "_" + version };
+    return {
+      reportName: documentType + '_' + tenureFileNumber + '_' + version,
+    };
   }
 
   /**
@@ -74,7 +61,7 @@ export class ReportService {
     const data = await axios
       .get(url, {
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
       })
       .then((res) => {
@@ -82,16 +69,12 @@ export class ReportService {
       });
 
     if (data.InspectionDate) {
-      data["InspectionDate"] = this.ttlsService.formatInspectedDate(
-        data.InspectionDate
-      );
+      data['InspectionDate'] = this.ttlsService.formatInspectedDate(data.InspectionDate);
     }
     // get the document template
-    const documentTemplateObject: { id: number; the_file: string } = await axios
-      .get(templateUrl)
-      .then((res) => {
-        return res.data;
-      });
+    const documentTemplateObject: { id: number; the_file: string } = await axios.get(templateUrl).then((res) => {
+      return res.data;
+    });
 
     // log the request
     const document_template_id = documentTemplateObject.id;
@@ -112,28 +95,28 @@ export class ReportService {
         '{"myFormatter":"_function_myFormatter|function(data) { return data.slice(1); }","myOtherFormatter":"_function_myOtherFormatter|function(data) {return data.slice(2);}"}',
       options: {
         cacheReport: false,
-        convertTo: "docx",
+        convertTo: 'docx',
         overwrite: true,
-        reportName: "ticdi-report",
+        reportName: 'ticdi-report',
       },
       template: {
         content: `${bufferBase64}`,
-        encodingType: "base64",
-        fileType: "docx",
+        encodingType: 'base64',
+        fileType: 'docx',
       },
     });
 
     const conf = {
-      method: "post",
+      method: 'post',
       url: process.env.cdogs_url,
       headers: {
         Authorization: `Bearer ${cdogsToken}`,
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
       },
-      responseType: "arraybuffer",
+      responseType: 'arraybuffer',
       data: md,
     };
-    const ax = require("axios");
+    const ax = require('axios');
     const response = await ax(conf).catch((error) => {
       console.log(error.response);
     });
@@ -163,20 +146,17 @@ export class ReportService {
       });
 
     // get the document template
-    const documentTemplateObject: { id: number; the_file: string } = await axios
-      .get(templateUrl)
-      .then((res) => {
-        return res.data;
-      });
+    const documentTemplateObject: { id: number; the_file: string } = await axios.get(templateUrl).then((res) => {
+      return res.data;
+    });
     const interestParcel = rawData.interestParcel;
     const tenantAddr = rawData.tenantAddr;
-    const regVars =  
-      {
-        regOfficeStreet: rawData && rawData.regOfficeStreet ? rawData.regOfficeStreet : '',
-        regOfficeCity: rawData && rawData.regOfficeCity ? rawData.regOfficeCity : '',
-        regOfficeProv: rawData && rawData.regOfficeProv ? rawData.regOfficeProv : '',
-        regOfficePostalCode: rawData && rawData.regOfficePostalCode ? rawData.regOfficePostalCode : ''
-      }
+    const regVars = {
+      regOfficeStreet: rawData && rawData.regOfficeStreet ? rawData.regOfficeStreet : '',
+      regOfficeCity: rawData && rawData.regOfficeCity ? rawData.regOfficeCity : '',
+      regOfficeProv: rawData && rawData.regOfficeProv ? rawData.regOfficeProv : '',
+      regOfficePostalCode: rawData && rawData.regOfficePostalCode ? rawData.regOfficePostalCode : '',
+    };
     const glVariables = grazingLeaseVariables(tenantAddr, interestParcel, regVars);
 
     const data = {
@@ -210,28 +190,28 @@ export class ReportService {
         '{"myFormatter":"_function_myFormatter|function(data) { return data.slice(1); }","myOtherFormatter":"_function_myOtherFormatter|function(data) {return data.slice(2);}"}',
       options: {
         cacheReport: false,
-        convertTo: "docx",
+        convertTo: 'docx',
         overwrite: true,
-        reportName: "ticdi-report",
+        reportName: 'ticdi-report',
       },
       template: {
         content: `${bufferBase64}`,
-        encodingType: "base64",
-        fileType: "docx",
+        encodingType: 'base64',
+        fileType: 'docx',
       },
     });
 
     const conf = {
-      method: "post",
+      method: 'post',
       url: process.env.cdogs_url,
       headers: {
         Authorization: `Bearer ${cdogsToken}`,
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
       },
-      responseType: "arraybuffer",
+      responseType: 'arraybuffer',
       data: md,
     };
-    const ax = require("axios");
+    const ax = require('axios');
     const response = await ax(conf).catch((error) => {
       console.log(error.response);
     });
@@ -252,13 +232,13 @@ export class ReportService {
     const version = await axios
       .get(url, {
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
       })
       .then((res) => {
         return res.data;
       });
-    return { reportName: "NFR_" + tenureFileNumber + "_" + version };
+    return { reportName: 'NFR_' + tenureFileNumber + '_' + version };
   }
 
   async generateNFRReport(
@@ -295,30 +275,24 @@ export class ReportService {
     const variables: any = {};
     variableJson.forEach(({ variable_name, variable_value }) => {
       const newVariableName = variable_name
-        .replace(/_/g, " ")
+        .replace(/_/g, ' ')
         .toLowerCase()
         .replace(/\b\w/g, (match) => match.toUpperCase())
-        .replace(/\s/g, "_")
+        .replace(/\s/g, '_')
         .replace(/^(\w)/, (match) => match.toUpperCase());
 
-      if (variable_value.includes("«")) {
+      if (variable_value.includes('«')) {
         // regex which converts «DB_TENURE_TYPE» to {d.DB_Tenure_Type}, also works for VAR_
-        variable_value = variable_value.replace(
-          /<<([^>>]+)>>/g,
-          function (match, innerText) {
-            innerText = convertToSpecialCamelCase(innerText);
-            return "{d." + innerText + "}";
-          }
-        );
-      } else if (variable_value.includes("<<")) {
+        variable_value = variable_value.replace(/<<([^>>]+)>>/g, function (match, innerText) {
+          innerText = convertToSpecialCamelCase(innerText);
+          return '{d.' + innerText + '}';
+        });
+      } else if (variable_value.includes('<<')) {
         // regex which converts <<DB_TENURE_TYPE>> to {d.DB_Tenure_Type}, also works for VAR_
-        variable_value = variable_value.replace(
-          /<<([^>>]+)>>/g,
-          function (match, innerText) {
-            innerText = convertToSpecialCamelCase(innerText);
-            return "{d." + innerText + "}";
-          }
-        );
+        variable_value = variable_value.replace(/<<([^>>]+)>>/g, function (match, innerText) {
+          innerText = convertToSpecialCamelCase(innerText);
+          return '{d.' + innerText + '}';
+        });
       }
 
       variables[`VAR_${newVariableName}`] = variable_value;
@@ -335,30 +309,23 @@ export class ReportService {
 
       const groupText = numberWords[group];
       const varName = `Section${groupText}_${index}_Text`;
-      if (provision.free_text.includes("«")) {
+      if (provision.free_text.includes('«')) {
         // regex which converts «DB_TENURE_TYPE» to {d.DB_Tenure_Type}, also works for VAR_
-        provision.free_text = provision.free_text.replace(
-          /«([^»]+)»/g,
-          function (match, innerText) {
-            innerText = convertToSpecialCamelCase(innerText);
-            return "{d." + innerText + "}";
-          }
-        );
-      } else if (provision.free_text.includes("<<")) {
+        provision.free_text = provision.free_text.replace(/«([^»]+)»/g, function (match, innerText) {
+          innerText = convertToSpecialCamelCase(innerText);
+          return '{d.' + innerText + '}';
+        });
+      } else if (provision.free_text.includes('<<')) {
         // regex which converts <<DB_TENURE_TYPE>> to {d.DB_Tenure_Type}, also works for VAR_
-        provision.free_text = provision.free_text.replace(
-          /<<([^>>]+)>>/g,
-          function (match, innerText) {
-            innerText = convertToSpecialCamelCase(innerText);
-            return "{d." + innerText + "}";
-          }
-        );
+        provision.free_text = provision.free_text.replace(/<<([^>>]+)>>/g, function (match, innerText) {
+          innerText = convertToSpecialCamelCase(innerText);
+          return '{d.' + innerText + '}';
+        });
       }
       showProvisionSections[varName] = provision.free_text;
       // workaround for template formatting
-      if (showProvisionSections[varName] != "") {
-        showProvisionSections[varName] =
-          showProvisionSections[varName] + "\r\n\r\n";
+      if (showProvisionSections[varName] != '') {
+        showProvisionSections[varName] = showProvisionSections[varName] + '\r\n\r\n';
       }
 
       const showVarName = `showSection${groupText}_${index}`;
@@ -367,13 +334,9 @@ export class ReportService {
 
     // Logic for including section titles based on which sections are displaying information
     for (const key in showProvisionSections) {
-      if (key.startsWith("showSection")) {
+      if (key.startsWith('showSection')) {
         const number = key.match(/Section(\w+)_\d+/)[1];
-        if (
-          number === "Twenty" ||
-          number === "TwentyFive" ||
-          number === "TwentySeven"
-        ) {
+        if (number === 'Twenty' || number === 'TwentyFive' || number === 'TwentySeven') {
           const titleKey = `Section${number}_Title`; // titleKey = Section<Number>_Title
           showProvisionSections[key] = showProvisionSections[key]; // key = showSection<Number>_<#>
           showProvisionSections[titleKey] = sectionTitles[number]; // set title text
@@ -384,11 +347,17 @@ export class ReportService {
 
     // Format the raw ttls data
     const tenantAddr = rawData.tenantAddr;
-    const interestParcel = rawData.interestParcel[0];
+    const interestParcels = rawData.interestParcel;
+    let concatLegalDescriptions = '';
+    if (interestParcels && interestParcels.length > 0) {
+      let legalDescArray = [];
+      for (let ip of interestParcels) {
+        legalDescArray.push(ip.legalDescription);
+      }
+      concatLegalDescriptions = legalDescArray.join('\n');
+    }
 
-    const DB_Address_Mailing_Tenant = tenantAddr[0]
-      ? nfrAddressBuilder(tenantAddr)
-      : "";
+    const DB_Address_Mailing_Tenant = tenantAddr[0] ? nfrAddressBuilder(tenantAddr) : '';
 
     const VAR_Fee_Documentation_Amount: number =
       variables && variables.VAR_Fee_Documentation_Amount
@@ -398,10 +367,8 @@ export class ReportService {
         : 0;
     if (variables && variables.VAR_Fee_Documentation_Amount) {
       !isNaN(variables.VAR_Fee_Documentation_Amount)
-        ? (variables.VAR_Fee_Documentation_Amount = formatMoney(
-            parseFloat(variables.VAR_Fee_Documentation_Amount)
-          ))
-        : (variables.VAR_Fee_Documentation_Amount = "0.00");
+        ? (variables.VAR_Fee_Documentation_Amount = formatMoney(parseFloat(variables.VAR_Fee_Documentation_Amount)))
+        : (variables.VAR_Fee_Documentation_Amount = '0.00');
     }
 
     const VAR_Fee_Application_Amount: number =
@@ -412,10 +379,8 @@ export class ReportService {
         : 0;
     if (variables && variables.VAR_Fee_Application_Amount) {
       !isNaN(variables.VAR_Fee_Application_Amount)
-        ? (variables.VAR_Fee_Application_Amount = formatMoney(
-            parseFloat(variables.VAR_Fee_Application_Amount)
-          ))
-        : (variables.VAR_Fee_Application_Amount = "0.00");
+        ? (variables.VAR_Fee_Application_Amount = formatMoney(parseFloat(variables.VAR_Fee_Application_Amount)))
+        : (variables.VAR_Fee_Application_Amount = '0.00');
     }
 
     const VAR_Fee_Occupational_Rental_Amount: number =
@@ -433,7 +398,7 @@ export class ReportService {
           parseFloat(variables.VAR_Fee_Occupational_Rental_Amount)
         );
       } else {
-        variables.VAR_Fee_Occupational_Rental_Amount = "0.00";
+        variables.VAR_Fee_Occupational_Rental_Amount = '0.00';
       }
     }
 
@@ -445,26 +410,18 @@ export class ReportService {
         : 0;
     if (variables && variables.VAR_Fee_Other_Credit_Amount) {
       !isNaN(variables.VAR_Fee_Other_Credit_Amount)
-        ? (variables.VAR_Fee_Other_Credit_Amount = formatMoney(
-            parseFloat(variables.VAR_Fee_Other_Credit_Amount)
-          ))
-        : (variables.VAR_Fee_Other_Credit_Amount = "0.00");
+        ? (variables.VAR_Fee_Other_Credit_Amount = formatMoney(parseFloat(variables.VAR_Fee_Other_Credit_Amount)))
+        : (variables.VAR_Fee_Other_Credit_Amount = '0.00');
     }
 
     const GST_Rate: number = rawData && rawData.gstRate ? rawData.gstRate : 0;
     const DB_Fee_Payable_Type: string = rawData.feePayableType;
-    const DB_Fee_Payable_Amount: number = rawData.feePayableAmount
-      ? rawData.feePayableAmount
-      : 0;
-    const DB_Fee_Payable_Amount_GST: number = rawData.feePayableAmountGst
-      ? rawData.feePayableAmountGst
-      : 0;
-    const DB_GST_Exempt: string = rawData.gstExempt ? rawData.gstExempt : "N";
-    const DB_GST_Exempt_Area: number = rawData.gstExemptArea
-      ? rawData.gstExemptArea
-      : 0;
+    const DB_Fee_Payable_Amount: number = rawData.feePayableAmount ? rawData.feePayableAmount : 0;
+    const DB_Fee_Payable_Amount_GST: number = rawData.feePayableAmountGst ? rawData.feePayableAmountGst : 0;
+    const DB_GST_Exempt: string = rawData.gstExempt ? rawData.gstExempt : 'N';
+    const DB_GST_Exempt_Area: number = rawData.gstExemptArea ? rawData.gstExemptArea : 0;
     let DB_Total_GST_Amount: number;
-    const DB_FP_Asterisk: string = DB_GST_Exempt === "Y" ? "" : "*";
+    const DB_FP_Asterisk: string = DB_GST_Exempt === 'Y' ? '' : '*';
 
     let totalArea = 0;
     if (rawData.interestParcel && rawData.interestParcel[0]) {
@@ -477,11 +434,9 @@ export class ReportService {
     // Get the ratio of the taxable are to the totalArea
     const areaRatio = totalArea !== 0 ? taxableArea / totalArea : 0;
 
-    if (DB_GST_Exempt === "Y") {
+    if (DB_GST_Exempt === 'Y') {
       DB_Total_GST_Amount =
-        ((DB_Fee_Payable_Amount_GST * areaRatio +
-          VAR_Fee_Documentation_Amount +
-          VAR_Fee_Application_Amount) *
+        ((DB_Fee_Payable_Amount_GST * areaRatio + VAR_Fee_Documentation_Amount + VAR_Fee_Application_Amount) *
           GST_Rate) /
         100.0;
     } else {
@@ -504,87 +459,66 @@ export class ReportService {
       VAR_Fee_Other_Credit_Amount;
 
     let monies = [];
-    const Show_Fee_Payable_Amount_GST = DB_Fee_Payable_Amount_GST
-      ? DB_Fee_Payable_Amount_GST > 0
-        ? 1
-        : 0
-      : 0;
+    const Show_Fee_Payable_Amount_GST = DB_Fee_Payable_Amount_GST ? (DB_Fee_Payable_Amount_GST > 0 ? 1 : 0) : 0;
     if (Show_Fee_Payable_Amount_GST === 1) {
       monies.push({
         description: DB_Fee_Payable_Type,
-        dollarSign: "*$",
+        dollarSign: '*$',
         value: formatMoney(DB_Fee_Payable_Amount_GST),
       });
     }
-    const Show_Fee_Payable_Amount = DB_Fee_Payable_Amount
-      ? DB_Fee_Payable_Amount > 0
-        ? 1
-        : 0
-      : 0;
+    const Show_Fee_Payable_Amount = DB_Fee_Payable_Amount ? (DB_Fee_Payable_Amount > 0 ? 1 : 0) : 0;
     if (Show_Fee_Payable_Amount === 1) {
       monies.push({
         description: DB_Fee_Payable_Type,
-        dollarSign: "$",
+        dollarSign: '$',
         value: formatMoney(DB_Fee_Payable_Amount),
       });
     }
-    const Show_Fee_Occupational_Rental_Amount =
-      VAR_Fee_Occupational_Rental_Amount
-        ? VAR_Fee_Occupational_Rental_Amount > 0
-          ? 1
-          : 0
-        : 0;
+    const Show_Fee_Occupational_Rental_Amount = VAR_Fee_Occupational_Rental_Amount
+      ? VAR_Fee_Occupational_Rental_Amount > 0
+        ? 1
+        : 0
+      : 0;
     if (Show_Fee_Occupational_Rental_Amount === 1) {
       monies.push({
-        description: "Occupational Rental Amount",
+        description: 'Occupational Rental Amount',
         dollarSign: `${DB_FP_Asterisk}$`,
         value: formatMoney(VAR_Fee_Occupational_Rental_Amount),
       });
     }
-    const Show_Fee_Documentation_Amount = VAR_Fee_Documentation_Amount
-      ? VAR_Fee_Documentation_Amount > 0
-        ? 1
-        : 0
-      : 0;
+    const Show_Fee_Documentation_Amount = VAR_Fee_Documentation_Amount ? (VAR_Fee_Documentation_Amount > 0 ? 1 : 0) : 0;
     if (Show_Fee_Documentation_Amount === 1) {
       monies.push({
-        description: "Documentation Amount",
-        dollarSign: "*$",
+        description: 'Documentation Amount',
+        dollarSign: '*$',
         value: formatMoney(VAR_Fee_Documentation_Amount),
       });
     }
-    const Show_Fee_Application_Amount = VAR_Fee_Application_Amount
-      ? VAR_Fee_Application_Amount > 0
-        ? 1
-        : 0
-      : 0;
+    const Show_Fee_Application_Amount = VAR_Fee_Application_Amount ? (VAR_Fee_Application_Amount > 0 ? 1 : 0) : 0;
     if (Show_Fee_Application_Amount === 1) {
       monies.push({
-        description: "Application Amount",
-        dollarSign: "*$",
+        description: 'Application Amount',
+        dollarSign: '*$',
         value: formatMoney(VAR_Fee_Application_Amount),
       });
     }
-    const Show_Fee_Other_Credit_Amount = VAR_Fee_Other_Credit_Amount
-      ? VAR_Fee_Other_Credit_Amount > 0
-        ? 1
-        : 0
-      : 0;
+    const Show_Fee_Other_Credit_Amount = VAR_Fee_Other_Credit_Amount ? (VAR_Fee_Other_Credit_Amount > 0 ? 1 : 0) : 0;
     if (Show_Fee_Other_Credit_Amount === 1) {
       monies.push({
-        description: "Other (credit)",
-        dollarSign: "$",
+        description: 'Other (credit)',
+        dollarSign: '$',
         value: formatMoney(VAR_Fee_Other_Credit_Amount),
       });
     }
     monies.push({
-      description: "GST Total",
-      dollarSign: "$",
+      description: 'GST Total',
+      dollarSign: '$',
       value: formatMoney(DB_Total_GST_Amount),
     });
     const moniesTotal = {
-      description: "Total Fees Payable",
-      dollarSign: "$",
+      description: 'Total Fees Payable',
+      dollarSign: '$',
       value: formatMoney(DB_Total_Monies_Payable),
     };
 
@@ -603,17 +537,11 @@ export class ReportService {
       DB_File_Number: rawData.fileNum,
       DB_Address_Mailing_Tenant: DB_Address_Mailing_Tenant,
       DB_Tenure_Type: rawData.type // convert a tenure type like LICENSE to License
-        ? rawData.type.toLowerCase().charAt(0).toUpperCase() +
-          rawData.type.toLowerCase().slice(1)
-        : "",
-      DB_Legal_Description: interestParcel
-        ? interestParcel.legalDescription
-        : "",
+        ? rawData.type.toLowerCase().charAt(0).toUpperCase() + rawData.type.toLowerCase().slice(1)
+        : '',
+      DB_Legal_Description: concatLegalDescriptions,
       DB_Fee_Payable_Type: DB_Fee_Payable_Type,
-      DB_Fee_Payable_Amount_GST:
-        DB_Fee_Payable_Amount_GST == 0
-          ? ""
-          : formatMoney(DB_Fee_Payable_Amount_GST),
+      DB_Fee_Payable_Amount_GST: DB_Fee_Payable_Amount_GST == 0 ? '' : formatMoney(DB_Fee_Payable_Amount_GST),
       DB_Fee_Payable_Amount: formatMoney(DB_Fee_Payable_Amount),
       DB_FP_Asterisk: DB_FP_Asterisk,
       DB_Total_GST_Amount: formatMoney(DB_Total_GST_Amount),
@@ -641,14 +569,7 @@ export class ReportService {
     });
 
     // Save the NFR Data
-    await this.saveNFR(
-      dtid,
-      variantName,
-      "Complete",
-      provisionJson,
-      variableJson,
-      idirUsername
-    );
+    await this.saveNFR(dtid, variantName, 'Complete', provisionJson, variableJson, idirUsername);
 
     // Generate the report
     const cdogsToken = await this.ttlsService.callGetToken();
@@ -659,36 +580,36 @@ export class ReportService {
         '{"myFormatter":"_function_myFormatter|function(data) { return data.slice(1); }","myOtherFormatter":"_function_myOtherFormatter|function(data) {return data.slice(2);}"}',
       options: {
         cacheReport: false,
-        convertTo: "docx",
+        convertTo: 'docx',
         overwrite: true,
-        reportName: "nfr-report",
+        reportName: 'nfr-report',
       },
       template: {
         content: `${bufferBase64}`,
-        encodingType: "base64",
-        fileType: "docx",
+        encodingType: 'base64',
+        fileType: 'docx',
       },
     };
     const md = JSON.stringify(cdogsData);
 
     let conf = {
-      method: "post",
+      method: 'post',
       url: process.env.cdogs_url,
       headers: {
         Authorization: `Bearer ${cdogsToken}`,
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
       },
-      responseType: "arraybuffer",
+      responseType: 'arraybuffer',
       data: md,
     };
-    const ax = require("axios");
+    const ax = require('axios');
     const response = await ax(conf).catch((error) => {
       console.log(error.response);
     });
     // response.data is the docx file after the first insertions
     const firstFile = response.data;
     // convert the docx file buffer to base64 for a second cdogs conversion
-    const base64File = Buffer.from(firstFile).toString("base64");
+    const base64File = Buffer.from(firstFile).toString('base64');
     cdogsData.template.content = base64File;
     const md2 = JSON.stringify(cdogsData);
     conf.data = md2;
@@ -700,19 +621,16 @@ export class ReportService {
     return response2.data;
   }
 
-  async getNFRProvisionsByVariantAndDtid(
-    variantName: string,
-    dtid: number
-  ): Promise<any> {
+  async getNFRProvisionsByVariantAndDtid(variantName: string, dtid: number): Promise<any> {
     const returnItems = [
-      "type",
-      "provision_name",
-      "help_text",
-      "free_text",
-      "category",
-      "provision_group",
-      "id",
-      "mandatory",
+      'type',
+      'provision_name',
+      'help_text',
+      'free_text',
+      'category',
+      'provision_group',
+      'id',
+      'mandatory',
     ];
     let reduced, provisions;
     // nfrDataId exists so return a list of provisions with pre-existing free_text data inserted, certain provisions preselected
@@ -758,9 +676,9 @@ export class ReportService {
     // make the returned data readable for the ajax request
     return reduced.map((obj) => {
       const groupObj = obj.provision_group;
-      delete obj["provision_group"];
-      obj["max"] = groupObj.max;
-      obj["provision_group"] = groupObj.provision_group;
+      delete obj['provision_group'];
+      obj['max'] = groupObj.max;
+      obj['provision_group'] = groupObj.provision_group;
       return obj;
     });
   }
@@ -772,10 +690,7 @@ export class ReportService {
     });
   }
 
-  async getNFRVariablesByVariantAndDtid(
-    variantName: string,
-    dtid: number
-  ): Promise<any> {
+  async getNFRVariablesByVariantAndDtid(variantName: string, dtid: number): Promise<any> {
     // if an nfrId is provided, get the variables with any existing user specified values
     const url = `${hostname}:${port}/nfr-data/variables/${variantName}/${dtid}`;
     const variables = await axios
@@ -851,7 +766,7 @@ export class ReportService {
             dtid: nfr.dtid,
             version: template.template_version,
             file_name: template.file_name,
-            updated_date: nfr.update_timestamp.split("T")[0],
+            updated_date: nfr.update_timestamp.split('T')[0],
             status: nfr.status,
             active: template.active_flag,
             nfr_id: nfr.id,
@@ -873,7 +788,7 @@ export class ReportService {
     return axios
       .get(url, {
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
       })
       .then((res) => {
@@ -920,10 +835,7 @@ export class ReportService {
     });
   }
 
-  async getEnabledProvisionsByVariantAndDtid(
-    variantName: string,
-    dtid: number
-  ) {
+  async getEnabledProvisionsByVariantAndDtid(variantName: string, dtid: number) {
     const url = `${hostname}:${port}/nfr-data/get-enabled-provisions/${variantName}/${dtid}`;
     return axios.get(url).then((res) => {
       return res.data;

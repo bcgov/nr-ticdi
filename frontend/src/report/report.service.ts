@@ -2,9 +2,9 @@ import { Injectable } from '@nestjs/common';
 import * as dotenv from 'dotenv';
 import { firstValueFrom } from 'rxjs';
 import { TTLSService } from 'src/ttls/ttls.service';
-import { GL_REPORT_TYPE, LUR_REPORT_TYPE, numberWords, sectionTitles } from 'utils/constants';
-import { ProvisionJSON, VariableJSON } from 'utils/types';
-import { convertToSpecialCamelCase, formatMoney, grazingLeaseVariables, nfrAddressBuilder } from 'utils/util';
+import { GL_REPORT_TYPE, LUR_REPORT_TYPE, numberWords, sectionTitles } from '../../utils/constants';
+import { ProvisionJSON, VariableJSON } from '../../utils/types';
+import { convertToSpecialCamelCase, formatMoney, grazingLeaseVariables, nfrAddressBuilder } from '../../utils/util';
 const axios = require('axios');
 
 dotenv.config();
@@ -352,9 +352,13 @@ export class ReportService {
     if (interestParcels && interestParcels.length > 0) {
       let legalDescArray = [];
       for (let ip of interestParcels) {
-        legalDescArray.push(ip.legalDescription);
+        if (ip.legalDescription && ip.legalDescription != '') {
+          legalDescArray.push(ip.legalDescription);
+        }
       }
-      concatLegalDescriptions = legalDescArray.join('\n');
+      if (legalDescArray.length > 0) {
+        concatLegalDescriptions = legalDescArray.join('\n');
+      }
     }
 
     const DB_Address_Mailing_Tenant = tenantAddr[0] ? nfrAddressBuilder(tenantAddr) : '';

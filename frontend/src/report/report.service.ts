@@ -350,6 +350,7 @@ export class ReportService {
     const interestParcels = rawData.interestParcel;
     let concatLegalDescriptions = '';
     if (interestParcels && interestParcels.length > 0) {
+      interestParcels.sort((a, b) => b.interestParcelId - a.interestParcelId);
       let legalDescArray = [];
       for (let ip of interestParcels) {
         if (ip.legalDescription && ip.legalDescription != '') {

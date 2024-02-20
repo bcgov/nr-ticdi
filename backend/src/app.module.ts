@@ -50,14 +50,14 @@ if (process.env.POSTGRESQL_PASSWORD != null) {
       session: { secret: process.env.session_secret },
     }),
   ],
-  controllers: [AppController, AdminController],
+  controllers: [AdminController],
   providers: [
     AppService,
     TTLSService,
-    {
-      provide: APP_FILTER,
-      useClass: HttpExceptionFilter,
-    },
+    // {
+    //   provide: APP_FILTER,
+    //   useClass: HttpExceptionFilter,
+    // },
   ],
 })
 export class AppModule {}

@@ -3,6 +3,8 @@ import { rawData2 } from "../../app/constants/constants";
 import { DTRDisplayObject } from "../types/types";
 import { buildDTRDisplayData } from "../util/util";
 import ReportPage from "./pages/ReportPage";
+import SearchPage from "./pages/SearchPage";
+import AdminPage from "./pages/AdminPage";
 
 interface ContentProps {
   page: string;
@@ -25,12 +27,8 @@ const Content: FC<ContentProps> = ({ page }) => {
                 {page === "report" && (
                   <ReportPage data={data} reportType={reportInfo.name} />
                 )}
-                {/* {page === "search" && (
-                  <SearchPage />
-                )}
-                {page === "admin" && (
-                  <AdminPage />
-                )} */}
+                {page === "search" && <SearchPage />}
+                {page === "admin" && <AdminPage />}
               </div>
             </div>
           </form>

@@ -1,4 +1,5 @@
 import { FC } from "react";
+import "./modals.css";
 
 const RemoveAdmin: FC = ({}) => {
   return (
@@ -18,40 +19,44 @@ const RemoveAdmin: FC = ({}) => {
                 </div>
                 <div className="form-group row">
                   <div className="col-md-2 ml-3">
-                    <label for="removeName">Name:</label>
+                    <label htmlFor="removeName">Name:</label>
                   </div>
                   <div className="col-md-9">
                     <input
                       id="removeName"
                       value=""
-                      style="color:gray; min-width: 270px"
-                      readonly
+                      className="removeAdminInput"
+                      readOnly
                     />
                   </div>
                   <div className="col-md-2 ml-3">
-                    <label for="removeUsername">Username:</label>
+                    <label htmlFor="removeUsername">Username:</label>
                   </div>
                   <div className="col-md-9">
                     <input
                       id="removeUsername"
                       value=""
-                      style="color:gray; min-width: 270px"
-                      readonly
+                      className="removeAdminInput"
+                      readOnly
                     />
                   </div>
                   <div className="col-md-2 ml-3">
-                    <label for="removeEmail">Email:</label>
+                    <label htmlFor="removeEmail">Email:</label>
                   </div>
                   <div className="col-md-9">
                     <input
                       id="removeEmail"
                       value=""
-                      style="color:gray; min-width: 270px"
-                      readonly
+                      className="removeAdminInput"
+                      readOnly
                     />
                   </div>
                 </div>
-                <input id="removeIdirUsername" value="" style="display: none" />
+                <input
+                  id="removeIdirUsername"
+                  value=""
+                  style={{ display: "none" }}
+                />
               </div>
             </div>
             <div className="modal-footer">

@@ -24,9 +24,7 @@ let port: number;
 
 @Injectable()
 export class ReportService {
-  constructor(
-    private readonly ttlsService: TTLSService
-  ) {
+  constructor(private readonly ttlsService: TTLSService) {
     hostname = process.env.backend_url
       ? process.env.backend_url
       : `http://localhost`;
@@ -42,7 +40,11 @@ export class ReportService {
    * @param tenureFileNumber
    * @returns
    */
-  async generateReportName(dtid: number, tenureFileNumber: string, documentType:string) {
+  async generateReportName(
+    dtid: number,
+    tenureFileNumber: string,
+    documentType: string
+  ) {
     const url = `${hostname}:${port}/print-request-log/version/${dtid}/${documentType}`;
     // grab the next version string for the dtid
     const version = await axios
@@ -54,7 +56,9 @@ export class ReportService {
       .then((res) => {
         return res.data;
       });
-    return { reportName: documentType + "_" + tenureFileNumber + "_" + version };
+    return {
+      reportName: documentType + "_" + tenureFileNumber + "_" + version,
+    };
   }
 
   /**
@@ -170,21 +174,32 @@ export class ReportService {
       });
     const interestParcel = rawData.interestParcel;
     const tenantAddr = rawData.tenantAddr;
-    const regVars =  
-      {
-        regOfficeStreet: rawData && rawData.regOfficeStreet ? rawData.regOfficeStreet : '',
-        regOfficeCity: rawData && rawData.regOfficeCity ? rawData.regOfficeCity : '',
-        regOfficeProv: rawData && rawData.regOfficeProv ? rawData.regOfficeProv : '',
-        regOfficePostalCode: rawData && rawData.regOfficePostalCode ? rawData.regOfficePostalCode : ''
-      }
-    const glVariables = grazingLeaseVariables(tenantAddr, interestParcel, regVars);
+    const regVars = {
+      regOfficeStreet:
+        rawData && rawData.regOfficeStreet ? rawData.regOfficeStreet : "",
+      regOfficeCity:
+        rawData && rawData.regOfficeCity ? rawData.regOfficeCity : "",
+      regOfficeProv:
+        rawData && rawData.regOfficeProv ? rawData.regOfficeProv : "",
+      regOfficePostalCode:
+        rawData && rawData.regOfficePostalCode
+          ? rawData.regOfficePostalCode
+          : "",
+    };
+    const glVariables = grazingLeaseVariables(
+      tenantAddr,
+      interestParcel,
+      regVars
+    );
 
     const data = {
       DB_File_Number: rawData.fileNum,
       DB_Document_Number: dtid,
-      DB_Address_Street_Tenant: glVariables.glStreetAddress || glVariables.glMailingAddress,
+      DB_Address_Street_Tenant:
+        glVariables.glStreetAddress || glVariables.glMailingAddress,
       DB_Address_Regional_Office: glVariables.addressRegionalOffice,
-      DB_Address_Mailing_Tenant: glVariables.glMailingAddress || glVariables.glStreetAddress,
+      DB_Address_Mailing_Tenant:
+        glVariables.glMailingAddress || glVariables.glStreetAddress,
       DB_Name_Tenant: glVariables.mailingName,
       DB_Name_Tenant_List: glVariables.mailingNameList,
       DB_Name_Corporation: glVariables.mailingCorp,

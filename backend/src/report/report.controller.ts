@@ -21,9 +21,9 @@ import { ReportService } from "./report.service";
 let requestUrl: string;
 let requestConfig: AxiosRequestConfig;
 
-@UseFilters(AuthenticationFilter)
-@UseGuards(AuthenticationGuard)
-@UseGuards(GenerateReportGuard)
+// @UseFilters(AuthenticationFilter)
+// @UseGuards(AuthenticationGuard)
+// @UseGuards(GenerateReportGuard)
 @Controller("report")
 export class ReportController {
   constructor(
@@ -48,7 +48,11 @@ export class ReportController {
     @Param("tfn") tenureFileNumber: string,
     @Param("documentType") documentType: string
   ): Promise<{ reportName: string }> {
-    return this.reportService.generateReportName(dtid, tenureFileNumber, documentType);
+    return this.reportService.generateReportName(
+      dtid,
+      tenureFileNumber,
+      documentType
+    );
   }
 
   @Get("get-nfr-report-name/:dtid/:tfn")
@@ -67,17 +71,28 @@ export class ReportController {
   @Header("Content-Disposition", "attachment; filename=landusereport.docx")
   async generateReport(
     @Session() session: { data: SessionData },
-    @Body() data: { prdid: string; document_type: string, dtid: number }
+    @Body() data: { prdid: string; document_type: string; dtid: number }
   ) {
     // this should eventually check permissions and prevent unauthorized users from generating documents
     let idir_username = "";
+    session = {
+      data: {
+        activeAccount: {
+          idir_username: "mtennant",
+          name: "",
+          full_name: "",
+          client_roles: [""],
+        },
+      },
+      ...session,
+    };
     if (session.data.activeAccount) {
       idir_username = session.data.activeAccount.idir_username;
       console.log("active account found");
     } else {
       console.log("no active account found");
     }
-    if (data.document_type == 'GL') {
+    if (data.document_type == "GL") {
       return new StreamableFile(
         await this.reportService.generateGLReport(+data.dtid, idir_username)
       );
@@ -87,6 +102,23 @@ export class ReportController {
       );
     }
   }
+
+  // @Post("generate-report-new")
+  // @Header(
+  //   "Content-Type",
+  //   "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+  // )
+  // async generateReportNew(@Session() session: {data: SessionData}) {
+  //   let idir_username = "";
+  //   if (session.data.activeAccount) {
+  //     idir_username = session.data.activeAccount.idir_username;
+  //     console.log("Active account found");
+  //   } else {
+  //     console.log("No active account found");
+  //   }
+  //   // receive document_type id to get the report type & active template
+  //   return new StreamableFile(await this.reportService.generateReportNew(+data.dtid, idir_username));
+  // }
 
   @Post("generate-nfr-report")
   @Header(

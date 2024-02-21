@@ -5,6 +5,11 @@ import { AppService } from "./app.service";
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  app.enableCors({
+    origin: "http://localhost:3000",
+    methods: "GET,POST,PUT,DELETE,OPTIONS",
+    allowedHeaders: "Content-Type,Authorization",
+  });
   const config = new DocumentBuilder()
     .setTitle("Users example")
     .setDescription("The user API description")
@@ -17,6 +22,6 @@ async function bootstrap() {
   const appService = app.get(AppService);
   // await appService.initializeDb();
 
-  await app.listen(3000);
+  await app.listen(3001);
 }
 bootstrap();

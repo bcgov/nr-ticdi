@@ -1,19 +1,15 @@
-import { FC } from "react";
+import { FC, useState } from "react";
 import { rawData2 } from "../../app/constants/constants";
 import { DTRDisplayObject } from "../types/types";
 import { buildDTRDisplayData } from "../util/util";
 import ReportPage from "./pages/ReportPage";
 import SearchPage from "./pages/SearchPage";
 import AdminPage from "./pages/AdminPage";
+import { PAGE, CURRENT_REPORT_PAGES } from "../util/constants";
 
 interface ContentProps {
   page: string;
 }
-
-const reportInfo = {
-  id: 1,
-  name: "Land Use Report",
-};
 
 const Content: FC<ContentProps> = ({ page }) => {
   const data: DTRDisplayObject = buildDTRDisplayData(rawData2);
@@ -24,11 +20,17 @@ const Content: FC<ContentProps> = ({ page }) => {
           <form>
             <div className="main">
               <div className="container">
-                {page === "report" && (
-                  <ReportPage data={data} reportType={reportInfo.name} />
+                {Object.values(CURRENT_REPORT_PAGES).includes(page) && (
+                  <ReportPage data={data} documentDescription={page} />
                 )}
-                {page === "search" && <SearchPage />}
-                {page === "admin" && <AdminPage />}
+                {page === PAGE.INDEX && (
+                  <ReportPage
+                    data={data}
+                    documentDescription={CURRENT_REPORT_PAGES.LUR}
+                  />
+                )}
+                {page === PAGE.SEARCH && <SearchPage />}
+                {page === PAGE.ADMIN && <AdminPage />}
               </div>
             </div>
           </form>

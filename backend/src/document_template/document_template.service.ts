@@ -191,6 +191,13 @@ export class DocumentTemplateService {
     });
   }
 
+  getReportTemplate(report_id: number): Promise<DocumentTemplate> {
+    return this.documentTemplateRepository.findOneBy({
+      id: report_id,
+      active_flag: true,
+    });
+  }
+
   findOne(id: number): Promise<DocumentTemplate> {
     return this.documentTemplateRepository.findOneByOrFail({
       id: id,

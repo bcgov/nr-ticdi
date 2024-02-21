@@ -8,5 +8,6 @@ import { PrintRequestLogService } from "./print_request_log.service";
   imports: [TypeOrmModule.forFeature([PrintRequestLog])],
   controllers: [PrintRequestLogController],
   providers: [PrintRequestLogService],
+  exports: [PrintRequestLogService],
 })
 export class PrintRequestLogModule {}

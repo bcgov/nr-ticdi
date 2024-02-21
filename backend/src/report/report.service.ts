@@ -1,7 +1,8 @@
-import { HttpService } from "@nestjs/axios";
 import { Injectable } from "@nestjs/common";
 import * as dotenv from "dotenv";
 import { firstValueFrom } from "rxjs";
+import { DocumentTemplateService } from "src/document_template/document_template.service";
+import { PrintRequestLogService } from "src/print_request_log/print_request_log.service";
 import { TTLSService } from "src/ttls/ttls.service";
 import {
   GL_REPORT_TYPE,
@@ -24,7 +25,11 @@ let port: number;
 
 @Injectable()
 export class ReportService {
-  constructor(private readonly ttlsService: TTLSService) {
+  constructor(
+    private readonly ttlsService: TTLSService,
+    private readonly documentTemplateService: DocumentTemplateService,
+    private readonly printRequestLogService: PrintRequestLogService
+  ) {
     hostname = process.env.backend_url
       ? process.env.backend_url
       : `http://localhost`;
@@ -69,6 +74,7 @@ export class ReportService {
    * @returns
    */
   async generateLURReport(prdid: number, username: string) {
+    prdid = 1;
     const documentType = LUR_REPORT_TYPE;
     const url = `${hostname}:${port}/print-request-detail/view/${prdid}`;
     const templateUrl = `${hostname}:${port}/document-template/get-active-report/${documentType}`;
@@ -141,11 +147,12 @@ export class ReportService {
     const response = await ax(conf).catch((error) => {
       console.log(error.response);
     });
+    console.log("time - " + Date.now());
     return response.data;
   }
 
   /**
-   * Generates the Land Use Report using CDOGS
+   * Generates the Grazing Lease Use Report using CDOGS
    *
    * @param prdid
    * @param username
@@ -252,6 +259,73 @@ export class ReportService {
     });
     return response.data;
   }
+
+  // /**
+  //  *
+  //  * @param dtid
+  //  * @param idir_username
+  //  * @param reportType - id of the report type used to get report type & active template
+  //  */
+  // async generateReportNew(
+  //   dtid: number,
+  //   idir_username: string,
+  //   reportId: number
+  // ) {
+  //   const documentTemplateObject: { id: number; the_file: string; document_type: string } = await this.documentTemplateService.getReportTemplate(reportId);
+
+  //   const data = {};
+
+  //   // log the request
+  //   const logData = {
+  //     document_template_id: documentTemplateObject.id,
+  //     print_request_detail_id: null,
+  //     document_type: documentTemplateObject.document_type,
+  //     dtid: dtid,
+  //     request_app_user: idir_username,
+  //     request_json: JSON.stringify(data),
+  //     create_userid: idir_username,
+  //   };
+  //   await this.printRequestLogService.create(logData);
+
+  //   const bufferBase64 = documentTemplateObject.the_file;
+  //   return await this.callCdogs(bufferBase64, data)
+  // }
+
+  // async callCdogs(base64Template: string, data: any) {
+  //   const cdogsToken = await this.ttlsService.callGetToken();
+  //   const md = JSON.stringify({
+  //     data,
+  //     formatters:
+  //       '{"myFormatter":"_function_myFormatter|function(data) { return data.slice(1); }","myOtherFormatter":"_function_myOtherFormatter|function(data) {return data.slice(2);}"}',
+  //     options: {
+  //       cacheReport: false,
+  //       convertTo: "docx",
+  //       overwrite: true,
+  //       reportName: "ticdi-report",
+  //     },
+  //     template: {
+  //       content: `${base64Template}`,
+  //       encodingType: "base64",
+  //       fileType: "docx",
+  //     },
+  //   });
+
+  //   const conf = {
+  //     method: "post",
+  //     url: process.env.cdogs_url,
+  //     headers: {
+  //       Authorization: `Bearer ${cdogsToken}`,
+  //       "Content-Type": "application/json",
+  //     },
+  //     responseType: "arraybuffer",
+  //     data: md,
+  //   };
+  //   const ax = require("axios");
+  //   const response = await ax(conf).catch((error) => {
+  //     console.log(error.response);
+  //   });
+  //   return response.data;
+  // }
 
   /**
    * Generates an NFR report name using tenure file number

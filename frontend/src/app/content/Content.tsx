@@ -5,7 +5,7 @@ import { buildDTRDisplayData } from "../util/util";
 import ReportPage from "./pages/ReportPage";
 import SearchPage from "./pages/SearchPage";
 import AdminPage from "./pages/AdminPage";
-import { PAGE, CURRENT_REPORT_PAGES } from "../util/constants";
+import { CURRENT_REPORT_PAGES } from "../util/constants";
 
 interface ContentProps {
   page: string;
@@ -23,14 +23,14 @@ const Content: FC<ContentProps> = ({ page }) => {
                 {Object.values(CURRENT_REPORT_PAGES).includes(page) && (
                   <ReportPage data={data} documentDescription={page} />
                 )}
-                {page === PAGE.INDEX && (
+                {page === CURRENT_REPORT_PAGES.LUR && (
                   <ReportPage
                     data={data}
                     documentDescription={CURRENT_REPORT_PAGES.LUR}
                   />
                 )}
-                {page === PAGE.SEARCH && <SearchPage />}
-                {page === PAGE.ADMIN && <AdminPage />}
+                {page === "search" && <SearchPage />}
+                {page === "admin" && <AdminPage />}
               </div>
             </div>
           </form>

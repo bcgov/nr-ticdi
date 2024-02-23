@@ -7,12 +7,9 @@ import AreaDetails from "../display/AreaDetails";
 import DtidDetails from "../display/DtidDetails";
 import { generateReport } from "../../common/report";
 import VariantDropdown from "../../components/common/VariantDropdown";
-import {
-  CURRENT_REPORT_PAGES,
-  NFR_REPORT_PAGES,
-  PAGE,
-} from "../../util/constants";
+import { CURRENT_REPORT_PAGES, NFR_REPORT_PAGES } from "../../util/constants";
 import InterestedParties from "../display/InterestedParties";
+import { useParams } from "react-router";
 
 export interface ReportPageProps {
   data: DTRDisplayObject;
@@ -20,10 +17,12 @@ export interface ReportPageProps {
 }
 
 const ReportPage: FC<ReportPageProps> = ({ data, documentDescription }) => {
-  const [dtid] = useState(data.dtid);
+  // const [dtid] = useState(data.dtid);
+  const { dtid } = useParams();
+  const dtidNumber = dtid ? parseInt(dtid) : 0;
 
   const generateReportHandler = () => {
-    generateReport(dtid, data.fileNum, documentDescription);
+    generateReport(dtidNumber, data.fileNum, documentDescription);
   };
 
   return (
@@ -62,8 +61,7 @@ const ReportPage: FC<ReportPageProps> = ({ data, documentDescription }) => {
       <Collapsible title="Tenure Details">
         <TenureDetails data={data} />
       </Collapsible>
-      {documentDescription === CURRENT_REPORT_PAGES.LUR ||
-      documentDescription === PAGE.INDEX ? (
+      {documentDescription === CURRENT_REPORT_PAGES.LUR ? (
         <Collapsible title="Area">
           <AreaDetails data={data} />
         </Collapsible>

@@ -1,11 +1,10 @@
-import { FC, useEffect, useState } from "react";
-import { getSearchData } from "../../common/search";
-import SearchDataTable, {
-  SearchData,
-} from "../../components/table/SearchDataTable";
+import { FC, useEffect, useState } from 'react';
+import { getSearchData } from '../../common/search';
+import SearchDataTable, { SearchData } from '../../components/table/SearchDataTable';
 
 const SearchPage: FC = () => {
   const [isDownloading, setIsDownloading] = useState(false);
+  const [selectedDtid, setSelectedDtid] = useState();
 
   const handleDownloadDocument = async () => {
     // setIsDownloading(true);
@@ -32,8 +31,19 @@ const SearchPage: FC = () => {
     // }
   };
 
+  const openDocument = () => {};
+
   return (
-    <SearchDataTable />
+    <>
+      <SearchDataTable />
+      <div className="row justify-content-end">
+        <div className="col-md-5">
+          <button type="button" className="btn btn-success" onClick={openDocument}>
+            Open
+          </button>
+        </div>
+      </div>
+    </>
     // <>
     //   <div className="container container-fluid">
     //     <h2>Search</h2>

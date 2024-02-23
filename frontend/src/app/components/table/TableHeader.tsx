@@ -5,5 +5,5 @@ interface TableHeaderProps {
 }
 
 export const TableHeader: FC<TableHeaderProps> = ({ children }) => {
-  return <thead className="bg-gray-50">{children}</thead>;
+  return <thead className="text-left">{children}</thead>;
 };

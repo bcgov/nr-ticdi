@@ -1,6 +1,5 @@
 import config from "../../config";
 import * as api from "./api";
-import axios from "axios";
 import fileDownload from "js-file-download";
 
 export async function generateReport(
@@ -8,7 +7,6 @@ export async function generateReport(
   fileNum: string,
   documentDescription: string
 ): Promise<void> {
-  console.log("generateReport!");
   const reportNameUrl = `${config.API_BASE_URL}/report/get-report-name/${dtid}/${fileNum}/${documentDescription}`;
   const reportUrl = `${config.API_BASE_URL}/report/generate-report`;
 

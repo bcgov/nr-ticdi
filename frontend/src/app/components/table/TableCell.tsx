@@ -1,21 +1,14 @@
-import React, { FC } from "react";
+import { FC } from 'react';
 
 interface TableCellProps {
-  children: React.ReactNode;
+  children: any;
   colSpan?: number;
   className?: string;
+  style?: React.CSSProperties;
 }
-
-export const TableCell: FC<TableCellProps> = ({
-  children,
-  colSpan,
-  className,
-}) => {
+export const TableCell: FC<TableCellProps> = ({ children, colSpan, className, style }) => {
   return (
-    <td
-      className={`px-6 py-4 whitespace-nowrap text-sm text-gray-500 ${className}`}
-      colSpan={colSpan}
-    >
+    <td className={`text-sm ${className ? className : ''}`} colSpan={colSpan} style={style}>
       {children}
     </td>
   );

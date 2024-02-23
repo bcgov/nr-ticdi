@@ -1,35 +1,36 @@
-import { FC, useState } from "react";
-import { generateReport } from "../../common/report";
-import SearchDataTable from "../../components/table/SearchDataTable";
+import { FC, useEffect, useState } from "react";
+import { getSearchData } from "../../common/search";
+import SearchDataTable, {
+  SearchData,
+} from "../../components/table/SearchDataTable";
 
 const SearchPage: FC = () => {
   const [isDownloading, setIsDownloading] = useState(false);
 
-  // const handleDownloadDocument = async () => {
-  //   setIsDownloading(true);
-  //   const dtid = (document.getElementById("searchInput") as HTMLInputElement)
-  //     .value;
-  //   const template_id = (
-  //     document.querySelector(
-  //       'input[name="radioActive"]:checked'
-  //     ) as HTMLInputElement
-  //   ).id.replace("active-", "");
-
-  //   try {
-  //     const blob = await generateReport(dtid, template_id);
-  //     const url = window.URL.createObjectURL(blob);
-  //     const a = document.createElement("a");
-  //     a.href = url;
-  //     a.download = `report_${new Date().toISOString()}.docx`;
-  //     document.body.appendChild(a);
-  //     a.click();
-  //     window.URL.revokeObjectURL(url);
-  //   } catch (error) {
-  //     console.error("Error generating report:", error);
-  //   } finally {
-  //     setIsDownloading(false);
-  //   }
-  // };
+  const handleDownloadDocument = async () => {
+    // setIsDownloading(true);
+    // const dtid = (document.getElementById("searchInput") as HTMLInputElement)
+    //   .value;
+    // const template_id = (
+    //   document.querySelector(
+    //     'input[name="radioActive"]:checked'
+    //   ) as HTMLInputElement
+    // ).id.replace("active-", "");
+    // try {
+    //   const blob = await generateReport(dtid, template_id);
+    //   const url = window.URL.createObjectURL(blob);
+    //   const a = document.createElement("a");
+    //   a.href = url;
+    //   a.download = `report_${new Date().toISOString()}.docx`;
+    //   document.body.appendChild(a);
+    //   a.click();
+    //   window.URL.revokeObjectURL(url);
+    // } catch (error) {
+    //   console.error("Error generating report:", error);
+    // } finally {
+    //   setIsDownloading(false);
+    // }
+  };
 
   return (
     <SearchDataTable />

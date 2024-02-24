@@ -14,20 +14,49 @@ export type SearchData = {
   variant_name: string;
 };
 
-const SearchDataTable: React.FC = () => {
+interface SearchDataTableProps {
+  searchTerm: string;
+  setSelectedDocumentChange: (dtid: number, variant: string) => void;
+}
+
+const SearchDataTable: React.FC<SearchDataTableProps> = ({ searchTerm, setSelectedDocumentChange }) => {
   const [searchData, setSearchData] = useState<SearchData[]>([]);
+  const [filteredSearchData, setFilteredSearchData] = useState<SearchData[]>([]);
+  const [selectedDocument, setSelectedDocument] = useState<{ dtid: number; variant: string } | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
       const data = await getSearchData();
-      console.log(data);
       setSearchData(data);
     };
 
     fetchData();
   }, []);
 
-  const activeRadioHandler = (nfrId: number) => {};
+  useEffect(() => {
+    const filterData = () => {
+      if (!searchTerm || searchTerm === '') {
+        setFilteredSearchData(searchData);
+        return;
+      }
+      const lowerCaseSearchTerm = searchTerm.toLowerCase();
+
+      const filteredData = searchData.filter((item) =>
+        (Object.keys(item) as (keyof SearchData)[]).some((key) =>
+          String(item[key]).toLowerCase().includes(lowerCaseSearchTerm)
+        )
+      );
+
+      setFilteredSearchData(filteredData);
+    };
+
+    filterData();
+  }, [searchTerm, searchData]);
+
+  const activeRadioHandler = (dtid: number, variant: string) => {
+    setSelectedDocument({ dtid, variant });
+    setSelectedDocumentChange(dtid, variant);
+  };
 
   const columnHelper = createColumnHelper<SearchData>();
 
@@ -78,8 +107,8 @@ const SearchDataTable: React.FC = () => {
         <input
           type="radio"
           name="activeSelection"
-          checked={info.getValue() === true}
-          onChange={() => activeRadioHandler(info.row.original.nfr_id)}
+          checked={info.row.original.dtid === selectedDocument?.dtid}
+          onChange={() => activeRadioHandler(info.row.original.dtid, info.row.original.variant_name)}
           style={{ minWidth: '40px', marginTop: '10px' }}
         />
       ),
@@ -100,7 +129,7 @@ const SearchDataTable: React.FC = () => {
     }),
   ];
 
-  return <DataTable columns={columns} data={searchData} />;
+  return <DataTable columns={columns} data={filteredSearchData} />;
 };
 
 export default SearchDataTable;

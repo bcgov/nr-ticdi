@@ -1,18 +1,14 @@
-import { FC, useState } from "react";
-import { rawData2 } from "../../app/constants/constants";
-import { DTRDisplayObject } from "../types/types";
-import { buildDTRDisplayData } from "../util/util";
-import ReportPage from "./pages/ReportPage";
-import SearchPage from "./pages/SearchPage";
-import AdminPage from "./pages/AdminPage";
-import { CURRENT_REPORT_PAGES } from "../util/constants";
+import { FC } from 'react';
+import ReportPage from './pages/ReportPage';
+import SearchPage from './pages/SearchPage';
+import AdminPage from './pages/AdminPage';
+import { CURRENT_REPORT_PAGES } from '../util/constants';
 
 interface ContentProps {
-  page: string;
+  pageTitle: string;
 }
 
-const Content: FC<ContentProps> = ({ page }) => {
-  const data: DTRDisplayObject = buildDTRDisplayData(rawData2);
+const Content: FC<ContentProps> = ({ pageTitle }) => {
   return (
     <div className="content-wrapper">
       <section className="content">
@@ -20,17 +16,14 @@ const Content: FC<ContentProps> = ({ page }) => {
           <form>
             <div className="main">
               <div className="container">
-                {Object.values(CURRENT_REPORT_PAGES).includes(page) && (
-                  <ReportPage data={data} documentDescription={page} />
+                {Object.values(CURRENT_REPORT_PAGES).includes(pageTitle) && (
+                  <ReportPage documentDescription={pageTitle} />
                 )}
-                {page === CURRENT_REPORT_PAGES.LUR && (
-                  <ReportPage
-                    data={data}
-                    documentDescription={CURRENT_REPORT_PAGES.LUR}
-                  />
-                )}
-                {page === "search" && <SearchPage />}
-                {page === "admin" && <AdminPage />}
+                {/* {pageTitle === CURRENT_REPORT_PAGES.LUR && (
+                  <ReportPage documentDescription={CURRENT_REPORT_PAGES.LUR} />
+                )} */}
+                {pageTitle === 'Search' && <SearchPage />}
+                {pageTitle === 'Admin' && <AdminPage />}
               </div>
             </div>
           </form>

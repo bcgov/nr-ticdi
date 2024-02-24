@@ -120,4 +120,7 @@ export interface AreaItem {
   legalDescription: string | null;
 }
 
-export interface InterestedParties {}
+export interface InterestedParties {
+  clientName: string | null;
+  address: string | null;
+}

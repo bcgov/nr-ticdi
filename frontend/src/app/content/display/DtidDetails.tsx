@@ -1,12 +1,16 @@
-import { FC } from "react";
-import { DTRDisplayObject } from "../../../app/types/types";
-import DataSection from "../../components/common/DataSection";
+import { FC } from 'react';
+import { DTRDisplayObject } from '../../../app/types/types';
+import DataSection from '../../components/common/DataSection';
 
 interface DtidDetailsProps {
   data: DTRDisplayObject;
 }
 
 const DtidDetails: FC<DtidDetailsProps> = ({ data }) => {
+  if (!data) {
+    return <div className="ml-2 mb-3 mt-3">No details available.</div>;
+  }
+
   return (
     <div className="ml-2 mb-3 mt-3">
       <div className="form-row">
@@ -22,17 +26,11 @@ const DtidDetails: FC<DtidDetailsProps> = ({ data }) => {
       <div className="form-row">
         <div className="col-md-5 form-group">
           <div className="font-weight-bold">Primary Contact Email Address</div>
-          <DataSection
-            content={data.primaryContactEmail}
-            id="primaryContactEmail"
-          />
+          <DataSection content={data.primaryContactEmail} id="primaryContactEmail" />
         </div>
         <div className="col-md-5 form-group">
           <div className="font-weight-bold">Primary Contact Phone Number</div>
-          <DataSection
-            content={data.primaryContactPhone}
-            id="primaryContactPhoneNumber"
-          />
+          <DataSection content={data.primaryContactPhone} id="primaryContactPhoneNumber" />
         </div>
       </div>
       <div className="form-row">
@@ -42,10 +40,7 @@ const DtidDetails: FC<DtidDetailsProps> = ({ data }) => {
         </div>
         <div className="col-md-5 form-group">
           <div className="font-weight-bold">Contact/Agent Phone Number</div>
-          <DataSection
-            content={data.contactPhoneNumber}
-            id="contactPhoneNumber"
-          />
+          <DataSection content={data.contactPhoneNumber} id="contactPhoneNumber" />
         </div>
       </div>
       <div className="form-row">

@@ -1,28 +1,32 @@
 import { FC } from 'react';
 import { DTRDisplayObject } from '../../../app/types/types';
+import DataSection from '../../components/common/DataSection';
 
 interface InterestedPartiesProps {
   data: DTRDisplayObject;
 }
 
-// TODO
 const InterestedParties: FC<InterestedPartiesProps> = ({ data }) => {
+  if (!data) {
+    return <div className="ml-2 mb-3 mt-3">No interested parties available.</div>;
+  }
   return (
-    <div className="container mx-auto">
-      <div className="grid grid-cols-3 gap-1">
-        {data.areaList.map((item, index) => (
-          <div key={index} className="pt-2 pb-2">
-            <div className="font-semibold">Client Name</div>
-            <div className="mt-1">{item.areaInHectares}</div>
-
-            <div className="pb-2">
-              <div className="font-semibold">Address</div>
-              <div className="mt-1">{item.legalDescription}</div>
+    <>
+      <div className="ml-2 mb-3 mt-3">
+        {data.interestedParties.map((item) => (
+          <div className="form-row">
+            <div className="col-md-5 form-group">
+              <div className="font-weight-bold">Client Name</div>
+              <DataSection content={item.clientName} />
+            </div>
+            <div className="col-md-5 form-group">
+              <div className="font-weight-bold">Address</div>
+              <DataSection content={item.address} />
             </div>
           </div>
         ))}
       </div>
-    </div>
+    </>
   );
 };
 

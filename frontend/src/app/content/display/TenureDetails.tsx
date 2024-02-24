@@ -1,12 +1,15 @@
-import { FC } from "react";
-import { DTRDisplayObject } from "../../../app/types/types";
-import DataSection from "../../components/common/DataSection";
+import { FC } from 'react';
+import { DTRDisplayObject } from '../../../app/types/types';
+import DataSection from '../../components/common/DataSection';
 
 interface TenureDetailsProps {
   data: DTRDisplayObject;
 }
 
 const TenureDetails: FC<TenureDetailsProps> = ({ data }) => {
+  if (!data) {
+    return <div className="ml-2 mb-3 mt-3">No tenure details available.</div>;
+  }
   return (
     <>
       <div className="ml-2 mb-3 mt-3">

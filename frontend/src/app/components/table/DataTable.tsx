@@ -39,7 +39,7 @@ export function DataTable<TData>({ columns, data }: DataTableProps<TData>) {
         <TableBody>
           {table.getRowModel().rows?.length ? (
             table.getRowModel().rows.map((row) => (
-              <TableRow key={row.id} dataState={row.getIsSelected() ? 'selected' : undefined}>
+              <TableRow key={row.id}>
                 {row.getVisibleCells().map((cell) => {
                   const customCss = (cell.column.columnDef.meta as any)?.customCss;
                   return (

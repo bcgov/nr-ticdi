@@ -1,4 +1,4 @@
-import { FC } from "react";
+import { FC } from 'react';
 
 interface HeaderProps {
   isAdmin: Boolean;
@@ -38,29 +38,23 @@ const Header: FC<HeaderProps> = ({ isAdmin, idirUsername }) => {
           >
             <span className="navbar-toggler-icon"></span>
           </button>
-          <div
-            className="collapse navbar-collapse"
-            id="navbarNavAltMarkup"
-            style={{ width: "auto" }}
-          >
-            <div className="navbar-nav" style={{ width: "auto" }}>
+          <div className="collapse navbar-collapse" id="navbarNavAltMarkup" style={{ width: 'auto' }}>
+            <div className="navbar-nav" style={{ width: 'auto' }}>
               {isAdmin && (
-                <div id="adminLinkDiv" style={{ width: "auto" }}>
-                  <a
-                    className="nav-item nav-link"
-                    id="adminLink"
-                    href="/system-admin"
-                  ></a>
+                <div id="adminLinkDiv" style={{ width: 'auto' }}>
+                  <a className="nav-item nav-link" id="adminLink" href="/system-admin">
+                    Administration
+                  </a>
                 </div>
               )}
-              <div id="searchLinkDiv" style={{ width: "auto" }}>
+              <div id="searchLinkDiv" style={{ width: 'auto' }}>
                 <a className="nav-item nav-link" id="searchLink" href="/search">
                   Search
                 </a>
               </div>
             </div>
           </div>
-          <div style={{ float: "right", color: "white" }}>{idirUsername}</div>
+          <div style={{ float: 'right', color: 'white' }}>{idirUsername}</div>
         </div>
       </nav>
     </header>

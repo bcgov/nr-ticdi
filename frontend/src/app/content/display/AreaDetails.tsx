@@ -13,7 +13,7 @@ const AreaDetails: FC<AreaDetailsProps> = ({ data }) => {
   return (
     <div className="ml-2 mb-3 mt-3">
       {data.areaList.map((item, index) => (
-        <div className="form-row">
+        <div key={index} className="form-row">
           <div className="col-md-5 form-group">
             <div className="font-weight-bold">Area</div>
             <DataSection content={item.areaInHectares} id={`areaHa${index}`} />

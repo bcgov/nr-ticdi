@@ -10,6 +10,7 @@ import VariantDropdown from '../../components/common/VariantDropdown';
 import { CURRENT_REPORT_PAGES, NFR_REPORT_PAGES } from '../../util/constants';
 import InterestedParties from '../display/InterestedParties';
 import { useParams } from 'react-router';
+import Skeleton from 'react-loading-skeleton';
 
 export interface ReportPageProps {
   documentDescription: string;
@@ -42,9 +43,6 @@ const ReportPage: FC<ReportPageProps> = ({ documentDescription }) => {
     }
   };
 
-  if (!data) {
-    return <div>Loading...</div>;
-  }
   return (
     <>
       <div className="h1">Preview - {documentDescription} (Draft)</div>
@@ -58,13 +56,13 @@ const ReportPage: FC<ReportPageProps> = ({ documentDescription }) => {
       <div className="mb-3 mt-3">
         <div className="font-weight-bold inlineDiv mr-1">DTID:</div>
         <div className="inlineDiv" id="dtid">
-          {data?.dtid}
+          {data?.dtid || <Skeleton />}
         </div>
       </div>
       <div className="mb-3">
         <div className="font-weight-bold inlineDiv mr-1">Tenure File Number:</div>
         <div className="inlineDiv" id="tfn">
-          {data?.fileNum}
+          {data?.fileNum || <Skeleton />}
         </div>
       </div>
       <div className="mb-3">
@@ -72,19 +70,13 @@ const ReportPage: FC<ReportPageProps> = ({ documentDescription }) => {
         <div className="inlineDiv">{data?.primaryContactName}</div>
       </div>
       <Collapsible title="Disposition Transaction ID Details">
-        <DtidDetails data={data!} />
+        {data ? <DtidDetails data={data!} /> : <Skeleton />}
       </Collapsible>
-      <Collapsible title="Tenure Details">
-        <TenureDetails data={data!} />
-      </Collapsible>
+      <Collapsible title="Tenure Details">{data ? <TenureDetails data={data!} /> : <Skeleton />}</Collapsible>
       {documentDescription === CURRENT_REPORT_PAGES.LUR ? (
-        <Collapsible title="Area">
-          <AreaDetails data={data!} />
-        </Collapsible>
+        <Collapsible title="Area">{data ? <AreaDetails data={data!} /> : <Skeleton />}</Collapsible>
       ) : (
-        <Collapsible title="Interested Parties">
-          <InterestedParties data={data!} />
-        </Collapsible>
+        <Collapsible title="Interested Parties">{data ? <InterestedParties data={data!} /> : <Skeleton />}</Collapsible>
       )}
 
       <Button text="Create" onClick={generateReportHandler} />

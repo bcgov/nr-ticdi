@@ -13,8 +13,8 @@ const InterestedParties: FC<InterestedPartiesProps> = ({ data }) => {
   return (
     <>
       <div className="ml-2 mb-3 mt-3">
-        {data.interestedParties.map((item) => (
-          <div className="form-row">
+        {data.interestedParties.map((item, index) => (
+          <div key={index} className="form-row">
             <div className="col-md-5 form-group">
               <div className="font-weight-bold">Client Name</div>
               <DataSection content={item.clientName} />

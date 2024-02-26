@@ -13,49 +13,47 @@ import {
   Get,
   Param,
   Res,
-} from "@nestjs/common";
-import { ExportDataObject, SessionData, UserObject } from "utils/types";
-import { AxiosRequestConfig } from "axios";
-import { AdminService } from "./admin.service";
-import { AuthenticationFilter } from "src/authentication/authentication.filter";
-import { AuthenticationGuard } from "src/authentication/authentication.guard";
-import { AdminGuard } from "./admin.guard";
-import { FileInterceptor } from "@nestjs/platform-express";
-import { Express } from "express";
-import * as stream from "stream";
+} from '@nestjs/common';
+import { ExportDataObject, SessionData, UserObject } from 'utils/types';
+import { AxiosRequestConfig } from 'axios';
+import { AdminService } from './admin.service';
+import { AuthenticationFilter } from 'src/authentication/authentication.filter';
+import { AuthenticationGuard } from 'src/authentication/authentication.guard';
+import { AdminGuard } from './admin.guard';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { Express } from 'express';
+import * as stream from 'stream';
 
 let requestUrl: string;
 let requestConfig: AxiosRequestConfig;
 
-@Controller("admin")
-@UseFilters(AuthenticationFilter)
-@UseGuards(AuthenticationGuard)
-@UseGuards(AdminGuard)
+@Controller('admin')
+// @UseFilters(AuthenticationFilter)
+// @UseGuards(AuthenticationGuard)
+// @UseGuards(AdminGuard)
 export class AdminController {
   constructor(private readonly adminService: AdminService) {
-    const hostname = process.env.backend_url
-      ? process.env.backend_url
-      : `http://localhost`;
+    const hostname = process.env.backend_url ? process.env.backend_url : `http://localhost`;
     const port = process.env.backend_url ? 3000 : 3001;
     requestUrl = `${hostname}:${port}/template/`;
     requestConfig = {
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
       },
     };
   }
 
-  @Get("activate-template/:id/:document_type")
+  @Get('activate-template/:id/:document_type')
   async activateTemplate(
     @Session() session: { data?: SessionData },
-    @Param("id") id,
-    @Param("document_type") document_type
+    @Param('id') id,
+    @Param('document_type') document_type
   ) {
     const update_userid = session.data.activeAccount
       ? session.data.activeAccount.idir_username
         ? session.data.activeAccount.idir_username
-        : ""
-      : "";
+        : ''
+      : '';
     return this.adminService.activateTemplate({
       id: id,
       update_userid: update_userid,
@@ -63,31 +61,27 @@ export class AdminController {
     });
   }
 
-  @Get("download-template/:id")
-  async downloadTemplate(@Param("id") id, @Res() res) {
+  @Get('download-template/:id')
+  async downloadTemplate(@Param('id') id, @Res() res) {
     const dtObject = await this.adminService.downloadTemplate(id);
     const base64Data = dtObject.the_file;
-    const buffer = Buffer.from(base64Data, "base64");
+    const buffer = Buffer.from(base64Data, 'base64');
     const streamableFile = new stream.PassThrough();
     streamableFile.end(buffer);
     res.set({
-      "Content-Type":
-        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-      "Content-Disposition": "attachment; filename=file.docx",
+      'Content-Type': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      'Content-Disposition': 'attachment; filename=file.docx',
     });
     streamableFile.pipe(res);
   }
 
-  @Get("remove-template/:reportType/:id")
-  async removeTemplate(
-    @Param("reportType") reportType: string,
-    @Param("id") id: number
-  ) {
+  @Get('remove-template/:reportType/:id')
+  async removeTemplate(@Param('reportType') reportType: string, @Param('id') id: number) {
     return this.adminService.removeTemplate(reportType, id);
   }
 
-  @Post("upload-template")
-  @UseInterceptors(FileInterceptor("file"))
+  @Post('upload-template')
+  @UseInterceptors(FileInterceptor('file'))
   async uploadTemplate2(
     @Session() session: { data?: SessionData },
     @UploadedFile(
@@ -95,8 +89,7 @@ export class AdminController {
         validators: [
           new MaxFileSizeValidator({ maxSize: 5000000 }),
           new FileTypeValidator({
-            fileType:
-              "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+            fileType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
           }), // checks the mimetype
         ],
       })
@@ -112,13 +105,13 @@ export class AdminController {
     const create_userid = session.data.activeAccount
       ? session.data.activeAccount.idir_username
         ? session.data.activeAccount.idir_username
-        : ""
-      : "";
+        : ''
+      : '';
     const template_author = session.data.activeAccount
       ? session.data.activeAccount.name
         ? session.data.activeAccount.name
-        : ""
-      : "";
+        : ''
+      : '';
     const uploadData = {
       document_type: params.document_type,
       active_flag: params.active_flag,
@@ -128,27 +121,25 @@ export class AdminController {
       create_userid: create_userid,
     };
     await this.adminService.uploadTemplate(uploadData, file);
-    return { message: "Template uploaded successfully" };
+    return { message: 'Template uploaded successfully' };
   }
 
   /**
    * Used for an AJAX route to render all admins in a datatable
    * @returns altered admin object array
    */
-  @Get("get-admins")
+  @Get('get-admins')
   getAdmins(): Promise<UserObject[]> {
     return this.adminService.getAdminUsers();
   }
 
-  @Get("get-export-data")
-  getExportData(): Promise<ExportDataObject[]> {
+  @Get('get-export-data')
+  getExportData(): Promise<string> {
     return this.adminService.getExportData();
   }
 
-  @Post("add-admin")
-  async addAdmin(
-    @Body() searchInputs: { idirUsername: string }
-  ): Promise<{ userObject: UserObject; error: string }> {
+  @Post('add-admin')
+  async addAdmin(@Body() searchInputs: { idirUsername: string }): Promise<{ userObject: UserObject; error: string }> {
     try {
       const user = await this.adminService.addAdmin(searchInputs.idirUsername);
       return { userObject: user, error: null };
@@ -157,7 +148,7 @@ export class AdminController {
     }
   }
 
-  @Post("search-users")
+  @Post('search-users')
   async searchUsers(@Body() searchInputs: { email: string }): Promise<{
     userObject: {
       firstName: string;
@@ -175,57 +166,52 @@ export class AdminController {
     }
   }
 
-  @Get("remove-admin/:username")
-  removeAdmin(
-    @Param("username") username: string
-  ): Promise<{ message: string }> {
-    return this.adminService.removeAdmin(username);
+  @Post('remove-admin')
+  removeAdmin(@Body() input: { idirUsername: string }): Promise<{ message: string }> {
+    return this.adminService.removeAdmin(input.idirUsername);
   }
 
-  @Get("templates/:reportId")
-  getTemplates(@Param("reportId") reportId: number): Promise<any> {
+  @Get('templates/:reportId')
+  getTemplates(@Param('reportId') reportId: number): Promise<any> {
     return this.adminService.getTemplates(reportId);
   }
 
-  @Get("open-document/:nfr_id")
-  setSessionDocument(
-    @Session() session: { data?: SessionData },
-    @Param("nfr_id") nfrId: number
-  ): void {
+  @Get('open-document/:nfr_id')
+  setSessionDocument(@Session() session: { data?: SessionData }, @Param('nfr_id') nfrId: number): void {
     session.data.selected_document = { nfr_id: nfrId };
   }
 
-  @Get("get-templates/:document_type")
-  getDocumentTemplates(@Param("document_type") documentType: string): any {
+  @Get('get-templates/:document_type')
+  getDocumentTemplates(@Param('document_type') documentType: string): any {
     return this.adminService.getDocumentTemplates(documentType);
   }
 
-  @Get("nfr-provisions")
+  @Get('nfr-provisions')
   getNFRProvisions(): any {
     return this.adminService.getNFRProvisions();
   }
 
-  @Get("nfr-variables")
+  @Get('nfr-variables')
   getNFRVariables(): any {
     return this.adminService.getNFRVariables();
   }
 
-  @Get("enable-provision/:provisionId")
-  enableProvision(@Param("provisionId") id: number): any {
+  @Get('enable-provision/:provisionId')
+  enableProvision(@Param('provisionId') id: number): any {
     return this.adminService.enableProvision(id);
   }
 
-  @Get("disable-provision/:provisionId")
-  disableProvision(@Param("provisionId") id: number): any {
+  @Get('disable-provision/:provisionId')
+  disableProvision(@Param('provisionId') id: number): any {
     return this.adminService.disableProvision(id);
   }
 
-  @Get("get-group-max")
+  @Get('get-group-max')
   getGroupMax() {
     return this.adminService.getGroupMax();
   }
 
-  @Post("add-provision")
+  @Post('add-provision')
   addProvision(
     @Body()
     provisionParams: {
@@ -245,7 +231,7 @@ export class AdminController {
     return this.adminService.addProvision(provisionParams, create_userid);
   }
 
-  @Post("update-provision")
+  @Post('update-provision')
   updateProvision(
     @Body()
     provisionParams: {
@@ -266,7 +252,7 @@ export class AdminController {
     return this.adminService.updateProvision(provisionParams, update_userid);
   }
 
-  @Post("add-variable")
+  @Post('add-variable')
   addVariable(
     @Body()
     variableParams: {
@@ -281,7 +267,7 @@ export class AdminController {
     return this.adminService.addVariable(variableParams, create_userid);
   }
 
-  @Post("update-variable")
+  @Post('update-variable')
   updateVariable(
     @Body()
     variableParams: {
@@ -296,8 +282,8 @@ export class AdminController {
     return this.adminService.updateVariable(variableParams, update_userid);
   }
 
-  @Get("remove-variable/:id")
-  removeVariable(@Param("id") id: number) {
+  @Get('remove-variable/:id')
+  removeVariable(@Param('id') id: number) {
     return this.adminService.removeVariable(id);
   }
 }

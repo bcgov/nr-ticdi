@@ -1,10 +1,10 @@
-import { Injectable } from "@nestjs/common";
-import * as dotenv from "dotenv";
-import { HttpService } from "@nestjs/axios";
-import { ExportDataObject, SearchResultsItem, UserObject } from "utils/types";
-import { REPORT_TYPES } from "utils/constants";
-const axios = require("axios");
-const FormData = require("form-data");
+import { Injectable } from '@nestjs/common';
+import * as dotenv from 'dotenv';
+import { HttpService } from '@nestjs/axios';
+import { ExportDataObject, SearchResultsItem, UserObject } from 'utils/types';
+import { REPORT_TYPES } from 'utils/constants';
+const axios = require('axios');
+const FormData = require('form-data');
 
 dotenv.config();
 let hostname: string;
@@ -13,18 +13,12 @@ let port: number;
 @Injectable()
 export class AdminService {
   constructor(private readonly httpService: HttpService) {
-    hostname = process.env.backend_url
-      ? process.env.backend_url
-      : `http://localhost`;
+    hostname = process.env.backend_url ? process.env.backend_url : `http://localhost`;
     // local development backend port is 3001, docker backend port is 3000
     port = process.env.backend_url ? 3000 : 3001;
   }
 
-  async activateTemplate(data: {
-    id: number;
-    update_userid: string;
-    document_type: string;
-  }): Promise<any> {
+  async activateTemplate(data: { id: number; update_userid: string; document_type: string }): Promise<any> {
     const url = `${hostname}:${port}/document-template/activate-template`;
     return axios
       .post(url, {
@@ -45,9 +39,7 @@ export class AdminService {
   }
 
   async removeTemplate(reportType: string, id: number): Promise<any> {
-    const url = `${hostname}:${port}/document-template/remove/${encodeURI(
-      reportType
-    )}/${id}`;
+    const url = `${hostname}:${port}/document-template/remove/${encodeURI(reportType)}/${id}`;
     return axios.get(url).then((res) => {
       return res.data;
     });
@@ -66,13 +58,13 @@ export class AdminService {
   ): Promise<any> {
     const url = `${hostname}:${port}/document-template/create`;
     const form: any = new FormData();
-    form.append("document_type", data.document_type);
-    form.append("active_flag", data.active_flag);
-    form.append("mime_type", data.mime_type);
-    form.append("file_name", data.file_name);
-    form.append("template_author", data.template_author);
-    form.append("create_userid", data.create_userid);
-    form.append("file", file.buffer, "file");
+    form.append('document_type', data.document_type);
+    form.append('active_flag', data.active_flag);
+    form.append('mime_type', data.mime_type);
+    form.append('file_name', data.file_name);
+    form.append('template_author', data.template_author);
+    form.append('create_userid', data.create_userid);
+    form.append('file', file.buffer, 'file');
     return axios.post(url, form).then((res) => {
       return res.data;
     });
@@ -81,15 +73,15 @@ export class AdminService {
   async getToken() {
     const url = process.env.users_api_token_url;
     const token = `${process.env.users_api_client_id}:${process.env.users_api_client_secret}`;
-    const encodedToken = Buffer.from(token).toString("base64");
+    const encodedToken = Buffer.from(token).toString('base64');
     const config = {
       headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-        Authorization: "Basic " + encodedToken,
+        'Content-Type': 'application/x-www-form-urlencoded',
+        Authorization: 'Basic ' + encodedToken,
       },
     };
     const grantTypeParam = new URLSearchParams();
-    grantTypeParam.append("grant_type", "client_credentials");
+    grantTypeParam.append('grant_type', 'client_credentials');
     return axios
       .post(url, grantTypeParam, config)
       .then((response) => {
@@ -118,27 +110,29 @@ export class AdminService {
     const bearerToken = await this.getToken();
     const searchData: SearchResultsItem[] = await axios
       .get(url, {
-        headers: { Authorization: "Bearer " + bearerToken },
+        headers: { Authorization: 'Bearer ' + bearerToken },
       })
       .then((res) => {
         return res.data.data;
       })
       .catch((err) => {
         console.log(err.response.data);
-        throw new Error("No users found");
+        throw new Error('No users found');
       });
-    const firstName = searchData[0].firstName ? searchData[0].firstName : "";
-    const lastName = searchData[0].lastName ? searchData[0].lastName : "";
+    console.log('searchData');
+    console.log(searchData);
+    const firstName = searchData[0].firstName ? searchData[0].firstName : '';
+    const lastName = searchData[0].lastName ? searchData[0].lastName : '';
     const username = searchData[0].attributes
       ? searchData[0].attributes.idir_username[0]
         ? searchData[0].attributes.idir_username[0]
-        : ""
-      : "";
+        : ''
+      : '';
     const idirUsername = searchData[0].attributes
       ? searchData[0].attributes.idir_user_guid[0]
         ? searchData[0].attributes.idir_user_guid[0]
-        : ""
-      : "";
+        : ''
+      : '';
     const userObject = {
       firstName: firstName,
       lastName: lastName,
@@ -148,7 +142,7 @@ export class AdminService {
     const roleUrl = `${process.env.users_api_base_url}/integrations/${process.env.integration_id}/${process.env.css_environment}/users/${idirUsername}@idir/roles`;
     const roles = await axios
       .get(roleUrl, {
-        headers: { Authorization: "Bearer " + bearerToken },
+        headers: { Authorization: 'Bearer ' + bearerToken },
       })
       .then((res) => {
         return res.data;
@@ -159,12 +153,12 @@ export class AdminService {
       });
     let isAdmin: boolean = false;
     for (let entry of roles.data) {
-      if (entry && entry.name == "ticdi_admin") {
+      if (entry && entry.name == 'ticdi_admin') {
         isAdmin = true;
       }
     }
     if (isAdmin) {
-      throw new Error("That user is already a TICDI admin");
+      throw new Error('That user is already a TICDI admin');
     }
     return userObject;
   }
@@ -184,34 +178,34 @@ export class AdminService {
     const bearerToken = await this.getToken();
     const searchData: SearchResultsItem[] = await axios
       .get(url, {
-        headers: { Authorization: "Bearer " + bearerToken },
+        headers: { Authorization: 'Bearer ' + bearerToken },
       })
       .then((res) => {
         return res.data.data;
       })
       .catch((err) => console.log(err.response.data));
     if (searchData.length > 1) {
-      throw new Error("More than one user was found");
+      throw new Error('More than one user was found');
     } else if (searchData.length == 0) {
-      throw new Error("No users were found");
+      throw new Error('No users were found');
     }
     const userObject: UserObject = this.formatSearchData(searchData)[0];
     await axios
       .post(
         addAdminUrl,
         {
-          roleName: "ticdi_admin",
-          username: userObject.idirUsername + "@idir",
-          operation: "add",
+          roleName: 'ticdi_admin',
+          username: userObject.idirUsername + '@idir',
+          operation: 'add',
         },
-        { headers: { Authorization: "Bearer " + bearerToken } }
+        { headers: { Authorization: 'Bearer ' + bearerToken } }
       )
       .then((res) => {
         return res.data;
       })
       .catch((err) => {
         console.log(err);
-        throw new Error("Failed to add admin role");
+        throw new Error('Failed to add admin role');
       });
     return userObject;
   }
@@ -226,7 +220,7 @@ export class AdminService {
     const url = `${process.env.users_api_base_url}/integrations/${process.env.integration_id}/${process.env.css_environment}/roles/ticdi_admin/users`;
     const data: SearchResultsItem[] = await axios
       .get(url, {
-        headers: { Authorization: "Bearer " + bearerToken },
+        headers: { Authorization: 'Bearer ' + bearerToken },
       })
       .then((res) => {
         return res.data.data;
@@ -236,14 +230,15 @@ export class AdminService {
     return this.formatSearchData(data);
   }
 
-  async getExportData(): Promise<ExportDataObject[]> {
+  async getExportData(): Promise<string> {
     const bearerToken = await this.getToken();
     const url = `${process.env.users_api_base_url}/integrations/${process.env.integration_id}/${process.env.css_environment}/roles/ticdi_admin/users`;
     const data: SearchResultsItem[] = await axios
       .get(url, {
-        headers: { Authorization: "Bearer " + bearerToken },
+        headers: { Authorization: 'Bearer ' + bearerToken },
       })
       .then((res) => {
+        console.log(res.data.data);
         return res.data.data;
       })
       .catch((err) => console.log(err.response.data));
@@ -258,29 +253,26 @@ export class AdminService {
    * @returns null
    */
   async removeAdmin(username: string) {
-    const ticdiAdminRole = "ticdi_admin";
+    const ticdiAdminRole = 'ticdi_admin';
     const bearerToken = await this.getToken();
     const url = `${process.env.users_api_base_url}/integrations/${process.env.integration_id}/${process.env.css_environment}/users/${username}@idir/roles/${ticdiAdminRole}`;
     const res = await axios
       .delete(url, {
-        headers: { Authorization: "Bearer " + bearerToken },
+        headers: { Authorization: 'Bearer ' + bearerToken },
       })
       .then((res) => {
         return res;
       })
       .catch((err) => {
         console.log(err.response.data);
-        return { message: "Failed to remove admin privileges" };
+        return { message: 'Failed to remove admin privileges' };
       });
-    return { message: "success" };
+    return { message: 'error' };
   }
 
   async getTemplates(reportId: number) {
-    const documentType =
-      reportId == 1 || reportId == 2 ? REPORT_TYPES[reportId - 1] : "none";
-    const url = `${hostname}:${port}/document-template/${encodeURI(
-      documentType
-    )}`;
+    const documentType = reportId == 1 || reportId == 2 ? REPORT_TYPES[reportId - 1] : 'none';
+    const url = `${hostname}:${port}/document-template/${encodeURI(documentType)}`;
     const data = await axios
       .get(url)
       .then((res) => {
@@ -299,8 +291,8 @@ export class AdminService {
       const document = {
         version: entry.template_version,
         file_name: entry.file_name,
-        updated_date: entry.update_timestamp.split("T")[0],
-        status: "???",
+        updated_date: entry.update_timestamp.split('T')[0],
+        status: '???',
         active: entry.active_flag,
         template_id: entry.id,
       };
@@ -310,17 +302,8 @@ export class AdminService {
   }
 
   async getDocumentTemplates(documentType: string): Promise<any> {
-    const returnItems = [
-      "id",
-      "template_version",
-      "file_name",
-      "uploaded_date",
-      "active_flag",
-      "update_timestamp",
-    ];
-    const url = `${hostname}:${port}/document-template/${encodeURI(
-      documentType
-    )}`;
+    const returnItems = ['id', 'template_version', 'file_name', 'uploaded_date', 'active_flag', 'update_timestamp'];
+    const url = `${hostname}:${port}/document-template/${encodeURI(documentType)}`;
     const documentTemplateObjects = await axios
       .get(url)
       .then((res) => {
@@ -332,29 +315,27 @@ export class AdminService {
         .filter((key) => returnItems.includes(key))
         .reduce(
           (acc, key) => {
-            key == "update_timestamp"
-              ? (acc[key] = obj[key].split("T")[0])
-              : (acc[key] = obj[key]);
+            key == 'update_timestamp' ? (acc[key] = obj[key].split('T')[0]) : (acc[key] = obj[key]);
             return acc;
           },
-          { view: "view", remove: "remove" }
+          { view: 'view', remove: 'remove' }
         )
     );
   }
 
   async getNFRProvisions(): Promise<any> {
     const returnItems = [
-      "id",
-      "dtid",
-      "type",
-      "provision_group",
-      "max",
-      "provision_name",
-      "free_text",
-      "help_text",
-      "category",
-      "active_flag",
-      "variants",
+      'id',
+      'dtid',
+      'type',
+      'provision_group',
+      'max',
+      'provision_name',
+      'free_text',
+      'help_text',
+      'category',
+      'active_flag',
+      'variants',
     ];
     const url = `${hostname}:${port}/nfr-provision`;
     const nfrProvisions = await axios
@@ -371,19 +352,13 @@ export class AdminService {
             acc[key] = obj[key];
             return acc;
           },
-          { edit: "edit" }
+          { edit: 'edit' }
         )
     );
   }
 
   async getNFRVariables(): Promise<any> {
-    const returnItems = [
-      "variable_name",
-      "variable_value",
-      "help_text",
-      "id",
-      "provision_id",
-    ];
+    const returnItems = ['variable_name', 'variable_value', 'help_text', 'id', 'provision_id'];
     const url = `${hostname}:${port}/nfr-provision/variables`;
     const nfrVariables = await axios
       .get(url)
@@ -399,7 +374,7 @@ export class AdminService {
             acc[key] = obj[key];
             return acc;
           },
-          { edit: "edit", remove: "remove" }
+          { edit: 'edit', remove: 'remove' }
         )
     );
   }
@@ -440,11 +415,9 @@ export class AdminService {
     create_userid: string
   ) {
     const url = `${hostname}:${port}/nfr-provision`;
-    return await axios
-      .post(url, { ...provisionParams, create_userid })
-      .then((res) => {
-        return res.data;
-      });
+    return await axios.post(url, { ...provisionParams, create_userid }).then((res) => {
+      return res.data;
+    });
   }
 
   async updateProvision(
@@ -463,11 +436,9 @@ export class AdminService {
     update_userid: string
   ) {
     const url = `${hostname}:${port}/nfr-provision/update`;
-    return await axios
-      .post(url, { ...provisionParams, update_userid })
-      .then((res) => {
-        return res.data;
-      });
+    return await axios.post(url, { ...provisionParams, update_userid }).then((res) => {
+      return res.data;
+    });
   }
 
   async addVariable(
@@ -480,11 +451,9 @@ export class AdminService {
     create_userid: string
   ) {
     const url = `${hostname}:${port}/nfr-provision/add-variable`;
-    return await axios
-      .post(url, { ...variableParams, create_userid })
-      .then((res) => {
-        return res.data;
-      });
+    return await axios.post(url, { ...variableParams, create_userid }).then((res) => {
+      return res.data;
+    });
   }
 
   async updateVariable(
@@ -497,11 +466,9 @@ export class AdminService {
     update_userid: string
   ) {
     const url = `${hostname}:${port}/nfr-provision/update-variable`;
-    return await axios
-      .post(url, { ...variableParams, update_userid })
-      .then((res) => {
-        return res.data;
-      });
+    return await axios.post(url, { ...variableParams, update_userid }).then((res) => {
+      return res.data;
+    });
   }
 
   async removeVariable(id: number) {
@@ -518,20 +485,16 @@ export class AdminService {
   formatSearchData(data: SearchResultsItem[]): UserObject[] {
     let userObjectArray = [];
     for (let entry of data) {
-      const firstName = entry.firstName ? entry.firstName : "";
-      const lastName = entry.lastName ? entry.lastName : "";
-      const username = entry.attributes.idir_username[0]
-        ? entry.attributes.idir_username[0]
-        : "";
-      const email = entry.email ? entry.email : "";
-      const idirUsername = entry.username
-        ? entry.username.replace("@idir", "")
-        : "";
+      const firstName = entry.firstName ? entry.firstName : '';
+      const lastName = entry.lastName ? entry.lastName : '';
+      const username = entry.attributes.idir_username[0] ? entry.attributes.idir_username[0] : '';
+      const email = entry.email ? entry.email : '';
+      const idirUsername = entry.username ? entry.username.replace('@idir', '') : '';
       const userObject: UserObject = {
-        name: firstName + " " + lastName,
+        name: firstName + ' ' + lastName,
         username: username,
         email: email,
-        remove: "Remove",
+        remove: 'Remove',
         idirUsername: idirUsername,
       };
       userObjectArray.push(userObject);
@@ -544,34 +507,20 @@ export class AdminService {
    * @param data
    * @returns formatted admin user data for exporting to csv
    */
-  formatExportData(data: SearchResultsItem[]): ExportDataObject[] {
-    let exportDataObjectArray = [];
-    for (let entry of data) {
-      let firstName = entry.firstName ? entry.firstName : "";
-      let lastName = entry.lastName ? entry.lastName : "";
-      let username = entry.username ? entry.username : "";
-      let email = entry.email ? entry.email : "";
-      let idir_user_guid = entry.attributes.idir_user_guid[0]
-        ? entry.attributes.idir_user_guid[0]
-        : "";
-      let idir_username = entry.attributes.idir_username[0]
-        ? entry.attributes.idir_username[0]
-        : "";
-      let display_name = entry.attributes.display_name[0]
-        ? entry.attributes.display_name[0]
-        : "";
-      const exportDataObject: ExportDataObject = {
-        firstName: '"' + firstName + '"',
-        lastName: '"' + lastName + '"',
-        username: '"' + username + '"',
-        email: '"' + email + '"',
-        idir_user_guid: '"' + idir_user_guid + '"',
-        idir_username: '"' + idir_username + '"',
-        display_name: '"' + display_name + '"',
-      };
-      exportDataObjectArray.push(exportDataObject);
-    }
+  formatExportData(data: SearchResultsItem[]): string {
+    const header = 'First Name,Last Name,Username,Email,IDIR User GUID,IDIR Username,Display Name\n';
+    const csvRows = data.map((entry) => {
+      const firstName = entry.firstName ? `"${entry.firstName}"` : '';
+      const lastName = entry.lastName ? `"${entry.lastName}"` : '';
+      const username = entry.username ? `"${entry.username}"` : '';
+      const email = entry.email ? `"${entry.email}"` : '';
+      const idir_user_guid = entry.attributes.idir_user_guid[0] ? `"${entry.attributes.idir_user_guid[0]}"` : '';
+      const idir_username = entry.attributes.idir_username[0] ? `"${entry.attributes.idir_username[0]}"` : '';
+      const display_name = entry.attributes.display_name[0] ? `"${entry.attributes.display_name[0]}"` : '';
 
-    return exportDataObjectArray;
+      return [firstName, lastName, username, email, idir_user_guid, idir_username, display_name].join(',');
+    });
+
+    return header + csvRows.join('\n');
   }
 }

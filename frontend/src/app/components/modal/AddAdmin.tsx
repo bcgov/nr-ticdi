@@ -1,189 +1,166 @@
-import { FC } from "react";
+import { FC, useState } from 'react';
+import Modal from 'react-bootstrap/Modal';
+import Button from 'react-bootstrap/Button';
+import Form from 'react-bootstrap/Form';
+import { Col, Row, Spinner } from 'react-bootstrap';
+import { findIdirUser } from '../../common/admin';
 
-const AddAdmin: FC = ({}) => {
-  const searchUsers = () => {};
+type AddAdminProps = {
+  show: boolean;
+  onHide: () => void;
+};
 
-  const addAdmin = () => {};
+export type IdirUserObject = {
+  firstName: string;
+  lastName: string;
+  username: string;
+  idirUsername: string;
+};
+
+const AddAdmin: FC<AddAdminProps> = ({ show, onHide }) => {
+  const [email, setEmail] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [userObject, setUserObject] = useState<IdirUserObject | null>(null);
+  const [error, setError] = useState('');
+  const [showError, setShowError] = useState(false);
+
+  const searchUsers = async () => {
+    setLoading(true);
+    try {
+      const { foundUserObject, error } = await findIdirUser(email);
+      if (error) {
+        setError(error);
+        setShowError(true);
+      } else {
+        setUserObject(foundUserObject);
+      }
+    } catch (error) {
+      console.error('Removal error:', error);
+      setError('An error occurred during removal.');
+      setShowError(true);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const addAdmin = async () => {
+    setLoading(true);
+    const addParams = {
+      idirUsername: userObject?.idirUsername,
+    };
+    try {
+      const response = await fetch(`/admin/add-admin`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(addParams),
+      });
+      const resJson = await response.json();
+      if (!resJson.error) {
+        onHide();
+      } else {
+        setError(resJson.error);
+      }
+    } catch (err) {
+      console.log(err);
+      setError('An error occurred while adding an administrator.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
-    <>
-      <div id="addAdministratorModal" className="modal fade" role="dialog">
-        <div className="modal-dialog modal-lg">
-          <div className="modal-content">
-            <div className="modal-header">
-              <h4 className="modal-title">Add Administrator</h4>
-            </div>
-            <div className="modal-body">
-              <div id="addAdministratorBody">
-                <div className="form-group row mb-0">
-                  <div className="col-md-6 ml-3">
-                    <label htmlFor="searchEmail" style={{ fontWeight: "bold" }}>
-                      Email:
-                    </label>
-                  </div>
-                </div>
-                <div className="form-group row">
-                  <div className="col-md-10 ml-3">
-                    <input
-                      id="searchEmail"
-                      value=""
-                      style={{ width: "100%" }}
-                    />
-                  </div>
-                </div>
-                <div className="form-group row">
-                  <div className="col-md-4 ml-3">
-                    <button
-                      id="searchUsersButton"
-                      className="btn btn-success"
-                      onClick={() => searchUsers()}
-                    >
-                      Search
-                    </button>
-                  </div>
-                </div>
-                <div className="form-group row mb-0">
-                  <div className="col-md-6 ml-3">
-                    <label
-                      htmlFor="searchSurname"
-                      style={{ fontWeight: "bold" }}
-                    >
-                      Surname:
-                    </label>
-                  </div>
-                </div>
-                <div className="form-group row">
-                  <div className="col-md-10 ml-3">
-                    <input
-                      id="searchSurname"
-                      value=""
-                      style={{ width: "100%" }}
-                      readOnly
-                      disabled
-                    />
-                  </div>
-                </div>
-                <div className="form-group row mb-0">
-                  <div className="col-md-6 ml-3">
-                    <label
-                      htmlFor="searchGivenName"
-                      style={{ fontWeight: "bold" }}
-                    >
-                      Given Name 1:
-                    </label>
-                  </div>
-                </div>
-                <div className="form-group row">
-                  <div className="col-md-10 ml-3">
-                    <input
-                      id="searchGivenName"
-                      value=""
-                      style={{ width: "100%" }}
-                      readOnly
-                      disabled
-                    />
-                  </div>
-                </div>
-                <div className="form-group row mb-0">
-                  <div className="col-md-3 ml-3">
-                    <label
-                      htmlFor="searchUsername"
-                      style={{ fontWeight: "bold" }}
-                    >
-                      Username:{" "}
-                    </label>
-                  </div>
-                </div>
-                <div className="form-group row">
-                  <div className="col-md-10 ml-3">
-                    <input
-                      id="searchUsername"
-                      value=""
-                      style={{ width: "100%" }}
-                      readOnly
-                      disabled
-                    />
-                  </div>
-                </div>
-                <div className="form-group row mb-0">
-                  <div className="col-md-6 ml-3">
-                    <label htmlFor="searchRole" style={{ fontWeight: "bold" }}>
-                      Role:
-                    </label>
-                  </div>
-                </div>
-                <div className="form-group row">
-                  <div className="col-md-10 ml-3">
-                    <select id="searchRole" style={{ width: "100%" }} disabled>
-                      <option>TICDIADMIN</option>
-                    </select>
-                  </div>
-                </div>
-                <div className="form-group row mb-0">
-                  <div className="col-md-6 ml-3">
-                    <label style={{ fontWeight: "bold" }}>Status:</label>
-                  </div>
-                </div>
-                <div className="form-group row mb-0">
-                  <div className="col-md-1"></div>
-                  <div className="col-md-6">
-                    <label htmlFor="searchStatusActive">Active:</label>
-                    <input
-                      id="searchStatusActive"
-                      type="radio"
-                      name="adminStatus"
-                      checked
-                      disabled
-                    />
-                  </div>
-                </div>
-                <div className="form-group row mb-0">
-                  <div className="col-md-1"></div>
-                  <div className="col-md-6">
-                    <label htmlFor="searchStatusInactive">Inactive:</label>
-                    <input
-                      id="searchStatusInactive"
-                      type="radio"
-                      name="adminStatus"
-                      disabled
-                    />
-                  </div>
-                </div>
-                <div className="text-center">
-                  <div
-                    className="alert alert-danger modal-alert"
-                    style={{ display: "none" }}
-                  ></div>
-                </div>
-              </div>
-              <input
-                id="searchIdirUsername"
-                style={{ display: "none" }}
-                value=""
-              />
-            </div>
-            <div className="modal-footer d-flex justify-content-between">
-              <button
-                type="button"
-                className="btn btn-secondary"
-                data-dismiss="modal"
-              >
-                Cancel
-              </button>
-              <button
-                id="addAdminButton"
-                type="button"
-                className="btn btn-primary"
-                onClick={() => addAdmin()}
+    <Modal show={show} onHide={onHide} size="lg">
+      <Modal.Header closeButton>
+        <Modal.Title>Add Administrator</Modal.Title>
+      </Modal.Header>
+      <Modal.Body>
+        <Form>
+          <Form.Group as={Row} controlId="searchEmail" className="mb-3">
+            <Form.Label column sm={2} style={{ fontWeight: 'bold' }}>
+              Email:
+            </Form.Label>
+            <Col sm={10}>
+              <Form.Control type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+            </Col>
+          </Form.Group>
+          <Form.Group as={Row} className="mb-3">
+            <Col sm={{ span: 10, offset: 2 }}>
+              <Button variant="success" onClick={searchUsers} disabled={loading}>
+                {loading ? (
+                  <Spinner as="span" animation="border" size="sm" role="status" aria-hidden="true" />
+                ) : (
+                  'Search'
+                )}
+              </Button>
+            </Col>
+          </Form.Group>
+          <Form.Group as={Row} controlId="searchFirstName" className="mb-3">
+            <Form.Label column sm={2} style={{ fontWeight: 'bold' }}>
+              First Name:
+            </Form.Label>
+            <Col sm={10}>
+              <Form.Control type="text" readOnly value={userObject?.firstName || ''} />
+            </Col>
+          </Form.Group>
+          <Form.Group as={Row} controlId="searchLastName" className="mb-3">
+            <Form.Label column sm={2} style={{ fontWeight: 'bold' }}>
+              Last Name:
+            </Form.Label>
+            <Col sm={10}>
+              <Form.Control type="text" readOnly value={userObject?.lastName || ''} />
+            </Col>
+          </Form.Group>
+          <Form.Group as={Row} controlId="searchUsername" className="mb-3">
+            <Form.Label column sm={2} style={{ fontWeight: 'bold' }}>
+              Username:
+            </Form.Label>
+            <Col sm={10}>
+              <Form.Control type="text" readOnly value={userObject?.username || ''} />
+            </Col>
+          </Form.Group>
+          <Form.Group as={Row} controlId="searchRole" className="mb-3">
+            <Form.Label column sm={2} style={{ fontWeight: 'bold' }}>
+              Role:
+            </Form.Label>
+            <Col sm={10}>
+              <Form.Control as="select" readOnly disabled defaultValue="TICDIADMIN">
+                <option>TICDIADMIN</option>
+              </Form.Control>
+            </Col>
+          </Form.Group>
+          <Form.Group as={Row} className="mb-0">
+            <Form.Label column sm={2} style={{ fontWeight: 'bold' }}>
+              Status:
+            </Form.Label>
+            <Col sm={10}>
+              <Form.Check
+                type="radio"
+                label="Active"
+                name="adminStatus"
+                id="searchStatusActive"
+                defaultChecked
                 disabled
-              >
-                Add Administrator
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </>
+              />
+              <Form.Check type="radio" label="Inactive" name="adminStatus" id="searchStatusInactive" disabled />
+            </Col>
+          </Form.Group>
+        </Form>
+        {showError && <div className="alert alert-danger">{error}</div>}
+      </Modal.Body>
+      <Modal.Footer>
+        <Button variant="secondary" onClick={onHide}>
+          Cancel
+        </Button>
+
+        <Button variant="primary" onClick={addAdmin} disabled={loading || !userObject}>
+          {loading ? (
+            <Spinner as="span" animation="border" size="sm" role="status" aria-hidden="true" />
+          ) : (
+            'Add Administrator'
+          )}
+        </Button>
+      </Modal.Footer>
+    </Modal>
   );
 };
 export default AddAdmin;

@@ -23,7 +23,7 @@ const Content: FC<ContentProps> = ({ pageTitle }) => {
                   <ReportPage documentDescription={CURRENT_REPORT_PAGES.LUR} />
                 )} */}
                 {pageTitle === 'Search' && <SearchPage />}
-                {pageTitle === 'Admin' && <AdminPage />}
+                {pageTitle === 'System Administration' && <AdminPage />}
               </div>
             </div>
           </form>

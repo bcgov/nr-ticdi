@@ -1,83 +1,86 @@
-import { FC } from "react";
-import "./modals.css";
+import { FC, useState } from 'react';
+import './modals.css';
+import { AdminData } from '../../components/table/AdminDataTable';
+import Modal from 'react-bootstrap/Modal';
+import Button from 'react-bootstrap/Button';
+import Form from 'react-bootstrap/Form';
+import { Col, Row } from 'react-bootstrap';
+import { removeAdmin } from '../../common/admin';
 
-const RemoveAdmin: FC = ({}) => {
+type RemoveAdminProps = {
+  admin: AdminData;
+  show: boolean;
+  onHide: () => void;
+};
+
+const RemoveAdmin: FC<RemoveAdminProps> = ({ admin, show, onHide }) => {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [showError, setShowError] = useState(false);
+
+  const removeHandler = async () => {
+    setLoading(true);
+    try {
+      const { message } = await removeAdmin(admin.idirUsername);
+      if (message === 'success') {
+        onHide();
+      } else {
+        setError(message);
+        setShowError(true);
+      }
+    } catch (error) {
+      console.error('Removal error:', error);
+      setError('An error occurred during removal.');
+      setShowError(true);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <>
-      <div id="removeAdminModal" className="modal fade" role="dialog">
-        <div className="modal-dialog modal-lg">
-          <div className="modal-content">
-            <div className="modal-header">
-              <h4 className="modal-title">Remove Administrator</h4>
-            </div>
-            <div className="modal-body">
-              <div id="removeAdminBody">
-                <div className="form-group row">
-                  <div className="col-md-12">
-                    <p>Are you sure you want to remove this administrator?</p>
-                  </div>
-                </div>
-                <div className="form-group row">
-                  <div className="col-md-2 ml-3">
-                    <label htmlFor="removeName">Name:</label>
-                  </div>
-                  <div className="col-md-9">
-                    <input
-                      id="removeName"
-                      value=""
-                      className="removeAdminInput"
-                      readOnly
-                    />
-                  </div>
-                  <div className="col-md-2 ml-3">
-                    <label htmlFor="removeUsername">Username:</label>
-                  </div>
-                  <div className="col-md-9">
-                    <input
-                      id="removeUsername"
-                      value=""
-                      className="removeAdminInput"
-                      readOnly
-                    />
-                  </div>
-                  <div className="col-md-2 ml-3">
-                    <label htmlFor="removeEmail">Email:</label>
-                  </div>
-                  <div className="col-md-9">
-                    <input
-                      id="removeEmail"
-                      value=""
-                      className="removeAdminInput"
-                      readOnly
-                    />
-                  </div>
-                </div>
-                <input
-                  id="removeIdirUsername"
-                  value=""
-                  style={{ display: "none" }}
-                />
-              </div>
-            </div>
-            <div className="modal-footer">
-              <button
-                type="button"
-                className="btn btn-primary remove-admin-finalize"
-              >
-                Yes
-              </button>
-              <button
-                type="button"
-                className="btn btn-secondary"
-                data-dismiss="modal"
-              >
-                No
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </>
+    <Modal show={show} onHide={onHide} size="lg">
+      <Modal.Header closeButton>
+        <Modal.Title>Remove Administrator</Modal.Title>
+      </Modal.Header>
+      <Modal.Body>
+        <p>Are you sure you want to remove this administrator?</p>
+        <Form>
+          <Form.Group as={Row} controlId="removeName" className="mb-3">
+            <Form.Label column sm={2} style={{ fontWeight: 'bold' }}>
+              Name:
+            </Form.Label>
+            <Col sm={10}>
+              <Form.Control type="text" readOnly defaultValue={admin?.name} />
+            </Col>
+          </Form.Group>
+          <Form.Group as={Row} controlId="removeUsername" className="mb-3">
+            <Form.Label column sm={2} style={{ fontWeight: 'bold' }}>
+              Username:
+            </Form.Label>
+            <Col sm={10}>
+              <Form.Control type="text" readOnly defaultValue={admin?.username} />
+            </Col>
+          </Form.Group>
+          <Form.Group as={Row} controlId="removeEmail" className="mb-3">
+            <Form.Label column sm={2} style={{ fontWeight: 'bold' }}>
+              Email:
+            </Form.Label>
+            <Col sm={10}>
+              <Form.Control type="text" readOnly defaultValue={admin?.email} />
+            </Col>
+          </Form.Group>
+        </Form>
+        {showError && <div className={`alert alert-danger text-center`}>{error}</div>}
+      </Modal.Body>
+      <Modal.Footer>
+        <Button variant="secondary" onClick={onHide} disabled={loading}>
+          No
+        </Button>
+        <Button variant="primary" onClick={() => removeHandler()} disabled={loading}>
+          Yes
+        </Button>
+      </Modal.Footer>
+    </Modal>
   );
 };
 

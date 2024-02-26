@@ -1,7 +1,6 @@
-import axios, { AxiosResponse, AxiosError, AxiosRequestConfig } from "axios";
-import { Dispatch } from "redux";
-import config from "../../config";
-import { AUTH_TOKEN } from "../service/user-service";
+import axios, { AxiosResponse, AxiosError, AxiosRequestConfig } from 'axios';
+import config from '../../config';
+import { AUTH_TOKEN } from '../service/user-service';
 
 const STATUS_CODES = {
   Ok: 200,
@@ -23,18 +22,13 @@ interface ApiRequestParameters<T = {}> {
   params?: T;
 }
 
-export const get = <T, M = {}>(
-  parameters: ApiRequestParameters<M>,
-  headers?: {}
-): Promise<T> => {
+export const get = <T, M = {}>(parameters: ApiRequestParameters<M>, headers?: {}): Promise<T> => {
   let config: AxiosRequestConfig = { headers: headers };
   return new Promise<T>((resolve, reject) => {
     const { url, requiresAuthentication, params } = parameters;
 
     if (requiresAuthentication) {
-      axios.defaults.headers.common[
-        "Authorization"
-      ] = `Bearer ${localStorage.getItem(AUTH_TOKEN)}`;
+      axios.defaults.headers.common['Authorization'] = `Bearer ${localStorage.getItem(AUTH_TOKEN)}`;
     }
 
     if (params) {
@@ -59,17 +53,13 @@ export const get = <T, M = {}>(
   });
 };
 
-export const post = <T, M = {}>(
-  parameters: ApiRequestParameters<M>
-): Promise<T> => {
+export const post = <T, M = {}>(parameters: ApiRequestParameters<M>): Promise<T> => {
   let config: AxiosRequestConfig = { headers: {} };
   return new Promise<T>((resolve, reject) => {
     const { url, requiresAuthentication, params } = parameters;
 
     if (requiresAuthentication) {
-      axios.defaults.headers.common[
-        "Authorization"
-      ] = `Bearer ${localStorage.getItem(AUTH_TOKEN)}`;
+      axios.defaults.headers.common['Authorization'] = `Bearer ${localStorage.getItem(AUTH_TOKEN)}`;
     }
 
     axios
@@ -84,17 +74,34 @@ export const post = <T, M = {}>(
   });
 };
 
-export const fileDownload = <T, M = {}>(
-  parameters: ApiRequestParameters<M>
-): Promise<T> => {
-  let config: AxiosRequestConfig = { headers: {}, responseType: "blob" };
+export const fileDownloadGet = <T, M = {}>(parameters: ApiRequestParameters<M>): Promise<T> => {
+  let config: AxiosRequestConfig = { headers: {}, responseType: 'blob' };
+  return new Promise<T>((resolve, reject) => {
+    const { url, requiresAuthentication } = parameters;
+
+    if (requiresAuthentication) {
+      axios.defaults.headers.common['Authorization'] = `Bearer ${localStorage.getItem('AUTH_TOKEN')}`;
+    }
+
+    axios
+      .get(url, config)
+      .then((response: AxiosResponse) => {
+        resolve(response.data as T);
+      })
+      .catch((error: AxiosError) => {
+        console.log(error.message);
+        reject(error);
+      });
+  });
+};
+
+export const fileDownloadPost = <T, M = {}>(parameters: ApiRequestParameters<M>): Promise<T> => {
+  let config: AxiosRequestConfig = { headers: {}, responseType: 'blob' };
   return new Promise<T>((resolve, reject) => {
     const { url, requiresAuthentication, params } = parameters;
 
     if (requiresAuthentication) {
-      axios.defaults.headers.common[
-        "Authorization"
-      ] = `Bearer ${localStorage.getItem(AUTH_TOKEN)}`;
+      axios.defaults.headers.common['Authorization'] = `Bearer ${localStorage.getItem(AUTH_TOKEN)}`;
     }
 
     axios
@@ -109,17 +116,13 @@ export const fileDownload = <T, M = {}>(
   });
 };
 
-export const patch = <T, M = {}>(
-  parameters: ApiRequestParameters<M>
-): Promise<T> => {
+export const patch = <T, M = {}>(parameters: ApiRequestParameters<M>): Promise<T> => {
   let config: AxiosRequestConfig = { headers: {} };
   return new Promise<T>((resolve, reject) => {
     const { url, requiresAuthentication, params: data } = parameters;
 
     if (requiresAuthentication) {
-      axios.defaults.headers.common[
-        "Authorization"
-      ] = `Bearer ${localStorage.getItem(AUTH_TOKEN)}`;
+      axios.defaults.headers.common['Authorization'] = `Bearer ${localStorage.getItem(AUTH_TOKEN)}`;
     }
 
     axios
@@ -140,17 +143,13 @@ export const patch = <T, M = {}>(
   });
 };
 
-export const put = <T, M = {}>(
-  parameters: ApiRequestParameters<M>
-): Promise<T> => {
+export const put = <T, M = {}>(parameters: ApiRequestParameters<M>): Promise<T> => {
   let config: AxiosRequestConfig = { headers: {} };
   return new Promise<T>((resolve, reject) => {
     const { url, requiresAuthentication, params: data } = parameters;
 
     if (requiresAuthentication) {
-      axios.defaults.headers.common[
-        "Authorization"
-      ] = `Bearer ${localStorage.getItem(AUTH_TOKEN)}`;
+      axios.defaults.headers.common['Authorization'] = `Bearer ${localStorage.getItem(AUTH_TOKEN)}`;
     }
 
     axios
@@ -172,23 +171,17 @@ export const put = <T, M = {}>(
 };
 
 // adjust for uploading templates
-export const putFile = <T, M = {}>(
-  parameters: ApiRequestParameters<M>,
-  headers: {},
-  file: File
-): Promise<T> => {
+export const putFile = <T, M = {}>(parameters: ApiRequestParameters<M>, headers: {}, file: File): Promise<T> => {
   let config: AxiosRequestConfig = { headers: headers };
 
   const formData = new FormData();
-  if (file) formData.append("file", file);
+  if (file) formData.append('file', file);
 
   return new Promise<T>((resolve, reject) => {
     const { url, requiresAuthentication } = parameters;
 
     if (requiresAuthentication) {
-      axios.defaults.headers.common[
-        "Authorization"
-      ] = `Bearer ${localStorage.getItem(AUTH_TOKEN)}`;
+      axios.defaults.headers.common['Authorization'] = `Bearer ${localStorage.getItem(AUTH_TOKEN)}`;
     }
 
     axios
@@ -225,12 +218,3 @@ export const generateApiParameters = <T = {}>(
 
   return result;
 };
-
-//const response = await get<Blob>(parameters, header, attachment);
-
-// const response = await putFile<COMSObject>(
-//   dispatch,
-//   parameters,
-//   header,
-//   attachment
-// );

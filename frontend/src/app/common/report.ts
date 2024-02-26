@@ -55,7 +55,7 @@ const handleDownload = async (
   const postParameters = api.generateApiParameters(url, data);
 
   await api
-    .fileDownload<Blob>(postParameters)
+    .fileDownloadPost<Blob>(postParameters)
     .then(async (blob) => {
       fileDownload(blob, filename);
     })

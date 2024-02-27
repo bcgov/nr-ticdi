@@ -42,6 +42,7 @@ export class ReportController {
   async getData(@Session() session: { data?: SessionData }, @Param('dtid') dtid: number) {
     console.log(dtid);
     console.log(session);
+    await this.reportService.getActiveNfrDataByDtid(dtid);
     await this.ttlsService.setWebadeToken();
     const response: any = await firstValueFrom(this.ttlsService.callHttp(dtid))
       .then((res) => {
@@ -53,6 +54,12 @@ export class ReportController {
         console.log(err.response.data);
       });
     return response;
+  }
+
+  @Get('get-nfr-data/:dtid')
+  getNfrData(@Session() session: { data?: SessionData }, @Param('dtid') dtid: number) {
+    console.log('get-nfr-data ~ ' + dtid);
+    return this.reportService.getActiveNfrDataByDtid(dtid);
   }
 
   @Get('get-report-name/:dtid/:tfn/:documentType')
@@ -105,23 +112,6 @@ export class ReportController {
     }
   }
 
-  // @Post("generate-report-new")
-  // @Header(
-  //   "Content-Type",
-  //   "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-  // )
-  // async generateReportNew(@Session() session: {data: SessionData}) {
-  //   let idir_username = "";
-  //   if (session.data.activeAccount) {
-  //     idir_username = session.data.activeAccount.idir_username;
-  //     console.log("Active account found");
-  //   } else {
-  //     console.log("No active account found");
-  //   }
-  //   // receive document_type id to get the report type & active template
-  //   return new StreamableFile(await this.reportService.generateReportNew(+data.dtid, idir_username));
-  // }
-
   @Post('generate-nfr-report')
   @Header('Content-Type', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document')
   @Header('Content-Disposition', 'attachment; filename=nfr-report.docx')
@@ -159,6 +149,7 @@ export class ReportController {
 
   @Get('get-group-max/:variant')
   getGroupMaxByVariant(@Param('variant') variantName: string) {
+    console.log('variantName: ' + variantName);
     return this.reportService.getGroupMaxByVariant(variantName);
   }
 

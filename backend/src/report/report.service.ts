@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import * as dotenv from 'dotenv';
 import { firstValueFrom } from 'rxjs';
 import { DocumentTemplateService } from 'src/document_template/document_template.service';
+import { NFRProvisionService } from 'src/nfr_provision/nfr_provision.service';
 import { PrintRequestLogService } from 'src/print_request_log/print_request_log.service';
 import { TTLSService } from 'src/ttls/ttls.service';
 import { GL_REPORT_TYPE, LUR_REPORT_TYPE, numberWords, sectionTitles } from 'utils/constants';
@@ -18,7 +19,8 @@ export class ReportService {
   constructor(
     private readonly ttlsService: TTLSService,
     private readonly documentTemplateService: DocumentTemplateService,
-    private readonly printRequestLogService: PrintRequestLogService
+    private readonly printRequestLogService: PrintRequestLogService,
+    private readonly nfrProvisionService: NFRProvisionService
   ) {
     hostname = process.env.backend_url ? process.env.backend_url : `http://localhost`;
     // local development backend port is 3001, docker backend port is 3000
@@ -750,11 +752,8 @@ export class ReportService {
     });
   }
 
-  async getGroupMaxByVariant(variantName: string): Promise<any> {
-    const url = `${hostname}:${port}/nfr-provision/get-group-max/variant/${variantName}`;
-    return await axios.get(url).then((res) => {
-      return res.data;
-    });
+  getGroupMaxByVariant(variantName: string): Promise<any> {
+    return this.nfrProvisionService.getGroupMaxByVariant(variantName);
   }
 
   async getNFRVariablesByVariantAndDtid(variantName: string, dtid: number): Promise<any> {
@@ -777,18 +776,12 @@ export class ReportService {
     }
   }
 
-  async getMandatoryProvisions() {
-    const url = `${hostname}:${port}/nfr-provision/get-all-mandatory-provisions/0`;
-    return await axios.get(url).then((res) => {
-      return res.data;
-    });
+  getMandatoryProvisions() {
+    return this.nfrProvisionService.getMandatoryProvisions();
   }
 
-  async getMandatoryProvisionsByVariant(variantName: string) {
-    const url = `${hostname}:${port}/nfr-provision/get-mandatory-provisions/variant/${variantName}`;
-    return await axios.get(url).then((res) => {
-      return res.data;
-    });
+  getMandatoryProvisionsByVariant(variantName: string) {
+    return this.nfrProvisionService.getMandatoryProvisionsByVariant(variantName);
   }
 
   async getNFRData() {
@@ -852,7 +845,7 @@ export class ReportService {
 
   async getActiveNfrDataByDtid(dtid: number): Promise<any> {
     const url = `${hostname}:${port}/nfr-data/dtid/${dtid}`;
-    return axios
+    const response = await axios
       .get(url, {
         headers: {
           'Content-Type': 'application/json',
@@ -861,6 +854,21 @@ export class ReportService {
       .then((res) => {
         return res.data;
       });
+    // console.log('!!!~~~~~~~~');
+    // console.log("this.getGroupMaxByVariant('NOTICE OF FINAL REVIEW')");
+    // const groupMax = await this.getGroupMaxByVariant('NOTICE OF FINAL REVIEW');
+    // // console.log(groupMax);
+    // console.log('\ngetActiveNfrDataByDtid');
+    // console.log(response);
+    // console.log('\nnfr_data_provisions');
+    // // console.log(response.nfrData.nfr_data_provisions);
+    // console.log('\nnfr_data_variables');
+    // // console.log(response.nfrData.nfr_data_variables);
+    // console.log('\nthis.getMandatoryProvisionsByVariant(NOTICE OF FINAL REVIEW)');
+    // const mandatoryProvisions = await this.getMandatoryProvisionsByVariant('NOTICE OF FINAL REVIEW');
+    // // console.log(mandatoryProvisions);
+    // console.log('~~~~~~~~!!!');
+    return response;
   }
 
   async saveNFR(

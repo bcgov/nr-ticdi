@@ -1,5 +1,5 @@
 import config from '../../config';
-import { DTR, DTRDisplayObject } from '../types/types';
+import { DTR, DTRDisplayObject, NfrDataObject, ProvisionGroup } from '../types/types';
 import { buildDTRDisplayData } from '../util/util';
 import * as api from './api';
 import fileDownload from 'js-file-download';
@@ -62,4 +62,19 @@ const handleDownload = async (
     .catch((error) => {
       console.error('Download error:', error);
     });
+};
+
+/** Section for Notice of Final Review which has lots of custom logic */
+export const getNfrDataByDtid = async (dtid: number) => {
+  const url = `${config.API_BASE_URL}/report/get-nfr-data/${dtid}`;
+  const getParameters = api.generateApiParameters(url);
+  const response: NfrDataObject = await api.get<NfrDataObject>(getParameters);
+  return response;
+};
+
+export const getGroupMaxByVariant = async (variant: string) => {
+  const url = `${config.API_BASE_URL}/report/get-group-max/${variant}`;
+  const getParameters = api.generateApiParameters(url);
+  const response: ProvisionGroup[] = await api.get<ProvisionGroup[]>(getParameters);
+  return response;
 };

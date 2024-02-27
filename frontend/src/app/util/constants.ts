@@ -64,6 +64,14 @@ export const CURRENT_REPORT_PAGES = {
   NFR_TO_OBTAIN: 'Notice of Final Review (To Obtain Survey)',
 };
 
+export const NFR_VARIANTS: string[] = [
+  'NOTICE OF FINAL REVIEW',
+  'NOTICE OF FINAL REVIEW (DELAYED)',
+  'NOTICE OF FINAL REVIEW (NO FEES)',
+  'NOTICE OF FINAL REVIEW (SURVEY REQUIRED)',
+  'NOTICE OF FINAL REVIEW (TO OBTAIN SURVEY)',
+];
+
 // similar to the above comment
 export const NFR_REPORT_PAGES = {
   NFR_DEFAULT: 'Notice of Final Review',

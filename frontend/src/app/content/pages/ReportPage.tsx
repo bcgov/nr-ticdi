@@ -7,10 +7,11 @@ import AreaDetails from '../display/AreaDetails';
 import DtidDetails from '../display/DtidDetails';
 import { generateReport, getData } from '../../common/report';
 import VariantDropdown from '../../components/common/VariantDropdown';
-import { CURRENT_REPORT_PAGES, NFR_REPORT_PAGES } from '../../util/constants';
+import { CURRENT_REPORT_PAGES, NFR_REPORT_PAGES, NFR_VARIANTS } from '../../util/constants';
 import InterestedParties from '../display/InterestedParties';
 import { useParams } from 'react-router';
 import Skeleton from 'react-loading-skeleton';
+import Provisions from '../display/Provisions';
 
 export interface ReportPageProps {
   documentDescription: string;
@@ -21,12 +22,15 @@ const ReportPage: FC<ReportPageProps> = ({ documentDescription }) => {
   const dtidNumber = dtid ? parseInt(dtid, 10) : null;
 
   const [data, setData] = useState<DTRDisplayObject | null>(null);
+  const [showNfr, setShowNfr] = useState<boolean>(false);
 
   useEffect(() => {
+    setShowNfr(NFR_VARIANTS.includes(documentDescription.toUpperCase()));
     const fetchData = async () => {
       if (dtidNumber) {
         try {
           const fetchedData: DTRDisplayObject = await getData(dtidNumber);
+
           setData(fetchedData);
         } catch (error) {
           console.error('Failed to fetch data', error);
@@ -35,7 +39,7 @@ const ReportPage: FC<ReportPageProps> = ({ documentDescription }) => {
       }
     };
     fetchData();
-  }, [dtidNumber]);
+  }, [dtidNumber, documentDescription]);
 
   const generateReportHandler = () => {
     if (dtidNumber) {
@@ -78,6 +82,16 @@ const ReportPage: FC<ReportPageProps> = ({ documentDescription }) => {
       ) : (
         <Collapsible title="Interested Parties">{data ? <InterestedParties data={data!} /> : <Skeleton />}</Collapsible>
       )}
+      {showNfr && (
+        <Collapsible title="Provisions">
+          <Provisions dtid={dtidNumber!} variantName={documentDescription} />
+        </Collapsible>
+      )}
+      {/* {showNfr && 
+      <Collapsible title="Variables">
+        <Variables dtid={dtidNumber!} variantName={documentDescription} />
+      </Collapsible>
+      } */}
 
       <Button text="Create" onClick={generateReportHandler} />
     </>

@@ -1,6 +1,4 @@
 export interface DTR {
-  // "@type": string;
-  // links: RelLink[];
   dtid: number;
   fileNum: string;
   orgUnit: string | null;
@@ -34,8 +32,6 @@ export interface DTR {
 }
 
 export interface InterestParcel {
-  // "@type": string;
-  // links: any[];
   interestParcelId: number | null;
   legalDescription: string | null;
   areaCalcCode: string | null;
@@ -48,16 +44,7 @@ export interface InterestParcel {
   wktGeometry: string | null;
 }
 
-// interface RelLink {
-//   "@type": string;
-//   rel: string | null;
-//   href: string | null;
-//   method: string | null;
-// }
-
 export interface TenantAddressResource {
-  // "@type": string;
-  // links: RelLink[];
   firstName: string | null;
   middleName: string | null;
   lastName: string | null;
@@ -124,3 +111,69 @@ export interface InterestedParties {
   clientName: string | null;
   address: string | null;
 }
+
+/** NFR types section start */
+export type NfrDataVariableObject = {
+  data_variable_value: string;
+  id: number;
+  nfr_variable: NfrVariableObject;
+};
+
+export type NfrVariableObject = {
+  id: number;
+  variable_name: string;
+  variable_value: string;
+  help_text: string;
+  create_userid: string;
+  update_userid: string;
+  create_timestamp: string;
+  update_timestamp: string;
+};
+
+export type NfrDataProvisionObject = {
+  provision_free_text: string;
+  id: number;
+  nfr_provision: NfrProvisionObject;
+};
+
+export type NfrProvisionObject = {
+  type: string;
+  provision_name: string;
+  free_text: string;
+  category: string;
+  active_flag: boolean;
+  create_userid: string;
+  update_userid: string;
+  provision_group: number; // will always be null
+  id: number;
+  help_text: string;
+  create_timestamp: string;
+  update_timestamp: string;
+};
+
+export type ProvisionGroup = {
+  id: number;
+  provision_group: number;
+  provision_group_text: string;
+  max: number;
+};
+
+export type NfrDataObject = {
+  nfrData: {
+    dtid: number;
+    variant_name: string;
+    template_id: number;
+    status: string;
+    create_userid: string;
+    update_userid: string;
+    id: number;
+    active: boolean;
+    create_timestamp: string;
+    update_timestamp: string;
+    nfr_data_provisions: NfrDataProvisionObject;
+    nfr_data_variables: NfrDataVariableObject;
+  };
+  provisionIds: number[];
+  variableIds: number[];
+};
+/** NFR types section end */

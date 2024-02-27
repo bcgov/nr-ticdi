@@ -1,4 +1,4 @@
-import { NFRDataVariable } from "src/nfr_data/entities/nfr_data_variable.entity";
+import { NFRDataVariable } from 'src/nfr_data/entities/nfr_data_variable.entity';
 import {
   Entity,
   Column,
@@ -7,8 +7,8 @@ import {
   OneToMany,
   CreateDateColumn,
   UpdateDateColumn,
-} from "typeorm";
-import { NFRProvision } from "./nfr_provision.entity";
+} from 'typeorm';
+import { NFRProvision } from './nfr_provision.entity';
 
 /**
  * This entity holds variables associated with a provision.
@@ -37,13 +37,9 @@ export class NFRProvisionVariable {
     nullable: true,
   })
   provision: NFRProvision;
-  @OneToMany(
-    () => NFRDataVariable,
-    (nfrDataVariable) => nfrDataVariable.nfr_variable,
-    {
-      nullable: true,
-      cascade: true,
-    }
-  )
+  @OneToMany(() => NFRDataVariable, (nfrDataVariable) => nfrDataVariable.nfr_variable, {
+    nullable: true,
+    cascade: true,
+  })
   nfr_data_variables: NFRDataVariable[];
 }

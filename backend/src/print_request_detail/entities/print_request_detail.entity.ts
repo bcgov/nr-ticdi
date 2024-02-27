@@ -1,10 +1,4 @@
-import {
-  Column,
-  CreateDateColumn,
-  Entity,
-  PrimaryGeneratedColumn,
-  UpdateDateColumn,
-} from "typeorm";
+import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 
 @Entity()
 export class PrintRequestDetail {
@@ -129,41 +123,41 @@ export class PrintRequestDetail {
     update_userid?: string
   ) {
     this.dtid = dtid || null;
-    this.tenure_file_number = tenure_file_number || "";
-    this.incorporation_number = incorporation_number || "";
-    this.organization_unit = organization_unit || "";
-    this.purpose_name = purpose_name || "";
-    this.sub_purpose_name = sub_purpose_name || "";
-    this.type_name = type_name || "";
-    this.sub_type_name = sub_type_name || "";
-    this.licence_holder_name = licence_holder_name || "";
-    this.contact_agent = contact_agent || "";
-    this.contact_company_name = contact_company_name || "";
-    this.contact_first_name = contact_first_name || "";
-    this.contact_middle_name = contact_middle_name || "";
-    this.contact_last_name = contact_last_name || "";
-    this.contact_phone_number = contact_phone_number || "";
-    this.contact_email_address = contact_email_address || "";
-    this.first_name = first_name || "";
-    this.middle_name = middle_name || "";
-    this.last_name = last_name || "";
-    this.legal_name = legal_name || "";
-    this.email_address = email_address || "";
-    this.phone_number = phone_number || "";
-    this.inspected_date = inspected_date || "";
-    this.mailing_address = mailing_address || "";
-    this.mailing_address_line_1 = mailing_address_line_1 || "";
-    this.mailing_address_line_2 = mailing_address_line_2 || "";
-    this.mailing_address_line_3 = mailing_address_line_3 || "";
-    this.mailing_city = mailing_city || "";
-    this.mailing_province_state_code = mailing_province_state_code || "";
-    this.mailing_postal_code = mailing_postal_code || "";
-    this.mailing_zip = mailing_zip || "";
-    this.mailing_country_code = mailing_country_code || "";
-    this.mailing_country = mailing_country || "";
-    this.location_description = location_description || "";
-    this.tenure = tenure || "";
-    this.create_userid = create_userid || "";
-    this.update_userid = update_userid || "";
+    this.tenure_file_number = tenure_file_number || '';
+    this.incorporation_number = incorporation_number || '';
+    this.organization_unit = organization_unit || '';
+    this.purpose_name = purpose_name || '';
+    this.sub_purpose_name = sub_purpose_name || '';
+    this.type_name = type_name || '';
+    this.sub_type_name = sub_type_name || '';
+    this.licence_holder_name = licence_holder_name || '';
+    this.contact_agent = contact_agent || '';
+    this.contact_company_name = contact_company_name || '';
+    this.contact_first_name = contact_first_name || '';
+    this.contact_middle_name = contact_middle_name || '';
+    this.contact_last_name = contact_last_name || '';
+    this.contact_phone_number = contact_phone_number || '';
+    this.contact_email_address = contact_email_address || '';
+    this.first_name = first_name || '';
+    this.middle_name = middle_name || '';
+    this.last_name = last_name || '';
+    this.legal_name = legal_name || '';
+    this.email_address = email_address || '';
+    this.phone_number = phone_number || '';
+    this.inspected_date = inspected_date || '';
+    this.mailing_address = mailing_address || '';
+    this.mailing_address_line_1 = mailing_address_line_1 || '';
+    this.mailing_address_line_2 = mailing_address_line_2 || '';
+    this.mailing_address_line_3 = mailing_address_line_3 || '';
+    this.mailing_city = mailing_city || '';
+    this.mailing_province_state_code = mailing_province_state_code || '';
+    this.mailing_postal_code = mailing_postal_code || '';
+    this.mailing_zip = mailing_zip || '';
+    this.mailing_country_code = mailing_country_code || '';
+    this.mailing_country = mailing_country || '';
+    this.location_description = location_description || '';
+    this.tenure = tenure || '';
+    this.create_userid = create_userid || '';
+    this.update_userid = update_userid || '';
   }
 }

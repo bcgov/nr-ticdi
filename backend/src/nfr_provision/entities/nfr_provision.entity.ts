@@ -8,11 +8,11 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
-} from "typeorm";
-import { NFRProvisionGroup } from "./nfr_provision_group.entity";
-import { NFRProvisionVariant } from "./nfr_provision_variant.entity";
-import { NFRProvisionVariable } from "./nfr_provision_variable.entity";
-import { NFRDataProvision } from "src/nfr_data/entities/nfr_data_provision.entity";
+} from 'typeorm';
+import { NFRProvisionGroup } from './nfr_provision_group.entity';
+import { NFRProvisionVariant } from './nfr_provision_variant.entity';
+import { NFRProvisionVariable } from './nfr_provision_variable.entity';
+import { NFRDataProvision } from 'src/nfr_data/entities/nfr_data_provision.entity';
 
 @Entity()
 export class NFRProvision {
@@ -38,19 +38,12 @@ export class NFRProvision {
   create_timestamp: Date;
   @UpdateDateColumn()
   update_timestamp: Date;
-  @ManyToOne(
-    () => NFRProvisionGroup,
-    (provisionGroup) => provisionGroup.provisions
-  )
+  @ManyToOne(() => NFRProvisionGroup, (provisionGroup) => provisionGroup.provisions)
   provision_group: NFRProvisionGroup;
-  @OneToMany(
-    () => NFRProvisionVariable,
-    (provisionVariable) => provisionVariable.provision,
-    {
-      nullable: true,
-      cascade: true,
-    }
-  )
+  @OneToMany(() => NFRProvisionVariable, (provisionVariable) => provisionVariable.provision, {
+    nullable: true,
+    cascade: true,
+  })
   provision_variables: NFRProvisionVariable[];
   @ManyToMany(() => NFRProvisionVariant, {
     nullable: true,
@@ -58,14 +51,10 @@ export class NFRProvision {
   })
   @JoinTable()
   provision_variant: NFRProvisionVariant[];
-  @OneToMany(
-    () => NFRDataProvision,
-    (nfrDataProvision) => nfrDataProvision.nfr_provision,
-    {
-      nullable: true,
-      cascade: true,
-    }
-  )
+  @OneToMany(() => NFRDataProvision, (nfrDataProvision) => nfrDataProvision.nfr_provision, {
+    nullable: true,
+    cascade: true,
+  })
   nfr_data_provisions: NFRDataProvision[];
 
   constructor(
@@ -79,13 +68,13 @@ export class NFRProvision {
     provision_group?: NFRProvisionGroup,
     provision_variant?: NFRProvisionVariant[]
   ) {
-    this.type = type || "";
-    this.provision_name = provision_name || "";
-    this.free_text = free_text || "";
-    this.category = category || "";
+    this.type = type || '';
+    this.provision_name = provision_name || '';
+    this.free_text = free_text || '';
+    this.category = category || '';
     this.active_flag = active_flag;
-    this.create_userid = create_userid || "";
-    this.update_userid = update_userid || "";
+    this.create_userid = create_userid || '';
+    this.update_userid = update_userid || '';
     this.provision_group = provision_group || null;
     this.provision_variant = provision_variant;
   }

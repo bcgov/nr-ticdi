@@ -1,7 +1,7 @@
 import { ExceptionFilter, Catch, ArgumentsHost, HttpException, ForbiddenException } from '@nestjs/common';
 import { URL } from 'url';
 
-@Catch(HttpException)  
+@Catch(HttpException)
 export class AccountFilter implements ExceptionFilter {
   catch(exception: ForbiddenException, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
@@ -10,6 +10,6 @@ export class AccountFilter implements ExceptionFilter {
     const protocol = process.env.ticdi_environment == 'DEVELOPMENT' ? 'http://' : 'https://';
     const url = new URL(protocol + request.headers.host + response.req.url);
     const status = exception.getStatus();
-    response.status(status).redirect(url.origin); 
+    response.status(status).redirect(url.origin);
   }
 }

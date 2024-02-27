@@ -1,8 +1,8 @@
-import { Body, Controller, Delete, Get, Param, Post } from "@nestjs/common";
-import { CreateNFRProvisionDto } from "./dto/create-nfr_provision.dto";
-import { NFRProvisionService } from "./nfr_provision.service";
+import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
+import { CreateNFRProvisionDto } from './dto/create-nfr_provision.dto';
+import { NFRProvisionService } from './nfr_provision.service';
 
-@Controller("nfr-provision")
+@Controller('nfr-provision')
 export class NFRProvisionController {
   constructor(private readonly nfrProvisionService: NFRProvisionService) {}
 
@@ -14,14 +14,14 @@ export class NFRProvisionController {
     return this.nfrProvisionService.create(nfrProvision);
   }
 
-  @Post("update")
+  @Post('update')
   async update(@Body() nfrProvision: CreateNFRProvisionDto & { id: number }) {
     const id = nfrProvision.id;
-    delete nfrProvision["id"];
+    delete nfrProvision['id'];
     return this.nfrProvisionService.update(id, nfrProvision);
   }
 
-  @Post("add-variable")
+  @Post('add-variable')
   async addVariable(
     @Body()
     nfrVariable: {
@@ -34,7 +34,7 @@ export class NFRProvisionController {
     return this.nfrProvisionService.addVariable(nfrVariable);
   }
 
-  @Post("update-variable")
+  @Post('update-variable')
   async updateVariable(
     @Body()
     nfrVariable: {
@@ -46,12 +46,12 @@ export class NFRProvisionController {
     }
   ) {
     const id = nfrVariable.id;
-    delete nfrVariable["id"];
+    delete nfrVariable['id'];
     return this.nfrProvisionService.updateVariable(id, nfrVariable);
   }
 
-  @Get("remove-variable/:id")
-  async removeVariable(@Param("id") id: number) {
+  @Get('remove-variable/:id')
+  async removeVariable(@Param('id') id: number) {
     return this.nfrProvisionService.removeVariable(id);
   }
 
@@ -60,13 +60,13 @@ export class NFRProvisionController {
     return this.nfrProvisionService.findAll();
   }
 
-  @Get("variables")
+  @Get('variables')
   findAllVariables() {
     return this.nfrProvisionService.findAllVariables();
   }
 
-  @Get(":nfrProvisionId")
-  findById(@Param("nfrProvisionId") nfrProvisionId: number) {
+  @Get(':nfrProvisionId')
+  findById(@Param('nfrProvisionId') nfrProvisionId: number) {
     if (nfrProvisionId && nfrProvisionId != 0) {
       return this.nfrProvisionService.findById(nfrProvisionId);
     } else {
@@ -74,57 +74,55 @@ export class NFRProvisionController {
     }
   }
 
-  @Get("variant/:variant")
-  getProvisionsByVariant(@Param("variant") variantName: string) {
+  @Get('variant/:variant')
+  getProvisionsByVariant(@Param('variant') variantName: string) {
     return this.nfrProvisionService.getProvisionsByVariant(variantName);
   }
 
-  @Get("enable/:id")
-  enableProvision(@Param("id") id: number) {
+  @Get('enable/:id')
+  enableProvision(@Param('id') id: number) {
     return this.nfrProvisionService.enable(id);
   }
 
-  @Get("disable/:id")
-  disableProvision(@Param("id") id: number) {
+  @Get('disable/:id')
+  disableProvision(@Param('id') id: number) {
     return this.nfrProvisionService.disable(id);
   }
 
   // nestjs gets upset when there is no parameter, id is unused
-  @Get("get-group-max/:id")
-  getGroupMax(@Param("id") id: number) {
+  @Get('get-group-max/:id')
+  getGroupMax(@Param('id') id: number) {
     return this.nfrProvisionService.getGroupMax();
   }
 
-  @Get("get-group-max/variant/:variant")
-  getGroupMaxByDTID(@Param("variant") variantName: string) {
+  @Get('get-group-max/variant/:variant')
+  getGroupMaxByDTID(@Param('variant') variantName: string) {
     return this.nfrProvisionService.getGroupMaxByVariant(variantName);
   }
 
-  @Get("get-provision-variables/variant/:variant")
-  getVariablesByVariant(@Param("variant") variantName: string) {
-    console.log('get-provision-variables')
+  @Get('get-provision-variables/variant/:variant')
+  getVariablesByVariant(@Param('variant') variantName: string) {
+    console.log('get-provision-variables');
     return this.nfrProvisionService.getVariablesByVariant(variantName);
   }
 
-  @Get("get-all-mandatory-provisions/:id")
+  @Get('get-all-mandatory-provisions/:id')
   getMandatoryProvisions() {
     return this.nfrProvisionService.getMandatoryProvisions();
   }
 
-  @Get("get-mandatory-provisions/variant/:variant")
-  getMandatoryProvisionsByVariant(@Param("variant") variantName: string) {
-    return this.nfrProvisionService.getMandatoryProvisionsByVariant(
-      variantName
-    );
+  @Get('get-mandatory-provisions/variant/:variant')
+  getMandatoryProvisionsByVariant(@Param('variant') variantName: string) {
+    return this.nfrProvisionService.getMandatoryProvisionsByVariant(variantName);
   }
 
-  @Get("get-variants-with-ids/:id")
+  @Get('get-variants-with-ids/:id')
   getVariantsWithIds() {
     return this.nfrProvisionService.getVariantsWithIds();
   }
 
-  @Delete(":id")
-  remove(@Param("id") id: number) {
+  @Delete(':id')
+  remove(@Param('id') id: number) {
     return this.nfrProvisionService.remove(id);
   }
 }

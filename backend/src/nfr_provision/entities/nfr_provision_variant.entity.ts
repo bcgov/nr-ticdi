@@ -1,5 +1,5 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToMany } from "typeorm";
-import { NFRProvision } from "./nfr_provision.entity";
+import { Entity, Column, PrimaryGeneratedColumn, ManyToMany } from 'typeorm';
+import { NFRProvision } from './nfr_provision.entity';
 
 /**
  * This entity allows us to associate certain provisions with certain

@@ -1,10 +1,10 @@
-import { Injectable } from "@nestjs/common";
-import { InjectRepository } from "@nestjs/typeorm";
-import { In, Repository } from "typeorm";
-import { CreateDocumentTemplateDto } from "./dto/create-document_template.dto";
-import { UpdateDocumentTemplateDto } from "./dto/update-document_template.dto";
-import { DocumentTemplate } from "./entities/document_template.entity";
-import { NFRData } from "src/nfr_data/entities/nfr_data.entity";
+import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { In, Repository } from 'typeorm';
+import { CreateDocumentTemplateDto } from './dto/create-document_template.dto';
+import { UpdateDocumentTemplateDto } from './dto/update-document_template.dto';
+import { DocumentTemplate } from './entities/document_template.entity';
+import { NFRData } from 'src/nfr_data/entities/nfr_data.entity';
 
 @Injectable()
 export class DocumentTemplateService {
@@ -15,11 +15,8 @@ export class DocumentTemplateService {
     private nfrDataRepository: Repository<NFRData>
   ) {}
 
-  async create(
-    documentTemplate: CreateDocumentTemplateDto,
-    file: any
-  ): Promise<DocumentTemplate> {
-    const base64File = Buffer.from(file.buffer).toString("base64");
+  async create(documentTemplate: CreateDocumentTemplateDto, file: any): Promise<DocumentTemplate> {
+    const base64File = Buffer.from(file.buffer).toString('base64');
     const newItem = new DocumentTemplate();
     newItem.document_type = documentTemplate.document_type;
     newItem.template_author = documentTemplate.template_author;
@@ -33,9 +30,7 @@ export class DocumentTemplateService {
     return this.documentTemplateRepository.save(newTemplate);
   }
 
-  async getTemplateVersion(
-    documentTemplate: CreateDocumentTemplateDto
-  ): Promise<number> {
+  async getTemplateVersion(documentTemplate: CreateDocumentTemplateDto): Promise<number> {
     const existingReports = await this.documentTemplateRepository.findBy({
       document_type: documentTemplate.document_type,
     });
@@ -52,35 +47,21 @@ export class DocumentTemplateService {
     }
   }
 
-  async activateTemplate(data: {
-    id: number;
-    update_userid: string;
-    document_type: string;
-  }): Promise<any> {
+  async activateTemplate(data: { id: number; update_userid: string; document_type: string }): Promise<any> {
     let allTemplates = await this.documentTemplateRepository.findBy({
       document_type: data.document_type.toUpperCase(),
     });
     for (let entry of allTemplates) {
       if (entry.active_flag == true) {
-        await this.documentTemplateRepository.update(
-          { id: entry.id },
-          { active_flag: false }
-        );
+        await this.documentTemplateRepository.update({ id: entry.id }, { active_flag: false });
       }
     }
-    const activatedTemplate = await this.documentTemplateRepository.update(
-      { id: data.id },
-      { active_flag: true }
-    );
+    const activatedTemplate = await this.documentTemplateRepository.update({ id: data.id }, { active_flag: true });
     await this.updateNfrTemplates(data.document_type.toUpperCase());
     return activatedTemplate;
   }
 
-  async checkForActiveTemplates(data: {
-    id: number;
-    update_userid: string;
-    document_type: string;
-  }): Promise<any> {
+  async checkForActiveTemplates(data: { id: number; update_userid: string; document_type: string }): Promise<any> {
     let allTemplates = await this.documentTemplateRepository.findBy({
       document_type: data.document_type,
     });
@@ -90,10 +71,7 @@ export class DocumentTemplateService {
       }
     }
     // if no active templates, make this one active
-    return await this.documentTemplateRepository.update(
-      { id: data.id },
-      { active_flag: true }
-    );
+    return await this.documentTemplateRepository.update({ id: data.id }, { active_flag: true });
   }
 
   async getTemplatesInfoByIds(ids: number[]): Promise<any[]> {
@@ -121,20 +99,14 @@ export class DocumentTemplateService {
     // if the removed template was active, activate the highest version template
     const templateToRemove = await this.findOne(id);
     const variantName = templateToRemove.document_type;
-    await this.documentTemplateRepository.update(
-      { id: id },
-      { is_deleted: true, active_flag: false }
-    );
+    await this.documentTemplateRepository.update({ id: id }, { is_deleted: true, active_flag: false });
     if (templateToRemove.active_flag == true) {
       const allTemplates = await this.findAll(templateToRemove.document_type);
       if (allTemplates.length != 0) {
         let newestVersionTemplate: DocumentTemplate;
         let currentVersion = 0;
         for (let entry of allTemplates) {
-          if (
-            entry.is_deleted == false &&
-            entry.template_version > currentVersion
-          ) {
+          if (entry.is_deleted == false && entry.template_version > currentVersion) {
             currentVersion = entry.template_version;
             newestVersionTemplate = entry;
           }
@@ -150,9 +122,7 @@ export class DocumentTemplateService {
 
   // updates the updated_by and document_version columns
   // unused - needs to be updated
-  async update(
-    templateData: UpdateDocumentTemplateDto
-  ): Promise<DocumentTemplate> {
+  async update(templateData: UpdateDocumentTemplateDto): Promise<DocumentTemplate> {
     let allTemplates = await this.documentTemplateRepository.findBy({
       document_type: templateData.document_type,
     });
@@ -162,11 +132,10 @@ export class DocumentTemplateService {
         mostRecentTemplate = template;
       }
     }
-    let templateToUpdate =
-      await this.documentTemplateRepository.findOneByOrFail({
-        document_type: templateData.document_type,
-        template_version: templateData.template_version,
-      });
+    let templateToUpdate = await this.documentTemplateRepository.findOneByOrFail({
+      document_type: templateData.document_type,
+      template_version: templateData.template_version,
+    });
     templateToUpdate.document_type = templateData.document_type;
     templateToUpdate.template_version = mostRecentTemplate.template_version + 1;
     templateToUpdate.template_author = templateData.template_author;

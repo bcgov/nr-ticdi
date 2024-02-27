@@ -1,10 +1,5 @@
-import {
-  CanActivate,
-  ExecutionContext,
-  Injectable,
-  ForbiddenException,
-} from "@nestjs/common";
-import { Request } from "express";
+import { CanActivate, ExecutionContext, Injectable, ForbiddenException } from '@nestjs/common';
+import { Request } from 'express';
 
 @Injectable()
 export class GenerateReportGuard implements CanActivate {

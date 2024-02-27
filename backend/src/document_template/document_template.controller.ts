@@ -1,26 +1,19 @@
-import {
-  Body,
-  Controller,
-  Get,
-  Post,
-  UploadedFile,
-  UseInterceptors,
-} from "@nestjs/common";
-import { DocumentTemplateService } from "./document_template.service";
-import { CreateDocumentTemplateDto } from "./dto/create-document_template.dto";
-import { UpdateDocumentTemplateDto } from "./dto/update-document_template.dto";
-import { FileInterceptor } from "@nestjs/platform-express";
-import { Express } from "express";
-import { Param } from "@nestjs/common/decorators";
-import { DocumentTemplate } from "./entities/document_template.entity";
-import { TrimmedDocumentTemplate } from "../../utils/types";
+import { Body, Controller, Get, Post, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { DocumentTemplateService } from './document_template.service';
+import { CreateDocumentTemplateDto } from './dto/create-document_template.dto';
+import { UpdateDocumentTemplateDto } from './dto/update-document_template.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { Express } from 'express';
+import { Param } from '@nestjs/common/decorators';
+import { DocumentTemplate } from './entities/document_template.entity';
+import { TrimmedDocumentTemplate } from '../../utils/types';
 
-@Controller("document-template")
+@Controller('document-template')
 export class DocumentTemplateController {
   constructor(private readonly templateService: DocumentTemplateService) {}
 
-  @Post("create")
-  @UseInterceptors(FileInterceptor("file"))
+  @Post('create')
+  @UseInterceptors(FileInterceptor('file'))
   async create(
     @UploadedFile()
     file: Express.Multer.File,
@@ -44,49 +37,38 @@ export class DocumentTemplateController {
     });
   }
 
-  @Post("activate-template")
-  activateTemplate(
-    @Body() data: { id: number; update_userid: string; document_type: string }
-  ): Promise<any> {
+  @Post('activate-template')
+  activateTemplate(@Body() data: { id: number; update_userid: string; document_type: string }): Promise<any> {
     return this.templateService.activateTemplate(data);
   }
 
-  @Post("update")
+  @Post('update')
   update(@Body() data: UpdateDocumentTemplateDto): Promise<DocumentTemplate> {
     return this.templateService.update(data);
   }
 
-  @Get("remove/:document_type/:id")
-  remove(
-    @Param("document_type") document_type: string,
-    @Param("id") id: number
-  ): Promise<{ id: number }> {
+  @Get('remove/:document_type/:id')
+  remove(@Param('document_type') document_type: string, @Param('id') id: number): Promise<{ id: number }> {
     return this.templateService.remove(document_type, id);
   }
 
-  @Get(":document_type")
-  async findAll(
-    @Param("document_type") document_type: string
-  ): Promise<TrimmedDocumentTemplate[]> {
-    let documents: DocumentTemplate[] = await this.templateService.findAll(
-      document_type
-    );
+  @Get(':document_type')
+  async findAll(@Param('document_type') document_type: string): Promise<TrimmedDocumentTemplate[]> {
+    let documents: DocumentTemplate[] = await this.templateService.findAll(document_type);
     return documents.map(({ the_file, ...rest }) => rest);
   }
 
-  @Get("get-active-report/:document_type")
-  findActiveByDocumentType(
-    @Param("document_type") document_type: string
-  ): Promise<DocumentTemplate> {
+  @Get('get-active-report/:document_type')
+  findActiveByDocumentType(@Param('document_type') document_type: string): Promise<DocumentTemplate> {
     return this.templateService.findActiveByDocumentType(document_type);
   }
 
-  @Get("find-one/:id")
-  findOne(@Param("id") id: number): Promise<DocumentTemplate> {
+  @Get('find-one/:id')
+  findOne(@Param('id') id: number): Promise<DocumentTemplate> {
     return this.templateService.findOne(id);
   }
 
-  @Post("nfr-template-info")
+  @Post('nfr-template-info')
   getTemplatesInfoByIds(@Body() ids: number[]): Promise<any[]> {
     return this.templateService.getTemplatesInfoByIds(ids);
   }

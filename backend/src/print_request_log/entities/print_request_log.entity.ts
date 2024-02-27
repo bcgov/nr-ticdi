@@ -1,10 +1,4 @@
-import {
-  Column,
-  CreateDateColumn,
-  Entity,
-  PrimaryGeneratedColumn,
-  UpdateDateColumn,
-} from "typeorm";
+import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 
 @Entity()
 export class PrintRequestLog {
@@ -16,7 +10,7 @@ export class PrintRequestLog {
   print_request_detail_id: number;
   @Column({ nullable: true })
   dtid: number;
-  @Column({nullable: true})
+  @Column({ nullable: true })
   document_type: string;
   @Column({ nullable: true })
   request_app_user: string;
@@ -44,10 +38,10 @@ export class PrintRequestLog {
     this.document_template_id = document_template_id || null;
     this.print_request_detail_id = print_request_detail_id || null;
     this.dtid = dtid || null;
-    this.document_type = document_type || "";
-    this.request_app_user = request_app_user || "";
-    this.request_json = request_json || "";
-    this.create_userid = create_userid || "";
-    this.update_userid = update_userid || "";
+    this.document_type = document_type || '';
+    this.request_app_user = request_app_user || '';
+    this.request_json = request_json || '';
+    this.create_userid = create_userid || '';
+    this.update_userid = update_userid || '';
   }
 }

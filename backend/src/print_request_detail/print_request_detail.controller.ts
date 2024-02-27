@@ -1,12 +1,10 @@
-import { Body, Controller, Delete, Get, Param, Post } from "@nestjs/common";
-import { CreatePrintRequestDetailDto } from "./dto/create-print_request_detail.dto";
-import { PrintRequestDetailService } from "./print_request_detail.service";
+import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
+import { CreatePrintRequestDetailDto } from './dto/create-print_request_detail.dto';
+import { PrintRequestDetailService } from './print_request_detail.service';
 
-@Controller("print-request-detail")
+@Controller('print-request-detail')
 export class PrintRequestDetailController {
-  constructor(
-    private readonly printRequestDetailService: PrintRequestDetailService
-  ) {}
+  constructor(private readonly printRequestDetailService: PrintRequestDetailService) {}
 
   @Post()
   async create(
@@ -24,18 +22,18 @@ export class PrintRequestDetailController {
     return this.printRequestDetailService.findAll();
   }
 
-  @Get(":dtid")
-  findByDtid(@Param("dtid") dtid: string) {
+  @Get(':dtid')
+  findByDtid(@Param('dtid') dtid: string) {
     return this.printRequestDetailService.findByDtid(+dtid);
   }
 
-  @Get("view/:prdid")
-  findViewByPRDID(@Param("prdid") prdid: string) {
+  @Get('view/:prdid')
+  findViewByPRDID(@Param('prdid') prdid: string) {
     return this.printRequestDetailService.findViewByPRDID(+prdid);
   }
 
-  @Delete(":dtid")
-  remove(@Param("dtid") dtid: string) {
+  @Delete(':dtid')
+  remove(@Param('dtid') dtid: string) {
     return this.printRequestDetailService.remove(+dtid);
   }
 }

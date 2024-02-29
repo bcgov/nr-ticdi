@@ -128,7 +128,7 @@ export class ReportController {
     // this should eventually check permissions and prevent unauthorized users from generating documents
     let idir_username = '';
     let idir_full_name = '';
-    if (session.data.activeAccount) {
+    if (session?.data?.activeAccount) {
       idir_username = session.data.activeAccount.idir_username;
       idir_full_name = session.data.activeAccount.full_name;
       console.log('active account found');
@@ -178,7 +178,7 @@ export class ReportController {
     }
   ) {
     let idir_username = '';
-    if (session.data.activeAccount) {
+    if (session?.data?.activeAccount) {
       idir_username = session.data.activeAccount.idir_username;
       console.log('active account found');
     } else {
@@ -207,5 +207,10 @@ export class ReportController {
   @Get('search-nfr-data')
   getNFRData() {
     return this.reportService.getNFRData();
+  }
+
+  @Get('get-mandatory-provisions-by-variant/:variant')
+  getMandatoryProvisionsByVariant(@Param('variant') variant: string) {
+    return this.reportService.getMandatoryProvisionsByVariant(variant);
   }
 }

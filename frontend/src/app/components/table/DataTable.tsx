@@ -1,10 +1,20 @@
-import { ColumnDef, flexRender, getCoreRowModel, getPaginationRowModel, useReactTable } from '@tanstack/react-table';
+import {
+  ColumnDef,
+  PaginationState,
+  flexRender,
+  getCoreRowModel,
+  getFilteredRowModel,
+  getPaginationRowModel,
+  getSortedRowModel,
+  useReactTable,
+} from '@tanstack/react-table';
 import { Table } from './Table';
 import { TableHeader } from './TableHeader';
 import { TableRow } from './TableRow';
 import { TableHead } from './TableHead';
 import { TableBody } from './TableBody';
 import { TableCell } from './TableCell';
+import { useState } from 'react';
 
 interface DataTableProps<TData> {
   columns: ColumnDef<TData>[];
@@ -12,11 +22,23 @@ interface DataTableProps<TData> {
 }
 
 export function DataTable<TData>({ columns, data }: DataTableProps<TData>) {
+  const [pagination, setPagination] = useState<PaginationState>({
+    pageIndex: 0,
+    pageSize: 300,
+  });
+
   const table = useReactTable({
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
+    onPaginationChange: setPagination,
+    //no need to pass pageCount or rowCount with client-side pagination as it is calculated automatically
+    state: {
+      pagination,
+    },
   });
 
   return (
@@ -59,6 +81,57 @@ export function DataTable<TData>({ columns, data }: DataTableProps<TData>) {
           )}
         </TableBody>
       </Table>
+      {/* simple pagination controls */}
+      {/* <div className="flex items-center gap-2">
+        <button
+          className="border rounded p-1"
+          onClick={(e) => {
+            e.preventDefault();
+            table.setPageIndex(0);
+          }}
+          disabled={!table.getCanPreviousPage()}
+        >
+          {'<<'}
+        </button>
+        <button
+          className="border rounded p-1"
+          onClick={(e) => {
+            e.preventDefault();
+            table.previousPage();
+          }}
+          disabled={!table.getCanPreviousPage()}
+        >
+          {'<'}
+        </button>
+        <button
+          className="border rounded p-1"
+          onClick={(e) => {
+            e.preventDefault();
+            table.nextPage();
+          }}
+          disabled={!table.getCanNextPage()}
+        >
+          {'>'}
+        </button>
+        <button
+          className="border rounded p-1"
+          onClick={(e) => {
+            e.preventDefault();
+            table.previousPage();
+          }}
+          disabled={!table.getCanNextPage()}
+        >
+          {'>>'}
+        </button>
+        <span className="flex items-center gap-1">
+          <div>
+            Page{' '}
+            <strong>
+              {table.getState().pagination.pageIndex + 1} of {table.getPageCount().toLocaleString()}
+            </strong>
+          </div>
+        </span>
+      </div> */}
     </div>
   );
 }

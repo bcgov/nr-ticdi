@@ -1,22 +1,18 @@
-import { StrictMode } from "react";
-import { createRoot } from "react-dom/client";
-import { Provider } from "react-redux";
-import { store } from "./app/store/store";
+import { StrictMode } from 'react';
+import { createRoot } from 'react-dom/client';
 
-import App from "./app/App";
-import "./app/App.css";
-import reportWebVitals from "./reportWebVitals";
+import App from './app/App';
+import './app/App.css';
+import reportWebVitals from './reportWebVitals';
 // import UserService from "./app/service/user-service";
 
-const container = document.getElementById("root")!;
+const container = document.getElementById('root')!;
 const root = createRoot(container);
 
 // const onAuthenticatedCallback = () =>
 root.render(
   <StrictMode>
-    <Provider store={store}>
-      <App />
-    </Provider>
+    <App />
   </StrictMode>
 );
 

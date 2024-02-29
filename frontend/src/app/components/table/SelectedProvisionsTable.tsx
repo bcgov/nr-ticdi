@@ -1,47 +1,34 @@
 import React, { useEffect, useState } from 'react';
 import { DataTable } from './DataTable';
 import { ColumnDef, createColumnHelper } from '@tanstack/react-table';
-import { getAdminData } from '../../common/admin';
 import { getNfrProvisionsByVariantDtid } from '../../common/report';
-
-export type ProvisionData = {
-  type: string;
-  provision_name: string;
-  free_text: string;
-  category: string;
-  active_flag: boolean;
-  create_userid: string;
-  update_userid: string;
-  provision_variant: [
-    {
-      id: number;
-      variant_name: string;
-    }
-  ];
-  id: number;
-  help_text: string;
-  create_timestamp: string;
-  update_timestamp: string;
-  select: boolean;
-  max: number;
-  provision_group: number;
-};
+import { ProvisionData } from '../../content/display/Provisions';
 
 interface SelectedProvisionsTableTableProps {
   variant: string;
   dtid: number;
   selectedProvisionIds: number[] | undefined;
+  updateHandler: (provisionJson: ProvisionJson[]) => void;
 }
+
+export type SaveProvisionData = { provision_id: number; free_text: string };
+export type ProvisionJson = {
+  provision_id: number;
+  provision_group: number;
+  provision_name: string;
+  free_text: string;
+};
 
 const SelectedProvisionsTable: React.FC<SelectedProvisionsTableTableProps> = ({
   variant,
   dtid,
   selectedProvisionIds,
+  updateHandler,
 }) => {
   const [allProvisions, setAllProvisions] = useState<ProvisionData[]>([]);
   const [selectedProvisions, setSelectedProvisions] = useState<ProvisionData[]>([]);
 
-  // grab all provisions including free_text input by user
+  // grab all provisions
   useEffect(() => {
     const fetchData = async () => {
       setAllProvisions(await getNfrProvisionsByVariantDtid(variant, dtid));
@@ -49,13 +36,33 @@ const SelectedProvisionsTable: React.FC<SelectedProvisionsTableTableProps> = ({
     fetchData();
   }, [variant, dtid]);
 
-  // filter allProvisions to find selected ones for displaying
+  // filter/sort allProvisions to find selected ones for displaying
   useEffect(() => {
     if (allProvisions) {
       const filtered = allProvisions.filter((provision) => selectedProvisionIds?.includes(provision.id));
-      setSelectedProvisions(filtered);
+      const filteredAndSorted: ProvisionData[] = [...filtered].sort((a, b) => {
+        if (a.provision_group < b.provision_group) return -1;
+        if (a.provision_group > b.provision_group) return 1;
+        return a.provision_name.localeCompare(b.provision_name);
+      });
+      setSelectedProvisions(filteredAndSorted);
     }
   }, [allProvisions, selectedProvisionIds, variant]);
+
+  // update provision save data array in ReportPage when selectedProvisions changes
+  useEffect(() => {
+    const collectProvisionData = () => {
+      const provisionJson: ProvisionJson[] = selectedProvisions.map((provision) => ({
+        provision_id: provision.id,
+        provision_group: provision.provision_group,
+        provision_name: provision.provision_name,
+        free_text: provision.free_text,
+      }));
+
+      updateHandler(provisionJson);
+    };
+    collectProvisionData();
+  }, [selectedProvisions]);
 
   const columnHelper = createColumnHelper<ProvisionData>();
   const columns: ColumnDef<ProvisionData, any>[] = [

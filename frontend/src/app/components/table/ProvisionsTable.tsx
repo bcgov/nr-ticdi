@@ -2,31 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { DataTable } from './DataTable';
 import { ColumnDef, createColumnHelper } from '@tanstack/react-table';
 import { getNfrProvisionsByVariantDtid } from '../../common/report';
+import { ProvisionData } from '../../content/display/Provisions';
 
-export type ProvisionData = {
-  type: string;
-  provision_name: string;
-  free_text: string;
-  category: string;
-  active_flag: boolean;
-  create_userid: string;
-  update_userid: string;
-  provision_variant: [
-    {
-      id: number;
-      variant_name: string;
-    }
-  ];
-  id: number;
-  help_text: string;
-  create_timestamp: string;
-  update_timestamp: string;
-  select: boolean;
-  max: number;
-  provision_group: number;
-};
-
-interface ProvisionsTableTableProps {
+interface ProvisionsTableProps {
   dtid: number;
   variant: string;
   currentGroupNumber: number | null;
@@ -34,7 +12,7 @@ interface ProvisionsTableTableProps {
   selectProvision: (id: number, checked: boolean) => void;
 }
 
-const ProvisionsTable: React.FC<ProvisionsTableTableProps> = ({
+const ProvisionsTable: React.FC<ProvisionsTableProps> = ({
   dtid,
   variant,
   currentGroupNumber,
@@ -55,13 +33,30 @@ const ProvisionsTable: React.FC<ProvisionsTableTableProps> = ({
 
   // filter based on current group
   useEffect(() => {
-    const filtered = allProvisions.filter(
-      (provision) =>
-        provision.provision_group === currentGroupNumber &&
+    let filtered = allProvisions.filter((provision) => provision.provision_group === currentGroupNumber);
+    if (allProvisions[0] && allProvisions[0].provision_variant) {
+      filtered = filtered.filter((provision) =>
         provision.provision_variant.some((v) => v.variant_name.toUpperCase() === variant.toUpperCase())
-    );
+      );
+    }
     setFilteredProvisions(filtered);
   }, [allProvisions, currentGroupNumber, variant]);
+
+  // xor logic for the two provisions which can't be selected at the same time.
+  const isCheckboxDisabled = (provisionName: string, provisionId: number): boolean => {
+    const exclusiveProvisionNames = [
+      'ESTIMATED MONIES PAYABLE - NOTICE OF FINAL REVIEW - DELAYED',
+      'MONIES PAYABLE - NOTICE OF FINAL REVIEW - DELAYED',
+    ];
+    // check if the current provision is one of the two xor ones
+    if (exclusiveProvisionNames.includes(provisionName)) {
+      // if so, check if the other provision is already selected
+      const otherName = exclusiveProvisionNames.find((name) => name !== provisionName);
+      const otherProvision = allProvisions.find((provision) => provision.provision_name === otherName);
+      if (otherProvision) return selectedProvisionIds?.includes(otherProvision?.id) ?? false;
+    }
+    return false;
+  };
 
   const columnHelper = createColumnHelper<ProvisionData>();
   const columns: ColumnDef<ProvisionData, any>[] = [
@@ -76,30 +71,35 @@ const ProvisionsTable: React.FC<ProvisionsTableTableProps> = ({
     columnHelper.accessor('provision_name', {
       id: 'provision_name',
       cell: (info) => (
-        <input value={info.getValue()} style={{ minWidth: '400px', marginTop: '10px', marginRight: '5px' }} disabled />
+        <input value={info.getValue()} style={{ minWidth: '450px', marginTop: '10px', marginRight: '5px' }} disabled />
       ),
       header: () => 'Provision',
-      meta: { customCss: { minWidth: '400px', width: '400px' } },
+      meta: { customCss: { minWidth: '450px', width: '450px' } },
     }),
     columnHelper.accessor('help_text', {
       id: 'help_text',
       cell: (info) => (
-        <input value={info.getValue()} style={{ minWidth: '400px', marginTop: '10px', marginRight: '5px' }} disabled />
+        <input value={info.getValue()} style={{ minWidth: '450px', marginTop: '10px', marginRight: '5px' }} disabled />
       ),
       header: () => 'Help',
-      meta: { customCss: { minWidth: '400px', width: '400px' } },
+      meta: { customCss: { minWidth: '450px', width: '450px' } },
     }),
     columnHelper.accessor('select', {
       id: 'select',
       cell: (info) => (
         <input
           type="checkbox"
-          onChange={(e) => selectProvision(info.row.original.id, e.target.checked)}
+          onChange={(e) => {
+            if (!isCheckboxDisabled(info.row.original.provision_name, info.row.original.id)) {
+              selectProvision(info.row.original.id, e.target.checked);
+            }
+          }}
           checked={selectedProvisionIds?.includes(info.row.original.id) ?? false}
+          disabled={isCheckboxDisabled(info.row.original.provision_name, info.row.original.id)}
         />
       ),
       header: () => null,
-      meta: { customCss: { minWidth: '40px', width: '40px' } },
+      meta: { customCss: { minWidth: '40px', width: '40px', paddingTop: '15px' } },
     }),
     columnHelper.accessor('id', {
       id: 'id',

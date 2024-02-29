@@ -3,22 +3,44 @@ import { NfrDataObject, ProvisionGroup } from '../../types/types';
 import { NFR_VARIANTS } from '../../util/constants';
 import { getGroupMaxByVariant, getNfrDataByDtid } from '../../common/report';
 import ProvisionsTable from '../../components/table/ProvisionsTable';
-import SelectedProvisionsTable from '../../components/table/SelectedProvisionsTable';
+import SelectedProvisionsTable, { ProvisionJson } from '../../components/table/SelectedProvisionsTable';
 
 interface ProvisionsProps {
   dtid: number;
   variantName: string;
+  updateHandler: (provisionJson: ProvisionJson[]) => void;
+  updateSelectedProvisionIds: (selectedProvisionIds: number[]) => void;
 }
 
-const Provisions: FC<ProvisionsProps> = ({ dtid, variantName }) => {
+export type ProvisionData = {
+  type: string;
+  provision_name: string;
+  free_text: string;
+  category: string;
+  active_flag: boolean;
+  create_userid: string;
+  update_userid: string;
+  provision_variant: [
+    {
+      id: number;
+      variant_name: string;
+    }
+  ];
+  id: number;
+  help_text: string;
+  create_timestamp: string;
+  update_timestamp: string;
+  select: boolean;
+  max: number;
+  provision_group: number;
+};
+
+const Provisions: FC<ProvisionsProps> = ({ dtid, variantName, updateHandler, updateSelectedProvisionIds }) => {
   const [nfrData, setNfrData] = useState<NfrDataObject | null>(null);
   const [selectedProvisionIds, setSelectedProvisionIds] = useState<number[]>([]);
-  const [selectedVariableIds, setSelectedVariableIds] = useState<number[]>([]);
   const [provisionGroups, setProvisionGroups] = useState<ProvisionGroup[] | null>(null);
   const [selectedProvisionGroup, setSelectedProvisionGroup] = useState<number | null>(null);
   const [viewedProvisionGroups, setViewedProvisionGroups] = useState<Set<number>>(new Set());
-  console.log('selectedProvisionIds');
-  console.log(selectedProvisionIds);
 
   // Fetch NFR data if we are on the NFR page
   useEffect(() => {
@@ -26,11 +48,10 @@ const Provisions: FC<ProvisionsProps> = ({ dtid, variantName }) => {
       if (NFR_VARIANTS.includes(variantName?.toUpperCase())) {
         if (dtid) {
           const nfrData: NfrDataObject = await getNfrDataByDtid(dtid);
-          console.log('nfrData');
-          console.log(nfrData);
-          setNfrData(nfrData);
-          setSelectedProvisionIds(nfrData?.provisionIds);
-          setSelectedVariableIds(nfrData?.variableIds);
+          if (nfrData) {
+            setNfrData(nfrData);
+            setSelectedProvisionIds(nfrData.provisionIds);
+          }
         }
         const provisionGroupsObject: ProvisionGroup[] = await getGroupMaxByVariant(variantName);
         setProvisionGroups(provisionGroupsObject);
@@ -70,6 +91,10 @@ const Provisions: FC<ProvisionsProps> = ({ dtid, variantName }) => {
     });
   };
 
+  useEffect(() => {
+    updateSelectedProvisionIds(selectedProvisionIds);
+  }, [selectedProvisionIds]);
+
   return (
     <>
       <div>
@@ -87,7 +112,7 @@ const Provisions: FC<ProvisionsProps> = ({ dtid, variantName }) => {
             <option
               key={pg.id}
               value={pg.provision_group}
-              className={viewedProvisionGroups.has(pg.id) ? 'option-viewed' : 'option-default'}
+              className={viewedProvisionGroups.has(+pg.provision_group) ? 'option-viewed' : 'option-default'}
             >
               {pg.provision_group + ' - ' + pg.provision_group_text}
             </option>
@@ -103,7 +128,12 @@ const Provisions: FC<ProvisionsProps> = ({ dtid, variantName }) => {
       />
       <hr style={{ marginLeft: '0', backgroundColor: 'rgba(0, 0, 0, 0.3)' }} />
       <div style={{ fontWeight: 'bold' }}>Selected Provisions</div>
-      <SelectedProvisionsTable dtid={dtid} variant={variantName} selectedProvisionIds={selectedProvisionIds} />
+      <SelectedProvisionsTable
+        dtid={dtid}
+        variant={variantName}
+        selectedProvisionIds={selectedProvisionIds}
+        updateHandler={updateHandler}
+      />
     </>
   );
 };

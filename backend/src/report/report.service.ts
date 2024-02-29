@@ -315,7 +315,7 @@ export class ReportService {
       .then((res) => {
         return res.data;
       });
-    return { reportName: 'NFR_' + tenureFileNumber + '_' + version };
+    return { reportName: 'NFR_' + tenureFileNumber + '_' + version + '.docx' };
   }
 
   async generateNFRReport(

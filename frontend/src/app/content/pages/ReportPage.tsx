@@ -9,7 +9,7 @@ import { generateReport, getData } from '../../common/report';
 import VariantDropdown from '../../components/common/VariantDropdown';
 import { CURRENT_REPORT_PAGES, NFR_REPORT_PAGES, NFR_VARIANTS } from '../../util/constants';
 import InterestedParties from '../display/InterestedParties';
-import { useParams } from 'react-router';
+import { useParams, useNavigate } from 'react-router-dom';
 import Skeleton from 'react-loading-skeleton';
 import Provisions from '../display/Provisions';
 
@@ -23,6 +23,8 @@ const ReportPage: FC<ReportPageProps> = ({ documentDescription }) => {
 
   const [data, setData] = useState<DTRDisplayObject | null>(null);
   const [showNfr, setShowNfr] = useState<boolean>(false);
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     setShowNfr(NFR_VARIANTS.includes(documentDescription.toUpperCase()));
@@ -47,13 +49,54 @@ const ReportPage: FC<ReportPageProps> = ({ documentDescription }) => {
     }
   };
 
+  const variantChangeHandler = (variant: string) => {
+    const upperCaseVariant = variant.toUpperCase();
+    navigate(`/dtid/${dtid}/${upperCaseVariant}`);
+    // $("#documentVariantId").on("change", function () {
+    //   variantName = $(this).val();
+    //   reloadingTables = true;
+    //   const pUrl = `${window.location.origin}/report/nfr-provisions/${encodeURI(
+    //     variantName
+    //   )}/-1`;
+    //   fetch(`/report/enabled-provisions/${encodeURI(variantName)}`, {
+    //     method: "GET",
+    //     headers: {
+    //       "Content-Type": "application/json",
+    //     },
+    //     responseType: "application/json",
+    //   })
+    //     .then((res) => res.json())
+    //     .then((newMandatoryProvisions) => {
+    //       mandatoryProvisions = newMandatoryProvisions;
+    //       fetch(`/report/enabled-provisions2/${encodeURI(variantName)}/${dtid}`, {
+    //         method: "GET",
+    //         headers: {
+    //           "Content-Type": "application/json",
+    //         },
+    //         responseType: "application/json",
+    //       })
+    //         .then((res) => res.json())
+    //         .then((newEnabledProvisions) => {
+    //           enabledProvisions = newEnabledProvisions;
+    //         })
+    //         .then(() => {
+    //           provisionTable.ajax.url(pUrl).load();
+    //         });
+    //     });
+    // });
+  };
+
   return (
     <>
       <div className="h1">Preview - {documentDescription} (Draft)</div>
       <hr />
       {Object.values(NFR_REPORT_PAGES).includes(documentDescription) && (
         <div>
-          <VariantDropdown values={NFR_REPORT_PAGES} />
+          <VariantDropdown
+            values={NFR_REPORT_PAGES}
+            selectedVariant={documentDescription}
+            variantChangeHandler={variantChangeHandler}
+          />
           <hr />
         </div>
       )}

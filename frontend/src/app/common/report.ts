@@ -1,4 +1,5 @@
 import config from '../../config';
+import { ProvisionData } from '../components/table/ProvisionsTable';
 import { DTR, DTRDisplayObject, NfrDataObject, ProvisionGroup } from '../types/types';
 import { buildDTRDisplayData } from '../util/util';
 import * as api from './api';
@@ -76,5 +77,12 @@ export const getGroupMaxByVariant = async (variant: string) => {
   const url = `${config.API_BASE_URL}/report/get-group-max/${variant}`;
   const getParameters = api.generateApiParameters(url);
   const response: ProvisionGroup[] = await api.get<ProvisionGroup[]>(getParameters);
+  return response;
+};
+
+export const getNfrProvisionsByVariantDtid = async (variant: string, dtid: number): Promise<ProvisionData[]> => {
+  const url = `${config.API_BASE_URL}/report/nfr-provisions/${variant.toUpperCase()}/${dtid}`;
+  const getParameters = api.generateApiParameters(url);
+  const response: any = await api.get<any>(getParameters);
   return response;
 };

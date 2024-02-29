@@ -1,91 +1,115 @@
 import React, { useEffect, useState } from 'react';
 import { DataTable } from './DataTable';
 import { ColumnDef, createColumnHelper } from '@tanstack/react-table';
-import { getAdminData } from '../../common/admin';
+import { getNfrProvisionsByVariantDtid } from '../../common/report';
 
 export type ProvisionData = {
-  name: string;
-  username: string;
-  email: string;
-  remove: string;
-  idirUsername: string;
+  type: string;
+  provision_name: string;
+  free_text: string;
+  category: string;
+  active_flag: boolean;
+  create_userid: string;
+  update_userid: string;
+  provision_variant: [
+    {
+      id: number;
+      variant_name: string;
+    }
+  ];
+  id: number;
+  help_text: string;
+  create_timestamp: string;
+  update_timestamp: string;
+  select: boolean;
+  max: number;
+  provision_group: number;
 };
 
-interface AdminDataTableProps {
-  provisionData: ProvisionData[];
-  currentGroupNumber: number;
-  selectedProvisionIds: number[];
+interface ProvisionsTableTableProps {
+  dtid: number;
+  variant: string;
+  currentGroupNumber: number | null;
+  selectedProvisionIds: number[] | undefined;
+  selectProvision: (id: number, checked: boolean) => void;
 }
 
-const AdminDataTable: React.FC<AdminDataTableProps> = ({ provisionData, currentGroupNumber, selectedProvisionIds }) => {
+const ProvisionsTable: React.FC<ProvisionsTableTableProps> = ({
+  dtid,
+  variant,
+  currentGroupNumber,
+  selectedProvisionIds,
+  selectProvision,
+}) => {
   const [allProvisions, setAllProvisions] = useState<ProvisionData[]>([]);
-  const [filteredProvisions, setFilteredProvisions] = useState<ProvisionData[]>([]); // provisions in the currently selected group (main table display data)
-  const [selectedProvisions, setSelectedProvisions] = useState<ProvisionData[]>([]); // all provisions that have been selected (selected provisions table display data & save data)
+  const [filteredProvisions, setFilteredProvisions] = useState<ProvisionData[]>([]); // provisions in the currently selected group
 
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     setFilteredProvisions(allProvisions.filter((provision) => provision.));
-  //   };
+  // get data
+  useEffect(() => {
+    const fetchData = async () => {
+      setAllProvisions(await getNfrProvisionsByVariantDtid(variant, dtid));
+    };
 
-  //   fetchData();
-  // }, [currentGroupNumber]);
+    fetchData();
+  }, [dtid, variant, currentGroupNumber]);
 
-  // const columnHelper = createColumnHelper<AdminData>();
+  // filter based on current group
+  useEffect(() => {
+    const filtered = allProvisions.filter(
+      (provision) =>
+        provision.provision_group === currentGroupNumber &&
+        provision.provision_variant.some((v) => v.variant_name.toUpperCase() === variant.toUpperCase())
+    );
+    setFilteredProvisions(filtered);
+  }, [allProvisions, currentGroupNumber, variant]);
 
-  // const columns: ColumnDef<AdminData, any>[] = [
-  //   columnHelper.accessor('name', {
-  //     id: 'name',
-  //     cell: (info) => (
-  //       <input value={info.getValue()} style={{ minWidth: '250px', marginTop: '10px', marginRight: '5px' }} disabled />
-  //     ),
-  //     header: () => 'Name',
-  //     meta: { customCss: { minWidth: '250px', width: '250px' } },
-  //   }),
-  //   columnHelper.accessor('username', {
-  //     id: 'username',
-  //     cell: (info) => (
-  //       <input value={info.getValue()} style={{ minWidth: '250px', marginTop: '10px', marginRight: '5px' }} disabled />
-  //     ),
-  //     header: () => 'User Name',
-  //     meta: { customCss: { minWidth: '250px', width: '250px' } },
-  //   }),
-  //   columnHelper.accessor('email', {
-  //     id: 'email',
-  //     cell: (info) => (
-  //       <input value={info.getValue()} style={{ minWidth: '250px', marginTop: '10px', marginRight: '5px' }} disabled />
-  //     ),
-  //     header: () => 'Email',
-  //     meta: { customCss: { minWidth: '250px', width: '250px' } },
-  //   }),
-  //   columnHelper.accessor('remove', {
-  //     id: 'remove',
-  //     cell: (info) => (
-  //       <button
-  //         onClick={() => removeAdminButtonHandler(info.row.original)}
-  //         style={{
-  //           backgroundColor: 'transparent',
-  //           color: 'blue',
-  //           textDecoration: 'underline',
-  //           border: 'none',
-  //           cursor: 'pointer',
-  //           padding: 0,
-  //         }}
-  //       >
-  //         Remove
-  //       </button>
-  //     ),
-  //     header: () => null,
-  //     meta: { customCss: { minWidth: '80px', width: '80px' } },
-  //   }),
-  //   columnHelper.accessor('idirUsername', {
-  //     id: 'idirUsername',
-  //     cell: () => null,
-  //     header: () => null,
-  //     meta: { customCss: { display: 'none' } },
-  //   }),
-  // ];
+  const columnHelper = createColumnHelper<ProvisionData>();
+  const columns: ColumnDef<ProvisionData, any>[] = [
+    columnHelper.accessor('type', {
+      id: 'type',
+      cell: (info) => (
+        <input value={info.getValue()} style={{ minWidth: '50px', marginTop: '10px', marginRight: '5px' }} disabled />
+      ),
+      header: () => 'Type',
+      meta: { customCss: { minWidth: '50px', width: '50px' } },
+    }),
+    columnHelper.accessor('provision_name', {
+      id: 'provision_name',
+      cell: (info) => (
+        <input value={info.getValue()} style={{ minWidth: '400px', marginTop: '10px', marginRight: '5px' }} disabled />
+      ),
+      header: () => 'Provision',
+      meta: { customCss: { minWidth: '400px', width: '400px' } },
+    }),
+    columnHelper.accessor('help_text', {
+      id: 'help_text',
+      cell: (info) => (
+        <input value={info.getValue()} style={{ minWidth: '400px', marginTop: '10px', marginRight: '5px' }} disabled />
+      ),
+      header: () => 'Help',
+      meta: { customCss: { minWidth: '400px', width: '400px' } },
+    }),
+    columnHelper.accessor('select', {
+      id: 'select',
+      cell: (info) => (
+        <input
+          type="checkbox"
+          onChange={(e) => selectProvision(info.row.original.id, e.target.checked)}
+          checked={selectedProvisionIds?.includes(info.row.original.id) ?? false}
+        />
+      ),
+      header: () => null,
+      meta: { customCss: { minWidth: '40px', width: '40px' } },
+    }),
+    columnHelper.accessor('id', {
+      id: 'id',
+      cell: () => null,
+      header: () => null,
+      meta: { customCss: { display: 'none' } },
+    }),
+  ];
 
-  return <DataTable columns={[]} data={filteredProvisions} />;
+  return <DataTable columns={columns} data={filteredProvisions} />;
 };
 
-export default AdminDataTable;
+export default ProvisionsTable;

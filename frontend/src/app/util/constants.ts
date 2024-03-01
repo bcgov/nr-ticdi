@@ -35,6 +35,10 @@ export const PAGE = [
     title: 'System Administration',
     path: 'system-admin',
   },
+  {
+    title: 'Manage Templates',
+    path: 'manage-templates',
+  },
 ];
 
 // should eventually be stored in a table in the db and obtained from there

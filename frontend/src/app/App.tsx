@@ -10,13 +10,15 @@ const App: FC = () => {
     <Router>
       <Header idirUsername="Michael" isAdmin={true} />
       <Routes>
-        {PAGE.map((item, index) =>
-          CURRENT_REPORTS.includes(item.title) ? (
-            <Route key={index} path={`/dtid/:dtid/${item.path}`} element={<Content pageTitle={item.title} />} />
-          ) : (
-            <Route key={index} path={`/${item.path}/`} element={<Content pageTitle={item.title} />} />
-          )
-        )}
+        {PAGE.map((item, index) => {
+          if (CURRENT_REPORTS.includes(item.title)) {
+            return <Route key={index} path={`/dtid/:dtid/${item.path}`} element={<Content pageTitle={item.title} />} />;
+          } else if (item.title === 'Manage Templates') {
+            return <Route key={index} path={`/${item.path}/:id`} element={<Content pageTitle={item.title} />} />;
+          } else {
+            return <Route key={index} path={`/${item.path}/`} element={<Content pageTitle={item.title} />} />;
+          }
+        })}
       </Routes>
       <Footer />
     </Router>

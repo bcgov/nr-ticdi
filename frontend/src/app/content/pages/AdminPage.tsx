@@ -39,7 +39,7 @@ const AdminPage: FC = () => {
   };
 
   const manageReportsHandler = () => {
-    navigate(`/manage-reports/${selectedReport}`);
+    navigate(`/manage-templates/${selectedReport}`);
   };
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {

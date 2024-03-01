@@ -2,6 +2,7 @@ import { FC } from 'react';
 import ReportPage from './pages/ReportPage';
 import SearchPage from './pages/SearchPage';
 import AdminPage from './pages/AdminPage';
+import ManageTemplatesPage from './pages/ManageTemplatesPage';
 import { CURRENT_REPORT_PAGES } from '../util/constants';
 
 interface ContentProps {
@@ -19,11 +20,9 @@ const Content: FC<ContentProps> = ({ pageTitle }) => {
                 {Object.values(CURRENT_REPORT_PAGES).includes(pageTitle) && (
                   <ReportPage documentDescription={pageTitle} />
                 )}
-                {/* {pageTitle === CURRENT_REPORT_PAGES.LUR && (
-                  <ReportPage documentDescription={CURRENT_REPORT_PAGES.LUR} />
-                )} */}
                 {pageTitle === 'Search' && <SearchPage />}
                 {pageTitle === 'System Administration' && <AdminPage />}
+                {pageTitle === 'Manage Templates' && <ManageTemplatesPage />}
               </div>
             </div>
           </form>

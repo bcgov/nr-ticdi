@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { DataTable } from './DataTable';
+import { DataTable } from '../common/DataTable';
 import { ColumnDef, createColumnHelper } from '@tanstack/react-table';
-import { getNfrProvisionsByVariantDtid } from '../../common/report';
-import { ProvisionData } from '../../content/display/Provisions';
+import { getNfrProvisionsByVariantDtid } from '../../../common/report';
+import { ProvisionData } from '../../../content/display/Provisions';
 
 interface ProvisionsTableProps {
   dtid: number;

@@ -20,8 +20,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import Skeleton from 'react-loading-skeleton';
 import Provisions, { ProvisionData } from '../display/Provisions';
 import Variables from '../display/Variables';
-import { ProvisionJson, SaveProvisionData } from '../../components/table/SelectedProvisionsTable';
-import { SaveVariableData, VariableJson } from '../../components/table/VariablesTable';
+import { ProvisionJson, SaveProvisionData } from '../../components/table/reports/SelectedProvisionsTable';
+import { SaveVariableData, VariableJson } from '../../components/table/reports/VariablesTable';
 
 export interface ReportPageProps {
   documentDescription: string;

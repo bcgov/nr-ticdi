@@ -1,6 +1,6 @@
 import config from '../../config';
 import * as api from './api';
-import { SearchData } from '../components/table/SearchDataTable';
+import { SearchData } from '../components/table/search/SearchDataTable';
 
 /**
  * Returns an array of previously generated documents with information on them

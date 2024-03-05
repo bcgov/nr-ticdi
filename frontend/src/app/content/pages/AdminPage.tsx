@@ -4,7 +4,7 @@ import AddAdmin from '../../components/modal/AddAdmin';
 import RemoveAdmin from '../../components/modal/RemoveAdmin';
 import { useNavigate } from 'react-router-dom';
 import { exportUsers } from '../../common/admin';
-import AdminDataTable, { AdminData } from '../../components/table/AdminDataTable';
+import AdminDataTable, { AdminData } from '../../components/table/admin/AdminDataTable';
 
 const AdminPage: FC = () => {
   const navigate = useNavigate();

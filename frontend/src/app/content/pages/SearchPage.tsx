@@ -6,7 +6,7 @@
 
 import { FC, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import SearchDataTable from '../../components/table/SearchDataTable';
+import SearchDataTable from '../../components/table/search/SearchDataTable';
 
 const SearchPage: FC = () => {
   const [selectedDocument, setSelectedDocument] = useState<{ dtid: number; variant: string } | null>(null);

@@ -1,11 +1,21 @@
-import { FC } from 'react';
+import { FC, useState } from 'react';
 import { useParams } from 'react-router';
-import { REPORT_TYPES } from '../../util/constants';
+import { NFR_REPORT_PAGES, REPORT_TYPES } from '../../util/constants';
 import Collapsible from '../../components/common/Collapsible';
+import TemplateInfoTable from '../../components/table/manage-templates/TemplateInfoTable';
+import Button from '../../components/common/Button';
+import AddProvisionModal from '../../components/modal/AddProvisionModal';
+import UploadTemplateModal from '../../components/modal/UploadTemplateModal';
+import RemoveTemplateModal from '../../components/modal/RemoveTemplateModal';
 
 export interface ManageTemplatesPageProps {}
 
 const ManageTemplatesPage: FC<ManageTemplatesPageProps> = () => {
+  const [showUploadModal, setShowUploadModal] = useState<boolean>(false);
+  const [showRemoveTemplateModal, setShowRemoveTemplateModal] = useState<boolean>(false);
+  const [currentReportType, setCurrentReportType] = useState<string>('');
+  const [currentReportId, setCurrentReportId] = useState<number>(-1);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
   const { id } = useParams<{ id: string }>();
   let idNum: number;
   idNum = id ? parseInt(id) : 0;
@@ -13,16 +23,114 @@ const ManageTemplatesPage: FC<ManageTemplatesPageProps> = () => {
     (report) => report.reportType
   )[0];
 
+  const openUploadModal = (report: string) => {
+    setCurrentReportType(report);
+    setShowUploadModal(true);
+  };
+
+  const openRemoveTemplateModal = (id: number, report: string) => {
+    setCurrentReportType(report);
+    setCurrentReportId(id);
+    setShowRemoveTemplateModal(true);
+  };
+
+  const refreshTables = () => {
+    setRefreshTrigger((prev) => prev + 1);
+  };
+
   return (
     <>
       <h1>Manage Templates</h1>
       <hr />
-      <div className="form-group row d-flex justify-content-between align-items-center">
+      {reportType === 'Notice of Final Review' ? (
+        <>
+          <Collapsible title={NFR_REPORT_PAGES.NFR_DEFAULT}>
+            <TemplateInfoTable
+              reportType={NFR_REPORT_PAGES.NFR_DEFAULT}
+              refreshVersion={refreshTrigger}
+              handleRemove={openRemoveTemplateModal}
+            />
+            <Button
+              type="btn-success"
+              onClick={() => openUploadModal(NFR_REPORT_PAGES.NFR_DEFAULT)}
+              text="Upload New Version"
+            />
+          </Collapsible>
+          <Collapsible title={NFR_REPORT_PAGES.NFR_DELAYED}>
+            <TemplateInfoTable
+              reportType={NFR_REPORT_PAGES.NFR_DELAYED}
+              refreshVersion={refreshTrigger}
+              handleRemove={openRemoveTemplateModal}
+            />
+            <Button
+              type="btn-success"
+              onClick={() => openUploadModal(NFR_REPORT_PAGES.NFR_DELAYED)}
+              text="Upload New Version"
+            />
+          </Collapsible>
+          <Collapsible title={NFR_REPORT_PAGES.NFR_NO_FEES}>
+            <TemplateInfoTable
+              reportType={NFR_REPORT_PAGES.NFR_NO_FEES}
+              refreshVersion={refreshTrigger}
+              handleRemove={openRemoveTemplateModal}
+            />
+            <Button
+              type="btn-success"
+              onClick={() => openUploadModal(NFR_REPORT_PAGES.NFR_NO_FEES)}
+              text="Upload New Version"
+            />
+          </Collapsible>
+          <Collapsible title={NFR_REPORT_PAGES.NFR_SURVEY_REQ}>
+            <TemplateInfoTable
+              reportType={NFR_REPORT_PAGES.NFR_SURVEY_REQ}
+              refreshVersion={refreshTrigger}
+              handleRemove={openRemoveTemplateModal}
+            />
+            <Button
+              type="btn-success"
+              onClick={() => openUploadModal(NFR_REPORT_PAGES.NFR_SURVEY_REQ)}
+              text="Upload New Version"
+            />
+          </Collapsible>
+          <Collapsible title={NFR_REPORT_PAGES.NFR_TO_OBTAIN}>
+            <TemplateInfoTable
+              reportType={NFR_REPORT_PAGES.NFR_TO_OBTAIN}
+              refreshVersion={refreshTrigger}
+              handleRemove={openRemoveTemplateModal}
+            />
+            <Button
+              type="btn-success"
+              onClick={() => openUploadModal(NFR_REPORT_PAGES.NFR_TO_OBTAIN)}
+              text="Upload New Version"
+            />
+          </Collapsible>
+          <Collapsible title="Manage NFR Provisions">
+            <div>hello</div>
+          </Collapsible>
+        </>
+      ) : (
         <Collapsible title={reportType}>
-          <div>todo</div>
-          <hr />
+          <TemplateInfoTable
+            reportType={reportType}
+            refreshVersion={refreshTrigger}
+            handleRemove={openRemoveTemplateModal}
+          />
+          <Button type="btn-success" onClick={() => openUploadModal(reportType)} text="Upload New Version" />
         </Collapsible>
-      </div>
+      )}
+      <UploadTemplateModal
+        show={showUploadModal}
+        onHide={() => setShowUploadModal(false)}
+        onUpload={refreshTables}
+        reportType={currentReportType}
+      />
+      <RemoveTemplateModal
+        show={showRemoveTemplateModal}
+        onHide={() => setShowRemoveTemplateModal(false)}
+        onRemove={refreshTables}
+        reportType={currentReportType}
+        templateId={currentReportId}
+      />
     </>
   );
 };

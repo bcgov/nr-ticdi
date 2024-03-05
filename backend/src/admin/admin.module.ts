@@ -5,9 +5,10 @@ import { AdminGuard } from './admin.guard';
 import { AdminService } from './admin.service';
 import { AdminController } from './admin.controller';
 import { AuthenticationModule } from 'src/authentication/authentication.module';
+import { DocumentTemplateModule } from 'src/document_template/document_template.module';
 
 @Module({
-  imports: [HttpModule, AuthenticationModule],
+  imports: [HttpModule, AuthenticationModule, DocumentTemplateModule],
   providers: [AdminGuard, AdminService],
   exports: [AdminService],
   controllers: [AdminController],

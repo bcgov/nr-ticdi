@@ -9,7 +9,7 @@ interface ButtonProps {
 
 const Button: FC<ButtonProps> = ({ onClick, text, type = 'btn-primary', disabled = false }) => {
   return (
-    <div className="col-md-2 mt-2 mb-2 p-0">
+    <div>
       <button type="button" className={`btn ${type}`} onClick={onClick} disabled={disabled}>
         {text}
       </button>

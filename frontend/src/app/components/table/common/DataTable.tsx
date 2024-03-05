@@ -42,7 +42,7 @@ export function DataTable<TData>({ columns, data }: DataTableProps<TData>) {
   });
 
   return (
-    <div className="" style={{ width: 'auto' }}>
+    <div className="" style={{ width: 'auto', marginBottom: '10px', marginTop: '10px' }}>
       <Table>
         <TableHeader>
           {table.getHeaderGroups().map((headerGroup) => (

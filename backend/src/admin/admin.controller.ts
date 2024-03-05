@@ -49,7 +49,7 @@ export class AdminController {
     @Param('id') id,
     @Param('document_type') document_type
   ) {
-    const update_userid = session.data.activeAccount
+    const update_userid = session?.data?.activeAccount
       ? session.data.activeAccount.idir_username
         ? session.data.activeAccount.idir_username
         : ''
@@ -62,7 +62,7 @@ export class AdminController {
   }
 
   @Get('download-template/:id')
-  async downloadTemplate(@Param('id') id, @Res() res) {
+  async downloadTemplate(@Param('id') id: number, @Res() res) {
     const dtObject = await this.adminService.downloadTemplate(id);
     const base64Data = dtObject.the_file;
     const buffer = Buffer.from(base64Data, 'base64');
@@ -98,23 +98,22 @@ export class AdminController {
     @Body()
     params: {
       document_type: string;
-      active_flag: boolean;
       template_name: string;
     }
   ) {
-    const create_userid = session.data.activeAccount
+    const create_userid = session?.data?.activeAccount
       ? session.data.activeAccount.idir_username
         ? session.data.activeAccount.idir_username
         : ''
       : '';
-    const template_author = session.data.activeAccount
+    const template_author = session?.data?.activeAccount
       ? session.data.activeAccount.name
         ? session.data.activeAccount.name
         : ''
       : '';
     const uploadData = {
       document_type: params.document_type,
-      active_flag: params.active_flag,
+      active_flag: false,
       mime_type: file.mimetype,
       file_name: params.template_name,
       template_author: template_author,
@@ -123,6 +122,14 @@ export class AdminController {
     await this.adminService.uploadTemplate(uploadData, file);
     return { message: 'Template uploaded successfully' };
   }
+
+  // @Post('upload-template')
+  // @UseInterceptors(FileInterceptor('file'))
+  // async uploadTemplate(@UploadedFile() file: Express.Multer.File, @Body() body: any) {
+  //   console.log(file); // Check if the file is received correctly
+  //   console.log(body); // Log the body to see if other data is as expected
+  //   return { message: 'Debugging' };
+  // }
 
   /**
    * Used for an AJAX route to render all admins in a datatable

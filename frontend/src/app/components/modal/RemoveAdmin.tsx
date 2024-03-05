@@ -1,6 +1,6 @@
 import { FC, useState } from 'react';
 import './modals.css';
-import { AdminData } from '../../components/table/AdminDataTable';
+import { AdminData } from '../table/admin/AdminDataTable';
 import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';

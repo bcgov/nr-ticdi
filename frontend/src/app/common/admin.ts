@@ -1,6 +1,6 @@
 import config from '../../config';
 import { IdirUserObject } from '../components/modal/AddAdmin';
-import { AdminData } from '../components/table/AdminDataTable';
+import { AdminData } from '../components/table/admin/AdminDataTable';
 import * as api from './api';
 import fileDownload from 'js-file-download';
 
@@ -35,27 +35,8 @@ export async function getAdminData(): Promise<AdminData[]> {
 export async function exportUsers(): Promise<void> {
   const reportUrl: string = `${config.API_BASE_URL}/admin/get-export-data`;
   const reportName: string = `user_list-${getDateTimeForFileName()}.csv`;
-  handleDownload(reportUrl, reportName);
+  api.handleFileDownloadGet(reportUrl, reportName);
 }
-
-/**
- * Helper function that presents generated report for download
- *
- * @param url
- * @param data
- * @param filename
- */
-const handleDownload = async (url: string, filename: string) => {
-  const getParameters = api.generateApiParameters(url);
-  await api
-    .fileDownloadGet<Blob>(getParameters)
-    .then(async (blob) => {
-      fileDownload(blob, filename);
-    })
-    .catch((error) => {
-      console.error('Download error:', error);
-    });
-};
 
 export const findIdirUser = async (
   email: string

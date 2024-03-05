@@ -1,12 +1,11 @@
 import config from '../../config';
-import { ProvisionJson } from '../components/table/SelectedProvisionsTable';
-import { VariableJson } from '../components/table/VariablesTable';
+import { ProvisionJson } from '../components/table/reports/SelectedProvisionsTable';
+import { VariableJson } from '../components/table/reports/VariablesTable';
 import { ProvisionData } from '../content/display/Provisions';
 import { VariableData } from '../content/display/Variables';
 import { DTR, DTRDisplayObject, NfrDataObject, ProvisionGroup } from '../types/types';
 import { buildDTRDisplayData } from '../util/util';
 import * as api from './api';
-import fileDownload from 'js-file-download';
 
 /**
  * Gets ttls data and parses it for displaying
@@ -41,28 +40,8 @@ export async function generateReport(dtid: number, fileNum: string, documentDesc
     dtid: dtid,
     document_type: documentDescription,
   };
-  handleDownload(reportUrl, data, reportName);
+  api.handleFileDownloadPost(reportUrl, data, reportName);
 }
-
-/**
- * Helper function that presents generated report for download
- *
- * @param url
- * @param data
- * @param filename
- */
-const handleDownload = async (url: string, data: any, filename: string) => {
-  const postParameters = api.generateApiParameters(url, data);
-
-  await api
-    .fileDownloadPost<Blob>(postParameters)
-    .then(async (blob) => {
-      fileDownload(blob, filename);
-    })
-    .catch((error) => {
-      console.error('Download error:', error);
-    });
-};
 
 /** Section for Notice of Final Review which has lots of custom logic */
 export const getNfrDataByDtid = async (dtid: number) => {
@@ -138,5 +117,5 @@ export const generateNfrReport = async (
     variableJson: variableJson,
   };
 
-  handleDownload(url, data, reportName);
+  api.handleFileDownloadPost(url, data, reportName);
 };

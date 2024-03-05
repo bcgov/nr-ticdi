@@ -1,6 +1,6 @@
 import { FC, useEffect, useState } from 'react';
 import { getNfrVariablesByVariantDtid } from '../../common/report';
-import VariablesTable, { VariableJson } from '../../components/table/VariablesTable';
+import VariablesTable, { VariableJson } from '../../components/table/reports/VariablesTable';
 
 interface VariablesProps {
   dtid: number;

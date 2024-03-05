@@ -1,6 +1,7 @@
 import axios, { AxiosResponse, AxiosError, AxiosRequestConfig } from 'axios';
 import config from '../../config';
 import { AUTH_TOKEN } from '../service/user-service';
+import fileDownload from 'js-file-download';
 
 const STATUS_CODES = {
   Ok: 200,
@@ -54,7 +55,9 @@ export const get = <T, M = {}>(parameters: ApiRequestParameters<M>, headers?: {}
 };
 
 export const post = <T, M = {}>(parameters: ApiRequestParameters<M>): Promise<T> => {
-  let config: AxiosRequestConfig = { headers: {} };
+  let config: AxiosRequestConfig = {
+    headers: {},
+  };
   return new Promise<T>((resolve, reject) => {
     const { url, requiresAuthentication, params } = parameters;
 
@@ -74,7 +77,7 @@ export const post = <T, M = {}>(parameters: ApiRequestParameters<M>): Promise<T>
   });
 };
 
-export const fileDownloadGet = <T, M = {}>(parameters: ApiRequestParameters<M>): Promise<T> => {
+const fileDownloadGet = <T, M = {}>(parameters: ApiRequestParameters<M>): Promise<T> => {
   let config: AxiosRequestConfig = { headers: {}, responseType: 'blob' };
   return new Promise<T>((resolve, reject) => {
     const { url, requiresAuthentication } = parameters;
@@ -95,7 +98,7 @@ export const fileDownloadGet = <T, M = {}>(parameters: ApiRequestParameters<M>):
   });
 };
 
-export const fileDownloadPost = <T, M = {}>(parameters: ApiRequestParameters<M>): Promise<T> => {
+const fileDownloadPost = <T, M = {}>(parameters: ApiRequestParameters<M>): Promise<T> => {
   let config: AxiosRequestConfig = { headers: {}, responseType: 'blob' };
   return new Promise<T>((resolve, reject) => {
     const { url, requiresAuthentication, params } = parameters;
@@ -114,6 +117,43 @@ export const fileDownloadPost = <T, M = {}>(parameters: ApiRequestParameters<M>)
         reject(error);
       });
   });
+};
+
+/**
+ * Used for file downloads through get request
+ *
+ * @param url
+ * @param filename
+ */
+export const handleFileDownloadGet = async (url: string, filename: string) => {
+  const getParameters = generateApiParameters(url);
+
+  await fileDownloadGet<Blob>(getParameters)
+    .then(async (blob) => {
+      fileDownload(blob, filename);
+    })
+    .catch((error) => {
+      console.error('Download error:', error);
+    });
+};
+
+/**
+ * Used for file donwloads through post request
+ *
+ * @param url
+ * @param data { prdid: number | null; dtid: number; document_type: string }
+ * @param filename
+ */
+export const handleFileDownloadPost = async (url: string, data: any, filename: string) => {
+  const postParameters = generateApiParameters(url, data);
+
+  await fileDownloadPost<Blob>(postParameters)
+    .then(async (blob) => {
+      fileDownload(blob, filename);
+    })
+    .catch((error) => {
+      console.error('Download error:', error);
+    });
 };
 
 export const patch = <T, M = {}>(parameters: ApiRequestParameters<M>): Promise<T> => {

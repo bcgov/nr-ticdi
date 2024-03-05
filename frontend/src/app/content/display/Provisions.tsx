@@ -2,8 +2,8 @@ import { FC, useEffect, useState } from 'react';
 import { NfrDataObject, ProvisionGroup } from '../../types/types';
 import { NFR_VARIANTS } from '../../util/constants';
 import { getGroupMaxByVariant, getNfrDataByDtid } from '../../common/report';
-import ProvisionsTable from '../../components/table/ProvisionsTable';
-import SelectedProvisionsTable, { ProvisionJson } from '../../components/table/SelectedProvisionsTable';
+import ProvisionsTable from '../../components/table/reports/ProvisionsTable';
+import SelectedProvisionsTable, { ProvisionJson } from '../../components/table/reports/SelectedProvisionsTable';
 
 interface ProvisionsProps {
   dtid: number;

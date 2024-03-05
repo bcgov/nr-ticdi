@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { DataTable } from './DataTable';
+import { DataTable } from '../common/DataTable';
 import { ColumnDef, createColumnHelper } from '@tanstack/react-table';
-import { getSearchData } from '../../common/search';
+import { getSearchData } from '../../../common/search';
 
 export type SearchData = {
   dtid: number;

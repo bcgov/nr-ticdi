@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { DataTable } from './DataTable';
+import { DataTable } from '../common/DataTable';
 import { ColumnDef, createColumnHelper } from '@tanstack/react-table';
-import { VariableData } from '../../content/display/Variables';
+import { VariableData } from '../../../content/display/Variables';
 import VariableValueCell from './VariableValueCell';
 
 export type SaveVariableData = {
@@ -50,7 +50,7 @@ const VariablesTable: React.FC<VariablesTableProps> = React.memo(({ variables, u
         }))
       );
     }
-  }, [initialized, variables]);
+  }, [initialized, variables, updateHandler]);
 
   const columnHelper = createColumnHelper<VariableData>();
   const columns: ColumnDef<VariableData, any>[] = [

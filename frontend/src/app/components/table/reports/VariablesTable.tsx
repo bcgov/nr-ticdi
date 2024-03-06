@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { DataTable } from '../common/DataTable';
 import { ColumnDef, createColumnHelper } from '@tanstack/react-table';
 import { VariableData } from '../../../content/display/Variables';
-import VariableValueCell from './VariableValueCell';
 
 export type SaveVariableData = {
   provision_id: number;
@@ -84,5 +83,28 @@ const VariablesTable: React.FC<VariablesTableProps> = React.memo(({ variables, u
 
   return <DataTable columns={columns} data={variables} />;
 });
+
+interface VariableValueCellProps {
+  value: string;
+  updateValue: (v: number, i: string) => void;
+  variableId: number;
+}
+
+const VariableValueCell: React.FC<VariableValueCellProps> = ({ value, updateValue, variableId }) => {
+  const [inputValue, setInputValue] = useState(value);
+
+  const handleBlur = () => {
+    updateValue(variableId, inputValue);
+  };
+
+  return (
+    <input
+      value={inputValue}
+      onChange={(e) => setInputValue(e.target.value)}
+      onBlur={handleBlur}
+      style={{ width: '100%' }}
+    />
+  );
+};
 
 export default VariablesTable;

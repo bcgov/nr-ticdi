@@ -25,6 +25,11 @@ const EditProvisionModal: FC<EditProvisionModalProps> = ({ provision, variables,
   const [group, setGroup] = useState<number>(1);
   const [groupDescription, setGroupDescription] = useState<string>('');
   const [max, setMax] = useState<number>(3);
+  const [maxToggle, setMaxToggle] = useState<boolean>(false);
+  const [provisionName, setProvisionName] = useState<string>('');
+  const [freeText, setFreeText] = useState<string>('');
+  const [helpText, setHelpText] = useState<string>('');
+  const [category, setCategory] = useState<string>('');
 
   useEffect(() => {
     const getData = async () => {
@@ -37,10 +42,39 @@ const EditProvisionModal: FC<EditProvisionModalProps> = ({ provision, variables,
           setGroupDescription(groupMax ? groupMax.provision_group_text : '');
         }
         setMax(provision.max);
+        setProvisionName(provision.provision_name);
+        setFreeText(provision.free_text);
+        setHelpText(provision.help_text);
+        setCategory(provision.category);
       }
     };
     getData();
   }, [provision]);
+  const handleTypeChange = (e: React.ChangeEvent<HTMLInputElement>) => {};
+  const handleGroupChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setGroup(parseInt(e.target.value));
+  };
+  const handleGroupDescriptionChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setGroupDescription(e.target.value);
+  };
+  const handleMaxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setMax(parseInt(e.target.value));
+  };
+  const handleMaxToggle = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setMaxToggle(e.target.checked);
+  };
+  const handleProvisionNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setProvisionName(e.target.value);
+  };
+  const handleFreeTextChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFreeText(e.target.value);
+  };
+  const handleHelpTextChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setHelpText(e.target.value);
+  };
+  const handleCategoryTextChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setCategory(e.target.value);
+  };
 
   //   const saveButtonHandler = () => {
   //     const updatedProvision: Provision = {
@@ -76,7 +110,12 @@ const EditProvisionModal: FC<EditProvisionModalProps> = ({ provision, variables,
               Group
             </Form.Label>
             <Col sm="10">
-              <Form.Control type="number" defaultValue={provision?.provision_group} name="provision_group" />
+              <Form.Control
+                type="number"
+                defaultValue={provision?.provision_group}
+                name="provision_group"
+                onChange={handleGroupChange}
+              />
             </Col>
           </Form.Group>
 
@@ -140,6 +179,9 @@ const EditProvisionModal: FC<EditProvisionModalProps> = ({ provision, variables,
             </Col>
           </Form.Group>
         </Form>
+        {/** add variants section here */}
+        {/** add variables table here - will toggle variable edit & remove views */}
+        {/** add variables button here */}
         {showError && <div className="alert alert-danger">{error}</div>}
       </Modal.Body>
       <Modal.Footer>

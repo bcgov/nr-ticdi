@@ -40,6 +40,7 @@ const Provisions: FC<ProvisionsProps> = ({ dtid, variantName, updateHandler, upd
   const [selectedProvisionIds, setSelectedProvisionIds] = useState<number[]>([]);
   const [provisionGroups, setProvisionGroups] = useState<ProvisionGroup[] | null>(null);
   const [selectedProvisionGroup, setSelectedProvisionGroup] = useState<number | null>(null);
+  const [selectedProvisionGroupMax, setSelectedProvisionGroupMax] = useState<number | null>(null);
   const [viewedProvisionGroups, setViewedProvisionGroups] = useState<Set<number>>(new Set());
 
   // Fetch NFR data if we are on the NFR page
@@ -67,8 +68,11 @@ const Provisions: FC<ProvisionsProps> = ({ dtid, variantName, updateHandler, upd
   }, [variantName]);
 
   const handleProvisionGroupChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    const value = event.target.value;
-    setSelectedProvisionGroup(parseInt(value));
+    const value = parseInt(event.target.value);
+    setSelectedProvisionGroup(value);
+    const provisionGroup = provisionGroups?.find((pg) => value === pg.provision_group);
+    const pgMax = provisionGroup ? provisionGroup.max : 999;
+    setSelectedProvisionGroupMax(pgMax);
 
     if (value) {
       setViewedProvisionGroups((prevViewedProvisionGroups) => {
@@ -123,6 +127,7 @@ const Provisions: FC<ProvisionsProps> = ({ dtid, variantName, updateHandler, upd
         dtid={dtid}
         variant={variantName}
         currentGroupNumber={selectedProvisionGroup}
+        currentGroupMax={selectedProvisionGroupMax}
         selectedProvisionIds={selectedProvisionIds}
         selectProvision={selectProvisionHandler}
       />

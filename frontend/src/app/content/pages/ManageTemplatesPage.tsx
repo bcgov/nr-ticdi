@@ -7,14 +7,21 @@ import Button from '../../components/common/Button';
 import AddProvisionModal from '../../components/modal/AddProvisionModal';
 import UploadTemplateModal from '../../components/modal/UploadTemplateModal';
 import RemoveTemplateModal from '../../components/modal/RemoveTemplateModal';
+import ManageProvisionsTable from '../../components/table/manage-templates/ManageProvisionsTable';
+import { Provision, ProvisionUpload, Variable } from '../../types/types';
+import EditProvisionModal from '../../components/modal/EditProvisionModal';
+import { updateProvision } from '../../common/manage-templates';
 
 export interface ManageTemplatesPageProps {}
 
 const ManageTemplatesPage: FC<ManageTemplatesPageProps> = () => {
   const [showUploadModal, setShowUploadModal] = useState<boolean>(false);
   const [showRemoveTemplateModal, setShowRemoveTemplateModal] = useState<boolean>(false);
+  const [showEditProvisionModal, setShowEditProvisionModal] = useState<boolean>(false);
   const [currentReportType, setCurrentReportType] = useState<string>('');
   const [currentReportId, setCurrentReportId] = useState<number>(-1);
+  const [currentProvision, setCurrentProvision] = useState<Provision>();
+  const [currentVariables, setCurrentVariables] = useState<Variable[]>();
   const [refreshTrigger, setRefreshTrigger] = useState(0);
   const { id } = useParams<{ id: string }>();
   let idNum: number;
@@ -32,6 +39,18 @@ const ManageTemplatesPage: FC<ManageTemplatesPageProps> = () => {
     setCurrentReportType(report);
     setCurrentReportId(id);
     setShowRemoveTemplateModal(true);
+  };
+
+  const openEditProvisionModal = (provision: Provision, variables: Variable[]) => {
+    console.log(provision);
+    console.log(variables);
+    setCurrentProvision(provision);
+    setCurrentVariables(variables);
+    setShowEditProvisionModal(true);
+  };
+
+  const updateProvisionHandler = async (provisionUpload: ProvisionUpload, provisionId: number) => {
+    await updateProvision({ ...provisionUpload, id: provisionId });
   };
 
   const refreshTables = () => {
@@ -105,7 +124,7 @@ const ManageTemplatesPage: FC<ManageTemplatesPageProps> = () => {
             />
           </Collapsible>
           <Collapsible title="Manage NFR Provisions">
-            <div>hello</div>
+            <ManageProvisionsTable refreshVersion={refreshTrigger} editProvisionHandler={openEditProvisionModal} />
           </Collapsible>
         </>
       ) : (
@@ -130,6 +149,13 @@ const ManageTemplatesPage: FC<ManageTemplatesPageProps> = () => {
         onRemove={refreshTables}
         reportType={currentReportType}
         templateId={currentReportId}
+      />
+      <EditProvisionModal
+        provision={currentProvision}
+        variables={currentVariables}
+        show={showEditProvisionModal}
+        onHide={() => setShowEditProvisionModal(false)}
+        updateProvisionHandler={updateProvisionHandler}
       />
     </>
   );

@@ -68,35 +68,27 @@ const SelectedProvisionsTable: React.FC<SelectedProvisionsTableTableProps> = ({
   const columns: ColumnDef<ProvisionData, any>[] = [
     columnHelper.accessor('type', {
       id: 'type',
-      cell: (info) => (
-        <input value={info.getValue()} style={{ minWidth: '50px', marginTop: '10px', marginRight: '5px' }} disabled />
-      ),
+      cell: (info) => <input value={info.getValue()} style={{ width: '100%' }} readOnly />,
       header: () => 'Type',
-      meta: { customCss: { minWidth: '50px', width: '50px' } },
+      meta: { customCss: { width: '5%' } },
     }),
     columnHelper.accessor('provision_group', {
       id: 'provision_group',
-      cell: (info) => (
-        <input value={info.getValue()} style={{ minWidth: '50px', marginTop: '10px', marginRight: '5px' }} disabled />
-      ),
+      cell: (info) => <input value={info.getValue()} style={{ width: '100%' }} readOnly />,
       header: () => 'Group',
-      meta: { customCss: { minWidth: '50px', width: '50px' } },
+      meta: { customCss: { width: '5%' } },
     }),
     columnHelper.accessor('provision_name', {
       id: 'provision_name',
-      cell: (info) => (
-        <input value={info.getValue()} style={{ minWidth: '500px', marginTop: '10px', marginRight: '5px' }} disabled />
-      ),
+      cell: (info) => <input value={info.getValue()} style={{ width: '100%' }} readOnly />,
       header: () => 'Provision',
-      meta: { customCss: { minWidth: '500px', width: '500px' } },
+      meta: { customCss: { width: '50%' } },
     }),
     columnHelper.accessor('category', {
       id: 'category',
-      cell: (info) => (
-        <input value={info.getValue()} style={{ minWidth: '120px', marginTop: '10px', marginRight: '5px' }} disabled />
-      ),
+      cell: (info) => <input value={info.getValue()} style={{ width: '100%' }} readOnly />,
       header: () => 'Category',
-      meta: { customCss: { minWidth: '120px', width: '120px' } },
+      meta: { customCss: { width: '30%' } },
     }),
   ];
 

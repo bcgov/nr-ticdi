@@ -22,7 +22,7 @@ const VariableValueCell: React.FC<VariableValueCellProps> = ({ value, updateValu
       value={inputValue}
       onChange={(e) => setInputValue(e.target.value)}
       onBlur={handleBlur}
-      style={{ minWidth: '400px', marginTop: '10px', marginRight: '5px' }}
+      style={{ width: '100%' }}
     />
   );
 };

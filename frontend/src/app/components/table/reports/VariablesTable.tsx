@@ -56,11 +56,9 @@ const VariablesTable: React.FC<VariablesTableProps> = React.memo(({ variables, u
   const columns: ColumnDef<VariableData, any>[] = [
     columnHelper.accessor('variable_name', {
       id: 'variable_name',
-      cell: (info) => (
-        <input value={info.getValue()} style={{ minWidth: '300px', marginTop: '10px', marginRight: '5px' }} disabled />
-      ),
+      cell: (info) => <input value={info.getValue()} style={{ width: '100%' }} title={info.getValue()} readOnly />,
       header: () => 'Variable',
-      meta: { customCss: { minWidth: '300px', width: '300px' } },
+      meta: { customCss: { width: '28%' } },
     }),
     columnHelper.accessor('variable_value', {
       id: 'variable_value',
@@ -68,15 +66,13 @@ const VariablesTable: React.FC<VariablesTableProps> = React.memo(({ variables, u
         <VariableValueCell value={info.getValue()} updateValue={saveChanges} variableId={info.row.original.id} />
       ),
       header: () => 'Enter Text',
-      meta: { customCss: { minWidth: '400px', width: '400px' } },
+      meta: { customCss: { width: '36%' } },
     }),
     columnHelper.accessor('help_text', {
       id: 'help_text',
-      cell: (info) => (
-        <input value={info.getValue()} style={{ minWidth: '400px', marginTop: '10px', marginRight: '5px' }} disabled />
-      ),
+      cell: (info) => <input value={info.getValue()} style={{ width: '100%' }} title={info.getValue()} readOnly />,
       header: () => 'Help',
-      meta: { customCss: { minWidth: '400px', width: '400px' } },
+      meta: { customCss: { width: '36%' } },
     }),
     columnHelper.accessor('id', {
       id: 'id',

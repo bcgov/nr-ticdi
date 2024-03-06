@@ -112,7 +112,6 @@ export interface InterestedParties {
   address: string | null;
 }
 
-/** NFR types section start */
 export type NfrDataVariableObject = {
   data_variable_value: string;
   id: number;
@@ -176,4 +175,73 @@ export type NfrDataObject = {
   provisionIds: number[];
   variableIds: number[];
 };
-/** NFR types section end */
+
+export type TemplateInfo = {
+  template_version: number;
+  file_name: string;
+  update_timestamp: string;
+  active_flag: boolean;
+  view: any; // remove from route
+  remove: any; // remove from route
+  id: number;
+};
+
+export type GroupMax = {
+  provision_group: number;
+  max: number;
+  provision_group_text: string;
+};
+
+export type Provision = {
+  type: string;
+  provision_group: number;
+  max: number;
+  provision_name: string;
+  free_text: string;
+  category: string;
+  active_flag: boolean;
+  edit: any; // remove from route
+  help_text: string;
+  id: number;
+  variants: any; // seems to be a string array which gets converted to string and saved in the cell
+};
+
+export type Variable = {
+  variable_name: string;
+  variable_value: string;
+  edit: any; // remove
+  remove: any; // remove
+  help_text: string;
+  id: number;
+  provision_id: number;
+};
+
+export type ProvisionUpload = {
+  type: string;
+  provision_group: number;
+  provision_group_text: string;
+  max: number;
+  provision_name: string;
+  free_text: string;
+  help_text: string;
+  category: string;
+  variants: any;
+};
+
+export type VariableUpload = {
+  provision_id: number;
+  variable_name: string;
+  variable_value: string;
+  help_text: string;
+};
+
+export type SearchData = {
+  dtid: number;
+  version: number;
+  file_name: string;
+  updated_date: string;
+  status: string;
+  active: boolean;
+  nfr_id: number;
+  variant_name: string;
+};

@@ -6,7 +6,7 @@ interface TableProps {
 
 export const Table: FC<TableProps> = ({ children }) => {
   return (
-    <table className="" style={{}}>
+    <table className="" style={{ tableLayout: 'fixed', width: '100%' }}>
       {children}
     </table>
   );

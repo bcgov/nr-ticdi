@@ -58,27 +58,21 @@ const AdminDataTable: React.FC<AdminDataTableProps> = ({ searchTerm, removeAdmin
   const columns: ColumnDef<AdminData, any>[] = [
     columnHelper.accessor('name', {
       id: 'name',
-      cell: (info) => (
-        <input value={info.getValue()} style={{ minWidth: '250px', marginTop: '10px', marginRight: '5px' }} disabled />
-      ),
+      cell: (info) => <input value={info.getValue()} style={{ width: '100%' }} readOnly />,
       header: () => 'Name',
-      meta: { customCss: { minWidth: '250px', width: '250px' } },
+      meta: { customCss: { width: '30%' } },
     }),
     columnHelper.accessor('username', {
       id: 'username',
-      cell: (info) => (
-        <input value={info.getValue()} style={{ minWidth: '250px', marginTop: '10px', marginRight: '5px' }} disabled />
-      ),
+      cell: (info) => <input value={info.getValue()} style={{ width: '100%' }} readOnly />,
       header: () => 'User Name',
-      meta: { customCss: { minWidth: '250px', width: '250px' } },
+      meta: { customCss: { width: '30%' } },
     }),
     columnHelper.accessor('email', {
       id: 'email',
-      cell: (info) => (
-        <input value={info.getValue()} style={{ minWidth: '250px', marginTop: '10px', marginRight: '5px' }} disabled />
-      ),
+      cell: (info) => <input value={info.getValue()} style={{ width: '100%' }} readOnly />,
       header: () => 'Email',
-      meta: { customCss: { minWidth: '250px', width: '250px' } },
+      meta: { customCss: { width: '30%' } },
     }),
     columnHelper.accessor('remove', {
       id: 'remove',
@@ -98,7 +92,7 @@ const AdminDataTable: React.FC<AdminDataTableProps> = ({ searchTerm, removeAdmin
         </button>
       ),
       header: () => null,
-      meta: { customCss: { minWidth: '80px', width: '80px' } },
+      meta: { customCss: { width: '10%' } },
     }),
     columnHelper.accessor('idirUsername', {
       id: 'idirUsername',

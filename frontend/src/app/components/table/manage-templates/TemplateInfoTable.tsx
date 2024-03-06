@@ -1,18 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { DataTable } from '../common/DataTable';
 import { ColumnDef, createColumnHelper } from '@tanstack/react-table';
-import { TemplateInfo, activateTemplate, downloadTemplate, getTemplatesInfo } from '../../../common/manage-templates';
+import { activateTemplate, downloadTemplate, getTemplatesInfo } from '../../../common/manage-templates';
 import Button from '../../common/Button';
-
-export type SearchData = {
-  template_version: number;
-  file_name: string;
-  update_timestamp: string;
-  active_flag: boolean;
-  view: any;
-  remove: any;
-  id: number;
-};
+import { TemplateInfo } from '../../../types/types';
 
 interface TemplateInfoTableProps {
   reportType: string;
@@ -69,32 +60,26 @@ const TemplateInfoTable: React.FC<TemplateInfoTableProps> = ({ reportType, refre
     handleRemove(id, reportType);
   };
 
-  const columnHelper = createColumnHelper<SearchData>();
+  const columnHelper = createColumnHelper<TemplateInfo>();
 
-  const columns: ColumnDef<SearchData, any>[] = [
+  const columns: ColumnDef<TemplateInfo, any>[] = [
     columnHelper.accessor('template_version', {
       id: 'template_version',
-      cell: (info) => (
-        <input value={info.getValue()} style={{ minWidth: '40px', marginTop: '10px', marginRight: '5px' }} disabled />
-      ),
+      cell: (info) => <input value={info.getValue()} style={{ width: '100%' }} readOnly />,
       header: () => 'Doc No.',
-      meta: { customCss: { minWidth: '40px', width: '40px' } },
+      meta: { customCss: { width: '5%' } },
     }),
     columnHelper.accessor('file_name', {
       id: 'file_name',
-      cell: (info) => (
-        <input value={info.getValue()} style={{ minWidth: '400px', marginTop: '10px', marginRight: '5px' }} disabled />
-      ),
+      cell: (info) => <input value={info.getValue()} style={{ width: '100%' }} readOnly />,
       header: () => 'Template Name',
-      meta: { customCss: { minWidth: '400px', width: '400px' } },
+      meta: { customCss: { width: '50%' } },
     }),
     columnHelper.accessor('update_timestamp', {
       id: 'update_timestamp',
-      cell: (info) => (
-        <input value={info.getValue()} style={{ minWidth: '80px', marginTop: '10px', marginRight: '5px' }} disabled />
-      ),
+      cell: (info) => <input value={info.getValue()} style={{ width: '100%' }} readOnly />,
       header: () => 'Uploaded Date',
-      meta: { customCss: { minWidth: '80px', width: '80px' } },
+      meta: { customCss: { width: '15%' } },
     }),
     columnHelper.accessor('active_flag', {
       id: 'active_flag',
@@ -104,12 +89,12 @@ const TemplateInfoTable: React.FC<TemplateInfoTableProps> = ({ reportType, refre
           name={`activeSelection_${reportType}`}
           checked={currentlyActive === info.row.original.id}
           onChange={() => activeRadioHandler(info.row.original.id)}
-          style={{ minWidth: '40px', marginTop: '10px' }}
+          style={{ width: '100%' }}
           disabled={loading}
         />
       ),
       header: () => 'Active',
-      meta: { customCss: { minWidth: '40px', width: '40px' } },
+      meta: { customCss: { width: '5%' } },
     }),
     columnHelper.accessor('view', {
       id: 'view',
@@ -121,6 +106,7 @@ const TemplateInfoTable: React.FC<TemplateInfoTableProps> = ({ reportType, refre
         ></Button>
       ),
       header: () => null,
+      meta: { customCss: { width: '7%' } },
     }),
     columnHelper.accessor('remove', {
       id: 'remove',
@@ -128,7 +114,7 @@ const TemplateInfoTable: React.FC<TemplateInfoTableProps> = ({ reportType, refre
         <Button type="btn-warning" onClick={() => handleRemoveButton(info.row.original.id)} text="Remove"></Button>
       ),
       header: () => null,
-      meta: { customCss: { paddingLeft: '10px' } },
+      meta: { customCss: { width: '15%' } },
     }),
     columnHelper.accessor('id', {
       id: 'id',

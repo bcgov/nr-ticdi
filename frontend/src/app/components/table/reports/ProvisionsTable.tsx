@@ -8,6 +8,7 @@ interface ProvisionsTableProps {
   dtid: number;
   variant: string;
   currentGroupNumber: number | null;
+  currentGroupMax: number | null;
   selectedProvisionIds: number[] | undefined;
   selectProvision: (id: number, checked: boolean) => void;
 }
@@ -16,11 +17,13 @@ const ProvisionsTable: React.FC<ProvisionsTableProps> = ({
   dtid,
   variant,
   currentGroupNumber,
+  currentGroupMax,
   selectedProvisionIds,
   selectProvision,
 }) => {
   const [allProvisions, setAllProvisions] = useState<ProvisionData[]>([]);
   const [filteredProvisions, setFilteredProvisions] = useState<ProvisionData[]>([]); // provisions in the currently selected group
+  const [currentGroupProvisions, setCurrentGroupProvisions] = useState<ProvisionData[]>([]);
 
   // get data
   useEffect(() => {
@@ -43,7 +46,7 @@ const ProvisionsTable: React.FC<ProvisionsTableProps> = ({
   }, [allProvisions, currentGroupNumber, variant]);
 
   // xor logic for the two provisions which can't be selected at the same time.
-  const isCheckboxDisabled = (provisionName: string, provisionId: number): boolean => {
+  const isCheckboxDisabled = (provisionId: number, provisionName: string): boolean => {
     const exclusiveProvisionNames = [
       'ESTIMATED MONIES PAYABLE - NOTICE OF FINAL REVIEW - DELAYED',
       'MONIES PAYABLE - NOTICE OF FINAL REVIEW - DELAYED',
@@ -55,6 +58,17 @@ const ProvisionsTable: React.FC<ProvisionsTableProps> = ({
       const otherProvision = allProvisions.find((provision) => provision.provision_name === otherName);
       if (otherProvision) return selectedProvisionIds?.includes(otherProvision?.id) ?? false;
     }
+
+    const selectedInGroup = filteredProvisions.filter((provision) =>
+      selectedProvisionIds?.includes(provision.id)
+    ).length;
+    if (
+      currentGroupMax !== null &&
+      selectedInGroup >= currentGroupMax &&
+      !selectedProvisionIds?.includes(provisionId)
+    ) {
+      return true; // Disable checkbox if not selected and group max reached
+    }
     return false;
   };
 
@@ -62,27 +76,21 @@ const ProvisionsTable: React.FC<ProvisionsTableProps> = ({
   const columns: ColumnDef<ProvisionData, any>[] = [
     columnHelper.accessor('type', {
       id: 'type',
-      cell: (info) => (
-        <input value={info.getValue()} style={{ minWidth: '50px', marginTop: '10px', marginRight: '5px' }} disabled />
-      ),
+      cell: (info) => <input value={info.getValue()} style={{ width: '100%' }} readOnly />,
       header: () => 'Type',
-      meta: { customCss: { minWidth: '50px', width: '50px' } },
+      meta: { customCss: { width: '5%' } },
     }),
     columnHelper.accessor('provision_name', {
       id: 'provision_name',
-      cell: (info) => (
-        <input value={info.getValue()} style={{ minWidth: '450px', marginTop: '10px', marginRight: '5px' }} disabled />
-      ),
+      cell: (info) => <input value={info.getValue()} style={{ width: '100%' }} readOnly />,
       header: () => 'Provision',
-      meta: { customCss: { minWidth: '450px', width: '450px' } },
+      meta: { customCss: { width: '45%' } },
     }),
     columnHelper.accessor('help_text', {
       id: 'help_text',
-      cell: (info) => (
-        <input value={info.getValue()} style={{ minWidth: '450px', marginTop: '10px', marginRight: '5px' }} disabled />
-      ),
+      cell: (info) => <input value={info.getValue()} style={{ width: '100%' }} title={info.getValue()} readOnly />,
       header: () => 'Help',
-      meta: { customCss: { minWidth: '450px', width: '450px' } },
+      meta: { customCss: { width: '45%' } },
     }),
     columnHelper.accessor('select', {
       id: 'select',
@@ -90,16 +98,17 @@ const ProvisionsTable: React.FC<ProvisionsTableProps> = ({
         <input
           type="checkbox"
           onChange={(e) => {
-            if (!isCheckboxDisabled(info.row.original.provision_name, info.row.original.id)) {
+            if (!isCheckboxDisabled(info.row.original.id, info.row.original.provision_name)) {
               selectProvision(info.row.original.id, e.target.checked);
             }
           }}
           checked={selectedProvisionIds?.includes(info.row.original.id) ?? false}
-          disabled={isCheckboxDisabled(info.row.original.provision_name, info.row.original.id)}
+          disabled={isCheckboxDisabled(info.row.original.id, info.row.original.provision_name)}
+          style={{ width: '100%' }}
         />
       ),
       header: () => null,
-      meta: { customCss: { minWidth: '40px', width: '40px', paddingTop: '15px' } },
+      meta: { customCss: { width: '5%' } },
     }),
     columnHelper.accessor('id', {
       id: 'id',

@@ -2,31 +2,28 @@ import React, { useEffect, useState } from 'react';
 import { DataTable } from '../common/DataTable';
 import { ColumnDef, createColumnHelper } from '@tanstack/react-table';
 import { getSearchData } from '../../../common/search';
-
-export type SearchData = {
-  dtid: number;
-  version: number;
-  file_name: string;
-  updated_date: string;
-  status: string;
-  active: boolean;
-  nfr_id: number;
-  variant_name: string;
-};
+import { SearchData } from '../../../types/types';
 
 interface SearchDataTableProps {
   searchTerm: string;
-  setSelectedDocumentChange: (dtid: number, variant: string) => void;
+  setSelectedDocumentChange: (dtid: number, variant_name: string) => void;
 }
 
 const SearchDataTable: React.FC<SearchDataTableProps> = ({ searchTerm, setSelectedDocumentChange }) => {
   const [searchData, setSearchData] = useState<SearchData[]>([]);
   const [filteredSearchData, setFilteredSearchData] = useState<SearchData[]>([]);
-  const [selectedDocument, setSelectedDocument] = useState<{ dtid: number; variant: string } | null>(null);
+  const [selectedDocument, setSelectedDocument] = useState<{ dtid: number; variant_name: string } | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
-      const data = await getSearchData();
+      const data: SearchData[] = await getSearchData();
+      data.sort((a, b) => a.dtid - b.dtid); // sort by dtid for now
+      const firstItem: SearchData | null = data[0] ? data[0] : null;
+      if (firstItem) {
+        const { dtid, variant_name } = firstItem;
+        setSelectedDocument({ dtid, variant_name });
+        setSelectedDocumentChange(dtid, variant_name);
+      }
       setSearchData(data);
     };
 
@@ -53,9 +50,9 @@ const SearchDataTable: React.FC<SearchDataTableProps> = ({ searchTerm, setSelect
     filterData();
   }, [searchTerm, searchData]);
 
-  const activeRadioHandler = (dtid: number, variant: string) => {
-    setSelectedDocument({ dtid, variant });
-    setSelectedDocumentChange(dtid, variant);
+  const activeRadioHandler = (dtid: number, variant_name: string) => {
+    setSelectedDocument({ dtid, variant_name });
+    setSelectedDocumentChange(dtid, variant_name);
   };
 
   const columnHelper = createColumnHelper<SearchData>();
@@ -63,43 +60,33 @@ const SearchDataTable: React.FC<SearchDataTableProps> = ({ searchTerm, setSelect
   const columns: ColumnDef<SearchData, any>[] = [
     columnHelper.accessor('dtid', {
       id: 'dtid',
-      cell: (info) => (
-        <input value={info.getValue()} style={{ minWidth: '80px', marginTop: '10px', marginRight: '5px' }} disabled />
-      ),
+      cell: (info) => <input value={info.getValue()} style={{ width: '100%' }} readOnly />,
       header: () => 'DTID',
-      meta: { customCss: { minWidth: '80px', width: '80px' } },
+      meta: { customCss: { width: '10%' } },
     }),
     columnHelper.accessor('version', {
       id: 'version',
-      cell: (info) => (
-        <input value={info.getValue()} style={{ minWidth: '40px', marginTop: '10px', marginRight: '5px' }} disabled />
-      ),
+      cell: (info) => <input value={info.getValue()} style={{ width: '100%' }} readOnly />,
       header: () => 'Version',
-      meta: { customCss: { minWidth: '40px', width: '40px' } },
+      meta: { customCss: { width: '10%' } },
     }),
     columnHelper.accessor('file_name', {
       id: 'file_name',
-      cell: (info) => (
-        <input value={info.getValue()} style={{ minWidth: '300px', marginTop: '10px', marginRight: '5px' }} disabled />
-      ),
+      cell: (info) => <input value={info.getValue()} style={{ width: '100%' }} readOnly />,
       header: () => 'Template Name',
-      meta: { customCss: { minWidth: '300px', width: '300px' } },
+      meta: { customCss: { width: '50%' } },
     }),
     columnHelper.accessor('updated_date', {
       id: 'updated_date',
-      cell: (info) => (
-        <input value={info.getValue()} style={{ minWidth: '120px', marginTop: '10px', marginRight: '5px' }} disabled />
-      ),
+      cell: (info) => <input value={info.getValue()} style={{ width: '100%' }} readOnly />,
       header: () => 'Uploaded Date',
-      meta: { customCss: { minWidth: '120px', width: '120px' } },
+      meta: { customCss: { width: '15%' } },
     }),
     columnHelper.accessor('status', {
       id: 'status',
-      cell: (info) => (
-        <input value={info.getValue()} style={{ minWidth: '80px', marginTop: '10px', marginRight: '5px' }} disabled />
-      ),
+      cell: (info) => <input value={info.getValue()} style={{ width: '100%' }} readOnly />,
       header: () => 'Status',
-      meta: { customCss: { minWidth: '80px', width: '80px' } },
+      meta: { customCss: { width: '10%' } },
     }),
     columnHelper.accessor('active', {
       id: 'active',
@@ -109,11 +96,11 @@ const SearchDataTable: React.FC<SearchDataTableProps> = ({ searchTerm, setSelect
           name="activeSelection"
           checked={info.row.original.dtid === selectedDocument?.dtid}
           onChange={() => activeRadioHandler(info.row.original.dtid, info.row.original.variant_name)}
-          style={{ minWidth: '40px', marginTop: '10px' }}
+          style={{ width: '100%' }}
         />
       ),
       header: () => '',
-      meta: { customCss: { minWidth: '40px', width: '40px' } },
+      meta: { customCss: { width: '5%' } },
     }),
     columnHelper.accessor('nfr_id', {
       id: 'nfr_id',

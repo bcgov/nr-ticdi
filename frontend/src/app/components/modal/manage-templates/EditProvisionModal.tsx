@@ -20,6 +20,8 @@ const EditProvisionModal: FC<EditProvisionModalProps> = ({ provision, variables,
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [showError, setShowError] = useState(false);
+  const [allVariables, setAllVariables] = useState<Variable[] | undefined>(variables);
+  const [currentProvision, setCurrentProvision] = useState<Provision | undefined>(provision);
   const [currentVariable, setCurrentVariable] = useState<Variable>();
 
   const [displayEditProvision, setDisplayEditProvision] = useState(true);
@@ -68,6 +70,10 @@ const EditProvisionModal: FC<EditProvisionModalProps> = ({ provision, variables,
           provision_id: provision.id,
         };
         await addVariable(variableUpload);
+        // if (allVariables && provision) {
+        //   const newVariables = [...allVariables, {variable_name, variable_value, help_text, provision_id: provision.id}];
+        //   setAllVariables(newVariables);
+        // }
         returnToEditProvision();
       }
     } catch (err) {

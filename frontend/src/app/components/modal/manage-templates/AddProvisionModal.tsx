@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { GroupMax, ProvisionUpload } from '../../../types/types';
 import { Button, Col, Form, Modal, Row, Spinner } from 'react-bootstrap';
 
@@ -7,20 +7,40 @@ interface AddProvisionModalProps {
   show: boolean;
   addProvisionHandler: (provision: ProvisionUpload) => void;
   onHide: () => void;
+  refreshTables: () => void;
 }
 
-const AddProvisionModal: React.FC<AddProvisionModalProps> = ({ groupMaxArray, show, addProvisionHandler, onHide }) => {
+const AddProvisionModal: React.FC<AddProvisionModalProps> = ({
+  groupMaxArray,
+  show,
+  addProvisionHandler,
+  onHide,
+  refreshTables,
+}) => {
   const [loading, setLoading] = useState<boolean>(false);
   const [type, setType] = useState<string>('M');
   const [group, setGroup] = useState<number>(1);
   const [groupDescription, setGroupDescription] = useState<string>('');
-  const [max, setMax] = useState<number | null>();
-  const [maxToggle, setMaxToggle] = useState<boolean>(false);
+  const [max, setMax] = useState<number | null>(null);
+  const [maxInputValue, setMaxInputValue] = useState<string>('');
+  const [isMaxUnlimited, setIsMaxUnlimited] = useState<boolean>(false);
   const [provisionName, setProvisionName] = useState<string>('');
   const [freeText, setFreeText] = useState<string>('');
   const [helpText, setHelpText] = useState<string>('');
   const [category, setCategory] = useState<string>('');
   const [variants, setVariants] = useState<number[]>([]);
+
+  useEffect(() => {
+    setIsMaxUnlimited(max ? max >= 999 : false);
+  }, [max]);
+
+  useEffect(() => {
+    if (isMaxUnlimited) {
+      setMaxInputValue('');
+    } else {
+      setMaxInputValue(max !== null && max !== 999 ? max.toString() : '');
+    }
+  }, [max, isMaxUnlimited]);
 
   const handleTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setType(e.target.value);
@@ -30,8 +50,16 @@ const AddProvisionModal: React.FC<AddProvisionModalProps> = ({ groupMaxArray, sh
     const newGroup = parseInt(e.target.value);
     setGroup(newGroup);
     const newGroupMax: GroupMax | undefined = groupMaxArray?.find((gm) => gm.provision_group === newGroup);
-    if (newGroupMax) setMax(newGroupMax.max);
-    else setMax(null);
+    if (newGroupMax) {
+      setMax(newGroupMax.max);
+      if (newGroupMax.max >= 999) {
+        setIsMaxUnlimited(true);
+      }
+      setGroupDescription(newGroupMax.provision_group_text);
+    } else {
+      setMax(null);
+      setGroupDescription('');
+    }
   };
 
   const handleGroupDescriptionChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -39,11 +67,23 @@ const AddProvisionModal: React.FC<AddProvisionModalProps> = ({ groupMaxArray, sh
   };
 
   const handleMaxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setMax(parseInt(e.target.value));
+    const value = e.target.value;
+    setMaxInputValue(value);
+    const newMax = parseInt(value);
+    if (!isNaN(newMax)) {
+      setMax(newMax);
+    } else {
+      setMax(null);
+    }
   };
 
   const handleMaxToggle = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setMaxToggle(e.target.checked);
+    setIsMaxUnlimited(e.target.checked);
+    if (e.target.checked) {
+      setMax(999);
+    } else {
+      setMax(null);
+    }
   };
 
   const handleProvisionNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -72,28 +112,48 @@ const AddProvisionModal: React.FC<AddProvisionModalProps> = ({ groupMaxArray, sh
   };
 
   const handleSaveButton = () => {
-    if (max) {
-      const trueMax = maxToggle ? 999 : max;
-      const provisionUpload: ProvisionUpload = {
-        type: type,
-        provision_group: group,
-        provision_group_text: groupDescription,
-        max: trueMax,
-        provision_name: provisionName,
-        free_text: freeText,
-        help_text: helpText,
-        category: category,
-        variants: variants,
-      };
-      console.log(provisionUpload);
-      addProvisionHandler(provisionUpload);
+    try {
+      setLoading(true);
+      if (max) {
+        const trueMax = isMaxUnlimited ? 999 : max;
+        const provisionUpload: ProvisionUpload = {
+          type: type,
+          provision_group: group,
+          provision_group_text: groupDescription,
+          max: trueMax,
+          provision_name: provisionName,
+          free_text: freeText,
+          help_text: helpText,
+          category: category,
+          variants: variants,
+        };
+        addProvisionHandler(provisionUpload);
+        refreshTables();
+      }
+    } catch (err) {
+      console.log('Error adding provision');
+      console.log(err);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <Modal show={show} onHide={onHide} size="lg">
-      <Modal.Header closeButton>
-        <Modal.Title>Edit Provision</Modal.Title>
+      <Modal.Header>
+        <Modal.Title>Add Provision</Modal.Title>
+        <Button
+          variant="none"
+          onClick={onHide}
+          style={{
+            marginLeft: 'auto',
+            border: 'none',
+            backgroundColor: 'transparent',
+            color: 'black',
+          }}
+        >
+          &times;
+        </Button>
       </Modal.Header>
       <Modal.Body>
         <Form>
@@ -124,7 +184,12 @@ const AddProvisionModal: React.FC<AddProvisionModalProps> = ({ groupMaxArray, sh
               Group Description
             </Form.Label>
             <Col sm="12">
-              <Form.Control type="text" name="provision_group_text" onChange={handleGroupDescriptionChange} />
+              <Form.Control
+                type="text"
+                name="provision_group_text"
+                value={groupDescription}
+                onChange={handleGroupDescriptionChange}
+              />
             </Col>
           </Form.Group>
 
@@ -133,7 +198,13 @@ const AddProvisionModal: React.FC<AddProvisionModalProps> = ({ groupMaxArray, sh
               Max
             </Form.Label>
             <Col sm="12">
-              <Form.Control type="number" name="max" onChange={handleMaxChange} disabled={maxToggle} />
+              <Form.Control
+                type="number"
+                name="max"
+                value={maxInputValue}
+                onChange={handleMaxChange}
+                disabled={isMaxUnlimited}
+              />
             </Col>
           </Form.Group>
 
@@ -142,7 +213,7 @@ const AddProvisionModal: React.FC<AddProvisionModalProps> = ({ groupMaxArray, sh
               <FormLabelWithPeriods text="No Maximum?" />
             </Col>
             <Col sm={{ span: 4 }}>
-              <Form.Check name="max_unlimited" onChange={handleMaxToggle} />
+              <Form.Check name="max_unlimited" checked={isMaxUnlimited} onChange={handleMaxToggle} />
             </Col>
           </Form.Group>
 

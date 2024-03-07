@@ -3,14 +3,14 @@ import { useParams } from 'react-router';
 import { NFR_REPORT_PAGES, REPORT_TYPES } from '../../util/constants';
 import Collapsible from '../../components/common/Collapsible';
 import TemplateInfoTable from '../../components/table/manage-templates/TemplateInfoTable';
-import Button from '../../components/common/Button';
 import AddProvisionModal from '../../components/modal/manage-templates/AddProvisionModal';
 import UploadTemplateModal from '../../components/modal/manage-templates/UploadTemplateModal';
 import RemoveTemplateModal from '../../components/modal/manage-templates/RemoveTemplateModal';
 import ManageProvisionsTable from '../../components/table/manage-templates/ManageProvisionsTable';
 import { GroupMax, Provision, ProvisionUpload, Variable } from '../../types/types';
 import EditProvisionModal from '../../components/modal/manage-templates/EditProvisionModal';
-import { addProvision, getGroupMax, updateProvision } from '../../common/manage-templates';
+import { addProvision, getGroupMax, getProvisions, getVariables, updateProvision } from '../../common/manage-templates';
+import { Button } from 'react-bootstrap';
 
 export interface ManageTemplatesPageProps {}
 
@@ -24,6 +24,8 @@ const ManageTemplatesPage: FC<ManageTemplatesPageProps> = () => {
   const [currentProvision, setCurrentProvision] = useState<Provision>();
   const [currentVariables, setCurrentVariables] = useState<Variable[]>();
   const [groupMaxArray, setGroupMaxArray] = useState<GroupMax[]>();
+  const [allProvisions, setAllProvisions] = useState<Provision[]>();
+  const [allVariables, setAllVariables] = useState<Variable[]>();
   const [refreshTrigger, setRefreshTrigger] = useState(0);
   const { id } = useParams<{ id: string }>();
   let idNum: number;
@@ -34,11 +36,23 @@ const ManageTemplatesPage: FC<ManageTemplatesPageProps> = () => {
 
   useEffect(() => {
     const getData = async () => {
-      const fetchedGroupMaxArray = await getGroupMax();
+      const fetchedGroupMaxArray: GroupMax[] = await getGroupMax();
       setGroupMaxArray(fetchedGroupMaxArray);
+      const provisionData: Provision[] = await getProvisions();
+      setAllProvisions(provisionData);
+      const variablesData: Variable[] = await getVariables();
+      setAllVariables(variablesData);
+      if (currentProvision && currentVariables) {
+        const updatedProvision: Provision | undefined = provisionData.find((p) => p.id === currentProvision.id);
+        if (updatedProvision) setCurrentProvision(updatedProvision);
+        const updatedVariables: Variable[] | undefined = variablesData.filter(
+          (v) => v.provision_id === currentProvision.id
+        );
+        setCurrentVariables(updatedVariables);
+      }
     };
     getData();
-  }, []);
+  }, [refreshTrigger]);
 
   const openUploadModal = (report: string) => {
     setCurrentReportType(report);
@@ -81,11 +95,9 @@ const ManageTemplatesPage: FC<ManageTemplatesPageProps> = () => {
               refreshVersion={refreshTrigger}
               handleRemove={openRemoveTemplateModal}
             />
-            <Button
-              type="btn-success"
-              onClick={() => openUploadModal(NFR_REPORT_PAGES.NFR_DEFAULT)}
-              text="Upload New Version"
-            />
+            <Button variant="success" onClick={() => openUploadModal(NFR_REPORT_PAGES.NFR_DEFAULT)}>
+              Upload New Version
+            </Button>
           </Collapsible>
           <Collapsible title={NFR_REPORT_PAGES.NFR_DELAYED}>
             <TemplateInfoTable
@@ -93,11 +105,9 @@ const ManageTemplatesPage: FC<ManageTemplatesPageProps> = () => {
               refreshVersion={refreshTrigger}
               handleRemove={openRemoveTemplateModal}
             />
-            <Button
-              type="btn-success"
-              onClick={() => openUploadModal(NFR_REPORT_PAGES.NFR_DELAYED)}
-              text="Upload New Version"
-            />
+            <Button variant="success" onClick={() => openUploadModal(NFR_REPORT_PAGES.NFR_DELAYED)}>
+              Upload New Version
+            </Button>
           </Collapsible>
           <Collapsible title={NFR_REPORT_PAGES.NFR_NO_FEES}>
             <TemplateInfoTable
@@ -105,11 +115,9 @@ const ManageTemplatesPage: FC<ManageTemplatesPageProps> = () => {
               refreshVersion={refreshTrigger}
               handleRemove={openRemoveTemplateModal}
             />
-            <Button
-              type="btn-success"
-              onClick={() => openUploadModal(NFR_REPORT_PAGES.NFR_NO_FEES)}
-              text="Upload New Version"
-            />
+            <Button variant="success" onClick={() => openUploadModal(NFR_REPORT_PAGES.NFR_NO_FEES)}>
+              Upload New Version
+            </Button>
           </Collapsible>
           <Collapsible title={NFR_REPORT_PAGES.NFR_SURVEY_REQ}>
             <TemplateInfoTable
@@ -117,11 +125,9 @@ const ManageTemplatesPage: FC<ManageTemplatesPageProps> = () => {
               refreshVersion={refreshTrigger}
               handleRemove={openRemoveTemplateModal}
             />
-            <Button
-              type="btn-success"
-              onClick={() => openUploadModal(NFR_REPORT_PAGES.NFR_SURVEY_REQ)}
-              text="Upload New Version"
-            />
+            <Button variant="success" onClick={() => openUploadModal(NFR_REPORT_PAGES.NFR_SURVEY_REQ)}>
+              Upload New Version
+            </Button>
           </Collapsible>
           <Collapsible title={NFR_REPORT_PAGES.NFR_TO_OBTAIN}>
             <TemplateInfoTable
@@ -129,14 +135,19 @@ const ManageTemplatesPage: FC<ManageTemplatesPageProps> = () => {
               refreshVersion={refreshTrigger}
               handleRemove={openRemoveTemplateModal}
             />
-            <Button
-              type="btn-success"
-              onClick={() => openUploadModal(NFR_REPORT_PAGES.NFR_TO_OBTAIN)}
-              text="Upload New Version"
-            />
+            <Button variant="success" onClick={() => openUploadModal(NFR_REPORT_PAGES.NFR_TO_OBTAIN)}>
+              Upload New Version
+            </Button>
           </Collapsible>
           <Collapsible title="Manage NFR Provisions">
-            <ManageProvisionsTable refreshVersion={refreshTrigger} editProvisionHandler={openEditProvisionModal} />
+            <ManageProvisionsTable
+              provisions={allProvisions}
+              variables={allVariables}
+              editProvisionHandler={openEditProvisionModal}
+            />
+            <Button variant="success" onClick={() => setShowAddProvisionModal(true)}>
+              Add a Provision
+            </Button>
           </Collapsible>
         </>
       ) : (
@@ -146,7 +157,9 @@ const ManageTemplatesPage: FC<ManageTemplatesPageProps> = () => {
             refreshVersion={refreshTrigger}
             handleRemove={openRemoveTemplateModal}
           />
-          <Button type="btn-success" onClick={() => openUploadModal(reportType)} text="Upload New Version" />
+          <Button variant="success" onClick={() => openUploadModal(reportType)}>
+            Upload New Version
+          </Button>
         </Collapsible>
       )}
       <UploadTemplateModal
@@ -169,12 +182,14 @@ const ManageTemplatesPage: FC<ManageTemplatesPageProps> = () => {
         show={showEditProvisionModal}
         onHide={() => setShowEditProvisionModal(false)}
         updateProvisionHandler={updateProvisionHandler}
+        refreshTables={refreshTables}
       />
       <AddProvisionModal
         groupMaxArray={groupMaxArray}
         show={showAddProvisionModal}
         onHide={() => setShowAddProvisionModal(false)}
         addProvisionHandler={addProvisionHandler}
+        refreshTables={refreshTables}
       />
     </>
   );

@@ -55,7 +55,7 @@ const VariablesTable: React.FC<VariablesTableProps> = React.memo(({ variables, u
   const columns: ColumnDef<VariableData, any>[] = [
     columnHelper.accessor('variable_name', {
       id: 'variable_name',
-      cell: (info) => <input value={info.getValue()} style={{ width: '100%' }} title={info.getValue()} readOnly />,
+      cell: (info) => <input value={info.getValue()} className="readonlyInput" title={info.getValue()} readOnly />,
       header: () => 'Variable',
       meta: { customCss: { width: '28%' } },
     }),
@@ -69,7 +69,7 @@ const VariablesTable: React.FC<VariablesTableProps> = React.memo(({ variables, u
     }),
     columnHelper.accessor('help_text', {
       id: 'help_text',
-      cell: (info) => <input value={info.getValue()} style={{ width: '100%' }} title={info.getValue()} readOnly />,
+      cell: (info) => <input value={info.getValue()} className="readonlyInput" title={info.getValue()} readOnly />,
       header: () => 'Help',
       meta: { customCss: { width: '36%' } },
     }),

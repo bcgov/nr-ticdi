@@ -2,8 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { DataTable } from '../common/DataTable';
 import { ColumnDef, createColumnHelper } from '@tanstack/react-table';
 import { activateTemplate, downloadTemplate, getTemplatesInfo } from '../../../common/manage-templates';
-import Button from '../../common/Button';
 import { TemplateInfo } from '../../../types/types';
+import { Button } from 'react-bootstrap';
 
 interface TemplateInfoTableProps {
   reportType: string;
@@ -65,19 +65,19 @@ const TemplateInfoTable: React.FC<TemplateInfoTableProps> = ({ reportType, refre
   const columns: ColumnDef<TemplateInfo, any>[] = [
     columnHelper.accessor('template_version', {
       id: 'template_version',
-      cell: (info) => <input value={info.getValue()} style={{ width: '100%' }} readOnly />,
+      cell: (info) => <input value={info.getValue()} className="readonlyInput" readOnly />,
       header: () => 'Doc No.',
       meta: { customCss: { width: '5%' } },
     }),
     columnHelper.accessor('file_name', {
       id: 'file_name',
-      cell: (info) => <input value={info.getValue()} style={{ width: '100%' }} readOnly />,
+      cell: (info) => <input value={info.getValue()} className="readonlyInput" readOnly />,
       header: () => 'Template Name',
       meta: { customCss: { width: '50%' } },
     }),
     columnHelper.accessor('update_timestamp', {
       id: 'update_timestamp',
-      cell: (info) => <input value={info.getValue()} style={{ width: '100%' }} readOnly />,
+      cell: (info) => <input value={info.getValue()} className="readonlyInput" readOnly />,
       header: () => 'Uploaded Date',
       meta: { customCss: { width: '15%' } },
     }),
@@ -100,10 +100,11 @@ const TemplateInfoTable: React.FC<TemplateInfoTableProps> = ({ reportType, refre
       id: 'view',
       cell: (info) => (
         <Button
-          type="btn-info"
+          variant="info"
           onClick={() => handleDownloadTemplate(info.row.original.id, info.row.original.file_name)}
-          text="View"
-        ></Button>
+        >
+          View
+        </Button>
       ),
       header: () => null,
       meta: { customCss: { width: '7%' } },
@@ -111,7 +112,9 @@ const TemplateInfoTable: React.FC<TemplateInfoTableProps> = ({ reportType, refre
     columnHelper.accessor('remove', {
       id: 'remove',
       cell: (info) => (
-        <Button type="btn-warning" onClick={() => handleRemoveButton(info.row.original.id)} text="Remove"></Button>
+        <Button variant="warning" onClick={() => handleRemoveButton(info.row.original.id)}>
+          Remove
+        </Button>
       ),
       header: () => null,
       meta: { customCss: { width: '15%' } },

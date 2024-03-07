@@ -76,19 +76,19 @@ const ProvisionsTable: React.FC<ProvisionsTableProps> = ({
   const columns: ColumnDef<ProvisionData, any>[] = [
     columnHelper.accessor('type', {
       id: 'type',
-      cell: (info) => <input value={info.getValue()} style={{ width: '100%' }} readOnly />,
+      cell: (info) => <input value={info.getValue()} className="readonlyInput" readOnly />,
       header: () => 'Type',
       meta: { customCss: { width: '5%' } },
     }),
     columnHelper.accessor('provision_name', {
       id: 'provision_name',
-      cell: (info) => <input value={info.getValue()} style={{ width: '100%' }} readOnly />,
+      cell: (info) => <input value={info.getValue()} className="readonlyInput" readOnly />,
       header: () => 'Provision',
       meta: { customCss: { width: '45%' } },
     }),
     columnHelper.accessor('help_text', {
       id: 'help_text',
-      cell: (info) => <input value={info.getValue()} style={{ width: '100%' }} title={info.getValue()} readOnly />,
+      cell: (info) => <input value={info.getValue()} className="readonlyInput" title={info.getValue()} readOnly />,
       header: () => 'Help',
       meta: { customCss: { width: '45%' } },
     }),

@@ -36,8 +36,20 @@ const RemoveTemplateModal: FC<RemoveTemplateModalProps> = ({ templateId, reportT
 
   return (
     <Modal show={show} onHide={onHide} size="lg">
-      <Modal.Header closeButton>
+      <Modal.Header>
         <Modal.Title>Remove Administrator</Modal.Title>
+        <Button
+          variant="none"
+          onClick={onHide}
+          style={{
+            marginLeft: 'auto',
+            border: 'none',
+            backgroundColor: 'transparent',
+            color: 'black',
+          }}
+        >
+          &times;
+        </Button>
       </Modal.Header>
       <Modal.Body>
         <p>Are you sure you would like to remove this template?</p>

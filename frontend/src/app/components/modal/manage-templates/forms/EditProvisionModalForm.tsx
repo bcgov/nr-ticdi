@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import { GroupMax, Provision, ProvisionUpload, Variable } from '../../../../types/types';
-import { getGroupMax } from '../../../../common/manage-templates';
 import { Button, Col, Form, Modal, Row, Spinner } from 'react-bootstrap';
 import ManageVariablesTable from '../../../table/manage-templates/ManageVariablesTable';
 
@@ -31,7 +30,8 @@ const EditProvisionModalForm: React.FC<EditProvisionModalFormProps> = ({
   const [group, setGroup] = useState<number | null>(null);
   const [groupDescription, setGroupDescription] = useState<string>('');
   const [max, setMax] = useState<number | null>(null);
-  const [maxToggle, setMaxToggle] = useState<boolean>(false);
+  const [maxInputValue, setMaxInputValue] = useState<string>('');
+  const [isMaxUnlimited, setIsMaxUnlimited] = useState<boolean>(false);
   const [provisionName, setProvisionName] = useState<string>('');
   const [freeText, setFreeText] = useState<string>('');
   const [helpText, setHelpText] = useState<string>('');
@@ -51,13 +51,23 @@ const EditProvisionModalForm: React.FC<EditProvisionModalFormProps> = ({
         setHelpText(provision.help_text);
         setCategory(provision.category);
         setVariants(provision.variants);
-        setMaxToggle(provision.max ? provision.max >= 999 : false);
-        console.log(maxToggle);
       }
     };
 
     getData();
   }, [provision, groupMaxArray]);
+
+  useEffect(() => {
+    setIsMaxUnlimited(max ? max >= 999 : false);
+  }, [max]);
+
+  useEffect(() => {
+    if (isMaxUnlimited) {
+      setMaxInputValue('');
+    } else {
+      setMaxInputValue(max !== null && max !== 999 ? max.toString() : '');
+    }
+  }, [max, isMaxUnlimited]);
 
   const handleTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setType(e.target.value);
@@ -67,8 +77,16 @@ const EditProvisionModalForm: React.FC<EditProvisionModalFormProps> = ({
     const newGroup = parseInt(e.target.value);
     setGroup(newGroup);
     const newGroupMax: GroupMax | undefined = groupMaxArray?.find((gm) => gm.provision_group === newGroup);
-    if (newGroupMax) setMax(newGroupMax.max);
-    else setMax(null);
+    if (newGroupMax) {
+      setMax(newGroupMax.max);
+      if (newGroupMax.max >= 999) {
+        setIsMaxUnlimited(true);
+      }
+      setGroupDescription(newGroupMax.provision_group_text);
+    } else {
+      setMax(null);
+      setGroupDescription('');
+    }
   };
 
   const handleGroupDescriptionChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -76,12 +94,23 @@ const EditProvisionModalForm: React.FC<EditProvisionModalFormProps> = ({
   };
 
   const handleMaxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newMax = parseInt(e.target.value);
-    setMax(newMax);
+    const value = e.target.value;
+    setMaxInputValue(value);
+    const newMax = parseInt(value);
+    if (!isNaN(newMax)) {
+      setMax(newMax);
+    } else {
+      setMax(null);
+    }
   };
 
   const handleMaxToggle = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setMaxToggle(e.target.checked);
+    setIsMaxUnlimited(e.target.checked);
+    if (e.target.checked) {
+      setMax(999);
+    } else {
+      setMax(null);
+    }
   };
 
   const handleProvisionNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -111,7 +140,7 @@ const EditProvisionModalForm: React.FC<EditProvisionModalFormProps> = ({
 
   const handleSaveButton = () => {
     if (provision && max) {
-      const trueMax = maxToggle ? 999 : max;
+      const trueMax = isMaxUnlimited ? 999 : max;
       const provisionUpload: ProvisionUpload = {
         type: type,
         provision_group: group ? group : 1,
@@ -186,10 +215,10 @@ const EditProvisionModalForm: React.FC<EditProvisionModalFormProps> = ({
             <Col sm="12">
               <Form.Control
                 type="number"
-                defaultValue={max ? (max !== 999 ? max : '') : ''}
+                value={maxInputValue}
                 name="max"
                 onChange={handleMaxChange}
-                disabled={maxToggle}
+                disabled={isMaxUnlimited}
               />
             </Col>
           </Form.Group>
@@ -199,7 +228,7 @@ const EditProvisionModalForm: React.FC<EditProvisionModalFormProps> = ({
               <FormLabelWithPeriods text="No Maximum?" />
             </Col>
             <Col sm={{ span: 4 }}>
-              <Form.Check name="max_unlimited" defaultChecked={max ? max === 999 : false} onChange={handleMaxToggle} />
+              <Form.Check name="max_unlimited" checked={isMaxUnlimited} onChange={handleMaxToggle} />
             </Col>
           </Form.Group>
 

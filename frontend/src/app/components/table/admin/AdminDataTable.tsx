@@ -58,19 +58,19 @@ const AdminDataTable: React.FC<AdminDataTableProps> = ({ searchTerm, removeAdmin
   const columns: ColumnDef<AdminData, any>[] = [
     columnHelper.accessor('name', {
       id: 'name',
-      cell: (info) => <input value={info.getValue()} style={{ width: '100%' }} readOnly />,
+      cell: (info) => <input value={info.getValue()} className="readonlyInput" readOnly />,
       header: () => 'Name',
       meta: { customCss: { width: '30%' } },
     }),
     columnHelper.accessor('username', {
       id: 'username',
-      cell: (info) => <input value={info.getValue()} style={{ width: '100%' }} readOnly />,
+      cell: (info) => <input value={info.getValue()} className="readonlyInput" readOnly />,
       header: () => 'User Name',
       meta: { customCss: { width: '30%' } },
     }),
     columnHelper.accessor('email', {
       id: 'email',
-      cell: (info) => <input value={info.getValue()} style={{ width: '100%' }} readOnly />,
+      cell: (info) => <input value={info.getValue()} className="readonlyInput" readOnly />,
       header: () => 'Email',
       meta: { customCss: { width: '30%' } },
     }),

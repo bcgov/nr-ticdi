@@ -60,31 +60,31 @@ const SearchDataTable: React.FC<SearchDataTableProps> = ({ searchTerm, setSelect
   const columns: ColumnDef<SearchData, any>[] = [
     columnHelper.accessor('dtid', {
       id: 'dtid',
-      cell: (info) => <input value={info.getValue()} style={{ width: '100%' }} readOnly />,
+      cell: (info) => <input value={info.getValue()} className="readonlyInput" readOnly />,
       header: () => 'DTID',
       meta: { customCss: { width: '10%' } },
     }),
     columnHelper.accessor('version', {
       id: 'version',
-      cell: (info) => <input value={info.getValue()} style={{ width: '100%' }} readOnly />,
+      cell: (info) => <input value={info.getValue()} className="readonlyInput" readOnly />,
       header: () => 'Version',
       meta: { customCss: { width: '10%' } },
     }),
     columnHelper.accessor('file_name', {
       id: 'file_name',
-      cell: (info) => <input value={info.getValue()} style={{ width: '100%' }} readOnly />,
+      cell: (info) => <input value={info.getValue()} className="readonlyInput" readOnly />,
       header: () => 'Template Name',
       meta: { customCss: { width: '50%' } },
     }),
     columnHelper.accessor('updated_date', {
       id: 'updated_date',
-      cell: (info) => <input value={info.getValue()} style={{ width: '100%' }} readOnly />,
+      cell: (info) => <input value={info.getValue()} className="readonlyInput" readOnly />,
       header: () => 'Uploaded Date',
       meta: { customCss: { width: '15%' } },
     }),
     columnHelper.accessor('status', {
       id: 'status',
-      cell: (info) => <input value={info.getValue()} style={{ width: '100%' }} readOnly />,
+      cell: (info) => <input value={info.getValue()} className="readonlyInput" readOnly />,
       header: () => 'Status',
       meta: { customCss: { width: '10%' } },
     }),

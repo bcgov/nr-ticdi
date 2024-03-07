@@ -3,11 +3,12 @@ import { Button, Col, Form, Modal, Spinner } from 'react-bootstrap';
 
 interface AddVariableModalFormProps {
   loading: boolean;
+  onHide: () => void;
   onBack: () => void;
   onSave: (variable_name: string, variable_value: string, help_text: string) => void;
 }
 
-const AddVariableModalForm: React.FC<AddVariableModalFormProps> = ({ loading, onBack, onSave }) => {
+const AddVariableModalForm: React.FC<AddVariableModalFormProps> = ({ loading, onHide, onBack, onSave }) => {
   const [variableName, setVariableName] = useState<string>('');
   const [variableValue, setVariableValue] = useState<string>('');
   const [helpText, setHelpText] = useState<string>('');
@@ -30,8 +31,20 @@ const AddVariableModalForm: React.FC<AddVariableModalFormProps> = ({ loading, on
 
   return (
     <>
-      <Modal.Header closeButton>
-        <Modal.Title>Edit Provision</Modal.Title>
+      <Modal.Header>
+        <Modal.Title>Add Variable</Modal.Title>
+        <Button
+          variant="none"
+          onClick={onHide}
+          style={{
+            marginLeft: 'auto',
+            border: 'none',
+            backgroundColor: 'transparent',
+            color: 'black',
+          }}
+        >
+          &times;
+        </Button>
       </Modal.Header>
       <Modal.Body>
         <Form>
@@ -63,7 +76,7 @@ const AddVariableModalForm: React.FC<AddVariableModalFormProps> = ({ loading, on
       </Modal.Body>
       <Modal.Footer>
         <Button variant="secondary" onClick={onBack}>
-          Cancel
+          Go back
         </Button>
 
         <Button variant="primary" onClick={handleSaveButton} disabled={loading}>

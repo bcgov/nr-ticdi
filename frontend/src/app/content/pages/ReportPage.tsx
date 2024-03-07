@@ -2,7 +2,6 @@ import { FC, useCallback, useEffect, useState } from 'react';
 import Collapsible from '../../../app/components/common/Collapsible';
 import { DTRDisplayObject } from '../../../app/types/types';
 import TenureDetails from '../display/TenureDetails';
-import Button from '../../../app/components/common/Button';
 import AreaDetails from '../display/AreaDetails';
 import DtidDetails from '../display/DtidDetails';
 import {
@@ -22,6 +21,7 @@ import Provisions, { ProvisionData } from '../display/Provisions';
 import Variables from '../display/Variables';
 import { ProvisionJson, SaveProvisionData } from '../../components/table/reports/SelectedProvisionsTable';
 import { SaveVariableData, VariableJson } from '../../components/table/reports/VariablesTable';
+import { Button } from 'react-bootstrap';
 
 export interface ReportPageProps {
   documentDescription: string;
@@ -221,11 +221,17 @@ const ReportPage: FC<ReportPageProps> = ({ documentDescription }) => {
       <div style={{ display: 'flex', gap: '10px' }}>
         {showNfr ? (
           <>
-            <Button text="Save for later" onClick={handleNfrSave} type={'btn-success'} disabled={loading} />
-            <Button text="Create" onClick={handleNfrGenerate} disabled={loading} />
+            <Button onClick={handleNfrSave} variant="success" disabled={loading}>
+              Save for later
+            </Button>
+            <Button onClick={handleNfrGenerate} disabled={loading}>
+              Create
+            </Button>
           </>
         ) : (
-          <Button text="Create" onClick={generateReportHandler} disabled={loading} />
+          <Button onClick={generateReportHandler} disabled={loading}>
+            Create
+          </Button>
         )}
       </div>
     </>

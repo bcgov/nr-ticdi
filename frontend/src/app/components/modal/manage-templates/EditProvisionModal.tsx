@@ -6,6 +6,7 @@ import EditProvisionModalForm from './forms/EditProvisionModalForm';
 import AddVariableModalForm from './forms/AddVariableModalForm';
 import EditVariableModalForm from './forms/EditVariableModalForm';
 import RemoveVariableModalForm from './forms/RemoveVariableModalForm';
+import { Button } from 'react-bootstrap';
 
 type EditProvisionModalProps = {
   provision: Provision | undefined;
@@ -14,9 +15,17 @@ type EditProvisionModalProps = {
   show: boolean;
   onHide: () => void;
   updateProvisionHandler: (provision: ProvisionUpload, provisionId: number) => void;
+  refreshTables: () => void;
 };
 
-const EditProvisionModal: FC<EditProvisionModalProps> = ({ provision, variables, groupMaxArray, show, onHide }) => {
+const EditProvisionModal: FC<EditProvisionModalProps> = ({
+  provision,
+  variables,
+  groupMaxArray,
+  show,
+  onHide,
+  refreshTables,
+}) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [showError, setShowError] = useState(false);
@@ -74,6 +83,7 @@ const EditProvisionModal: FC<EditProvisionModalProps> = ({ provision, variables,
         //   const newVariables = [...allVariables, {variable_name, variable_value, help_text, provision_id: provision.id}];
         //   setAllVariables(newVariables);
         // }
+        refreshTables();
         returnToEditProvision();
       }
     } catch (err) {
@@ -91,6 +101,7 @@ const EditProvisionModal: FC<EditProvisionModalProps> = ({ provision, variables,
       setLoading(true);
       await updateProvision({ ...provisionUpload, id });
       onHide();
+      refreshTables();
     } catch (err) {
       console.log('Error updating provision');
       console.log(err);
@@ -105,6 +116,7 @@ const EditProvisionModal: FC<EditProvisionModalProps> = ({ provision, variables,
     try {
       setLoading(true);
       await updateVariable({ ...variableUpload, id });
+      refreshTables();
       returnToEditProvision();
     } catch (err) {
       console.log('Error updating variable');
@@ -120,6 +132,7 @@ const EditProvisionModal: FC<EditProvisionModalProps> = ({ provision, variables,
     try {
       setLoading(true);
       await removeVariable(variableId);
+      refreshTables();
       returnToEditProvision();
     } catch (err) {
       console.log('Error removing variable');
@@ -149,12 +162,18 @@ const EditProvisionModal: FC<EditProvisionModalProps> = ({ provision, variables,
         </>
       )}
       {displayAddVariable && (
-        <AddVariableModalForm loading={loading} onBack={returnToEditProvision} onSave={handleAddVariable} />
+        <AddVariableModalForm
+          loading={loading}
+          onHide={onHide}
+          onBack={returnToEditProvision}
+          onSave={handleAddVariable}
+        />
       )}
       {displayEditVariable && (
         <EditVariableModalForm
           variable={currentVariable}
           loading={loading}
+          onHide={onHide}
           onBack={returnToEditProvision}
           onSave={handleUpdateVariable}
         />
@@ -163,6 +182,7 @@ const EditProvisionModal: FC<EditProvisionModalProps> = ({ provision, variables,
         <RemoveVariableModalForm
           variable={currentVariable}
           loading={loading}
+          onHide={onHide}
           onBack={returnToEditProvision}
           onRemove={handleRemoveVariable}
         />

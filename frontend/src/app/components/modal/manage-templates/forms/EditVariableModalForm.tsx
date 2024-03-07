@@ -5,11 +5,12 @@ import { Variable, VariableUpload } from '../../../../types/types';
 interface EditVariableModalFormProps {
   variable: Variable | undefined;
   loading: boolean;
+  onHide: () => void;
   onBack: () => void;
   onSave: (variableUpload: VariableUpload, id: number) => void;
 }
 
-const EditVariableModalForm: React.FC<EditVariableModalFormProps> = ({ variable, loading, onBack, onSave }) => {
+const EditVariableModalForm: React.FC<EditVariableModalFormProps> = ({ variable, loading, onHide, onBack, onSave }) => {
   const [variableName, setVariableName] = useState<string>('');
   const [variableValue, setVariableValue] = useState<string>('');
   const [helpText, setHelpText] = useState<string>('');
@@ -50,8 +51,20 @@ const EditVariableModalForm: React.FC<EditVariableModalFormProps> = ({ variable,
 
   return (
     <>
-      <Modal.Header closeButton>
-        <Modal.Title>Edit Provision</Modal.Title>
+      <Modal.Header>
+        <Modal.Title>Edit Variable</Modal.Title>
+        <Button
+          variant="none"
+          onClick={onHide}
+          style={{
+            marginLeft: 'auto',
+            border: 'none',
+            backgroundColor: 'transparent',
+            color: 'black',
+          }}
+        >
+          &times;
+        </Button>
       </Modal.Header>
       <Modal.Body>
         <Form>
@@ -83,7 +96,7 @@ const EditVariableModalForm: React.FC<EditVariableModalFormProps> = ({ variable,
       </Modal.Body>
       <Modal.Footer>
         <Button variant="secondary" onClick={onBack}>
-          Cancel
+          Go back
         </Button>
 
         <Button variant="primary" onClick={handleSaveButton} disabled={loading || !variable}>

@@ -1,7 +1,7 @@
 import { FC, useState } from 'react';
 import Modal from 'react-bootstrap/Modal';
 import { uploadTemplate } from '../../../common/manage-templates';
-import Button from '../../common/Button';
+import { Button } from 'react-bootstrap';
 
 type UploadTemplateModalProps = {
   show: boolean;
@@ -54,8 +54,20 @@ const UploadTemplateModal: FC<UploadTemplateModalProps> = ({ show, onHide, repor
 
   return (
     <Modal show={show} onHide={onHide} size="lg">
-      <Modal.Header closeButton>
+      <Modal.Header>
         <Modal.Title>Upload Template: {reportType}</Modal.Title>
+        <Button
+          variant="none"
+          onClick={onHide}
+          style={{
+            marginLeft: 'auto',
+            border: 'none',
+            backgroundColor: 'transparent',
+            color: 'black',
+          }}
+        >
+          &times;
+        </Button>
       </Modal.Header>
       <Modal.Body>
         <div style={{ margin: '10px' }}>
@@ -75,8 +87,12 @@ const UploadTemplateModal: FC<UploadTemplateModalProps> = ({ show, onHide, repor
         {showError && <div className="alert alert-danger">{error}</div>}
       </Modal.Body>
       <Modal.Footer>
-        <Button type="btn-primary" text="Save" onClick={uploadButtonHandler} disabled={!selectedFile || isLoading} />
-        <Button type="btn-secondary" text="Cancel" onClick={onHide} disabled={!selectedFile || isLoading} />
+        <Button variant="primary" onClick={uploadButtonHandler} disabled={!selectedFile || isLoading}>
+          Save
+        </Button>
+        <Button variant="secondary" onClick={onHide} disabled={!selectedFile || isLoading}>
+          Cancel
+        </Button>
       </Modal.Footer>
     </Modal>
   );

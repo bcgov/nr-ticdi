@@ -68,25 +68,25 @@ const SelectedProvisionsTable: React.FC<SelectedProvisionsTableTableProps> = ({
   const columns: ColumnDef<ProvisionData, any>[] = [
     columnHelper.accessor('type', {
       id: 'type',
-      cell: (info) => <input value={info.getValue()} style={{ width: '100%' }} readOnly />,
+      cell: (info) => <input value={info.getValue()} className="readonlyInput" readOnly />,
       header: () => 'Type',
       meta: { customCss: { width: '5%' } },
     }),
     columnHelper.accessor('provision_group', {
       id: 'provision_group',
-      cell: (info) => <input value={info.getValue()} style={{ width: '100%' }} readOnly />,
+      cell: (info) => <input value={info.getValue()} className="readonlyInput" readOnly />,
       header: () => 'Group',
       meta: { customCss: { width: '5%' } },
     }),
     columnHelper.accessor('provision_name', {
       id: 'provision_name',
-      cell: (info) => <input value={info.getValue()} style={{ width: '100%' }} readOnly />,
+      cell: (info) => <input value={info.getValue()} className="readonlyInput" readOnly />,
       header: () => 'Provision',
       meta: { customCss: { width: '50%' } },
     }),
     columnHelper.accessor('category', {
       id: 'category',
-      cell: (info) => <input value={info.getValue()} style={{ width: '100%' }} readOnly />,
+      cell: (info) => <input value={info.getValue()} className="readonlyInput" readOnly />,
       header: () => 'Category',
       meta: { customCss: { width: '30%' } },
     }),

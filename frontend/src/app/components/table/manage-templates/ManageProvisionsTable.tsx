@@ -1,37 +1,35 @@
 import React, { useEffect, useState } from 'react';
 import { DataTable } from '../common/DataTable';
 import { ColumnDef, createColumnHelper } from '@tanstack/react-table';
-import {
-  disableProvision,
-  enableProvision,
-  getProvisions,
-  getVariables,
-  removeVariable,
-} from '../../../common/manage-templates';
+import { disableProvision, enableProvision } from '../../../common/manage-templates';
 import { Provision, Variable } from '../../../types/types';
+import LinkButton from '../../common/LinkButton';
 
 interface ManageProvisionsTableProps {
-  refreshVersion: number;
+  provisions: Provision[] | undefined;
+  variables: Variable[] | undefined;
   editProvisionHandler: (provision: Provision, variables: Variable[]) => void;
 }
 
-const ManageProvisionsTable: React.FC<ManageProvisionsTableProps> = ({ refreshVersion, editProvisionHandler }) => {
-  const [provisions, setProvisions] = useState<Provision[]>([]);
-  const [variables, setVariables] = useState<Variable[]>([]);
+const ManageProvisionsTable: React.FC<ManageProvisionsTableProps> = ({
+  provisions,
+  variables,
+  editProvisionHandler,
+}) => {
+  const [allProvisions, setProvisions] = useState<Provision[]>([]);
+  const [allVariables, setVariables] = useState<Variable[]>([]);
   // const [currentlyActiveProvision, setCurrentlyActiveProvision] = useState<Provision>();
   const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
-    const fetchData = async () => {
-      const provisionData: Provision[] = await getProvisions();
-      const sortedData = basicSort(provisionData);
+    if (provisions) {
+      const sortedData = basicSort(provisions);
       setProvisions(sortedData);
-      const variableData: Variable[] = await getVariables();
-      setVariables(variableData);
-    };
-
-    fetchData();
-  }, [refreshVersion]);
+    }
+    if (variables) {
+      setVariables(variables);
+    }
+  }, [provisions, variables]);
 
   // will add column sorting to table later
   const basicSort = (data: Provision[]): Provision[] => {
@@ -73,15 +71,9 @@ const ManageProvisionsTable: React.FC<ManageProvisionsTableProps> = ({ refreshVe
     }
   };
 
-  // this opens a modal which is handled on the ManageTemplatesPage
-  const handleRemoveVariable = async (variableId: number) => {
-    await removeVariable(variableId);
-  };
-
   const openEditProvisionModal = async (provisionId: number) => {
-    const selectedProvision = provisions.find((p) => p.id === provisionId);
-    const selectedVariables = variables.filter((v) => v.provision_id === provisionId);
-    // setCurrentlyActiveProvision(selectedProvision);
+    const selectedProvision = allProvisions.find((p) => p.id === provisionId);
+    const selectedVariables = allVariables.filter((v) => v.provision_id === provisionId);
     if (selectedProvision) editProvisionHandler(selectedProvision, selectedVariables);
   };
 
@@ -90,37 +82,40 @@ const ManageProvisionsTable: React.FC<ManageProvisionsTableProps> = ({ refreshVe
   const columns: ColumnDef<Provision, any>[] = [
     columnHelper.accessor('type', {
       id: 'type',
-      cell: (info) => <input value={info.getValue()} style={{ width: '100%' }} readOnly />,
+      cell: (info) => <input value={info.getValue()} className="readonlyInput" readOnly />,
       header: () => 'Type',
       meta: { customCss: { width: '5%' } },
     }),
     columnHelper.accessor('provision_group', {
       id: 'provision_group',
-      cell: (info) => <input value={info.getValue()} style={{ width: '100%' }} readOnly />,
+      cell: (info) => <input value={info.getValue()} className="readonlyInput" readOnly />,
       header: () => 'Group',
       meta: { customCss: { width: '5%' } },
     }),
     columnHelper.accessor('max', {
       id: 'max',
-      cell: (info) => <input value={info.getValue()} style={{ width: '100%' }} readOnly />,
+      cell: (info) => {
+        const displayValue = info.getValue() >= 999 ? '-' : info.getValue();
+        return <input value={displayValue} className="readonlyInput" readOnly />;
+      },
       header: () => 'Max',
       meta: { customCss: { width: '5%' } },
     }),
     columnHelper.accessor('provision_name', {
       id: 'provision_name',
-      cell: (info) => <input value={info.getValue()} style={{ width: '100%' }} readOnly />,
+      cell: (info) => <input value={info.getValue()} className="readonlyInput" readOnly />,
       header: () => 'Provision',
       meta: { customCss: { width: '35%' } },
     }),
     columnHelper.accessor('free_text', {
       id: 'free_text',
-      cell: (info) => <input value={info.getValue()} style={{ width: '100%' }} title={info.getValue()} readOnly />,
+      cell: (info) => <input value={info.getValue()} className="readonlyInput" title={info.getValue()} readOnly />,
       header: () => 'Free Text',
       meta: { customCss: { width: '5%' } },
     }),
     columnHelper.accessor('category', {
       id: 'category',
-      cell: (info) => <input value={info.getValue()} style={{ width: '100%' }} readOnly />,
+      cell: (info) => <input value={info.getValue()} className="readonlyInput" readOnly />,
       header: () => 'Category',
       meta: { customCss: { width: '25%' } },
     }),
@@ -140,11 +135,7 @@ const ManageProvisionsTable: React.FC<ManageProvisionsTableProps> = ({ refreshVe
     }),
     columnHelper.accessor('edit', {
       id: 'edit',
-      cell: (info) => (
-        <a href="#" onClick={() => openEditProvisionModal(info.row.original.id)} style={{ width: '100%' }}>
-          Edit
-        </a>
-      ),
+      cell: (info) => <LinkButton text="Edit" onClick={() => openEditProvisionModal(info.row.original.id)} />,
       header: () => null,
       meta: { customCss: { width: '5%' } },
     }),
@@ -156,7 +147,7 @@ const ManageProvisionsTable: React.FC<ManageProvisionsTableProps> = ({ refreshVe
     }),
   ];
 
-  return <DataTable columns={columns} data={provisions} />;
+  return <DataTable columns={columns} data={allProvisions} />;
 };
 
 interface CheckboxCellProps {

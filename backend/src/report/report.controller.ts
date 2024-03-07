@@ -100,7 +100,7 @@ export class ReportController {
       ...session,
     };
     if (session.data.activeAccount) {
-      idir_username = session.data.activeAccount.idir_username;
+      idir_username = session?.data?.activeAccount.idir_username;
       console.log('active account found');
     } else {
       console.log('no active account found');
@@ -129,8 +129,8 @@ export class ReportController {
     let idir_username = '';
     let idir_full_name = '';
     if (session?.data?.activeAccount) {
-      idir_username = session.data.activeAccount.idir_username;
-      idir_full_name = session.data.activeAccount.full_name;
+      idir_username = session?.data?.activeAccount.idir_username;
+      idir_full_name = session?.data?.activeAccount.full_name;
       console.log('active account found');
     } else {
       console.log('no active account found');
@@ -179,7 +179,7 @@ export class ReportController {
   ) {
     let idir_username = '';
     if (session?.data?.activeAccount) {
-      idir_username = session.data.activeAccount.idir_username;
+      idir_username = session?.data?.activeAccount.idir_username;
       console.log('active account found');
     } else {
       console.log('no active account found');

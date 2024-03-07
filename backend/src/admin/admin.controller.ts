@@ -234,7 +234,7 @@ export class AdminController {
     },
     @Session() session: { data?: SessionData }
   ) {
-    const create_userid = session.data.activeAccount.idir_username;
+    const create_userid = session?.data?.activeAccount.idir_username;
     return this.adminService.addProvision(provisionParams, create_userid);
   }
 
@@ -255,7 +255,7 @@ export class AdminController {
     },
     @Session() session: { data?: SessionData }
   ) {
-    const update_userid = session.data.activeAccount.idir_username;
+    const update_userid = session?.data?.activeAccount.idir_username;
     return this.adminService.updateProvision(provisionParams, update_userid);
   }
 
@@ -270,7 +270,7 @@ export class AdminController {
     },
     @Session() session: { data?: SessionData }
   ) {
-    const create_userid = session.data.activeAccount.idir_username;
+    const create_userid = session?.data?.activeAccount.idir_username;
     return this.adminService.addVariable(variableParams, create_userid);
   }
 
@@ -285,7 +285,7 @@ export class AdminController {
     },
     @Session() session: { data?: SessionData }
   ) {
-    const update_userid = session.data.activeAccount.idir_username;
+    const update_userid = session?.data?.activeAccount.idir_username;
     return this.adminService.updateVariable(variableParams, update_userid);
   }
 

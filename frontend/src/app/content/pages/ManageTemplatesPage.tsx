@@ -1,16 +1,16 @@
-import { FC, useState } from 'react';
+import { FC, useEffect, useState } from 'react';
 import { useParams } from 'react-router';
 import { NFR_REPORT_PAGES, REPORT_TYPES } from '../../util/constants';
 import Collapsible from '../../components/common/Collapsible';
 import TemplateInfoTable from '../../components/table/manage-templates/TemplateInfoTable';
 import Button from '../../components/common/Button';
-import AddProvisionModal from '../../components/modal/AddProvisionModal';
-import UploadTemplateModal from '../../components/modal/UploadTemplateModal';
-import RemoveTemplateModal from '../../components/modal/RemoveTemplateModal';
+import AddProvisionModal from '../../components/modal/manage-templates/AddProvisionModal';
+import UploadTemplateModal from '../../components/modal/manage-templates/UploadTemplateModal';
+import RemoveTemplateModal from '../../components/modal/manage-templates/RemoveTemplateModal';
 import ManageProvisionsTable from '../../components/table/manage-templates/ManageProvisionsTable';
-import { Provision, ProvisionUpload, Variable } from '../../types/types';
-import EditProvisionModal from '../../components/modal/EditProvisionModal';
-import { updateProvision } from '../../common/manage-templates';
+import { GroupMax, Provision, ProvisionUpload, Variable } from '../../types/types';
+import EditProvisionModal from '../../components/modal/manage-templates/EditProvisionModal';
+import { addProvision, getGroupMax, updateProvision } from '../../common/manage-templates';
 
 export interface ManageTemplatesPageProps {}
 
@@ -18,10 +18,12 @@ const ManageTemplatesPage: FC<ManageTemplatesPageProps> = () => {
   const [showUploadModal, setShowUploadModal] = useState<boolean>(false);
   const [showRemoveTemplateModal, setShowRemoveTemplateModal] = useState<boolean>(false);
   const [showEditProvisionModal, setShowEditProvisionModal] = useState<boolean>(false);
+  const [showAddProvisionModal, setShowAddProvisionModal] = useState<boolean>(false);
   const [currentReportType, setCurrentReportType] = useState<string>('');
   const [currentReportId, setCurrentReportId] = useState<number>(-1);
   const [currentProvision, setCurrentProvision] = useState<Provision>();
   const [currentVariables, setCurrentVariables] = useState<Variable[]>();
+  const [groupMaxArray, setGroupMaxArray] = useState<GroupMax[]>();
   const [refreshTrigger, setRefreshTrigger] = useState(0);
   const { id } = useParams<{ id: string }>();
   let idNum: number;
@@ -29,6 +31,14 @@ const ManageTemplatesPage: FC<ManageTemplatesPageProps> = () => {
   const reportType: string = REPORT_TYPES.filter((report) => report.reportIndex === idNum).map(
     (report) => report.reportType
   )[0];
+
+  useEffect(() => {
+    const getData = async () => {
+      const fetchedGroupMaxArray = await getGroupMax();
+      setGroupMaxArray(fetchedGroupMaxArray);
+    };
+    getData();
+  }, []);
 
   const openUploadModal = (report: string) => {
     setCurrentReportType(report);
@@ -42,8 +52,6 @@ const ManageTemplatesPage: FC<ManageTemplatesPageProps> = () => {
   };
 
   const openEditProvisionModal = (provision: Provision, variables: Variable[]) => {
-    console.log(provision);
-    console.log(variables);
     setCurrentProvision(provision);
     setCurrentVariables(variables);
     setShowEditProvisionModal(true);
@@ -51,6 +59,10 @@ const ManageTemplatesPage: FC<ManageTemplatesPageProps> = () => {
 
   const updateProvisionHandler = async (provisionUpload: ProvisionUpload, provisionId: number) => {
     await updateProvision({ ...provisionUpload, id: provisionId });
+  };
+
+  const addProvisionHandler = async (provisionUpload: ProvisionUpload) => {
+    await addProvision(provisionUpload);
   };
 
   const refreshTables = () => {
@@ -153,9 +165,16 @@ const ManageTemplatesPage: FC<ManageTemplatesPageProps> = () => {
       <EditProvisionModal
         provision={currentProvision}
         variables={currentVariables}
+        groupMaxArray={groupMaxArray}
         show={showEditProvisionModal}
         onHide={() => setShowEditProvisionModal(false)}
         updateProvisionHandler={updateProvisionHandler}
+      />
+      <AddProvisionModal
+        groupMaxArray={groupMaxArray}
+        show={showAddProvisionModal}
+        onHide={() => setShowAddProvisionModal(false)}
+        addProvisionHandler={addProvisionHandler}
       />
     </>
   );

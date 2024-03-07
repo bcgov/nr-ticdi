@@ -1,5 +1,5 @@
 import config from '../../config';
-import { IdirUserObject } from '../components/modal/AddAdmin';
+import { IdirUserObject } from '../components/modal/admin/AddAdmin';
 import { AdminData } from '../components/table/admin/AdminDataTable';
 import * as api from './api';
 import fileDownload from 'js-file-download';

@@ -9,3 +9,20 @@
 .option-default {
   background-color: lightgoldenrodyellow;
 }
+
+.readonlyInput {
+  width: 100%;
+  color: gray;
+}
+
+.linkButton {
+  text-decoration: underline;
+  color: #1a5a96;
+  padding: 0;
+  border: none;
+  background-color: transparent;
+}
+
+.linkButton:hover {
+  color: blue;
+}

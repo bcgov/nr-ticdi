@@ -689,7 +689,6 @@ export class ReportService {
   }
 
   async getGroupMaxByVariant(variantName: string): Promise<any> {
-    console.log(variantName);
     const url = `${hostname}:${port}/nfr-provision/get-group-max/variant/${variantName}`;
     return await axios.get(url).then((res) => {
       return res.data;

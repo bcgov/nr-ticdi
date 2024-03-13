@@ -183,6 +183,7 @@ export type TemplateInfo = {
   active_flag: boolean;
   view: any; // remove from route
   remove: any; // remove from route
+  preview: any; // remove from route
   id: number;
 };
 

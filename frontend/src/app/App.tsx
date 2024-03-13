@@ -15,6 +15,10 @@ const App: FC = () => {
             return <Route key={index} path={`/dtid/:dtid/${item.path}`} element={<Content pageTitle={item.title} />} />;
           } else if (item.title === 'Manage Templates') {
             return <Route key={index} path={`/${item.path}/:id`} element={<Content pageTitle={item.title} />} />;
+          } else if (item.title === 'Document Preview') {
+            return <Route key={index} path={`/`} element={<Content pageTitle={item.title} />} />;
+          } else if (item.title === 'Manage Templates') {
+            return <Route key={index} path={`/manage-templates-select`} element={<Content pageTitle={item.title} />} />;
           } else {
             return <Route key={index} path={`/${item.path}/`} element={<Content pageTitle={item.title} />} />;
           }

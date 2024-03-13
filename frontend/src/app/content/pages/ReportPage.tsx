@@ -1,6 +1,6 @@
 import { FC, useCallback, useEffect, useState } from 'react';
 import Collapsible from '../../../app/components/common/Collapsible';
-import { DTRDisplayObject } from '../../../app/types/types';
+import { DTRDisplayObject, DocumentType } from '../../../app/types/types';
 import TenureDetails from '../display/TenureDetails';
 import AreaDetails from '../display/AreaDetails';
 import DtidDetails from '../display/DtidDetails';
@@ -8,9 +8,9 @@ import {
   generateNfrReport,
   generateReport,
   getData,
-  getMandatoryProvisionsByVariant,
-  getNfrProvisionsByVariantDtid,
-  saveNfr,
+  getDocumentProvisionsByDocTypeIdDtid,
+  saveDocument,
+  getMandatoryProvisionsByDocTypeId,
 } from '../../common/report';
 import VariantDropdown from '../../components/common/VariantDropdown';
 import { CURRENT_REPORT_PAGES, NFR_REPORT_PAGES, NFR_VARIANTS } from '../../util/constants';
@@ -24,10 +24,13 @@ import { SaveVariableData, VariableJson } from '../../components/table/reports/V
 import { Button } from 'react-bootstrap';
 
 export interface ReportPageProps {
-  documentDescription: string;
+  documentType: DocumentType;
 }
 
-const ReportPage: FC<ReportPageProps> = ({ documentDescription }) => {
+// TODO - remove variants, possibly replace with document type dropdown
+//        remove any mention of nfr
+
+const ReportPage: FC<ReportPageProps> = ({ documentType }) => {
   const { dtid } = useParams<{ dtid: string }>();
   const dtidNumber = dtid ? parseInt(dtid, 10) : null;
   const [loading, setLoading] = useState<boolean>(false);
@@ -44,16 +47,19 @@ const ReportPage: FC<ReportPageProps> = ({ documentDescription }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    setShowNfr(NFR_VARIANTS.includes(documentDescription.toUpperCase()));
+    setShowNfr(NFR_VARIANTS.includes(documentType.name.toUpperCase()));
     const fetchData = async () => {
       if (dtidNumber) {
         try {
           setLoading(true);
           const fetchedData: DTRDisplayObject = await getData(dtidNumber);
           setData(fetchedData);
-          const fetchProvisions: ProvisionData[] = await getNfrProvisionsByVariantDtid(documentDescription, dtidNumber);
+          const fetchProvisions: ProvisionData[] = await getDocumentProvisionsByDocTypeIdDtid(
+            documentType.id,
+            dtidNumber
+          );
           setAllProvisions(fetchProvisions);
-          const mpIds: number[] = await getMandatoryProvisionsByVariant(documentDescription);
+          const mpIds: number[] = await getMandatoryProvisionsByDocTypeId(documentType.id);
           setMandatoryProvisionIds(mpIds);
         } catch (error) {
           console.error('Failed to fetch data', error);
@@ -64,11 +70,11 @@ const ReportPage: FC<ReportPageProps> = ({ documentDescription }) => {
       }
     };
     fetchData();
-  }, [dtidNumber, documentDescription]);
+  }, [dtidNumber, documentType]);
 
   const generateReportHandler = () => {
     if (dtidNumber) {
-      generateReport(dtidNumber, data!.fileNum, documentDescription);
+      generateReport(dtidNumber, data!.fileNum, documentType.name);
     }
   };
 
@@ -80,7 +86,7 @@ const ReportPage: FC<ReportPageProps> = ({ documentDescription }) => {
           generateNfrReport(
             dtidNumber,
             data.fileNum,
-            documentDescription.toUpperCase(),
+            documentType.name.toUpperCase(),
             provisionJsonArray,
             variableJsonArray
           );
@@ -144,7 +150,7 @@ const ReportPage: FC<ReportPageProps> = ({ documentDescription }) => {
       if (dtidNumber) {
         try {
           setLoading(true);
-          await saveNfr(dtidNumber, documentDescription.toUpperCase(), provisionArray, variableArray);
+          await saveDocument(dtidNumber, documentType.name.toUpperCase(), provisionArray, variableArray);
         } catch (err) {
           console.log('Error saving NFR Data');
           console.log(err);
@@ -160,13 +166,13 @@ const ReportPage: FC<ReportPageProps> = ({ documentDescription }) => {
 
   return (
     <>
-      <div className="h1">Preview - {documentDescription} (Draft)</div>
+      <div className="h1">Preview - {documentType.name} (Draft)</div>
       <hr />
-      {Object.values(NFR_REPORT_PAGES).includes(documentDescription) && (
+      {Object.values(NFR_REPORT_PAGES).includes(documentType.name) && (
         <div>
           <VariantDropdown
             values={NFR_REPORT_PAGES}
-            selectedVariant={documentDescription}
+            selectedVariant={documentType.name}
             variantChangeHandler={variantChangeHandler}
           />
           <hr />
@@ -192,7 +198,7 @@ const ReportPage: FC<ReportPageProps> = ({ documentDescription }) => {
         {data ? <DtidDetails data={data!} /> : <Skeleton />}
       </Collapsible>
       <Collapsible title="Tenure Details">{data ? <TenureDetails data={data!} /> : <Skeleton />}</Collapsible>
-      {documentDescription === CURRENT_REPORT_PAGES.LUR ? (
+      {documentType.name === CURRENT_REPORT_PAGES.LUR ? (
         <Collapsible title="Area">{data ? <AreaDetails data={data!} /> : <Skeleton />}</Collapsible>
       ) : (
         <Collapsible title="Interested Parties">{data ? <InterestedParties data={data!} /> : <Skeleton />}</Collapsible>
@@ -201,7 +207,7 @@ const ReportPage: FC<ReportPageProps> = ({ documentDescription }) => {
         <Collapsible title="Provisions">
           <Provisions
             dtid={dtidNumber!}
-            variantName={documentDescription}
+            documentType={documentType}
             updateHandler={updateProvisionArray}
             updateSelectedProvisionIds={updateSelectedProvisionIds}
           />
@@ -211,7 +217,7 @@ const ReportPage: FC<ReportPageProps> = ({ documentDescription }) => {
         <Collapsible title="Variables">
           <Variables
             dtid={dtidNumber!}
-            variantName={documentDescription}
+            documentType={documentType}
             updateHandler={updateVariableArray}
             selectedProvisionIds={selectedProvisionIds}
           />

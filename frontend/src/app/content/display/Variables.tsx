@@ -1,10 +1,11 @@
 import { FC, useEffect, useState } from 'react';
-import { getNfrVariablesByVariantDtid } from '../../common/report';
+import { getDocumentVariablesByDocTypeIdDtid } from '../../common/report';
 import VariablesTable, { VariableJson } from '../../components/table/reports/VariablesTable';
+import { DocumentType } from '../../types/types';
 
 interface VariablesProps {
   dtid: number;
-  variantName: string;
+  documentType: DocumentType;
   updateHandler: (variableJson: VariableJson[]) => void;
   selectedProvisionIds: number[];
 }
@@ -21,17 +22,17 @@ export type VariableData = {
   provisionId: number;
 };
 
-const Variables: FC<VariablesProps> = ({ dtid, variantName, updateHandler, selectedProvisionIds }) => {
+const Variables: FC<VariablesProps> = ({ dtid, documentType, updateHandler, selectedProvisionIds }) => {
   const [allVariables, setAllVariables] = useState<VariableData[]>([]);
   const [filteredVariables, setFilteredVariables] = useState<VariableData[]>([]); // provisions in the currently selected group
 
   useEffect(() => {
     const getData = async () => {
-      const variables: VariableData[] = await getNfrVariablesByVariantDtid(variantName, dtid);
+      const variables: VariableData[] = await getDocumentVariablesByDocTypeIdDtid(documentType.id, dtid);
       setAllVariables(variables);
     };
     getData();
-  }, [dtid, variantName]);
+  }, [dtid, documentType]);
 
   useEffect(() => {
     const filtered: VariableData[] = allVariables.filter((variable) =>

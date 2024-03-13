@@ -8,6 +8,8 @@ import { FC, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import SearchDataTable from '../../components/table/search/SearchDataTable';
 
+// TODO - redo page to include all document types, replace variant with document type
+
 const SearchPage: FC = () => {
   const [selectedDocument, setSelectedDocument] = useState<{ dtid: number; variant: string } | null>(null);
   const [searchTerm, setSearchTerm] = useState('');

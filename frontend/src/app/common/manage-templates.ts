@@ -21,7 +21,7 @@ export const getGroupMax = async (): Promise<GroupMax[]> => {
 };
 
 export const getProvisions = async (): Promise<Provision[]> => {
-  const url = `${config.API_BASE_URL}/admin/nfr-provisions`;
+  const url = `${config.API_BASE_URL}/admin/provisions`;
   const getParameters = api.generateApiParameters(url);
   const response: Provision[] = await api.get<Provision[]>(getParameters);
   console.log('getProvisions response');

@@ -14,6 +14,9 @@ import { Button } from 'react-bootstrap';
 
 export interface ManageTemplatesPageProps {}
 
+// TODO - template upload and provisions to be split out into separate pages
+//        provision / variables routes are changing to be centered around document types instead of variants
+
 const ManageTemplatesPage: FC<ManageTemplatesPageProps> = () => {
   const [showUploadModal, setShowUploadModal] = useState<boolean>(false);
   const [showRemoveTemplateModal, setShowRemoveTemplateModal] = useState<boolean>(false);

@@ -1,16 +1,13 @@
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
-import { PrintRequestDetail } from './print_request_detail/entities/print_request_detail.entity';
-import { PrintRequestLog } from './print_request_log/entities/print_request_log.entity';
+import { DocumentData } from './document_data/entities/document_data.entity';
+import { DocumentDataProvision } from './document_data/entities/document_data_provision.entity';
+import { DocumentDataVariable } from './document_data/entities/document_data_variable.entity';
+import { DocumentDataLog } from './document_data_log/entities/document_data_log.entity';
 import { DocumentTemplate } from './document_template/entities/document_template.entity';
-import { PrintRequestDetailView } from './print_request_detail/entities/print_request_detail_vw';
-import { NFRData } from './nfr_data/entities/nfr_data.entity';
-import { NFRDataLog } from './nfr_data_log/entities/nfr_data_log.entity';
-import { NFRProvision } from './nfr_provision/entities/nfr_provision.entity';
-import { NFRProvisionGroup } from './nfr_provision/entities/nfr_provision_group.entity';
-import { NFRProvisionVariable } from './nfr_provision/entities/nfr_provision_variable.entity';
-import { NFRProvisionVariant } from './nfr_provision/entities/nfr_provision_variant.entity';
-import { NFRDataProvision } from './nfr_data/entities/nfr_data_provision.entity';
-import { NFRDataVariable } from './nfr_data/entities/nfr_data_variable.entity';
+import { DocumentType } from './document_type/entities/document_type.entity';
+import { Provision } from './provision/entities/provision.entity';
+import { ProvisionGroup } from './provision/entities/provision_group.entity';
+import { ProvisionVariable } from './provision/entities/provision_variable.entity';
 
 const config: TypeOrmModuleOptions = {
   type: 'postgres',
@@ -20,18 +17,15 @@ const config: TypeOrmModuleOptions = {
   username: process.env.POSTGRESQL_USER || 'postgres',
   password: process.env.POSTGRESQL_PASSWORD,
   entities: [
-    PrintRequestDetail,
-    PrintRequestLog,
-    NFRData,
-    NFRDataProvision,
-    NFRDataVariable,
-    NFRDataLog,
-    NFRProvision,
-    NFRProvisionGroup,
-    NFRProvisionVariable,
-    NFRProvisionVariant,
+    DocumentData,
+    DocumentDataProvision,
+    DocumentDataVariable,
+    DocumentDataLog,
+    Provision,
+    ProvisionGroup,
+    ProvisionVariable,
     DocumentTemplate,
-    PrintRequestDetailView,
+    DocumentType,
   ],
   synchronize: true,
 };

@@ -349,7 +349,7 @@ export class TTLSService {
 
   // TODO
   async generateNFRReport(prdid: number, templateId: number, variables: any, username: string) {
-    const url = `${hostname}:${port}/nfr-data/view/${prdid}`;
+    const url = `${hostname}:${port}/document-data/view/${prdid}`;
     const templateUrl = `${hostname}:${port}/document-template/find-one/${templateId}`;
     const logUrl = `${hostname}:${port}/print-request-log/`;
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

@@ -97,7 +97,7 @@ export class AdminController {
     file: Express.Multer.File,
     @Body()
     params: {
-      document_type: string;
+      document_type_id: number;
       template_name: string;
     }
   ) {
@@ -112,7 +112,7 @@ export class AdminController {
         : ''
       : '';
     const uploadData = {
-      document_type: params.document_type,
+      document_type_id: params.document_type_id,
       active_flag: false,
       mime_type: file.mimetype,
       file_name: params.template_name,
@@ -183,9 +183,9 @@ export class AdminController {
     return this.adminService.getTemplates(reportId);
   }
 
-  @Get('open-document/:nfr_id')
-  setSessionDocument(@Session() session: { data?: SessionData }, @Param('nfr_id') nfrId: number): void {
-    session.data.selected_document = { nfr_id: nfrId };
+  @Get('open-document/:document_id')
+  setSessionDocument(@Session() session: { data?: SessionData }, @Param('document_id') documentId: number): void {
+    session.data.selected_document = { document_id: documentId };
   }
 
   @Get('get-templates/:document_type')
@@ -193,12 +193,12 @@ export class AdminController {
     return this.adminService.getDocumentTemplates(documentType);
   }
 
-  @Get('nfr-provisions')
+  @Get('provisions')
   getNFRProvisions(): any {
     return this.adminService.getNFRProvisions();
   }
 
-  @Get('nfr-variables')
+  @Get('document-variables')
   getNFRVariables(): any {
     return this.adminService.getNFRVariables();
   }

@@ -56,9 +56,9 @@ export class ReportController {
     return response;
   }
 
-  @Get('get-nfr-data/:dtid')
+  @Get('get-document-data/:dtid')
   getNfrData(@Session() session: { data?: SessionData }, @Param('dtid') dtid: number) {
-    console.log('get-nfr-data ~ ' + dtid);
+    console.log('get-document-data ~ ' + dtid);
     return this.reportService.getActiveNfrDataByDtid(dtid);
   }
 
@@ -147,15 +147,51 @@ export class ReportController {
     );
   }
 
-  @Get('get-group-max/:variant')
-  getGroupMaxByVariant(@Param('variant') variantName: string) {
-    console.log('variantName: ' + variantName);
-    return this.reportService.getGroupMaxByVariant(variantName);
+  @Post('generate-report-new')
+  @Header('Content-Type', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document')
+  @Header('Content-Disposition', 'attachment; filename=report.docx')
+  async generateReportNew(
+    @Session() session: { data: SessionData },
+    @Body()
+    data: {
+      dtid: number;
+      document_type_id: number;
+      variableJson: VariableJSON[];
+      provisionJson: ProvisionJSON[];
+    }
+  ) {
+    let idir_username = '';
+    let idir_full_name = '';
+    if (session?.data?.activeAccount) {
+      idir_username = session?.data?.activeAccount.idir_username;
+      idir_full_name = session?.data?.activeAccount.full_name;
+      console.log('active account found');
+    } else {
+      console.log('no active account found');
+    }
+    // return new StreamableFile(
+    await this.reportService.generateReportNew(
+      data.dtid,
+      data.document_type_id,
+      idir_username,
+      idir_full_name,
+      data.variableJson,
+      data.provisionJson
+    );
+    // );
   }
 
-  @Get('nfr-provisions/:variantName/:dtid')
-  getNFRProvisionsByVariant(@Param('variantName') variantName: string, @Param('dtid') dtid: number): any {
-    return this.reportService.getNFRProvisionsByVariantAndDtid(variantName, dtid);
+  @Get('get-group-max/:document_type_id')
+  getGroupMaxByVariant(@Param('document_type_id') document_type_id: number) {
+    return this.reportService.getGroupMaxByDocTypeId(document_type_id);
+  }
+
+  @Get('provisions/:document_type_id/:dtid')
+  getDocumentProvisionsByDocumentTypeId(
+    @Param('document_type_id') document_type_id: number,
+    @Param('dtid') dtid: number
+  ): any {
+    return this.reportService.getDocumentProvisionsByDocTypeIdAndDtid(document_type_id, dtid);
   }
 
   @Get('get-provision-variables/:variantName/:dtid')
@@ -163,6 +199,35 @@ export class ReportController {
     console.log('getting variables for NFR');
     const variables = await this.reportService.getNFRVariablesByVariantAndDtid(variantName, dtid);
     return variables;
+  }
+
+  @Post('save-document')
+  saveDocument(
+    @Session() session: { data: SessionData },
+    @Body()
+    data: {
+      dtid: number;
+      document_type_id: number;
+      status: string;
+      provisionArray: ProvisionJSON[];
+      variableArray: VariableJSON[];
+    }
+  ) {
+    let idir_username = '';
+    if (session?.data?.activeAccount) {
+      idir_username = session?.data?.activeAccount.idir_username;
+      console.log('active account found');
+    } else {
+      console.log('no active account found');
+    }
+    return this.reportService.saveDocument(
+      data.dtid,
+      data.document_type_id,
+      data.status,
+      data.provisionArray,
+      data.variableArray,
+      idir_username
+    );
   }
 
   @Post('save-nfr')
@@ -194,23 +259,26 @@ export class ReportController {
     );
   }
 
-  @Get('enabled-provisions/:variantName')
-  getEnabledProvisionsByVariant(@Param('variantName') variantName: string) {
-    return this.reportService.getEnabledProvisionsByVariant(variantName);
+  @Get('enabled-provisions/:document_type_id')
+  getEnabledProvisionsByDocTypeId(@Param('document_type_id') document_type_id: number) {
+    return this.reportService.getEnabledProvisionsByDocTypeId(document_type_id);
   }
 
-  @Get('enabled-provisions2/:variantName/:dtid')
-  getEnabledProvisionsByVariantAndDtid(@Param('variantName') variantName: string, @Param('dtid') dtid: number) {
-    return this.reportService.getEnabledProvisionsByVariantAndDtid(variantName, dtid);
+  @Get('enabled-provisions2/:document_type_id/:dtid')
+  getEnabledProvisionsByDocumentTypeIdDtid(
+    @Param('document_type_id') document_type_id: number,
+    @Param('dtid') dtid: number
+  ) {
+    return this.reportService.getEnabledProvisionsByDocTypeIdDtid(document_type_id, dtid);
   }
 
-  @Get('search-nfr-data')
+  @Get('search-document-data')
   getNFRData() {
     return this.reportService.getNFRData();
   }
 
-  @Get('get-mandatory-provisions-by-variant/:variant')
-  getMandatoryProvisionsByVariant(@Param('variant') variant: string) {
-    return this.reportService.getMandatoryProvisionsByVariant(variant);
+  @Get('get-mandatory-provisions-by-document-type-id/:document_type_id')
+  getMandatoryProvisionsByDocumentTypeId(@Param('document_type_id') document_type_id: number) {
+    return this.reportService.getMandatoryProvisionsByDocumentTypeId(document_type_id);
   }
 }

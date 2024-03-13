@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { DataTable } from '../common/DataTable';
 import { ColumnDef, createColumnHelper } from '@tanstack/react-table';
-import { getNfrProvisionsByVariantDtid } from '../../../common/report';
+import { getDocumentProvisionsByDocTypeIdDtid } from '../../../common/report';
 import { ProvisionData } from '../../../content/display/Provisions';
+import { DocumentType } from '../../../types/types';
 
 interface ProvisionsTableProps {
   dtid: number;
-  variant: string;
+  docType: DocumentType;
   currentGroupNumber: number | null;
   currentGroupMax: number | null;
   selectedProvisionIds: number[] | undefined;
@@ -15,7 +16,7 @@ interface ProvisionsTableProps {
 
 const ProvisionsTable: React.FC<ProvisionsTableProps> = ({
   dtid,
-  variant,
+  docType,
   currentGroupNumber,
   currentGroupMax,
   selectedProvisionIds,
@@ -28,22 +29,17 @@ const ProvisionsTable: React.FC<ProvisionsTableProps> = ({
   // get data
   useEffect(() => {
     const fetchData = async () => {
-      setAllProvisions(await getNfrProvisionsByVariantDtid(variant, dtid));
+      setAllProvisions(await getDocumentProvisionsByDocTypeIdDtid(docType.id, dtid));
     };
 
     fetchData();
-  }, [dtid, variant, currentGroupNumber]);
+  }, [dtid, docType, currentGroupNumber]);
 
   // filter based on current group
   useEffect(() => {
     let filtered = allProvisions.filter((provision) => provision.provision_group === currentGroupNumber);
-    if (allProvisions[0] && allProvisions[0].provision_variant) {
-      filtered = filtered.filter((provision) =>
-        provision.provision_variant.some((v) => v.variant_name.toUpperCase() === variant.toUpperCase())
-      );
-    }
     setFilteredProvisions(filtered);
-  }, [allProvisions, currentGroupNumber, variant]);
+  }, [allProvisions, currentGroupNumber]);
 
   // xor logic for the two provisions which can't be selected at the same time.
   const isCheckboxDisabled = (provisionId: number, provisionName: string): boolean => {

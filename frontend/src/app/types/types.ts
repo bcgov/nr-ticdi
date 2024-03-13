@@ -132,7 +132,7 @@ export type NfrVariableObject = {
 export type NfrDataProvisionObject = {
   provision_free_text: string;
   id: number;
-  nfr_provision: NfrProvisionObject;
+  provision: NfrProvisionObject;
 };
 
 export type NfrProvisionObject = {
@@ -169,8 +169,8 @@ export type NfrDataObject = {
     active: boolean;
     create_timestamp: string;
     update_timestamp: string;
-    nfr_data_provisions: NfrDataProvisionObject;
-    nfr_data_variables: NfrDataVariableObject;
+    document_data_provisions: NfrDataProvisionObject;
+    document_data_variables: NfrDataVariableObject;
   };
   provisionIds: number[];
   variableIds: number[];
@@ -244,4 +244,13 @@ export type SearchData = {
   active: boolean;
   nfr_id: number;
   variant_name: string;
+};
+
+export type DocumentType = {
+  id: number;
+  name: string;
+  create_userid: string;
+  update_userid: string;
+  create_timestamp: string;
+  update_timestamp: string;
 };

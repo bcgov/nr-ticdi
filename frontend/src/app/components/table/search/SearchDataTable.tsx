@@ -9,6 +9,8 @@ interface SearchDataTableProps {
   setSelectedDocumentChange: (dtid: number, variant_name: string) => void;
 }
 
+// TODO - update this table to receive / handle documents using document type instead of variant
+
 const SearchDataTable: React.FC<SearchDataTableProps> = ({ searchTerm, setSelectedDocumentChange }) => {
   const [searchData, setSearchData] = useState<SearchData[]>([]);
   const [filteredSearchData, setFilteredSearchData] = useState<SearchData[]>([]);

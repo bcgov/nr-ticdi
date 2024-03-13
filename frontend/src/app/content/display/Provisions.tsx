@@ -1,16 +1,18 @@
 import { FC, useEffect, useState } from 'react';
-import { NfrDataObject, ProvisionGroup } from '../../types/types';
+import { DocumentType, NfrDataObject, ProvisionGroup } from '../../types/types';
 import { NFR_VARIANTS } from '../../util/constants';
-import { getGroupMaxByVariant, getNfrDataByDtid } from '../../common/report';
+import { getGroupMaxByDocTypeId, getDocumentDataByDtid } from '../../common/report';
 import ProvisionsTable from '../../components/table/reports/ProvisionsTable';
 import SelectedProvisionsTable, { ProvisionJson } from '../../components/table/reports/SelectedProvisionsTable';
 
 interface ProvisionsProps {
   dtid: number;
-  variantName: string;
+  documentType: DocumentType;
   updateHandler: (provisionJson: ProvisionJson[]) => void;
   updateSelectedProvisionIds: (selectedProvisionIds: number[]) => void;
 }
+
+// TODO - variants are being removed, provisions will now have an array of document types instead of variants
 
 export type ProvisionData = {
   type: string;
@@ -35,7 +37,7 @@ export type ProvisionData = {
   provision_group: number;
 };
 
-const Provisions: FC<ProvisionsProps> = ({ dtid, variantName, updateHandler, updateSelectedProvisionIds }) => {
+const Provisions: FC<ProvisionsProps> = ({ dtid, documentType, updateHandler, updateSelectedProvisionIds }) => {
   const [nfrData, setNfrData] = useState<NfrDataObject | null>(null);
   const [selectedProvisionIds, setSelectedProvisionIds] = useState<number[]>([]);
   const [provisionGroups, setProvisionGroups] = useState<ProvisionGroup[] | null>(null);
@@ -46,26 +48,26 @@ const Provisions: FC<ProvisionsProps> = ({ dtid, variantName, updateHandler, upd
   // Fetch NFR data if we are on the NFR page
   useEffect(() => {
     const fetchData = async () => {
-      if (NFR_VARIANTS.includes(variantName?.toUpperCase())) {
+      if (documentType && documentType.name && NFR_VARIANTS.includes(documentType.name.toUpperCase())) {
         if (dtid) {
-          const nfrData: NfrDataObject = await getNfrDataByDtid(dtid);
+          const nfrData: NfrDataObject = await getDocumentDataByDtid(dtid);
           if (nfrData) {
             setNfrData(nfrData);
             setSelectedProvisionIds(nfrData.provisionIds);
           }
         }
-        const provisionGroupsObject: ProvisionGroup[] = await getGroupMaxByVariant(variantName);
+        const provisionGroupsObject: ProvisionGroup[] = await getGroupMaxByDocTypeId(documentType.id);
         setProvisionGroups(provisionGroupsObject);
       }
     };
     fetchData();
-  }, [dtid, variantName]);
+  }, [dtid, documentType]);
 
   // reset the selected and viewed provisions on variant change
   useEffect(() => {
     setViewedProvisionGroups(new Set());
     setSelectedProvisionGroup(null);
-  }, [variantName]);
+  }, [documentType]);
 
   const handleProvisionGroupChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const value = parseInt(event.target.value);
@@ -125,7 +127,7 @@ const Provisions: FC<ProvisionsProps> = ({ dtid, variantName, updateHandler, upd
       </div>
       <ProvisionsTable
         dtid={dtid}
-        variant={variantName}
+        docType={documentType}
         currentGroupNumber={selectedProvisionGroup}
         currentGroupMax={selectedProvisionGroupMax}
         selectedProvisionIds={selectedProvisionIds}
@@ -135,7 +137,7 @@ const Provisions: FC<ProvisionsProps> = ({ dtid, variantName, updateHandler, upd
       <div style={{ fontWeight: 'bold' }}>Selected Provisions</div>
       <SelectedProvisionsTable
         dtid={dtid}
-        variant={variantName}
+        docType={documentType}
         selectedProvisionIds={selectedProvisionIds}
         updateHandler={updateHandler}
       />

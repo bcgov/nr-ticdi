@@ -50,7 +50,7 @@ groupMaxTable = $('#groupMaxTable').DataTable({
 
 provisionTable = $('#provisionTable').DataTable({
   ajax: {
-    url: `${window.location.origin}/report/nfr-provisions/${encodeURI(variantName)}/-1`,
+    url: `${window.location.origin}/report/provisions/${encodeURI(variantName)}/-1`,
     dataSrc: '',
   },
   paging: false,
@@ -191,7 +191,7 @@ provisionTable = $('#provisionTable').DataTable({
     if (reloadingTables) {
       // reloadingTables will be false for preload and true after the user changes the dropdown select
       const gmUrl = `${window.location.origin}/report/get-group-max/${variantName}`;
-      const spUrl = `${window.location.origin}/report/nfr-provisions/${encodeURI(variantName)}/${dtid}`;
+      const spUrl = `${window.location.origin}/report/provisions/${encodeURI(variantName)}/${dtid}`;
       const vUrl = `${window.location.origin}/report/get-provision-variables/${encodeURI(variantName)}/${dtid}`;
       fetch(`/report/get-group-max/${variantName}`)
         .then((res) => {
@@ -215,7 +215,7 @@ provisionTable = $('#provisionTable').DataTable({
   order: [[1, 'asc']],
 });
 
-let selectedProvisionsUrl = `${window.location.origin}/report/nfr-provisions/${encodeURI(variantName)}/${dtid}`;
+let selectedProvisionsUrl = `${window.location.origin}/report/provisions/${encodeURI(variantName)}/${dtid}`;
 selectedProvisionsTable = $('#selectedProvisionsTable').DataTable({
   ajax: {
     url: selectedProvisionsUrl,
@@ -341,7 +341,7 @@ document.querySelector('#saveNfr').addEventListener('click', function (event) {
 $('#documentVariantId').on('change', function () {
   variantName = $(this).val();
   reloadingTables = true;
-  const pUrl = `${window.location.origin}/report/nfr-provisions/${encodeURI(variantName)}/-1`;
+  const pUrl = `${window.location.origin}/report/provisions/${encodeURI(variantName)}/-1`;
   fetch(`/report/enabled-provisions/${encodeURI(variantName)}`, {
     method: 'GET',
     headers: {

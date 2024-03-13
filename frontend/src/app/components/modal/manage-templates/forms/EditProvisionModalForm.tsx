@@ -15,6 +15,8 @@ interface EditProvisionModalFormProps {
   onDisplayRemove: (variableId: number) => void;
 }
 
+// TODO - variants to be removed, possibly add ability to assign to multiple document types
+
 const EditProvisionModalForm: React.FC<EditProvisionModalFormProps> = ({
   provision,
   variables,

@@ -1,11 +1,14 @@
-import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import { DocumentType } from '../../document_type/entities/document_type.entity';
 
 @Entity()
 export class DocumentTemplate {
   @PrimaryGeneratedColumn()
   id: number;
-  @Column()
-  document_type: string; // the template type (Land Use Report / Notice of Final Review)
+  @ManyToOne(() => DocumentType, (documentType) => documentType.document_templates, {
+    nullable: true,
+  })
+  document_type: DocumentType;
   @Column()
   template_version: number;
   @Column()
@@ -32,7 +35,7 @@ export class DocumentTemplate {
   update_timestamp: Date;
 
   constructor(
-    document_type?: string,
+    document_type?: DocumentType,
     template_version?: number,
     template_author?: string,
     active_flag?: boolean,
@@ -44,7 +47,7 @@ export class DocumentTemplate {
     create_userid?: string,
     update_userid?: string
   ) {
-    this.document_type = document_type || '';
+    this.document_type = document_type || null;
     this.template_version = template_version || null;
     this.template_author = template_author || '';
     this.active_flag = active_flag || false;

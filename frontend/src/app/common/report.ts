@@ -3,7 +3,7 @@ import { ProvisionJson } from '../components/table/reports/SelectedProvisionsTab
 import { VariableJson } from '../components/table/reports/VariablesTable';
 import { ProvisionData } from '../content/display/Provisions';
 import { VariableData } from '../content/display/Variables';
-import { DTR, DTRDisplayObject, NfrDataObject, ProvisionGroup } from '../types/types';
+import { DTR, DTRDisplayObject, DocumentType, NfrDataObject, ProvisionGroup } from '../types/types';
 import { buildDTRDisplayData } from '../util/util';
 import * as api from './api';
 
@@ -44,42 +44,48 @@ export async function generateReport(dtid: number, fileNum: string, documentDesc
 }
 
 /** Section for Notice of Final Review which has lots of custom logic */
-export const getNfrDataByDtid = async (dtid: number) => {
-  const url = `${config.API_BASE_URL}/report/get-nfr-data/${dtid}`;
+export const getDocumentDataByDtid = async (dtid: number) => {
+  const url = `${config.API_BASE_URL}/report/get-document-data/${dtid}`;
   const getParameters = api.generateApiParameters(url);
   const response: NfrDataObject = await api.get<NfrDataObject>(getParameters);
   return response;
 };
 
-export const getGroupMaxByVariant = async (variant: string) => {
-  const url = `${config.API_BASE_URL}/report/get-group-max/${variant}`;
+export const getGroupMaxByDocTypeId = async (document_type_id: number) => {
+  const url = `${config.API_BASE_URL}/report/get-group-max/${document_type_id}`;
   const getParameters = api.generateApiParameters(url);
   const response: ProvisionGroup[] = await api.get<ProvisionGroup[]>(getParameters);
   return response;
 };
 
-export const getMandatoryProvisionsByVariant = async (variant: string): Promise<number[]> => {
-  const url = `${config.API_BASE_URL}/report/get-mandatory-provisions-by-variant/${variant.toUpperCase()}`;
+export const getMandatoryProvisionsByDocTypeId = async (document_type_id: number): Promise<number[]> => {
+  const url = `${config.API_BASE_URL}/report/get-mandatory-provisions-by-variant/${document_type_id}`;
   const getParameters = api.generateApiParameters(url);
   const response: number[] = await api.get<number[]>(getParameters);
   return response;
 };
 
-export const getNfrProvisionsByVariantDtid = async (variant: string, dtid: number): Promise<ProvisionData[]> => {
-  const url = `${config.API_BASE_URL}/report/nfr-provisions/${variant.toUpperCase()}/${dtid}`;
+export const getDocumentProvisionsByDocTypeIdDtid = async (
+  document_type_id: number,
+  dtid: number
+): Promise<ProvisionData[]> => {
+  const url = `${config.API_BASE_URL}/report/provisions/${document_type_id}/${dtid}`;
   const getParameters = api.generateApiParameters(url);
   const response: ProvisionData[] = await api.get<ProvisionData[]>(getParameters);
   return response;
 };
 
-export const getNfrVariablesByVariantDtid = async (variant: string, dtid: number): Promise<VariableData[]> => {
-  const url = `${config.API_BASE_URL}/report/get-provision-variables/${variant.toUpperCase()}/${dtid}`;
+export const getDocumentVariablesByDocTypeIdDtid = async (
+  document_type_id: number,
+  dtid: number
+): Promise<VariableData[]> => {
+  const url = `${config.API_BASE_URL}/report/get-provision-variables/${document_type_id}/${dtid}`;
   const getParameters = api.generateApiParameters(url);
   const response: VariableData[] = await api.get<VariableData[]>(getParameters);
   return response;
 };
 
-export const saveNfr = async (
+export const saveDocument = async (
   dtid: number,
   variantName: string,
   provisionArray: { provision_id: number; free_text: string }[],
@@ -118,4 +124,10 @@ export const generateNfrReport = async (
   };
 
   api.handleFileDownloadPost(url, data, reportName);
+};
+
+export const getDocumentTypes = () => {
+  const url = `${config.API_BASE_URL}/report/get-document-types`;
+  const getParameters = api.generateApiParameters(url);
+  return api.get<DocumentType[]>(getParameters);
 };

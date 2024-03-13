@@ -4,6 +4,7 @@ import { HttpService } from '@nestjs/axios';
 import { ExportDataObject, SearchResultsItem, UserObject } from 'utils/types';
 import { REPORT_TYPES } from 'utils/constants';
 import { DocumentTemplateService } from 'src/document_template/document_template.service';
+import { DocumentType } from 'src/document_type/entities/document_type.entity';
 const axios = require('axios');
 const FormData = require('form-data');
 
@@ -51,7 +52,7 @@ export class AdminService {
 
   async uploadTemplate(
     data: {
-      document_type: string;
+      document_type_id: number;
       active_flag: boolean;
       mime_type: string;
       file_name: string;
@@ -62,7 +63,7 @@ export class AdminService {
   ): Promise<any> {
     return this.documentTemplateService.create(
       {
-        document_type: data.document_type,
+        document_type_id: data.document_type_id,
         template_author: data.template_author,
         mime_type: data.mime_type,
         file_name: data.file_name,
@@ -340,7 +341,7 @@ export class AdminService {
       'active_flag',
       'variants',
     ];
-    const url = `${hostname}:${port}/nfr-provision`;
+    const url = `${hostname}:${port}/provision`;
     const nfrProvisions = await axios
       .get(url)
       .then((res) => {
@@ -362,7 +363,7 @@ export class AdminService {
 
   async getNFRVariables(): Promise<any> {
     const returnItems = ['variable_name', 'variable_value', 'help_text', 'id', 'provision_id'];
-    const url = `${hostname}:${port}/nfr-provision/variables`;
+    const url = `${hostname}:${port}/provision/variables`;
     const nfrVariables = await axios
       .get(url)
       .then((res) => {
@@ -383,21 +384,21 @@ export class AdminService {
   }
 
   async enableProvision(id: number): Promise<any> {
-    const url = `${hostname}:${port}/nfr-provision/enable/${id}`;
+    const url = `${hostname}:${port}/provision/enable/${id}`;
     return await axios.get(url).then((res) => {
       return res.data;
     });
   }
 
   async disableProvision(id: number): Promise<any> {
-    const url = `${hostname}:${port}/nfr-provision/disable/${id}`;
+    const url = `${hostname}:${port}/provision/disable/${id}`;
     return await axios.get(url).then((res) => {
       return res.data;
     });
   }
 
   async getGroupMax(): Promise<any> {
-    const url = `${hostname}:${port}/nfr-provision/get-group-max/1`;
+    const url = `${hostname}:${port}/provision/get-group-max/1`;
     return await axios.get(url).then((res) => {
       return res.data;
     });
@@ -417,7 +418,7 @@ export class AdminService {
     },
     create_userid: string
   ) {
-    const url = `${hostname}:${port}/nfr-provision`;
+    const url = `${hostname}:${port}/provision`;
     return await axios.post(url, { ...provisionParams, create_userid }).then((res) => {
       return res.data;
     });
@@ -438,7 +439,7 @@ export class AdminService {
     },
     update_userid: string
   ) {
-    const url = `${hostname}:${port}/nfr-provision/update`;
+    const url = `${hostname}:${port}/provision/update`;
     return await axios.post(url, { ...provisionParams, update_userid }).then((res) => {
       return res.data;
     });
@@ -453,7 +454,7 @@ export class AdminService {
     },
     create_userid: string
   ) {
-    const url = `${hostname}:${port}/nfr-provision/add-variable`;
+    const url = `${hostname}:${port}/provision/add-variable`;
     return await axios.post(url, { ...variableParams, create_userid }).then((res) => {
       return res.data;
     });
@@ -468,14 +469,14 @@ export class AdminService {
     },
     update_userid: string
   ) {
-    const url = `${hostname}:${port}/nfr-provision/update-variable`;
+    const url = `${hostname}:${port}/provision/update-variable`;
     return await axios.post(url, { ...variableParams, update_userid }).then((res) => {
       return res.data;
     });
   }
 
   async removeVariable(id: number) {
-    const url = `${hostname}:${port}/nfr-provision/remove-variable/${id}`;
+    const url = `${hostname}:${port}/provision/remove-variable/${id}`;
     return await axios.get(url).then((res) => {
       return res.data;
     });

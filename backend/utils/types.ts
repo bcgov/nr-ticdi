@@ -2,7 +2,7 @@
  * DocumentTemplate object without the base64 file.
  */
 export type TrimmedDocumentTemplate = {
-  document_type?: string;
+  document_type_id?: number;
   template_version?: number;
   template_author?: string;
   active_flag?: boolean;
@@ -38,7 +38,7 @@ export type SessionData = {
   accounts: AccountObject[];
   activeAccount: AccountObject;
   selected_document: {
-    nfr_id: number;
+    document_id: number;
   };
 };
 

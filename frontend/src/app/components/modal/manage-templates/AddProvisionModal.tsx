@@ -10,6 +10,8 @@ interface AddProvisionModalProps {
   refreshTables: () => void;
 }
 
+// TODO - variants to be removed, possibly add ability to assign to multiple document types
+
 const AddProvisionModal: React.FC<AddProvisionModalProps> = ({
   groupMaxArray,
   show,

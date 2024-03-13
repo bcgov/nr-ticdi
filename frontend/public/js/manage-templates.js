@@ -1,85 +1,85 @@
 var documentTable; // main template upload table
 var groupMaxTable, provisionTable, editProvisionVariableTable;
 var documentTable2, documentTable3, documentTable4, documentTable5; // nfr variants
-var reportType = "";
-var reportTitle = "";
-var nfrDelayed = "NOTICE OF FINAL REVIEW (DELAYED)";
-var nfrNoFees = "NOTICE OF FINAL REVIEW (NO FEES)";
-var nfrSurveyReq = "NOTICE OF FINAL REVIEW (SURVEY REQUIRED)";
-var nfrToObtain = "NOTICE OF FINAL REVIEW (TO OBTAIN SURVEY)";
+var reportType = '';
+var reportTitle = '';
+var nfrDelayed = 'NOTICE OF FINAL REVIEW (DELAYED)';
+var nfrNoFees = 'NOTICE OF FINAL REVIEW (NO FEES)';
+var nfrSurveyReq = 'NOTICE OF FINAL REVIEW (SURVEY REQUIRED)';
+var nfrToObtain = 'NOTICE OF FINAL REVIEW (TO OBTAIN SURVEY)';
 $(document).ready(function () {
   const urlParams = new URLSearchParams(window.location.search);
-  const reportIndex = parseInt(urlParams.get("report"));
+  const reportIndex = parseInt(urlParams.get('report'));
   if (reportIndex != 2) {
-    $(".nofr-section").hide();
+    $('.nofr-section').hide();
   }
   switch (reportIndex) {
     case 1:
-      reportType = "LAND USE REPORT";
-      reportTitle = "Land Use Report";
+      reportType = 'LAND USE REPORT';
+      reportTitle = 'Land Use Report';
       break;
     case 2:
-      reportType = "NOTICE OF FINAL REVIEW";
-      reportTitle = "Notice of Final Review";
+      reportType = 'NOTICE OF FINAL REVIEW';
+      reportTitle = 'Notice of Final Review';
       break;
     case 3:
-      reportType = "GRAZING LEASE";
-      reportTitle = "Grazing Lease";
+      reportType = 'GRAZING LEASE';
+      reportTitle = 'Grazing Lease';
       break;
     default:
       break;
   }
-  $("#reportTitle").text(reportTitle);
+  $('#reportTitle').text(reportTitle);
   // used for sorting the radio buttons
-  $.fn.dataTable.ext.order["dom-checkbox"] = function (settings, col) {
+  $.fn.dataTable.ext.order['dom-checkbox'] = function (settings, col) {
     return this.api()
-      .column(col, { order: "index" })
+      .column(col, { order: 'index' })
       .nodes()
       .map(function (td, i) {
-        return $("input", td).prop("checked") ? "1" : "0";
+        return $('input', td).prop('checked') ? '1' : '0';
       });
   };
-  documentTable = $("#documentTable").DataTable({
+  documentTable = $('#documentTable').DataTable({
     ajax: {
       url: `admin/get-templates/${encodeURIComponent(reportType)}`,
-      dataSrc: "",
+      dataSrc: '',
     },
     paging: true,
     bFilter: true,
     columns: [
-      { data: "template_version" },
-      { data: "file_name" },
-      { data: "update_timestamp" },
-      { data: "active_flag" },
-      { data: "view" },
-      { data: "remove" },
-      { data: "id" },
+      { data: 'template_version' },
+      { data: 'file_name' },
+      { data: 'update_timestamp' },
+      { data: 'active_flag' },
+      { data: 'view' },
+      { data: 'remove' },
+      { data: 'id' },
     ],
     columnDefs: [
       {
         targets: [0, 1, 2, 3, 4, 5, 6],
         render: function (data, type, row, meta) {
-          if (type === "display") {
+          if (type === 'display') {
             var columnTypes = [
-              "template_version",
-              "file_name",
-              "update_timestamp",
-              "active_flag",
-              "view",
-              "remove",
-              "id",
+              'template_version',
+              'file_name',
+              'update_timestamp',
+              'active_flag',
+              'view',
+              'remove',
+              'id',
             ];
             var columnType = columnTypes[meta.col];
-            var id = row["id"];
-            const checked = data === true ? "checked" : "";
+            var id = row['id'];
+            const checked = data === true ? 'checked' : '';
 
-            if (columnType === "active_flag") {
+            if (columnType === 'active_flag') {
               return `<input type='radio' name="dt1" data-id='${id}' onclick='activateTemplate.call(this)' ${checked}>`;
-            } else if (columnType === "remove") {
+            } else if (columnType === 'remove') {
               return `<button class='btn btn-warning remove-template-button' data-id='${id}' data-toggle='modal' data-target='#removeModal'>Remove`;
-            } else if (columnType === "view") {
+            } else if (columnType === 'view') {
               return `<button class='btn btn-info' id='view-${id}' onclick='downloadTemplate(${id})'>View`;
-            } else if (columnType === "id") {
+            } else if (columnType === 'id') {
               return `<input type='hidden' id='template_id-${id}' value='${data}' />`;
             } else {
               return `<input type='text' id='${columnType}-${id}' value='${data}' readonly style='color: gray; width: 100%;' />`;
@@ -91,7 +91,7 @@ $(document).ready(function () {
       },
       {
         targets: [3],
-        className: "text-center",
+        className: 'text-center',
       },
       {
         targets: [4, 5, 6],
@@ -100,53 +100,53 @@ $(document).ready(function () {
       },
     ],
     createdRow: function (row, data, dataIndex) {
-      $(row).attr("id", "row-" + data["id"]);
+      $(row).attr('id', 'row-' + data['id']);
     },
-    order: [[0, "asc"]],
+    order: [[0, 'asc']],
   });
   // nfr section
   if (reportIndex == 2) {
-    documentTable2 = $("#documentTable2").DataTable({
+    documentTable2 = $('#documentTable2').DataTable({
       ajax: {
         url: `admin/get-templates/${encodeURIComponent(nfrDelayed)}`,
-        dataSrc: "",
+        dataSrc: '',
       },
       paging: true,
       bFilter: true,
       columns: [
-        { data: "template_version" },
-        { data: "file_name" },
-        { data: "update_timestamp" },
-        { data: "active_flag" },
-        { data: "view" },
-        { data: "remove" },
-        { data: "id" },
+        { data: 'template_version' },
+        { data: 'file_name' },
+        { data: 'update_timestamp' },
+        { data: 'active_flag' },
+        { data: 'view' },
+        { data: 'remove' },
+        { data: 'id' },
       ],
       columnDefs: [
         {
           targets: [0, 1, 2, 3, 4, 5, 6],
           render: function (data, type, row, meta) {
-            if (type === "display") {
+            if (type === 'display') {
               var columnTypes = [
-                "template_version",
-                "file_name",
-                "update_timestamp",
-                "active_flag",
-                "view",
-                "remove",
-                "id",
+                'template_version',
+                'file_name',
+                'update_timestamp',
+                'active_flag',
+                'view',
+                'remove',
+                'id',
               ];
               var columnType = columnTypes[meta.col];
-              var id = row["id"];
-              const checked = data === true ? "checked" : "";
+              var id = row['id'];
+              const checked = data === true ? 'checked' : '';
 
-              if (columnType === "active_flag") {
+              if (columnType === 'active_flag') {
                 return `<input type='radio' name="dt2" data-id='${id}' data-variant='${nfrDelayed}' onclick='activateTemplate.call(this)' ${checked}>`;
-              } else if (columnType === "remove") {
+              } else if (columnType === 'remove') {
                 return `<button class='btn btn-warning remove-template-button' data-id='${id}' data-toggle='modal' data-target='#removeModal'>Remove`;
-              } else if (columnType === "view") {
+              } else if (columnType === 'view') {
                 return `<button class='btn btn-info' id='view-${id}' onclick='downloadTemplate(${id})'>View`;
-              } else if (columnType === "id") {
+              } else if (columnType === 'id') {
                 return `<input type='hidden' id='template_id-${id}' value='${data}' />`;
               } else {
                 return `<input type='text' id='${columnType}-${id}' value='${data}' readonly style='color: gray; width: 100%;' />`;
@@ -158,7 +158,7 @@ $(document).ready(function () {
         },
         {
           targets: [3],
-          className: "text-center",
+          className: 'text-center',
         },
         {
           targets: [4, 5, 6],
@@ -167,51 +167,51 @@ $(document).ready(function () {
         },
       ],
       createdRow: function (row, data, dataIndex) {
-        $(row).attr("id", "row-" + data["id"]);
+        $(row).attr('id', 'row-' + data['id']);
       },
-      order: [[0, "asc"]],
+      order: [[0, 'asc']],
     });
-    documentTable3 = $("#documentTable3").DataTable({
+    documentTable3 = $('#documentTable3').DataTable({
       ajax: {
         url: `admin/get-templates/${encodeURIComponent(nfrNoFees)}`,
-        dataSrc: "",
+        dataSrc: '',
       },
       paging: true,
       bFilter: true,
       columns: [
-        { data: "template_version" },
-        { data: "file_name" },
-        { data: "update_timestamp" },
-        { data: "active_flag" },
-        { data: "view" },
-        { data: "remove" },
-        { data: "id" },
+        { data: 'template_version' },
+        { data: 'file_name' },
+        { data: 'update_timestamp' },
+        { data: 'active_flag' },
+        { data: 'view' },
+        { data: 'remove' },
+        { data: 'id' },
       ],
       columnDefs: [
         {
           targets: [0, 1, 2, 3, 4, 5, 6],
           render: function (data, type, row, meta) {
-            if (type === "display") {
+            if (type === 'display') {
               var columnTypes = [
-                "template_version",
-                "file_name",
-                "update_timestamp",
-                "active_flag",
-                "view",
-                "remove",
-                "id",
+                'template_version',
+                'file_name',
+                'update_timestamp',
+                'active_flag',
+                'view',
+                'remove',
+                'id',
               ];
               var columnType = columnTypes[meta.col];
-              var id = row["id"];
-              const checked = data === true ? "checked" : "";
+              var id = row['id'];
+              const checked = data === true ? 'checked' : '';
 
-              if (columnType === "active_flag") {
+              if (columnType === 'active_flag') {
                 return `<input type='radio' name="dt3" data-id='${id}' data-variant='${nfrNoFees}' onclick='activateTemplate.call(this)' ${checked}>`;
-              } else if (columnType === "remove") {
+              } else if (columnType === 'remove') {
                 return `<button class='btn btn-warning remove-template-button' data-id='${id}' data-toggle='modal' data-target='#removeModal'>Remove`;
-              } else if (columnType === "view") {
+              } else if (columnType === 'view') {
                 return `<button class='btn btn-info' id='view-${id}' onclick='downloadTemplate(${id})'>View`;
-              } else if (columnType === "id") {
+              } else if (columnType === 'id') {
                 return `<input type='hidden' id='template_id-${id}' value='${data}' />`;
               } else {
                 return `<input type='text' id='${columnType}-${id}' value='${data}' readonly style='color: gray; width: 100%;' />`;
@@ -223,7 +223,7 @@ $(document).ready(function () {
         },
         {
           targets: [3],
-          className: "text-center",
+          className: 'text-center',
         },
         {
           targets: [4, 5, 6],
@@ -232,51 +232,51 @@ $(document).ready(function () {
         },
       ],
       createdRow: function (row, data, dataIndex) {
-        $(row).attr("id", "row-" + data["id"]);
+        $(row).attr('id', 'row-' + data['id']);
       },
-      order: [[0, "asc"]],
+      order: [[0, 'asc']],
     });
-    documentTable4 = $("#documentTable4").DataTable({
+    documentTable4 = $('#documentTable4').DataTable({
       ajax: {
         url: `admin/get-templates/${encodeURIComponent(nfrSurveyReq)}`,
-        dataSrc: "",
+        dataSrc: '',
       },
       paging: true,
       bFilter: true,
       columns: [
-        { data: "template_version" },
-        { data: "file_name" },
-        { data: "update_timestamp" },
-        { data: "active_flag" },
-        { data: "view" },
-        { data: "remove" },
-        { data: "id" },
+        { data: 'template_version' },
+        { data: 'file_name' },
+        { data: 'update_timestamp' },
+        { data: 'active_flag' },
+        { data: 'view' },
+        { data: 'remove' },
+        { data: 'id' },
       ],
       columnDefs: [
         {
           targets: [0, 1, 2, 3, 4, 5, 6],
           render: function (data, type, row, meta) {
-            if (type === "display") {
+            if (type === 'display') {
               var columnTypes = [
-                "template_version",
-                "file_name",
-                "update_timestamp",
-                "active_flag",
-                "view",
-                "remove",
-                "id",
+                'template_version',
+                'file_name',
+                'update_timestamp',
+                'active_flag',
+                'view',
+                'remove',
+                'id',
               ];
               var columnType = columnTypes[meta.col];
-              var id = row["id"];
-              const checked = data === true ? "checked" : "";
+              var id = row['id'];
+              const checked = data === true ? 'checked' : '';
 
-              if (columnType === "active_flag") {
+              if (columnType === 'active_flag') {
                 return `<input type='radio' name="dt4" data-id='${id}' data-variant='${nfrSurveyReq}' onclick='activateTemplate.call(this)' ${checked}>`;
-              } else if (columnType === "remove") {
+              } else if (columnType === 'remove') {
                 return `<button class='btn btn-warning remove-template-button' data-id='${id}' data-toggle='modal' data-target='#removeModal'>Remove`;
-              } else if (columnType === "view") {
+              } else if (columnType === 'view') {
                 return `<button class='btn btn-info' id='view-${id}' onclick='downloadTemplate(${id})'>View`;
-              } else if (columnType === "id") {
+              } else if (columnType === 'id') {
                 return `<input type='hidden' id='template_id-${id}' value='${data}' />`;
               } else {
                 return `<input type='text' id='${columnType}-${id}' value='${data}' readonly style='color: gray; width: 100%;' />`;
@@ -288,7 +288,7 @@ $(document).ready(function () {
         },
         {
           targets: [3],
-          className: "text-center",
+          className: 'text-center',
         },
         {
           targets: [4, 5, 6],
@@ -297,51 +297,51 @@ $(document).ready(function () {
         },
       ],
       createdRow: function (row, data, dataIndex) {
-        $(row).attr("id", "row-" + data["id"]);
+        $(row).attr('id', 'row-' + data['id']);
       },
-      order: [[0, "asc"]],
+      order: [[0, 'asc']],
     });
-    documentTable5 = $("#documentTable5").DataTable({
+    documentTable5 = $('#documentTable5').DataTable({
       ajax: {
         url: `admin/get-templates/${encodeURIComponent(nfrToObtain)}`,
-        dataSrc: "",
+        dataSrc: '',
       },
       paging: true,
       bFilter: true,
       columns: [
-        { data: "template_version" },
-        { data: "file_name" },
-        { data: "update_timestamp" },
-        { data: "active_flag" },
-        { data: "view" },
-        { data: "remove" },
-        { data: "id" },
+        { data: 'template_version' },
+        { data: 'file_name' },
+        { data: 'update_timestamp' },
+        { data: 'active_flag' },
+        { data: 'view' },
+        { data: 'remove' },
+        { data: 'id' },
       ],
       columnDefs: [
         {
           targets: [0, 1, 2, 3, 4, 5, 6],
           render: function (data, type, row, meta) {
-            if (type === "display") {
+            if (type === 'display') {
               var columnTypes = [
-                "template_version",
-                "file_name",
-                "update_timestamp",
-                "active_flag",
-                "view",
-                "remove",
-                "id",
+                'template_version',
+                'file_name',
+                'update_timestamp',
+                'active_flag',
+                'view',
+                'remove',
+                'id',
               ];
               var columnType = columnTypes[meta.col];
-              var id = row["id"];
-              const checked = data === true ? "checked" : "";
+              var id = row['id'];
+              const checked = data === true ? 'checked' : '';
 
-              if (columnType === "active_flag") {
+              if (columnType === 'active_flag') {
                 return `<input type='radio' name="dt5" data-id='${id}' data-variant='${nfrToObtain}' onclick='activateTemplate.call(this)' ${checked}>`;
-              } else if (columnType === "remove") {
+              } else if (columnType === 'remove') {
                 return `<button class='btn btn-warning remove-template-button' data-id='${id}' data-toggle='modal' data-target='#removeModal'>Remove`;
-              } else if (columnType === "view") {
+              } else if (columnType === 'view') {
                 return `<button class='btn btn-info' id='view-${id}' onclick='downloadTemplate(${id})'>View`;
-              } else if (columnType === "id") {
+              } else if (columnType === 'id') {
                 return `<input type='hidden' id='template_id-${id}' value='${data}' />`;
               } else {
                 return `<input type='text' id='${columnType}-${id}' value='${data}' readonly style='color: gray; width: 100%;' />`;
@@ -353,7 +353,7 @@ $(document).ready(function () {
         },
         {
           targets: [3],
-          className: "text-center",
+          className: 'text-center',
         },
         {
           targets: [4, 5, 6],
@@ -362,85 +362,81 @@ $(document).ready(function () {
         },
       ],
       createdRow: function (row, data, dataIndex) {
-        $(row).attr("id", "row-" + data["id"]);
+        $(row).attr('id', 'row-' + data['id']);
       },
-      order: [[0, "asc"]],
+      order: [[0, 'asc']],
     });
 
-    groupMaxTable = $("#groupMaxTable").DataTable({
+    groupMaxTable = $('#groupMaxTable').DataTable({
       ajax: {
-        url: "admin/get-group-max",
-        dataSrc: "",
+        url: 'admin/get-group-max',
+        dataSrc: '',
       },
       columns: [
-        { data: "provision_group", title: "Group" },
-        { data: "max", title: "Max" },
-        { data: "provision_group_text", title: "Group Description" },
+        { data: 'provision_group', title: 'Group' },
+        { data: 'max', title: 'Max' },
+        { data: 'provision_group_text', title: 'Group Description' },
       ],
-      order: [0, "asc"],
+      order: [0, 'asc'],
     });
-    provisionTable = $("#provisionTable").DataTable({
+    provisionTable = $('#provisionTable').DataTable({
       ajax: {
-        url: "admin/nfr-provisions",
-        dataSrc: "",
+        url: 'admin/provisions',
+        dataSrc: '',
       },
       paging: false,
       bFilter: false,
       columns: [
-        { data: "type" },
-        { data: "provision_group" },
-        { data: "max" },
-        { data: "provision_name" },
-        { data: "free_text" },
-        { data: "category" },
-        { data: "active_flag" },
-        { data: "edit" },
-        { data: "help_text" },
-        { data: "id" },
-        { data: "variants" },
+        { data: 'type' },
+        { data: 'provision_group' },
+        { data: 'max' },
+        { data: 'provision_name' },
+        { data: 'free_text' },
+        { data: 'category' },
+        { data: 'active_flag' },
+        { data: 'edit' },
+        { data: 'help_text' },
+        { data: 'id' },
+        { data: 'variants' },
       ],
       columnDefs: [
         {
           targets: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
           render: function (data, type, row, meta) {
-            if (type === "display") {
+            if (type === 'display') {
               var columnTypes = [
-                "type",
-                "provision_group",
-                "max",
-                "provision_name",
-                "free_text",
-                "category",
-                "active_flag",
-                "edit",
-                "help_text",
-                "id",
-                "variants",
+                'type',
+                'provision_group',
+                'max',
+                'provision_name',
+                'free_text',
+                'category',
+                'active_flag',
+                'edit',
+                'help_text',
+                'id',
+                'variants',
               ];
               var columnType = columnTypes[meta.col];
-              var id = row["id"];
-              var group = row["provision_group"];
-              var max = row["max"];
-              var provisionType = row["type"];
-              var mandatory = provisionType == "M" ? true : false;
-              var variants = JSON.stringify(row["variants"]);
+              var id = row['id'];
+              var group = row['provision_group'];
+              var max = row['max'];
+              var provisionType = row['type'];
+              var mandatory = provisionType == 'M' ? true : false;
+              var variants = JSON.stringify(row['variants']);
 
-              if (columnType === "active_flag") {
-                const checked = data === true ? "checked" : "";
+              if (columnType === 'active_flag') {
+                const checked = data === true ? 'checked' : '';
                 return `<input type='checkbox' data-id='${id}' data-group='${group}' data-max='${max}' name='radioActive' ${checked}>`;
-              } else if (
-                columnType === "help_text" ||
-                columnType === "id" ||
-                columnType === "variants"
-              ) {
+              } else if (columnType === 'help_text' || columnType === 'id' || columnType === 'variants') {
                 return `<input type='hidden' id='${columnType}-${id}' value='${data}' />`;
-              } else if (columnType === "edit") {
+              } else if (columnType === 'edit') {
                 return `<a href="#" data-id="${id}" data-variants="${variants}" data-mandatory="${mandatory}" onclick="openEditModal.call(this)">Edit</a>`;
-              } else if (columnType === "max") {
+              } else if (columnType === 'max') {
                 return `<input type='text' id='${columnType}-${id}' value='${
-                  data == 999 ? "-" : data
+                  data == 999 ? '-' : data
                 }' readonly style='color: gray; width: 100%;' />`;
-              } else if (columnType === "free_text") {
+              } else if (columnType === 'free_text') {
                 return `<input type='text' id='${columnType}-${id}' data-fullval='${data}' value='${data}' title='${data}' readonly style='color: gray; width: 100%; white-space: pre-wrap;' />`;
               } else {
                 return `<input type='text' id='${columnType}-${id}' value='${data}' readonly style='color: gray; width: 100%;' />`;
@@ -452,8 +448,8 @@ $(document).ready(function () {
         },
         {
           targets: [7],
-          className: "text-center",
-          orderDataType: "dom-checkbox",
+          className: 'text-center',
+          orderDataType: 'dom-checkbox',
         },
         {
           targets: [8, 9, 10],
@@ -462,12 +458,10 @@ $(document).ready(function () {
       ],
       drawCallback: function (settings) {
         // add event listeners to the provision checkboxes
-        const checkboxes = document.querySelectorAll(
-          'input[name="radioActive"]'
-        );
+        const checkboxes = document.querySelectorAll('input[name="radioActive"]');
         if (checkboxes.length > 0) {
           checkboxes.forEach((checkbox) => {
-            checkbox.addEventListener("click", function () {
+            checkbox.addEventListener('click', function () {
               if (checkbox.checked) {
                 fetch(`admin/enable-provision/${checkbox.dataset.id}`);
               } else {
@@ -477,54 +471,50 @@ $(document).ready(function () {
           });
         }
       },
-      order: [[1, "asc"]],
+      order: [[1, 'asc']],
     });
-    editProvisionVariableTable = $("#editProvisionVariableTable").DataTable({
+    editProvisionVariableTable = $('#editProvisionVariableTable').DataTable({
       ajax: {
-        url: "admin/nfr-variables",
-        dataSrc: "",
+        url: 'admin/nfr-variables',
+        dataSrc: '',
       },
-      info: "",
+      info: '',
       paging: false,
       bFilter: false,
       autoWidth: false,
       columns: [
-        { data: "variable_name", title: "Name", width: "40%" },
-        { data: "variable_value", title: "Value", width: "40%" },
-        { data: "edit", width: "10%" },
-        { data: "remove", width: "10%" },
-        { data: "help_text", visible: false },
-        { data: "id", visible: false },
-        { data: "provision_id", visible: false },
+        { data: 'variable_name', title: 'Name', width: '40%' },
+        { data: 'variable_value', title: 'Value', width: '40%' },
+        { data: 'edit', width: '10%' },
+        { data: 'remove', width: '10%' },
+        { data: 'help_text', visible: false },
+        { data: 'id', visible: false },
+        { data: 'provision_id', visible: false },
       ],
       columnDefs: [
         {
           targets: [0, 1, 2, 3, 4, 5, 6],
-          type: "string",
+          type: 'string',
           render: function (data, type, row, meta) {
-            if (type === "display") {
+            if (type === 'display') {
               var columnTypes = [
-                "variable_name",
-                "variable_value",
-                "edit",
-                "remove",
-                "help_text",
-                "id",
-                "provision_id",
+                'variable_name',
+                'variable_value',
+                'edit',
+                'remove',
+                'help_text',
+                'id',
+                'provision_id',
               ];
               var columnType = columnTypes[meta.col];
-              var id = row["id"];
-              var provisionId = row["provision_id"];
+              var id = row['id'];
+              var provisionId = row['provision_id'];
 
-              if (
-                columnType === "help_text" ||
-                columnType === "id" ||
-                columnType === "provision_id"
-              ) {
+              if (columnType === 'help_text' || columnType === 'id' || columnType === 'provision_id') {
                 return `<input type='hidden' id='${columnType}-${id}' value='${data}' />`;
-              } else if (columnType === "edit") {
+              } else if (columnType === 'edit') {
                 return `<a href="#" data-id="${id}" data-provision_id="${provisionId}" onclick="showEditVariable.call(this)">Edit</a>`;
-              } else if (columnType === "remove") {
+              } else if (columnType === 'remove') {
                 return `<a href="#" data-id="${id}" data-provision_id="${provisionId}" onclick="showRemoveVariable.call(this)">Remove</a>`;
               } else {
                 return `<input type='text' value='${data}' readonly style='color: gray; width: 100%;' />`;
@@ -540,66 +530,66 @@ $(document).ready(function () {
         },
       ],
       rowCallback: function (row, data) {
-        $(row).attr("data-provision_id", data.provision_id);
+        $(row).attr('data-provision_id', data.provision_id);
       },
     });
   }
 });
 // collapsible logic
-$("fieldset legend").click(function () {
-  $(this).parent().find(".contents").toggle();
-  if ($(".fa", this).hasClass("fa-plus")) {
-    $(".fa", this).removeClass("fa-plus").addClass("fa-minus");
+$('fieldset legend').click(function () {
+  $(this).parent().find('.contents').toggle();
+  if ($('.fa', this).hasClass('fa-plus')) {
+    $('.fa', this).removeClass('fa-plus').addClass('fa-minus');
   } else {
-    $(".fa", this).removeClass("fa-minus").addClass("fa-plus");
+    $('.fa', this).removeClass('fa-minus').addClass('fa-plus');
   }
 });
 /******************
  * Templates logic *
  *******************/
 function downloadTemplate(id) {
-  $(":button").prop("disabled", true);
+  $(':button').prop('disabled', true);
   const template_name = $(`#file_name-${id}`).val();
   fetch(`/admin/download-template/${id}`, {
-    method: "GET",
+    method: 'GET',
   })
     .then((res) => res.blob())
     .then((blob) => {
       const url = window.URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.style.display = "none";
+      const a = document.createElement('a');
+      a.style.display = 'none';
       a.href = url;
-      a.download = template_name + ".docx";
+      a.download = template_name + '.docx';
       document.body.appendChild(a);
       a.click();
       window.URL.revokeObjectURL(url);
-      $(":button").prop("disabled", false);
+      $(':button').prop('disabled', false);
     })
     .catch(() => {
-      $(":button").prop("disabled", false);
-      console.log("Error downloading the template");
+      $(':button').prop('disabled', false);
+      console.log('Error downloading the template');
     });
 }
 function removeTemplate() {
-  const id = $("#document-template-id").val();
+  const id = $('#document-template-id').val();
   const urlParams = new URLSearchParams(window.location.search);
-  const reportIndex = parseInt(urlParams.get("report"));
-  let reportType = "";
+  const reportIndex = parseInt(urlParams.get('report'));
+  let reportType = '';
   switch (reportIndex) {
     case 1:
-      reportType = "LAND USE REPORT";
+      reportType = 'LAND USE REPORT';
       break;
     case 2:
-      reportType = "NOTICE OF FINAL REVIEW";
+      reportType = 'NOTICE OF FINAL REVIEW';
       break;
     case 3:
-      reportType = "GRAZING LEASE";
+      reportType = 'GRAZING LEASE';
       break;
     default:
       break;
   }
   fetch(`/admin/remove-template/${reportType}/${id}`, {
-    method: "GET",
+    method: 'GET',
   })
     .then((res) => res.json())
     .then(() => {
@@ -610,23 +600,20 @@ function removeTemplate() {
       documentTable5.ajax.reload();
     })
     .catch(() => {
-      console.log("Error removing the template");
+      console.log('Error removing the template');
     });
 }
 function activateTemplate() {
-  const templateId = $(this).data("id");
-  let variantType = $(this).data("variant");
-  const reportType = $("#reportTitle").text();
+  const templateId = $(this).data('id');
+  let variantType = $(this).data('variant');
+  const reportType = $('#reportTitle').text();
   if (!variantType) {
     variantType = reportType;
   }
-  fetch(
-    `/admin/activate-template/${templateId}/${encodeURIComponent(variantType)}`,
-    {
-      method: "GET",
-      responseType: "application/json",
-    }
-  )
+  fetch(`/admin/activate-template/${templateId}/${encodeURIComponent(variantType)}`, {
+    method: 'GET',
+    responseType: 'application/json',
+  })
     .then((res) => res.json())
     .then((data) => {
       if (data.errors) {
@@ -636,70 +623,70 @@ function activateTemplate() {
     .catch(() => location.reload());
 }
 // remove template button clicked
-$(document).on("click", ".remove-template-button", function () {
-  const documentTemplateId = $(this).data("id");
-  $(".modal-body #document-template-id").val(documentTemplateId);
+$(document).on('click', '.remove-template-button', function () {
+  const documentTemplateId = $(this).data('id');
+  $('.modal-body #document-template-id').val(documentTemplateId);
 });
-$("#uploadModal").on("show.bs.modal", function (event) {
+$('#uploadModal').on('show.bs.modal', function (event) {
   const button = $(event.relatedTarget);
-  const variantName = button.data("variant");
+  const variantName = button.data('variant');
   const modal = $(this);
   if (variantName) {
-    modal.find("#uploadTitle").text("Upload Template: " + variantName);
-    modal.find("#uploadReportType").val(variantName);
+    modal.find('#uploadTitle').text('Upload Template: ' + variantName);
+    modal.find('#uploadReportType').val(variantName);
   } else {
-    modal.find("#uploadTitle").text("Upload Template: " + reportType);
-    modal.find("#uploadReportType").val(reportType);
+    modal.find('#uploadTitle').text('Upload Template: ' + reportType);
+    modal.find('#uploadReportType').val(reportType);
   }
 });
 // clear the modals on close
-$("#uploadModal").on("hidden.bs.modal", function () {
-  $("#saveButton").prop("disabled", true);
-  $(this).find(".upload-input").val("");
+$('#uploadModal').on('hidden.bs.modal', function () {
+  $('#saveButton').prop('disabled', true);
+  $(this).find('.upload-input').val('');
 });
 // upload modal confirmation/save
-$("#uploadModal").on("hidden.bs.modal", function (e) {
-  $("#confirmTitle").hide();
-  $("#uploadTitle").show();
-  $("#confirmBody").hide();
-  $("#uploadBody").show();
-  $("#yesButton").hide();
-  $("#noButton").hide();
-  $("#saveButton").show();
-  $("#cancelButton").show();
+$('#uploadModal').on('hidden.bs.modal', function (e) {
+  $('#confirmTitle').hide();
+  $('#uploadTitle').show();
+  $('#confirmBody').hide();
+  $('#uploadBody').show();
+  $('#yesButton').hide();
+  $('#noButton').hide();
+  $('#saveButton').show();
+  $('#cancelButton').show();
   var input = document.querySelector('input[type="file"]');
-  input.value = "";
+  input.value = '';
 });
 function saveButtonClicked() {
-  $("#uploadTitle").hide();
-  $("#confirmTitle").show();
-  $("#uploadBody").hide();
-  $("#confirmBody").show();
-  $("#saveButton").hide();
-  $("#cancelButton").hide();
-  $("#yesButton").show();
-  $("#noButton").show();
+  $('#uploadTitle').hide();
+  $('#confirmTitle').show();
+  $('#uploadBody').hide();
+  $('#confirmBody').show();
+  $('#saveButton').hide();
+  $('#cancelButton').hide();
+  $('#yesButton').show();
+  $('#noButton').show();
 }
 function uploadTemplate() {
-  let f = document.getElementById("uploadFile");
+  let f = document.getElementById('uploadFile');
   var input = document.querySelector('input[type="file"]');
   var formData = new FormData();
-  const reportType = $("#uploadReportType").val();
-  formData.append("file", input.files[0]);
-  formData.append("document_type", reportType);
-  formData.append("active_flag", false);
-  formData.append("template_name", $("#uploadTemplateName").val());
-  fetch("/admin/upload-template", {
-    method: "POST",
+  const reportType = $('#uploadReportType').val();
+  formData.append('file', input.files[0]);
+  formData.append('document_type', reportType);
+  formData.append('active_flag', false);
+  formData.append('template_name', $('#uploadTemplateName').val());
+  fetch('/admin/upload-template', {
+    method: 'POST',
     body: formData,
-    responseType: "application/json",
+    responseType: 'application/json',
   })
     .then((res) => res.json())
     .then((data) => {
       if (data.errors) {
         alert(data.errors);
       } else {
-        $("#uploadModal").modal("toggle");
+        $('#uploadModal').modal('toggle');
         if (reportType === nfrDelayed) {
           documentTable2.ajax.reload();
         } else if (reportType === nfrNoFees) {
@@ -719,17 +706,15 @@ function uploadTemplate() {
  * Add Provision Modal logic *
  ********************************/
 function addProvision() {
-  const type = $("#addProvisionType").find(":selected").val();
-  const provision_group = $("#addProvisionGroup").val();
-  const max = $("#addProvisionMaxUnlimited").is(":checked")
-    ? 999
-    : $("#addProvisionMax").val();
-  const provision_group_text = $("#addProvisionGroupText").val();
-  const provision_name = $("#addProvisionName").val();
-  const free_text = $("#addProvisionFreeText").val();
-  const help_text = $("#addProvisionHelpText").val();
-  const category = $("#addProvisionCategory").val();
-  const variantCheckboxes = document.querySelectorAll(".addProvisionVariant");
+  const type = $('#addProvisionType').find(':selected').val();
+  const provision_group = $('#addProvisionGroup').val();
+  const max = $('#addProvisionMaxUnlimited').is(':checked') ? 999 : $('#addProvisionMax').val();
+  const provision_group_text = $('#addProvisionGroupText').val();
+  const provision_name = $('#addProvisionName').val();
+  const free_text = $('#addProvisionFreeText').val();
+  const help_text = $('#addProvisionHelpText').val();
+  const category = $('#addProvisionCategory').val();
+  const variantCheckboxes = document.querySelectorAll('.addProvisionVariant');
   const variants = [];
   variantCheckboxes.forEach((checkbox) => {
     if (checkbox.checked) {
@@ -749,21 +734,21 @@ function addProvision() {
     variants: variants,
     // mandatory: mandatory,
   });
-  const matchingRow = $("#groupMaxTable")
-    .find("tr td:first-child")
+  const matchingRow = $('#groupMaxTable')
+    .find('tr td:first-child')
     .filter(function () {
       return $(this).text() === provision_group;
     })
-    .closest("tr");
+    .closest('tr');
   if (matchingRow.length) {
-    const maxCellValue = +matchingRow.find("td:eq(1)").text();
-    const groupTextCellValue = matchingRow.find("td:eq(2)").text();
+    const maxCellValue = +matchingRow.find('td:eq(1)').text();
+    const groupTextCellValue = matchingRow.find('td:eq(2)').text();
     if (maxCellValue === max && groupTextCellValue == provision_group_text) {
-      fetch("admin/add-provision", {
-        method: "POST",
+      fetch('admin/add-provision', {
+        method: 'POST',
         headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
         },
         body: data,
       })
@@ -772,29 +757,27 @@ function addProvision() {
           groupMaxTable.ajax.reload();
           provisionTable.ajax.reload();
         });
-      $("#addProvisionModal").modal("toggle");
+      $('#addProvisionModal').modal('toggle');
     } else {
       if (maxCellValue != max && groupTextCellValue != provision_group_text) {
-        $("#addGroupConfirmationText").text(
+        $('#addGroupConfirmationText').text(
           `This will change the maximum number of provisions and description for group ${provision_group}.`
         );
       } else if (maxCellValue != max) {
-        $("#addGroupConfirmationText").text(
+        $('#addGroupConfirmationText').text(
           `This will change the maximum number of provisions for group ${provision_group}.`
         );
       } else {
-        $("#addGroupConfirmationText").text(
-          `This will change the description for group ${provision_group}.`
-        );
+        $('#addGroupConfirmationText').text(`This will change the description for group ${provision_group}.`);
       }
       showAddConfirm();
     }
   } else {
-    fetch("admin/add-provision", {
-      method: "POST",
+    fetch('admin/add-provision', {
+      method: 'POST',
       headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
       },
       body: data,
     })
@@ -803,21 +786,19 @@ function addProvision() {
         groupMaxTable.ajax.reload();
         provisionTable.ajax.reload();
       });
-    $("#addProvisionModal").modal("toggle");
+    $('#addProvisionModal').modal('toggle');
   }
 }
 function confirmAddProvision() {
-  const type = $("#addProvisionType").find(":selected").val();
-  const provision_group = $("#addProvisionGroup").val();
-  const provision_group_text = $("#addProvisionGroupText").val();
-  const max = $("#addProvisionMaxUnlimited").is(":checked")
-    ? 999
-    : $("#addProvisionMax").val();
-  const provision_name = $("#addProvisionName").val();
-  const free_text = $("#addProvisionFreeText").val();
-  const help_text = $("#addProvisionHelpText").val();
-  const category = $("#addProvisionCategory").val();
-  const variantCheckboxes = document.querySelectorAll(".addProvisionVariant");
+  const type = $('#addProvisionType').find(':selected').val();
+  const provision_group = $('#addProvisionGroup').val();
+  const provision_group_text = $('#addProvisionGroupText').val();
+  const max = $('#addProvisionMaxUnlimited').is(':checked') ? 999 : $('#addProvisionMax').val();
+  const provision_name = $('#addProvisionName').val();
+  const free_text = $('#addProvisionFreeText').val();
+  const help_text = $('#addProvisionHelpText').val();
+  const category = $('#addProvisionCategory').val();
+  const variantCheckboxes = document.querySelectorAll('.addProvisionVariant');
   const variants = [];
   variantCheckboxes.forEach((checkbox) => {
     if (checkbox.checked) {
@@ -837,11 +818,11 @@ function confirmAddProvision() {
     variants: variants,
     // mandatory: mandatory,
   });
-  fetch("admin/add-provision", {
-    method: "POST",
+  fetch('admin/add-provision', {
+    method: 'POST',
     headers: {
-      Accept: "application/json",
-      "Content-Type": "application/json",
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
     },
     body: data,
   })
@@ -849,84 +830,84 @@ function confirmAddProvision() {
     .then(() => {
       groupMaxTable.ajax.reload();
       provisionTable.ajax.reload();
-      $("#addProvisionModal").modal("toggle");
+      $('#addProvisionModal').modal('toggle');
     });
 }
 function addProvisionGoBack() {
   hideAddConfirm();
 }
 // make sure add provision integer inputs only accept integers positive integers
-$("#addProvisionMax").on("input", function () {
+$('#addProvisionMax').on('input', function () {
   var value = $(this).val();
-  value = value.replace(/[^0-9]/g, "");
+  value = value.replace(/[^0-9]/g, '');
   $(this).val(value);
 });
-$("#addProvisionMaxUnlimited").on("change", function () {
-  if ($(this).is(":checked")) {
-    $("#addProvisionMax").val("");
-    $("#addProvisionMax").prop("readonly", true);
-    $("#addProvisionMax").addClass("input-readonly");
+$('#addProvisionMaxUnlimited').on('change', function () {
+  if ($(this).is(':checked')) {
+    $('#addProvisionMax').val('');
+    $('#addProvisionMax').prop('readonly', true);
+    $('#addProvisionMax').addClass('input-readonly');
   } else {
-    $("#addProvisionMax").prop("readonly", false);
-    $("#addProvisionMax").removeClass("input-readonly");
+    $('#addProvisionMax').prop('readonly', false);
+    $('#addProvisionMax').removeClass('input-readonly');
   }
 });
 // auto-update the maximum value based on the selected group
-$("#addProvisionGroup").on("input", function () {
+$('#addProvisionGroup').on('input', function () {
   var value = $(this).val();
-  value = value.replace(/[^0-9]/g, "");
+  value = value.replace(/[^0-9]/g, '');
   $(this).val(value);
-  const groupMaxTable = $("#groupMaxTable");
+  const groupMaxTable = $('#groupMaxTable');
   const matchingRow = groupMaxTable
-    .find("tr td:first-child")
+    .find('tr td:first-child')
     .filter(function () {
       return $(this).text() === value;
     })
-    .closest("tr");
+    .closest('tr');
   if (matchingRow.length) {
-    const maxCellValue = +matchingRow.find("td:eq(1)").text();
-    const groupTextCellValue = matchingRow.find("td:eq(2)").text();
+    const maxCellValue = +matchingRow.find('td:eq(1)').text();
+    const groupTextCellValue = matchingRow.find('td:eq(2)').text();
     if (maxCellValue == 999) {
-      $("#addProvisionMax").val("");
-      $("#addProvisionMaxUnlimited").prop("checked", true);
-      $("#addProvisionMax").prop("readonly", true);
-      $("#addProvisionMax").addClass("input-readonly");
+      $('#addProvisionMax').val('');
+      $('#addProvisionMaxUnlimited').prop('checked', true);
+      $('#addProvisionMax').prop('readonly', true);
+      $('#addProvisionMax').addClass('input-readonly');
     } else {
-      $("#addProvisionMax").val(maxCellValue);
-      $("#addProvisionMaxUnlimited").prop("checked", false);
-      $("#addProvisionMax").prop("readonly", false);
-      $("#addProvisionMax").removeClass("input-readonly");
+      $('#addProvisionMax').val(maxCellValue);
+      $('#addProvisionMaxUnlimited').prop('checked', false);
+      $('#addProvisionMax').prop('readonly', false);
+      $('#addProvisionMax').removeClass('input-readonly');
     }
-    $("#addProvisionGroupText").val(groupTextCellValue);
+    $('#addProvisionGroupText').val(groupTextCellValue);
   } else {
-    $("#addProvisionMax").val("");
+    $('#addProvisionMax').val('');
   }
 });
-$("#addProvisionModal").on("hidden.bs.modal", function () {
-  $(this).find(".provision-input").val("");
+$('#addProvisionModal').on('hidden.bs.modal', function () {
+  $(this).find('.provision-input').val('');
   hideAddConfirm();
 });
 function hideAddConfirm() {
-  $("#addProvisionDiv").show();
-  $("#addProvisionFooter").show();
-  $("#addProvisionConfirmationDiv").hide();
-  $("#addProvisionConfirmationFooter").hide();
+  $('#addProvisionDiv').show();
+  $('#addProvisionFooter').show();
+  $('#addProvisionConfirmationDiv').hide();
+  $('#addProvisionConfirmationFooter').hide();
 }
 function showAddConfirm() {
-  $("#addProvisionDiv").hide();
-  $("#addProvisionFooter").hide();
-  $("#addProvisionConfirmationDiv").show();
-  $("#addProvisionConfirmationFooter").show();
+  $('#addProvisionDiv').hide();
+  $('#addProvisionFooter').hide();
+  $('#addProvisionConfirmationDiv').show();
+  $('#addProvisionConfirmationFooter').show();
 }
 
 /*********************************
  * Edit Provision Modal logic *
  *********************************/
 function openEditModal() {
-  const provisionId = $(this).data("id");
+  const provisionId = $(this).data('id');
   // Hide rows that do not match the selected provision_id
-  $("#editProvisionVariableTable tbody tr").each(function () {
-    if ($(this).data("provision_id") != provisionId) {
+  $('#editProvisionVariableTable tbody tr').each(function () {
+    if ($(this).data('provision_id') != provisionId) {
       $(this).hide();
     } else {
       $(this).show();
@@ -936,25 +917,25 @@ function openEditModal() {
   const provision_group = $(`#provision_group-${provisionId}`).val();
   const max = $(`#max-${provisionId}`).val();
   const provision_name = $(`#provision_name-${provisionId}`).val();
-  const free_text = $(`#free_text-${provisionId}`).data("fullval");
+  const free_text = $(`#free_text-${provisionId}`).data('fullval');
   const help_text = $(`#help_text-${provisionId}`).val();
   const category = $(`#category-${provisionId}`).val();
-  const variants = $(this).data("variants");
-  const mandatory = $(this).data("mandatory");
+  const variants = $(this).data('variants');
+  const mandatory = $(this).data('mandatory');
 
-  let provision_group_text = "";
-  const matchingRow = $("#groupMaxTable")
-    .find("tr td:first-child")
+  let provision_group_text = '';
+  const matchingRow = $('#groupMaxTable')
+    .find('tr td:first-child')
     .filter(function () {
       return $(this).text() === provision_group;
     })
-    .closest("tr");
+    .closest('tr');
   if (matchingRow.length) {
-    provision_group_text = matchingRow.find("td:eq(2)").text();
+    provision_group_text = matchingRow.find('td:eq(2)').text();
   }
 
-  $("#editProvisionId").val(provisionId);
-  const editProvisionType = document.getElementById("editProvisionType");
+  $('#editProvisionId').val(provisionId);
+  const editProvisionType = document.getElementById('editProvisionType');
   for (let i = 0; i < editProvisionType.options.length; i++) {
     const option = editProvisionType.options[i];
     if (option.value === type) {
@@ -962,24 +943,24 @@ function openEditModal() {
       break;
     }
   }
-  $("#editProvisionGroup").val(provision_group);
-  $("#editProvisionGroupText").val(provision_group_text);
-  if (max == "-") {
-    $("#editProvisionMax").val("");
-    $("#editProvisionMaxUnlimited").prop("checked", true);
-    $("#editProvisionMax").prop("readonly", true);
-    $("#editProvisionMax").addClass("input-readonly");
+  $('#editProvisionGroup').val(provision_group);
+  $('#editProvisionGroupText').val(provision_group_text);
+  if (max == '-') {
+    $('#editProvisionMax').val('');
+    $('#editProvisionMaxUnlimited').prop('checked', true);
+    $('#editProvisionMax').prop('readonly', true);
+    $('#editProvisionMax').addClass('input-readonly');
   } else {
-    $("#editProvisionMax").val(max);
-    $("#editProvisionMaxUnlimited").prop("checked", false);
-    $("#editProvisionMax").prop("readonly", false);
-    $("#editProvisionMax").removeClass("input-readonly");
+    $('#editProvisionMax').val(max);
+    $('#editProvisionMaxUnlimited').prop('checked', false);
+    $('#editProvisionMax').prop('readonly', false);
+    $('#editProvisionMax').removeClass('input-readonly');
   }
-  $("#editProvisionName").val(provision_name);
-  $("#editProvisionFreeText").val(free_text);
-  $("#editProvisionHelpText").val(help_text);
-  $("#editProvisionCategory").val(category);
-  const variantCheckboxes = document.querySelectorAll(".editProvisionVariant");
+  $('#editProvisionName').val(provision_name);
+  $('#editProvisionFreeText').val(free_text);
+  $('#editProvisionHelpText').val(help_text);
+  $('#editProvisionCategory').val(category);
+  const variantCheckboxes = document.querySelectorAll('.editProvisionVariant');
   variantCheckboxes.forEach((checkbox) => {
     const variantId = parseInt(checkbox.dataset.id);
     if (variants.includes(variantId)) {
@@ -989,22 +970,20 @@ function openEditModal() {
     }
   });
 
-  $("#editProvisionMandatory").prop("checked", mandatory);
-  $("#editProvisionModal").modal("toggle");
+  $('#editProvisionMandatory').prop('checked', mandatory);
+  $('#editProvisionModal').modal('toggle');
 }
 function editProvision() {
-  const id = $("#editProvisionId").val();
-  const type = $("#editProvisionType").find(":selected").val();
-  const provision_group = $("#editProvisionGroup").val();
-  const provision_group_text = $("#editProvisionGroupText").val();
-  const max = $("#editProvisionMaxUnlimited").is(":checked")
-    ? 999
-    : $("#editProvisionMax").val();
-  const provision_name = $("#editProvisionName").val();
-  const free_text = $("#editProvisionFreeText").val();
-  const help_text = $("#editProvisionHelpText").val();
-  const category = $("#editProvisionCategory").val();
-  const variantCheckboxes = document.querySelectorAll(".editProvisionVariant");
+  const id = $('#editProvisionId').val();
+  const type = $('#editProvisionType').find(':selected').val();
+  const provision_group = $('#editProvisionGroup').val();
+  const provision_group_text = $('#editProvisionGroupText').val();
+  const max = $('#editProvisionMaxUnlimited').is(':checked') ? 999 : $('#editProvisionMax').val();
+  const provision_name = $('#editProvisionName').val();
+  const free_text = $('#editProvisionFreeText').val();
+  const help_text = $('#editProvisionHelpText').val();
+  const category = $('#editProvisionCategory').val();
+  const variantCheckboxes = document.querySelectorAll('.editProvisionVariant');
   const variants = [];
   variantCheckboxes.forEach((checkbox) => {
     if (checkbox.checked) {
@@ -1025,21 +1004,21 @@ function editProvision() {
     variants: variants,
     // mandatory: mandatory,
   });
-  const matchingRow = $("#groupMaxTable")
-    .find("tr td:first-child")
+  const matchingRow = $('#groupMaxTable')
+    .find('tr td:first-child')
     .filter(function () {
       return $(this).text() === provision_group;
     })
-    .closest("tr");
+    .closest('tr');
   if (matchingRow.length) {
-    const maxCellValue = +matchingRow.find("td:eq(1)").text();
-    const groupTextCellValue = matchingRow.find("td:eq(2)").text();
+    const maxCellValue = +matchingRow.find('td:eq(1)').text();
+    const groupTextCellValue = matchingRow.find('td:eq(2)').text();
     if (maxCellValue == max && provision_group_text == groupTextCellValue) {
-      fetch("admin/update-provision", {
-        method: "POST",
+      fetch('admin/update-provision', {
+        method: 'POST',
         headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
         },
         body: data,
       })
@@ -1047,30 +1026,28 @@ function editProvision() {
         .then(() => {
           groupMaxTable.ajax.reload();
           provisionTable.ajax.reload();
-          $("#editProvisionModal").modal("toggle");
+          $('#editProvisionModal').modal('toggle');
         });
     } else {
       if (maxCellValue != max && groupTextCellValue != provision_group_text) {
-        $("#editGroupConfirmationText").text(
+        $('#editGroupConfirmationText').text(
           `This will change the maximum number of provisions and description for group ${provision_group}.`
         );
       } else if (maxCellValue != max) {
-        $("#editGroupConfirmationText").text(
+        $('#editGroupConfirmationText').text(
           `This will change the maximum number of provisions for group ${provision_group}.`
         );
       } else {
-        $("#editGroupConfirmationText").text(
-          `This will change the description for group ${provision_group}.`
-        );
+        $('#editGroupConfirmationText').text(`This will change the description for group ${provision_group}.`);
       }
       showEditConfirm();
     }
   } else {
-    fetch("admin/update-provision", {
-      method: "POST",
+    fetch('admin/update-provision', {
+      method: 'POST',
       headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
       },
       body: data,
     })
@@ -1079,22 +1056,20 @@ function editProvision() {
         groupMaxTable.ajax.reload();
         provisionTable.ajax.reload();
       });
-    $("#editProvisionModal").modal("toggle");
+    $('#editProvisionModal').modal('toggle');
   }
 }
 function confirmEditProvision() {
-  const id = $("#editProvisionId").val();
-  const type = $("#editProvisionType").find(":selected").val();
-  const provision_group = $("#editProvisionGroup").val();
-  const provision_group_text = $("#editProvisionGroupText").val();
-  const max = $("#editProvisionMaxUnlimited").is(":checked")
-    ? 999
-    : $("#editProvisionMax").val();
-  const provision_name = $("#editProvisionName").val();
-  const free_text = $("#editProvisionFreeText").val();
-  const help_text = $("#editProvisionHelpText").val();
-  const category = $("#editProvisionCategory").val();
-  const variantCheckboxes = document.querySelectorAll(".editProvisionVariant");
+  const id = $('#editProvisionId').val();
+  const type = $('#editProvisionType').find(':selected').val();
+  const provision_group = $('#editProvisionGroup').val();
+  const provision_group_text = $('#editProvisionGroupText').val();
+  const max = $('#editProvisionMaxUnlimited').is(':checked') ? 999 : $('#editProvisionMax').val();
+  const provision_name = $('#editProvisionName').val();
+  const free_text = $('#editProvisionFreeText').val();
+  const help_text = $('#editProvisionHelpText').val();
+  const category = $('#editProvisionCategory').val();
+  const variantCheckboxes = document.querySelectorAll('.editProvisionVariant');
   const variants = [];
   variantCheckboxes.forEach((checkbox) => {
     if (checkbox.checked) {
@@ -1115,11 +1090,11 @@ function confirmEditProvision() {
     variants: variants,
     // mandatory: mandatory,
   });
-  fetch("admin/update-provision", {
-    method: "POST",
+  fetch('admin/update-provision', {
+    method: 'POST',
     headers: {
-      Accept: "application/json",
-      "Content-Type": "application/json",
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
     },
     body: data,
   })
@@ -1128,139 +1103,133 @@ function confirmEditProvision() {
       groupMaxTable.ajax.reload();
       provisionTable.ajax.reload();
     });
-  $("#editProvisionModal").modal("toggle");
+  $('#editProvisionModal').modal('toggle');
   hideEditConfirm();
 }
 function editProvisionGoBack() {
   hideEditConfirm();
 }
 // make sure add provision integer inputs only accept integers positive integers
-$("#editProvisionMax").on("input", function () {
+$('#editProvisionMax').on('input', function () {
   var value = $(this).val();
-  value = value.replace(/[^0-9]/g, "");
+  value = value.replace(/[^0-9]/g, '');
   $(this).val(value);
 });
-$("#editProvisionMaxUnlimited").on("change", function () {
-  if ($(this).is(":checked")) {
-    $("#editProvisionMax").val("");
-    $("#editProvisionMax").prop("readonly", true);
-    $("#editProvisionMax").addClass("input-readonly");
+$('#editProvisionMaxUnlimited').on('change', function () {
+  if ($(this).is(':checked')) {
+    $('#editProvisionMax').val('');
+    $('#editProvisionMax').prop('readonly', true);
+    $('#editProvisionMax').addClass('input-readonly');
   } else {
-    $("#editProvisionMax").prop("readonly", false);
-    $("#editProvisionMax").removeClass("input-readonly");
+    $('#editProvisionMax').prop('readonly', false);
+    $('#editProvisionMax').removeClass('input-readonly');
   }
 });
 // auto-update the maximum value based on the selected group
-$("#editProvisionGroup").on("input", function () {
+$('#editProvisionGroup').on('input', function () {
   var value = $(this).val();
-  value = value.replace(/[^0-9]/g, "");
+  value = value.replace(/[^0-9]/g, '');
   $(this).val(value);
-  const groupMaxTable = $("#groupMaxTable");
+  const groupMaxTable = $('#groupMaxTable');
   const matchingRow = groupMaxTable
-    .find("tr td:first-child")
+    .find('tr td:first-child')
     .filter(function () {
       return $(this).text() === value;
     })
-    .closest("tr");
+    .closest('tr');
   if (matchingRow.length) {
-    const maxCellValue = +matchingRow.find("td:eq(1)").text();
-    const groupTextCellValue = matchingRow.find("td:eq(2)").text();
-    $("#editProvisionGroupText").val(groupTextCellValue);
+    const maxCellValue = +matchingRow.find('td:eq(1)').text();
+    const groupTextCellValue = matchingRow.find('td:eq(2)').text();
+    $('#editProvisionGroupText').val(groupTextCellValue);
     if (maxCellValue == 999) {
-      $("#editProvisionMax").val("");
-      $("#editProvisionMaxUnlimited").prop("checked", true);
-      $("#editProvisionMax").prop("readonly", true);
-      $("#editProvisionMax").addClass("input-readonly");
+      $('#editProvisionMax').val('');
+      $('#editProvisionMaxUnlimited').prop('checked', true);
+      $('#editProvisionMax').prop('readonly', true);
+      $('#editProvisionMax').addClass('input-readonly');
     } else {
-      $("#editProvisionMax").val(maxCellValue);
-      $("#editProvisionMaxUnlimited").prop("checked", false);
-      $("#editProvisionMax").prop("readonly", false);
-      $("#editProvisionMax").removeClass("input-readonly");
+      $('#editProvisionMax').val(maxCellValue);
+      $('#editProvisionMaxUnlimited').prop('checked', false);
+      $('#editProvisionMax').prop('readonly', false);
+      $('#editProvisionMax').removeClass('input-readonly');
     }
   } else {
-    $("#editProvisionMax").val("");
+    $('#editProvisionMax').val('');
   }
 });
-$("#editProvisionModal").on("hidden.bs.modal", function () {
-  $(this).find(".provision-input").val("");
+$('#editProvisionModal').on('hidden.bs.modal', function () {
+  $(this).find('.provision-input').val('');
   hideEditConfirm();
 });
 function hideEditConfirm() {
-  $("#editProvisionModalTitle").show();
-  $("#editProvisionDiv").show();
-  $("#editProvisionFooter").show();
-  $("#editProvisionModalEditVarTitle").hide();
-  $("#editProvisionModalAddVarTitle").hide();
-  $("#editProvisionModalRemVarTitle").hide();
-  $("#editProvisionConfirmationDiv").hide();
-  $("#editProvisionAddVariableDiv").hide();
-  $("#editProvisionEditVariableDiv").hide();
-  $("#editProvisionConfirmationFooter").hide();
-  $("#editProvisionAddVariableFooter").hide();
-  $("#editProvisionEditVariableFooter").hide();
-  $("#removeVariableDiv").hide();
-  $("#removeVariableFooter").hide();
+  $('#editProvisionModalTitle').show();
+  $('#editProvisionDiv').show();
+  $('#editProvisionFooter').show();
+  $('#editProvisionModalEditVarTitle').hide();
+  $('#editProvisionModalAddVarTitle').hide();
+  $('#editProvisionModalRemVarTitle').hide();
+  $('#editProvisionConfirmationDiv').hide();
+  $('#editProvisionAddVariableDiv').hide();
+  $('#editProvisionEditVariableDiv').hide();
+  $('#editProvisionConfirmationFooter').hide();
+  $('#editProvisionAddVariableFooter').hide();
+  $('#editProvisionEditVariableFooter').hide();
+  $('#removeVariableDiv').hide();
+  $('#removeVariableFooter').hide();
 }
 function showEditConfirm() {
-  $("#editProvisionDiv").hide();
-  $("#editProvisionConfirmationDiv").show();
-  $("#editProvisionConfirmationFooter").show();
+  $('#editProvisionDiv').hide();
+  $('#editProvisionConfirmationDiv').show();
+  $('#editProvisionConfirmationFooter').show();
 }
 function showAddVariable() {
-  $("#editProvisionModalTitle").hide();
-  $("#editProvisionDiv").hide();
-  $("#editProvisionFooter").hide();
-  $("#editProvisionModalAddVarTitle").show();
-  $("#editProvisionAddVariableDiv").show();
-  $("#editProvisionAddVariableFooter").show();
+  $('#editProvisionModalTitle').hide();
+  $('#editProvisionDiv').hide();
+  $('#editProvisionFooter').hide();
+  $('#editProvisionModalAddVarTitle').show();
+  $('#editProvisionAddVariableDiv').show();
+  $('#editProvisionAddVariableFooter').show();
 }
 function showEditVariable() {
-  $("#editProvisionModalTitle").hide();
-  $("#editProvisionDiv").hide();
-  $("#editProvisionFooter").hide();
-  var row = $("#editProvisionVariableTable")
-    .DataTable()
-    .row($(this).parents("tr"))
-    .data();
-  $("#editVariableId").val(row.id);
-  $("#editVariableName").val(row.variable_name);
-  $("#editVariableValue").val(row.variable_value);
-  $("#editVariableHelpText").val(row.help_text);
-  $("#editProvisionModalEditVarTitle").show();
-  $("#editProvisionEditVariableDiv").show();
-  $("#editProvisionEditVariableFooter").show();
+  $('#editProvisionModalTitle').hide();
+  $('#editProvisionDiv').hide();
+  $('#editProvisionFooter').hide();
+  var row = $('#editProvisionVariableTable').DataTable().row($(this).parents('tr')).data();
+  $('#editVariableId').val(row.id);
+  $('#editVariableName').val(row.variable_name);
+  $('#editVariableValue').val(row.variable_value);
+  $('#editVariableHelpText').val(row.help_text);
+  $('#editProvisionModalEditVarTitle').show();
+  $('#editProvisionEditVariableDiv').show();
+  $('#editProvisionEditVariableFooter').show();
 }
 function showRemoveVariable() {
-  $("#editProvisionModalTitle").hide();
-  $("#editProvisionDiv").hide();
-  $("#editProvisionFooter").hide();
-  var row = $("#editProvisionVariableTable")
-    .DataTable()
-    .row($(this).parents("tr"))
-    .data();
-  $("#removeVariableName").text(row.variable_name);
-  $("#removeVariableId").val(row.id);
-  $("#editProvisionModalRemVarTitle").show();
-  $("#removeVariableDiv").show();
-  $("#removeVariableFooter").show();
+  $('#editProvisionModalTitle').hide();
+  $('#editProvisionDiv').hide();
+  $('#editProvisionFooter').hide();
+  var row = $('#editProvisionVariableTable').DataTable().row($(this).parents('tr')).data();
+  $('#removeVariableName').text(row.variable_name);
+  $('#removeVariableId').val(row.id);
+  $('#editProvisionModalRemVarTitle').show();
+  $('#removeVariableDiv').show();
+  $('#removeVariableFooter').show();
 }
 
 function addVariable() {
-  const provision_id = $("#editProvisionId").val();
-  const variable_name = $("#addVariableName").val();
-  const variable_value = $("#addVariableValue").val();
-  const help_text = $("#addVariableHelpText").val();
+  const provision_id = $('#editProvisionId').val();
+  const variable_name = $('#addVariableName').val();
+  const variable_value = $('#addVariableValue').val();
+  const help_text = $('#addVariableHelpText').val();
   const data = JSON.stringify({
     provision_id: provision_id,
     variable_name: variable_name,
     variable_value: variable_value,
     help_text: help_text,
   });
-  fetch("admin/add-variable", {
-    method: "POST",
+  fetch('admin/add-variable', {
+    method: 'POST',
     headers: {
-      Accept: "application/json",
-      "Content-Type": "application/json",
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
     },
     body: data,
   })
@@ -1273,11 +1242,11 @@ function addVariable() {
   hideEditConfirm();
 }
 function updateVariable() {
-  const id = $("#editVariableId").val();
-  const provision_id = $("#editProvisionId").val();
-  const variable_name = $("#editVariableName").val();
-  const variable_value = $("#editVariableValue").val();
-  const help_text = $("#editVariableHelpText").val();
+  const id = $('#editVariableId').val();
+  const provision_id = $('#editProvisionId').val();
+  const variable_name = $('#editVariableName').val();
+  const variable_value = $('#editVariableValue').val();
+  const help_text = $('#editVariableHelpText').val();
   const data = JSON.stringify({
     id: id,
     provision_id: provision_id,
@@ -1285,11 +1254,11 @@ function updateVariable() {
     variable_value: variable_value,
     help_text: help_text,
   });
-  fetch("admin/update-variable", {
-    method: "POST",
+  fetch('admin/update-variable', {
+    method: 'POST',
     headers: {
-      Accept: "application/json",
-      "Content-Type": "application/json",
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
     },
     body: data,
   })
@@ -1299,17 +1268,17 @@ function updateVariable() {
         filterEditProvisionVariableTable();
       });
       // clear the inputs
-      $("#editVariableId").val("");
-      $("#editVariableName").val("");
-      $("#editVariableValue").val("");
-      $("#editVariableHelpText").val("");
+      $('#editVariableId').val('');
+      $('#editVariableName').val('');
+      $('#editVariableValue').val('');
+      $('#editVariableHelpText').val('');
     });
   hideEditConfirm();
 }
 function removeVariable() {
-  const id = $("#removeVariableId").val();
+  const id = $('#removeVariableId').val();
   fetch(`admin/remove-variable/${id}`, {
-    method: "GET",
+    method: 'GET',
   })
     .then((res) => res.json())
     .then(() => {
@@ -1321,9 +1290,9 @@ function removeVariable() {
 }
 
 function filterEditProvisionVariableTable() {
-  const provisionId = $("#editProvisionId").val();
-  $("#editProvisionVariableTable tbody tr").each(function () {
-    if ($(this).data("provision_id") != provisionId) {
+  const provisionId = $('#editProvisionId').val();
+  $('#editProvisionVariableTable tbody tr').each(function () {
+    if ($(this).data('provision_id') != provisionId) {
       $(this).hide();
     } else {
       $(this).show();
@@ -1338,7 +1307,7 @@ const streamToText = async (blob) => {
   const readableStream = await blob.getReader();
   const chunk = await readableStream.read();
 
-  return new TextDecoder("utf-8").decode(chunk.value);
+  return new TextDecoder('utf-8').decode(chunk.value);
 };
 const bufferToText = (buffer) => {
   const bufferByteLength = buffer.byteLength;
@@ -1346,13 +1315,13 @@ const bufferToText = (buffer) => {
 
   return new TextDecoder().decode(bufferUint8Array);
 };
-document.getElementById("uploadFile").addEventListener("change", function (e) {
+document.getElementById('uploadFile').addEventListener('change', function (e) {
   let fileBase64;
-  $("#saveButton").prop("disabled", false);
-  $("#uploadTemplateName").prop("disabled", false);
-  let file = document.getElementById("uploadFile").files[0];
+  $('#saveButton').prop('disabled', false);
+  $('#uploadTemplateName').prop('disabled', false);
+  let file = document.getElementById('uploadFile').files[0];
   if (file.name) {
-    $("#uploadTemplateName").val(file.name.replace(".docx", ""));
+    $('#uploadTemplateName').val(file.name.replace('.docx', ''));
   }
   (async () => {
     const fileContent = await file.text();
@@ -1361,10 +1330,10 @@ document.getElementById("uploadFile").addEventListener("change", function (e) {
     var reader = new FileReader();
     reader.readAsDataURL(file);
     reader.onload = function () {
-      fileBase64 = reader.result.split("base64,")[1];
+      fileBase64 = reader.result.split('base64,')[1];
     };
     reader.onerror = function (error) {
-      console.log("Error: ", error);
+      console.log('Error: ', error);
     };
   })();
 });

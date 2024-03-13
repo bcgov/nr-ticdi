@@ -2,12 +2,14 @@ import { Injectable } from '@nestjs/common';
 import * as dotenv from 'dotenv';
 import { firstValueFrom } from 'rxjs';
 import { DocumentTemplateService } from 'src/document_template/document_template.service';
-import { NFRProvisionService } from 'src/nfr_provision/nfr_provision.service';
-import { PrintRequestLogService } from 'src/print_request_log/print_request_log.service';
+import { ProvisionService } from 'src/provision/provision.service';
 import { TTLSService } from 'src/ttls/ttls.service';
 import { GL_REPORT_TYPE, LUR_REPORT_TYPE, numberWords, sectionTitles } from 'utils/constants';
 import { ProvisionJSON, VariableJSON } from 'utils/types';
 import { convertToSpecialCamelCase, formatMoney, grazingLeaseVariables, nfrAddressBuilder } from 'utils/util';
+import { DocumentDataService } from 'src/document_data/document_data.service';
+import { DocumentTemplate } from 'src/document_template/entities/document_template.entity';
+import { DocumentDataLogService } from 'src/document_data_log/document_data_log.service';
 const axios = require('axios');
 
 dotenv.config();
@@ -19,8 +21,9 @@ export class ReportService {
   constructor(
     private readonly ttlsService: TTLSService,
     private readonly documentTemplateService: DocumentTemplateService,
-    private readonly printRequestLogService: PrintRequestLogService,
-    private readonly nfrProvisionService: NFRProvisionService
+    private readonly documentDataLogService: DocumentDataLogService,
+    private readonly provisionService: ProvisionService,
+    private readonly documentDataService: DocumentDataService
   ) {
     hostname = process.env.backend_url ? process.env.backend_url : `http://localhost`;
     // local development backend port is 3001, docker backend port is 3000
@@ -50,6 +53,12 @@ export class ReportService {
     return {
       reportName: documentType + '_' + tenureFileNumber + '_' + version + '.docx',
     };
+  }
+
+  async generateReport(dtid: number, username: string, document_type_id: number) {
+    const documentTemplateObject: { id: number; the_file: string } =
+      await this.documentTemplateService.findActiveByDocumentType(document_type_id);
+    const data = await this.documentDataService;
   }
 
   /**
@@ -304,7 +313,7 @@ export class ReportService {
    * @returns
    */
   async generateNFRReportName(dtid: number, tenureFileNumber: string) {
-    const url = `${hostname}:${port}/nfr-data-log/version/` + dtid;
+    const url = `${hostname}:${port}/document-data-log/version/` + dtid;
     // grab the next version string for the dtid
     const version = await axios
       .get(url, {
@@ -318,6 +327,36 @@ export class ReportService {
     return { reportName: 'NFR_' + tenureFileNumber + '_' + version + '.docx' };
   }
 
+  async generateReportNew(
+    dtid: number,
+    document_type_id: number,
+    idirUsername: string,
+    idirName: string,
+    variableJson: VariableJSON[],
+    provisionJson: ProvisionJSON[]
+  ) {
+    console.log('TODO');
+    // Get raw data from TTLS
+    await this.ttlsService.setWebadeToken();
+    const rawData: any = await firstValueFrom(this.ttlsService.callHttp(dtid))
+      .then((res) => {
+        return res;
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+    // Get the active template file for this document type
+    const documentTemplateObject: DocumentTemplate = await this.documentTemplateService.findActiveByDocumentType(
+      document_type_id
+    );
+    // format the provisions & variables in a dynamic way
+    // TODO
+    // create a log of the transaction
+    // TODO
+    // generate and return the document
+    // TODO
+  }
+
   async generateNFRReport(
     dtid: number,
     variantName: string,
@@ -327,7 +366,7 @@ export class ReportService {
     provisionJson: ProvisionJSON[]
   ) {
     const templateUrl = `${hostname}:${port}/document-template/get-active-report/${variantName}`;
-    const logUrl = `${hostname}:${port}/nfr-data-log/`;
+    const logUrl = `${hostname}:${port}/document-data-log/`;
 
     // get raw ttls data for later
     await this.ttlsService.setWebadeToken();
@@ -690,7 +729,7 @@ export class ReportService {
     return response2.data;
   }
 
-  async getNFRProvisionsByVariantAndDtid(variantName: string, dtid: number): Promise<any> {
+  async getDocumentProvisionsByDocTypeIdAndDtid(document_type_id: number, dtid: number): Promise<any> {
     const returnItems = [
       'type',
       'provision_name',
@@ -703,16 +742,10 @@ export class ReportService {
     ];
     let reduced, provisions;
     // nfrDataId exists so return a list of provisions with pre-existing free_text data inserted, certain provisions preselected
-    const url = `${hostname}:${port}/nfr-data/provisions/${variantName}/${dtid}`;
-    const nfrProvisions = await axios
-      .get(url)
-      .then((res) => {
-        return res.data;
-      })
-      .catch((err) => console.log(err.response.data));
-    if (nfrProvisions) {
-      const provisionIds = nfrProvisions.provisionIds;
-      provisions = nfrProvisions.provisions;
+    const documentProvisions = await this.documentDataService.getProvisionsByDocTypeIdAndDtid(document_type_id, dtid);
+    if (documentProvisions) {
+      const provisionIds = documentProvisions.provisionIds;
+      provisions = documentProvisions.provisions;
       reduced = provisions.map((obj) => {
         if (provisionIds.includes(obj.id)) {
           obj.select = true;
@@ -723,13 +756,7 @@ export class ReportService {
       });
     } else {
       // no nfrDataId so just return generic provisions with all of them deselected by default
-      const url2 = `${hostname}:${port}/nfr-provision/variant/${variantName}`;
-      provisions = await axios
-        .get(url2)
-        .then((res) => {
-          return res.data;
-        })
-        .catch((err) => console.log(err.response.data));
+      provisions = await this.provisionService.getProvisionsByDocumentTypeId(document_type_id);
       reduced = provisions.map((obj) =>
         Object.keys(obj)
           .filter((key) => returnItems.includes(key))
@@ -752,13 +779,13 @@ export class ReportService {
     });
   }
 
-  getGroupMaxByVariant(variantName: string): Promise<any> {
-    return this.nfrProvisionService.getGroupMaxByVariant(variantName);
+  getGroupMaxByDocTypeId(document_type_id: number): Promise<any> {
+    return this.provisionService.getGroupMaxByDocTypeId(document_type_id);
   }
 
   async getNFRVariablesByVariantAndDtid(variantName: string, dtid: number): Promise<any> {
     // if an nfrId is provided, get the variables with any existing user specified values
-    const url = `${hostname}:${port}/nfr-data/variables/${variantName}/${dtid}`;
+    const url = `${hostname}:${port}/document-data/variables/${variantName}/${dtid}`;
     const variables = await axios
       .get(url)
       .then((res) => {
@@ -769,7 +796,7 @@ export class ReportService {
       return variables;
     } else {
       // grab the basic variable list corresponding to the variant
-      const url2 = `${hostname}:${port}/nfr-provision/get-provision-variables/variant/${variantName}`;
+      const url2 = `${hostname}:${port}/provision/get-provision-variables/variant/${variantName}`;
       return axios.get(url2).then((res) => {
         return res.data;
       });
@@ -777,74 +804,67 @@ export class ReportService {
   }
 
   getMandatoryProvisions() {
-    return this.nfrProvisionService.getMandatoryProvisions();
+    return this.provisionService.getMandatoryProvisions();
   }
 
-  getMandatoryProvisionsByVariant(variantName: string) {
-    return this.nfrProvisionService.getMandatoryProvisionsByVariant(variantName);
+  getMandatoryProvisionsByDocumentTypeId(document_type_id: number) {
+    return this.provisionService.getMandatoryProvisionsByDocumentTypeId(document_type_id);
   }
 
   async getNFRData() {
     const nfrDataUrl = `${hostname}:${port}/nfr-data`;
     const templateUrl = `${hostname}:${port}/document-template/nfr-template-info`;
-    const nfrData = await axios
-      .get(nfrDataUrl)
-      .then((res) => {
-        return res.data;
-      })
-      .catch((err) => console.log(err.response.data));
-    const templateIds = [];
-    for (let entry of nfrData) {
-      templateIds.push(entry.template_id);
+
+    // get NFR data
+    let nfrData;
+    try {
+      const response = await axios.get(nfrDataUrl);
+      nfrData = response.data;
+    } catch (err) {
+      console.log(err.response.data);
+      return;
     }
-    const allTemplates: {
-      id: number;
-      file_name: string;
-      active_flag: boolean;
-      is_deleted: boolean;
-      template_version: number;
-    }[] = await axios
-      .post(templateUrl, templateIds)
-      .then((res) => {
-        return res.data;
-      })
-      .catch((err) => console.log(err.response.data));
 
-    // Combine the corresponding templates with the nfr data.
-    const combinedArray = [];
+    // get template IDs from NFR data
+    const templateIds = nfrData.map((entry) => entry.template_id);
 
-    let i = 0;
-    let j = 0;
+    // get templates using template IDs
+    let allTemplates;
+    try {
+      const response = await axios.post(templateUrl, templateIds);
+      allTemplates = response.data;
+    } catch (err) {
+      console.log(err.response.data);
+      return;
+    }
 
-    while (i < allTemplates.length && j < nfrData.length) {
-      const template = allTemplates[i];
-      const nfr = nfrData[j];
-
-      if (template.id === nfr.template_id) {
-        if (!template.is_deleted) {
-          combinedArray.push({
-            dtid: nfr.dtid,
-            version: template.template_version,
-            file_name: template.file_name,
-            updated_date: nfr.update_timestamp.split('T')[0],
-            status: nfr.status,
-            active: template.active_flag,
-            nfr_id: nfr.id,
-            variant_name: nfr.variant_name,
-          });
-        }
-        j++;
-      } else if (template.id < nfr.template_id) {
-        i++;
-      } else {
-        j++;
+    // filter out deleted templates and create a lookup table
+    const templatesLookup = allTemplates.reduce((acc, template) => {
+      if (!template.is_deleted) {
+        acc[template.id] = template;
       }
-    }
+      return acc;
+    }, {});
+
+    // combine NFR data with their corresponding templates
+    const combinedArray = nfrData
+      .filter((nfr) => templatesLookup[nfr.template_id])
+      .map((nfr) => ({
+        dtid: nfr.dtid,
+        version: templatesLookup[nfr.template_id].template_version,
+        file_name: templatesLookup[nfr.template_id].file_name,
+        updated_date: nfr.update_timestamp.split('T')[0],
+        status: nfr.status,
+        active: templatesLookup[nfr.template_id].active_flag,
+        nfr_id: nfr.id,
+        variant_name: nfr.variant_name,
+      }));
+
     return combinedArray;
   }
 
   async getActiveNfrDataByDtid(dtid: number): Promise<any> {
-    const url = `${hostname}:${port}/nfr-data/dtid/${dtid}`;
+    const url = `${hostname}:${port}/document-data/dtid/${dtid}`;
     const response = await axios
       .get(url, {
         headers: {
@@ -860,10 +880,10 @@ export class ReportService {
     // // console.log(groupMax);
     // console.log('\ngetActiveNfrDataByDtid');
     // console.log(response);
-    // console.log('\nnfr_data_provisions');
-    // // console.log(response.nfrData.nfr_data_provisions);
-    // console.log('\nnfr_data_variables');
-    // // console.log(response.nfrData.nfr_data_variables);
+    // console.log('\ndocument_data_provisions');
+    // // console.log(response.nfrData.document_data_provisions);
+    // console.log('\ndocument_data_variables');
+    // // console.log(response.nfrData.document_data_variables);
     // console.log('\nthis.getMandatoryProvisionsByVariant(NOTICE OF FINAL REVIEW)');
     // const mandatoryProvisions = await this.getMandatoryProvisionsByVariant('NOTICE OF FINAL REVIEW');
     // // console.log(mandatoryProvisions);
@@ -883,7 +903,7 @@ export class ReportService {
     const documentTemplate = await axios.get(templateUrl).then((res) => {
       return res.data;
     });
-    const url = `${hostname}:${port}/nfr-data`;
+    const url = `${hostname}:${port}/document-data`;
     const data = {
       dtid: dtid,
       variant_name: variant_name,
@@ -903,24 +923,32 @@ export class ReportService {
       });
   }
 
-  async getEnabledProvisionsByVariant(variantName: string) {
-    const url = `${hostname}:${port}/nfr-provision/get-mandatory-provisions/variant/${variantName}`;
-    return axios.get(url).then((res) => {
-      return res.data;
-    });
+  async saveDocument(
+    dtid: number,
+    document_type_id: number,
+    status: string,
+    provisionJsonArray: ProvisionJSON[],
+    variableJsonArray: VariableJSON[],
+    idir_username: string
+  ) {
+    const url = `${hostname}:${port}/document-data`;
+    const documentTemplate = await this.documentTemplateService.findActiveByDocumentType(document_type_id);
+    const data = {
+      dtid: dtid,
+      document_type_id: document_type_id,
+      template_id: documentTemplate.id,
+      status: status,
+      create_userid: idir_username,
+      ttls_data: [],
+    };
+    return this.documentDataService.createOrUpdate(data, provisionJsonArray, variableJsonArray);
   }
 
-  async getEnabledProvisionsByVariantAndDtid(variantName: string, dtid: number) {
-    const url = `${hostname}:${port}/nfr-data/get-enabled-provisions/${variantName}/${dtid}`;
-    return axios.get(url).then((res) => {
-      return res.data;
-    });
+  async getEnabledProvisionsByDocTypeId(document_type_id: number) {
+    return this.provisionService.getMandatoryProvisionsByDocumentTypeId(document_type_id);
   }
 
-  async getVariantsWithIds() {
-    const url = `${hostname}:${port}/nfr-provision/get-variants-with-ids/0`;
-    return axios.get(url).then((res) => {
-      return res.data;
-    });
+  getEnabledProvisionsByDocTypeIdDtid(document_type_id: number, dtid: number) {
+    return this.documentDataService.getEnabledProvisionsByDocTypeIdAndDtid(document_type_id, dtid);
   }
 }

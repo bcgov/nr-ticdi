@@ -463,7 +463,20 @@ export class ReportService {
 
     // Format the raw ttls data
     const tenantAddr = rawData.tenantAddr;
-    const interestParcel = rawData.interestParcel[0];
+    const interestParcels = rawData.interestParcel;
+    let concatLegalDescriptions = '';
+    if (interestParcels && interestParcels.length > 0) {
+      interestParcels.sort((a, b) => b.interestParcelId - a.interestParcelId);
+      let legalDescArray = [];
+      for (let ip of interestParcels) {
+        if (ip.legalDescription && ip.legalDescription != '') {
+          legalDescArray.push(ip.legalDescription);
+        }
+      }
+      if (legalDescArray.length > 0) {
+        concatLegalDescriptions = legalDescArray.join('\n');
+      }
+    }
 
     const DB_Address_Mailing_Tenant = tenantAddr[0] ? nfrAddressBuilder(tenantAddr) : '';
 
@@ -647,7 +660,7 @@ export class ReportService {
       DB_Tenure_Type: rawData.type // convert a tenure type like LICENSE to License
         ? rawData.type.toLowerCase().charAt(0).toUpperCase() + rawData.type.toLowerCase().slice(1)
         : '',
-      DB_Legal_Description: interestParcel ? interestParcel.legalDescription : '',
+      DB_Legal_Description: concatLegalDescriptions,
       DB_Fee_Payable_Type: DB_Fee_Payable_Type,
       DB_Fee_Payable_Amount_GST: DB_Fee_Payable_Amount_GST == 0 ? '' : formatMoney(DB_Fee_Payable_Amount_GST),
       DB_Fee_Payable_Amount: formatMoney(DB_Fee_Payable_Amount),

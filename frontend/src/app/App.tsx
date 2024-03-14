@@ -36,6 +36,15 @@ const App: FC = () => {
         />
         ;
         <Route
+          path={`/manage-templates-select`}
+          element={
+            <ContentWrapper>
+              <ManageTemplatesPage />
+            </ContentWrapper>
+          }
+        />
+        ;
+        <Route
           path={`/search`}
           element={
             <ContentWrapper>

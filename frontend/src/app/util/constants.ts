@@ -39,6 +39,18 @@ export const PAGE = [
     title: 'Manage Templates',
     path: 'manage-templates',
   },
+  {
+    title: 'Document Preview',
+    path: '/'
+  },
+  {
+    title: 'Select Manage Templates',
+    path: 'manage-templates-select'
+  },
+  {
+    title: 'System Administration Menu',
+    path: 'system-admin-menu',
+  }
 ];
 
 // should eventually be stored in a table in the db and obtained from there
@@ -56,6 +68,8 @@ export const REPORT_TYPES = [
   { reportIndex: 0, reportType: 'Land Use Report' },
   { reportIndex: 1, reportType: 'Notice of Final Review' },
   { reportIndex: 2, reportType: 'Grazing Lease' },
+  { reportIndex: 3, reportType: 'Standard Licence' },
+  { reportIndex: 4, reportType: 'Assignment Assumption' },
 ];
 
 export const CURRENT_REPORT_PAGES = {

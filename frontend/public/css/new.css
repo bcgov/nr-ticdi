@@ -17,3 +17,7 @@ hr {
   background-color: #000000;
   height: 1px;
 }
+
+.boldText {
+  font-weight: bold;
+}

@@ -96,6 +96,19 @@ const TemplateInfoTable: React.FC<TemplateInfoTableProps> = ({ reportType, refre
       header: () => 'Active',
       meta: { customCss: { width: '5%' } },
     }),
+    columnHelper.accessor('preview', {
+      id: 'preview',
+      cell: (info) => (
+        <Button
+          variant="success"
+          onClick={() => console.log("")}
+        >
+          Preview
+        </Button>
+      ),
+      header: () => null,
+      meta: { customCss: { width: '10%' } },
+    }),
     columnHelper.accessor('view', {
       id: 'view',
       cell: (info) => (
@@ -103,11 +116,11 @@ const TemplateInfoTable: React.FC<TemplateInfoTableProps> = ({ reportType, refre
           variant="info"
           onClick={() => handleDownloadTemplate(info.row.original.id, info.row.original.file_name)}
         >
-          View
+          View Doc
         </Button>
       ),
       header: () => null,
-      meta: { customCss: { width: '7%' } },
+      meta: { customCss: { width: '12%' } },
     }),
     columnHelper.accessor('remove', {
       id: 'remove',

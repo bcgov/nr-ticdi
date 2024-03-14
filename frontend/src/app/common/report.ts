@@ -103,6 +103,7 @@ export const saveDocument = async (
   await api.post<void>(postParameters);
 };
 
+// TODO stop using NFR
 export const generateNfrReport = async (
   dtid: number,
   fileNum: string,
@@ -128,6 +129,7 @@ export const generateNfrReport = async (
 
 export const getDocumentTypes = () => {
   const url = `${config.API_BASE_URL}/report/get-document-types`;
+  console.log(url);
   const getParameters = api.generateApiParameters(url);
   return api.get<DocumentType[]>(getParameters);
 };

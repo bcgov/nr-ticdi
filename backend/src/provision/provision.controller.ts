@@ -29,6 +29,7 @@ export class ProvisionController {
       variable_value: string;
       help_text: string;
       provision_id: number;
+      create_userid: string;
     }
   ) {
     return this.provisionService.addVariable(variable);
@@ -43,11 +44,10 @@ export class ProvisionController {
       help_text: string;
       provision_id: number;
       id: number;
+      update_userid: string;
     }
   ) {
-    const id = variable.id;
-    delete variable['id'];
-    return this.provisionService.updateVariable(id, variable);
+    return this.provisionService.updateVariable(variable);
   }
 
   @Get('remove-variable/:id')

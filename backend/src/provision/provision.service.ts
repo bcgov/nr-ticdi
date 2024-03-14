@@ -74,6 +74,7 @@ export class ProvisionService {
     variable_value: string;
     help_text: string;
     provision_id: number;
+    create_userid: string;
   }) {
     const provision = await this.findById(variable.provision_id);
     delete variable['provision_id'];
@@ -84,19 +85,18 @@ export class ProvisionService {
     return this.provisionVariableRepository.save(newVariable);
   }
 
-  async updateVariable(
-    id: number,
-    variable: {
-      variable_name: string;
-      variable_value: string;
-      help_text: string;
-      provision_id: number;
-    }
-  ) {
+  async updateVariable(variable: {
+    id: number;
+    variable_name: string;
+    variable_value: string;
+    help_text: string;
+    provision_id: number;
+    update_userid: string;
+  }) {
     const provision = await this.findById(variable.provision_id);
     delete variable['provision_id'];
     const variableToUpdate = await this.provisionVariableRepository.findOne({
-      where: { id: id },
+      where: { id: variable.id },
     });
 
     if (!variableToUpdate) {
@@ -106,6 +106,7 @@ export class ProvisionService {
     variableToUpdate.variable_value = variable.variable_value;
     variableToUpdate.help_text = variable.help_text;
     variableToUpdate.provision = provision;
+    variableToUpdate.update_userid = variable.update_userid;
 
     return this.provisionVariableRepository.save(variableToUpdate);
   }

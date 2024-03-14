@@ -43,11 +43,11 @@ export class AdminController {
     };
   }
 
-  @Get('activate-template/:id/:document_type')
+  @Get('activate-template/:id/:document_type_id')
   async activateTemplate(
     @Session() session: { data?: SessionData },
-    @Param('id') id,
-    @Param('document_type') document_type
+    @Param('id') id: number,
+    @Param('document_type_id') document_type_id: number
   ) {
     const update_userid = session?.data?.activeAccount
       ? session.data.activeAccount.idir_username
@@ -57,7 +57,7 @@ export class AdminController {
     return this.adminService.activateTemplate({
       id: id,
       update_userid: update_userid,
-      document_type: document_type,
+      document_type_id: document_type_id,
     });
   }
 
@@ -75,9 +75,9 @@ export class AdminController {
     streamableFile.pipe(res);
   }
 
-  @Get('remove-template/:reportType/:id')
-  async removeTemplate(@Param('reportType') reportType: string, @Param('id') id: number) {
-    return this.adminService.removeTemplate(reportType, id);
+  @Get('remove-template/:id/:document_type_id')
+  async removeTemplate(@Param('id') id: number, @Param('document_type_id') document_type_id: number) {
+    return this.adminService.removeTemplate(document_type_id, id);
   }
 
   @Post('upload-template')
@@ -188,19 +188,19 @@ export class AdminController {
     session.data.selected_document = { document_id: documentId };
   }
 
-  @Get('get-templates/:document_type')
-  getDocumentTemplates(@Param('document_type') documentType: string): any {
-    return this.adminService.getDocumentTemplates(documentType);
+  @Get('get-templates/:document_type_id')
+  getDocumentTemplates(@Param('document_type_id') document_type_id: number): any {
+    return this.adminService.getDocumentTemplates(document_type_id);
   }
 
   @Get('provisions')
-  getNFRProvisions(): any {
-    return this.adminService.getNFRProvisions();
+  getDocumentProvisions(): any {
+    return this.adminService.getDocumentProvisions();
   }
 
   @Get('document-variables')
-  getNFRVariables(): any {
-    return this.adminService.getNFRVariables();
+  getDocumentVariables(): any {
+    return this.adminService.getDocumentVariables();
   }
 
   @Get('enable-provision/:provisionId')
@@ -278,6 +278,7 @@ export class AdminController {
   updateVariable(
     @Body()
     variableParams: {
+      id: number;
       variable_name: string;
       variable_value: string;
       help_text: string;
@@ -286,7 +287,7 @@ export class AdminController {
     @Session() session: { data?: SessionData }
   ) {
     const update_userid = session?.data?.activeAccount.idir_username;
-    return this.adminService.updateVariable(variableParams, update_userid);
+    return this.adminService.updateVariable({ ...variableParams, update_userid });
   }
 
   @Get('remove-variable/:id')

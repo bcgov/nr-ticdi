@@ -5,6 +5,7 @@ import { ExportDataObject, SearchResultsItem, UserObject } from 'utils/types';
 import { REPORT_TYPES } from 'utils/constants';
 import { DocumentTemplateService } from 'src/document_template/document_template.service';
 import { DocumentType } from 'src/document_type/entities/document_type.entity';
+import { ProvisionService } from 'src/provision/provision.service';
 const axios = require('axios');
 const FormData = require('form-data');
 
@@ -16,38 +17,24 @@ let port: number;
 export class AdminService {
   constructor(
     private readonly httpService: HttpService,
-    private readonly documentTemplateService: DocumentTemplateService
+    private readonly documentTemplateService: DocumentTemplateService,
+    private readonly provisionService: ProvisionService
   ) {
     hostname = process.env.backend_url ? process.env.backend_url : `http://localhost`;
     // local development backend port is 3001, docker backend port is 3000
     port = process.env.backend_url ? 3000 : 3001;
   }
 
-  async activateTemplate(data: { id: number; update_userid: string; document_type: string }): Promise<any> {
-    const url = `${hostname}:${port}/document-template/activate-template`;
-    return axios
-      .post(url, {
-        id: data.id,
-        update_userid: data.update_userid,
-        document_type: data.document_type,
-      })
-      .then((res) => {
-        return res.data;
-      });
+  activateTemplate(data: { id: number; update_userid: string; document_type_id: number }): Promise<any> {
+    return this.documentTemplateService.activateTemplate(data);
   }
 
-  async downloadTemplate(id: number) {
-    const url = `${hostname}:${port}/document-template/find-one/${id}`;
-    return axios.get(url).then((res) => {
-      return res.data;
-    });
+  downloadTemplate(id: number) {
+    return this.documentTemplateService.findOne(id);
   }
 
-  async removeTemplate(reportType: string, id: number): Promise<any> {
-    const url = `${hostname}:${port}/document-template/remove/${encodeURI(reportType)}/${id}`;
-    return axios.get(url).then((res) => {
-      return res.data;
-    });
+  removeTemplate(document_type_id: number, id: number): Promise<any> {
+    return this.documentTemplateService.remove(document_type_id, id);
   }
 
   async uploadTemplate(
@@ -274,15 +261,8 @@ export class AdminService {
     return { message: 'error' };
   }
 
-  async getTemplates(reportId: number) {
-    const documentType = reportId == 1 || reportId == 2 ? REPORT_TYPES[reportId - 1] : 'none';
-    const url = `${hostname}:${port}/document-template/${encodeURI(documentType)}`;
-    const data = await axios
-      .get(url)
-      .then((res) => {
-        return res.data;
-      })
-      .catch((err) => console.log(err.response.data));
+  async getTemplates(document_type_id: number) {
+    const data = await this.documentTemplateService.findAll(document_type_id);
     let documents: {
       version: number;
       file_name: string;
@@ -295,7 +275,7 @@ export class AdminService {
       const document = {
         version: entry.template_version,
         file_name: entry.file_name,
-        updated_date: entry.update_timestamp.split('T')[0],
+        updated_date: entry.update_timestamp.toString().split('T')[0],
         status: '???',
         active: entry.active_flag,
         template_id: entry.id,
@@ -305,21 +285,15 @@ export class AdminService {
     return documents;
   }
 
-  async getDocumentTemplates(documentType: string): Promise<any> {
+  async getDocumentTemplates(document_type_id: number): Promise<any> {
     const returnItems = ['id', 'template_version', 'file_name', 'uploaded_date', 'active_flag', 'update_timestamp'];
-    const url = `${hostname}:${port}/document-template/${encodeURI(documentType)}`;
-    const documentTemplateObjects = await axios
-      .get(url)
-      .then((res) => {
-        return res.data;
-      })
-      .catch((err) => console.log(err.response.data));
+    const documentTemplateObjects = await this.documentTemplateService.findAll(document_type_id);
     return documentTemplateObjects.map((obj) =>
       Object.keys(obj)
         .filter((key) => returnItems.includes(key))
         .reduce(
           (acc, key) => {
-            key == 'update_timestamp' ? (acc[key] = obj[key].split('T')[0]) : (acc[key] = obj[key]);
+            key == 'update_timestamp' ? (acc[key] = obj[key].toString().split('T')[0]) : (acc[key] = obj[key]);
             return acc;
           },
           { view: 'view', remove: 'remove' }
@@ -327,7 +301,7 @@ export class AdminService {
     );
   }
 
-  async getNFRProvisions(): Promise<any> {
+  async getDocumentProvisions(): Promise<any> {
     const returnItems = [
       'id',
       'dtid',
@@ -341,14 +315,8 @@ export class AdminService {
       'active_flag',
       'variants',
     ];
-    const url = `${hostname}:${port}/provision`;
-    const nfrProvisions = await axios
-      .get(url)
-      .then((res) => {
-        return res.data;
-      })
-      .catch((err) => console.log(err.response.data));
-    return nfrProvisions.map((obj) =>
+    const documentProvisions = await this.provisionService.findAll();
+    return documentProvisions.map((obj) =>
       Object.keys(obj)
         .filter((key) => returnItems.includes(key))
         .reduce(
@@ -361,16 +329,10 @@ export class AdminService {
     );
   }
 
-  async getNFRVariables(): Promise<any> {
+  async getDocumentVariables(): Promise<any> {
     const returnItems = ['variable_name', 'variable_value', 'help_text', 'id', 'provision_id'];
-    const url = `${hostname}:${port}/provision/variables`;
-    const nfrVariables = await axios
-      .get(url)
-      .then((res) => {
-        return res.data;
-      })
-      .catch((err) => console.log(err.response.data));
-    return nfrVariables.map((obj) =>
+    const documentVariables = await this.provisionService.findAllVariables();
+    return documentVariables.map((obj) =>
       Object.keys(obj)
         .filter((key) => returnItems.includes(key))
         .reduce(
@@ -383,28 +345,19 @@ export class AdminService {
     );
   }
 
-  async enableProvision(id: number): Promise<any> {
-    const url = `${hostname}:${port}/provision/enable/${id}`;
-    return await axios.get(url).then((res) => {
-      return res.data;
-    });
+  enableProvision(id: number): Promise<any> {
+    return this.provisionService.enable(id);
   }
 
-  async disableProvision(id: number): Promise<any> {
-    const url = `${hostname}:${port}/provision/disable/${id}`;
-    return await axios.get(url).then((res) => {
-      return res.data;
-    });
+  disableProvision(id: number): Promise<any> {
+    return this.provisionService.disable(id);
   }
 
-  async getGroupMax(): Promise<any> {
-    const url = `${hostname}:${port}/provision/get-group-max/1`;
-    return await axios.get(url).then((res) => {
-      return res.data;
-    });
+  getGroupMax(): Promise<any> {
+    return this.provisionService.getGroupMax();
   }
 
-  async addProvision(
+  addProvision(
     provisionParams: {
       type: string;
       provision_group: number;
@@ -418,13 +371,10 @@ export class AdminService {
     },
     create_userid: string
   ) {
-    const url = `${hostname}:${port}/provision`;
-    return await axios.post(url, { ...provisionParams, create_userid }).then((res) => {
-      return res.data;
-    });
+    return this.provisionService.create({ ...provisionParams, create_userid });
   }
 
-  async updateProvision(
+  updateProvision(
     provisionParams: {
       id: number;
       type: string;
@@ -439,13 +389,10 @@ export class AdminService {
     },
     update_userid: string
   ) {
-    const url = `${hostname}:${port}/provision/update`;
-    return await axios.post(url, { ...provisionParams, update_userid }).then((res) => {
-      return res.data;
-    });
+    return this.provisionService.update(provisionParams.id, { ...provisionParams, update_userid });
   }
 
-  async addVariable(
+  addVariable(
     variableParams: {
       variable_name: string;
       variable_value: string;
@@ -454,32 +401,22 @@ export class AdminService {
     },
     create_userid: string
   ) {
-    const url = `${hostname}:${port}/provision/add-variable`;
-    return await axios.post(url, { ...variableParams, create_userid }).then((res) => {
-      return res.data;
-    });
+    return this.provisionService.addVariable({ ...variableParams, create_userid });
   }
 
-  async updateVariable(
-    variableParams: {
-      variable_name: string;
-      variable_value: string;
-      help_text: string;
-      provision_id: number;
-    },
-    update_userid: string
-  ) {
-    const url = `${hostname}:${port}/provision/update-variable`;
-    return await axios.post(url, { ...variableParams, update_userid }).then((res) => {
-      return res.data;
-    });
+  async updateVariable(variableParams: {
+    id: number;
+    variable_name: string;
+    variable_value: string;
+    help_text: string;
+    provision_id: number;
+    update_userid: string;
+  }) {
+    return this.provisionService.updateVariable(variableParams);
   }
 
-  async removeVariable(id: number) {
-    const url = `${hostname}:${port}/provision/remove-variable/${id}`;
-    return await axios.get(url).then((res) => {
-      return res.data;
-    });
+  removeVariable(id: number) {
+    return this.provisionService.removeVariable(id);
   }
 
   /**

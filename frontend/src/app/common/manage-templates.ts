@@ -61,16 +61,16 @@ export const downloadTemplate = async (id: number, fileName: string): Promise<vo
   console.log(response);
 };
 
-export const removeTemplate = async (id: number, reportType: string): Promise<void> => {
-  const url = `${config.API_BASE_URL}/admin/remove-template/${reportType}/${id}`;
+export const removeTemplate = async (id: number, document_template_id: number): Promise<void> => {
+  const url = `${config.API_BASE_URL}/admin/remove-template/${id}/${document_template_id}`;
   const getParameters = api.generateApiParameters(url);
   const response = await api.get<void>(getParameters);
   console.log('removeTemplate response');
   console.log(response);
 };
 
-export const activateTemplate = async (id: number, variantType: string): Promise<void> => {
-  const url = `${config.API_BASE_URL}/admin/activate-template/${id}/${variantType}`;
+export const activateTemplate = async (id: number, document_template_id: string): Promise<void> => {
+  const url = `${config.API_BASE_URL}/admin/activate-template/${id}/${document_template_id}`;
   const getParameters = api.generateApiParameters(url);
   await api.get<void>(getParameters);
 };

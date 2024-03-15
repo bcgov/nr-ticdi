@@ -51,13 +51,14 @@ $(document).ready(function () {
       { data: "file_name" },
       { data: "update_timestamp" },
       { data: "active_flag" },
+      { data: "preview" },
       { data: "view" },
       { data: "remove" },
       { data: "id" },
     ],
     columnDefs: [
       {
-        targets: [0, 1, 2, 3, 4, 5, 6],
+        targets: [0, 1, 2, 3, 4, 5, 6, 7],
         render: function (data, type, row, meta) {
           if (type === "display") {
             var columnTypes = [
@@ -65,6 +66,7 @@ $(document).ready(function () {
               "file_name",
               "update_timestamp",
               "active_flag",
+              "preview",
               "view",
               "remove",
               "id",
@@ -81,6 +83,8 @@ $(document).ready(function () {
               return `<button class='btn btn-info' id='view-${id}' onclick='downloadTemplate(${id})'>View`;
             } else if (columnType === "id") {
               return `<input type='hidden' id='template_id-${id}' value='${data}' />`;
+            } else if(columnType === "preview"){
+              return `<button class='btn btn-success' id='preview-${id}' onclick='previewTemplate(${id})'>Preview`;
             } else {
               return `<input type='text' id='${columnType}-${id}' value='${data}' readonly style='color: gray; width: 100%;' />`;
             }
@@ -118,13 +122,14 @@ $(document).ready(function () {
         { data: "file_name" },
         { data: "update_timestamp" },
         { data: "active_flag" },
+        { data: "preview" },
         { data: "view" },
         { data: "remove" },
         { data: "id" },
       ],
       columnDefs: [
         {
-          targets: [0, 1, 2, 3, 4, 5, 6],
+          targets: [0, 1, 2, 3, 4, 5, 6, 7],
           render: function (data, type, row, meta) {
             if (type === "display") {
               var columnTypes = [
@@ -132,6 +137,7 @@ $(document).ready(function () {
                 "file_name",
                 "update_timestamp",
                 "active_flag",
+                "preview",
                 "view",
                 "remove",
                 "id",
@@ -148,6 +154,8 @@ $(document).ready(function () {
                 return `<button class='btn btn-info' id='view-${id}' onclick='downloadTemplate(${id})'>View`;
               } else if (columnType === "id") {
                 return `<input type='hidden' id='template_id-${id}' value='${data}' />`;
+              } else if(columnType === "preview"){
+                return `<button class='btn btn-success' id='preview-${id}' onclick='previewTemplate(${id})'>Preview`;
               } else {
                 return `<input type='text' id='${columnType}-${id}' value='${data}' readonly style='color: gray; width: 100%;' />`;
               }
@@ -183,13 +191,14 @@ $(document).ready(function () {
         { data: "file_name" },
         { data: "update_timestamp" },
         { data: "active_flag" },
+        { data: "preview" },
         { data: "view" },
         { data: "remove" },
         { data: "id" },
       ],
       columnDefs: [
         {
-          targets: [0, 1, 2, 3, 4, 5, 6],
+          targets: [0, 1, 2, 3, 4, 5, 6, 7],
           render: function (data, type, row, meta) {
             if (type === "display") {
               var columnTypes = [
@@ -197,6 +206,7 @@ $(document).ready(function () {
                 "file_name",
                 "update_timestamp",
                 "active_flag",
+                "preview",
                 "view",
                 "remove",
                 "id",
@@ -213,6 +223,8 @@ $(document).ready(function () {
                 return `<button class='btn btn-info' id='view-${id}' onclick='downloadTemplate(${id})'>View`;
               } else if (columnType === "id") {
                 return `<input type='hidden' id='template_id-${id}' value='${data}' />`;
+              } else if(columnType === "preview"){
+                return `<button class='btn btn-success' id='preview-${id}' onclick='previewTemplate(${id})'>Preview`;
               } else {
                 return `<input type='text' id='${columnType}-${id}' value='${data}' readonly style='color: gray; width: 100%;' />`;
               }
@@ -248,6 +260,7 @@ $(document).ready(function () {
         { data: "file_name" },
         { data: "update_timestamp" },
         { data: "active_flag" },
+        { data: "preview" },
         { data: "view" },
         { data: "remove" },
         { data: "id" },
@@ -262,6 +275,7 @@ $(document).ready(function () {
                 "file_name",
                 "update_timestamp",
                 "active_flag",
+                "preview",
                 "view",
                 "remove",
                 "id",
@@ -278,6 +292,8 @@ $(document).ready(function () {
                 return `<button class='btn btn-info' id='view-${id}' onclick='downloadTemplate(${id})'>View`;
               } else if (columnType === "id") {
                 return `<input type='hidden' id='template_id-${id}' value='${data}' />`;
+              } else if(columnType === "preview"){
+                return `<button class='btn btn-success' id='preview-${id}' onclick='previewTemplate(${id})'>Preview`;
               } else {
                 return `<input type='text' id='${columnType}-${id}' value='${data}' readonly style='color: gray; width: 100%;' />`;
               }
@@ -313,6 +329,7 @@ $(document).ready(function () {
         { data: "file_name" },
         { data: "update_timestamp" },
         { data: "active_flag" },
+        { data: "preview" },
         { data: "view" },
         { data: "remove" },
         { data: "id" },
@@ -327,6 +344,7 @@ $(document).ready(function () {
                 "file_name",
                 "update_timestamp",
                 "active_flag",
+                "preview",
                 "view",
                 "remove",
                 "id",
@@ -343,6 +361,8 @@ $(document).ready(function () {
                 return `<button class='btn btn-info' id='view-${id}' onclick='downloadTemplate(${id})'>View`;
               } else if (columnType === "id") {
                 return `<input type='hidden' id='template_id-${id}' value='${data}' />`;
+              } else if(columnType === "preview"){
+                return `<button class='btn btn-success' id='preview-${id}' onclick='previewTemplate(${id})'>Preview`;
               } else {
                 return `<input type='text' id='${columnType}-${id}' value='${data}' readonly style='color: gray; width: 100%;' />`;
               }
@@ -579,6 +599,9 @@ function downloadTemplate(id) {
       $(":button").prop("disabled", false);
       console.log("Error downloading the template");
     });
+}
+function previewTemplate(id){
+  console.log("previewTemplate Logic");
 }
 function removeTemplate() {
   const id = $("#document-template-id").val();

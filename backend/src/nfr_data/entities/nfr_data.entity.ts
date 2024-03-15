@@ -1,13 +1,6 @@
-import {
-  Column,
-  CreateDateColumn,
-  Entity,
-  OneToMany,
-  PrimaryGeneratedColumn,
-  UpdateDateColumn,
-} from "typeorm";
-import { NFRDataProvision } from "./nfr_data_provision.entity";
-import { NFRDataVariable } from "./nfr_data_variable.entity";
+import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import { NFRDataProvision } from './nfr_data_provision.entity';
+import { NFRDataVariable } from './nfr_data_variable.entity';
 
 @Entity()
 export class NFRData {
@@ -22,23 +15,15 @@ export class NFRData {
   template_id: number;
   @Column({ nullable: true })
   status: string;
-  @OneToMany(
-    () => NFRDataProvision,
-    (nfrDataProvision) => nfrDataProvision.nfr_data,
-    {
-      nullable: true,
-      cascade: true,
-    }
-  )
+  @OneToMany(() => NFRDataProvision, (nfrDataProvision) => nfrDataProvision.nfr_data, {
+    nullable: true,
+    cascade: true,
+  })
   nfr_data_provisions: NFRDataProvision[];
-  @OneToMany(
-    () => NFRDataVariable,
-    (nfrDataVariable) => nfrDataVariable.nfr_data,
-    {
-      nullable: true,
-      cascade: true,
-    }
-  )
+  @OneToMany(() => NFRDataVariable, (nfrDataVariable) => nfrDataVariable.nfr_data, {
+    nullable: true,
+    cascade: true,
+  })
   nfr_data_variables: NFRDataVariable[];
   @Column({ nullable: true })
   active: boolean;
@@ -67,10 +52,10 @@ export class NFRData {
     update_userid?: string
   ) {
     this.dtid = dtid || null;
-    this.variant_name = variant_name || "";
+    this.variant_name = variant_name || '';
     this.template_id = template_id || null;
-    this.status = status || "";
-    this.create_userid = create_userid || "";
-    this.update_userid = update_userid || "";
+    this.status = status || '';
+    this.create_userid = create_userid || '';
+    this.update_userid = update_userid || '';
   }
 }

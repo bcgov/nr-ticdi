@@ -1,10 +1,4 @@
-import {
-  Column,
-  CreateDateColumn,
-  Entity,
-  PrimaryGeneratedColumn,
-  UpdateDateColumn,
-} from "typeorm";
+import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 
 @Entity()
 export class NFRDataLog {
@@ -41,9 +35,9 @@ export class NFRDataLog {
     this.document_template_id = document_template_id || null;
     this.nfr_data_id = nfr_data_id || null;
     this.dtid = dtid || null;
-    this.request_app_user = request_app_user || "";
-    this.request_json = request_json || "";
-    this.create_userid = create_userid || "";
-    this.update_userid = update_userid || "";
+    this.request_app_user = request_app_user || '';
+    this.request_json = request_json || '';
+    this.create_userid = create_userid || '';
+    this.update_userid = update_userid || '';
   }
 }

@@ -1,10 +1,4 @@
-import {
-  Column,
-  CreateDateColumn,
-  Entity,
-  PrimaryGeneratedColumn,
-  UpdateDateColumn,
-} from "typeorm";
+import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 
 @Entity()
 export class DocumentTemplate {
@@ -50,16 +44,16 @@ export class DocumentTemplate {
     create_userid?: string,
     update_userid?: string
   ) {
-    this.document_type = document_type || "";
+    this.document_type = document_type || '';
     this.template_version = template_version || null;
-    this.template_author = template_author || "";
+    this.template_author = template_author || '';
     this.active_flag = active_flag || false;
     this.is_deleted = is_deleted || false;
-    this.mime_type = mime_type || "";
-    this.file_name = file_name || "";
-    this.the_file = the_file || "";
-    this.comments = comments || "";
-    this.create_userid = create_userid || "";
-    this.update_userid = update_userid || "";
+    this.mime_type = mime_type || '';
+    this.file_name = file_name || '';
+    this.the_file = the_file || '';
+    this.comments = comments || '';
+    this.create_userid = create_userid || '';
+    this.update_userid = update_userid || '';
   }
 }

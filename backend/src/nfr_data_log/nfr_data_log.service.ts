@@ -1,8 +1,8 @@
-import { Injectable } from "@nestjs/common";
-import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
-import { CreateNFRDataLogDto } from "./dto/create-nfr_data_log.dto";
-import { NFRDataLog } from "./entities/nfr_data_log.entity";
+import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { CreateNFRDataLogDto } from './dto/create-nfr_data_log.dto';
+import { NFRDataLog } from './entities/nfr_data_log.entity';
 
 @Injectable()
 export class NFRDataLogService {
@@ -44,7 +44,7 @@ export class NFRDataLogService {
     let version = (requestLogs[1] + 1).toString();
     // prepend zeroes to the version before returning
     while (version.length < 4) {
-      version = "0" + version;
+      version = '0' + version;
     }
     return version;
   }

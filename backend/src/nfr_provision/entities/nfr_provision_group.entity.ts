@@ -1,5 +1,5 @@
-import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from "typeorm";
-import { NFRProvision } from "./nfr_provision.entity";
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
+import { NFRProvision } from './nfr_provision.entity';
 
 /**
  * This entity holds group descriptions and provision maximums

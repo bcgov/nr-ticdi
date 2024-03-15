@@ -1,9 +1,9 @@
-import { Injectable } from "@nestjs/common";
-import { InjectRepository } from "@nestjs/typeorm";
-import { DataSource, Repository } from "typeorm";
-import { CreatePrintRequestDetailDto } from "./dto/create-print_request_detail.dto";
-import { PrintRequestDetail } from "./entities/print_request_detail.entity";
-import { PrintRequestDetailView } from "./entities/print_request_detail_vw";
+import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { DataSource, Repository } from 'typeorm';
+import { CreatePrintRequestDetailDto } from './dto/create-print_request_detail.dto';
+import { PrintRequestDetail } from './entities/print_request_detail.entity';
+import { PrintRequestDetailView } from './entities/print_request_detail_vw';
 
 @Injectable()
 export class PrintRequestDetailService {
@@ -13,9 +13,7 @@ export class PrintRequestDetailService {
     private dataSource: DataSource
   ) {}
 
-  async create(
-    printRequestDetail: CreatePrintRequestDetailDto
-  ): Promise<PrintRequestDetail> {
+  async create(printRequestDetail: CreatePrintRequestDetailDto): Promise<PrintRequestDetail> {
     const newItem = new PrintRequestDetail();
     newItem.dtid = printRequestDetail.dtid;
     newItem.tenure_file_number = printRequestDetail.tenure_file_number;
@@ -45,8 +43,7 @@ export class PrintRequestDetailService {
     newItem.mailing_address_line_2 = printRequestDetail.mailing_address_line_2;
     newItem.mailing_address_line_3 = printRequestDetail.mailing_address_line_3;
     newItem.mailing_city = printRequestDetail.mailing_city;
-    newItem.mailing_province_state_code =
-      printRequestDetail.mailing_province_state_code;
+    newItem.mailing_province_state_code = printRequestDetail.mailing_province_state_code;
     newItem.mailing_postal_code = printRequestDetail.mailing_postal_code;
     newItem.mailing_zip = printRequestDetail.mailing_zip;
     newItem.mailing_country_code = printRequestDetail.mailing_country_code;
@@ -56,15 +53,11 @@ export class PrintRequestDetailService {
     newItem.create_userid = printRequestDetail.create_userid;
 
     const newPRD = this.printRequestDetailRepository.create(newItem);
-    return this.convertTenureToJson(
-      await this.printRequestDetailRepository.save(newPRD)
-    );
+    return this.convertTenureToJson(await this.printRequestDetailRepository.save(newPRD));
   }
 
   async findAll(): Promise<PrintRequestDetail[]> {
-    return this.convertTenureToJson(
-      await this.printRequestDetailRepository.find()
-    );
+    return this.convertTenureToJson(await this.printRequestDetailRepository.find());
   }
 
   async findByDtid(dtid: number): Promise<PrintRequestDetail[]> {
@@ -104,7 +97,7 @@ export class PrintRequestDetailService {
         prd = prd.map(function (entry) {
           if (entry.tenure) {
             p = JSON.parse(entry.tenure);
-            entry["tenure"] = p;
+            entry['tenure'] = p;
             return entry;
           }
         });
@@ -113,7 +106,7 @@ export class PrintRequestDetailService {
         prd = prd.map(function (entry) {
           if (entry.Tenure) {
             p = JSON.parse(entry.Tenure);
-            entry["Tenure"] = p;
+            entry['Tenure'] = p;
             return entry;
           }
         });
@@ -122,11 +115,11 @@ export class PrintRequestDetailService {
     } else {
       if (prd.tenure) {
         p = JSON.parse(prd.tenure);
-        prd["tenure"] = p;
+        prd['tenure'] = p;
         return prd;
       } else if (prd.Tenure) {
         p = JSON.parse(prd.Tenure);
-        prd["Tenure"] = p;
+        prd['Tenure'] = p;
         return prd;
       }
     }

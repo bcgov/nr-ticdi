@@ -1,0 +1,123 @@
+.collapsible-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin: 20px 0;
+  }
+  
+  .collapsible-title {
+    font-weight: bold;
+    font-size: 1.25rem;
+  }
+  
+  .collapsible-button {
+    border: none;
+    background-color: transparent;
+    cursor: pointer;
+    padding: 0;
+    display: flex;
+    align-items: center;
+  
+    &:before {
+      content: '−';
+      display: block;
+      font-size: 2rem;
+      color: #007bff;
+      margin-right: 10px;
+    }
+  
+    &.collapsed:before {
+      content: '+';
+    }
+  }
+  
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+  
+    th,
+    td {
+      text-align: left;
+      padding: 8px;
+    }
+  
+    th {
+      background-color: #f8f9fa;
+    }
+  
+    input[type='text'] {
+      width: 100%;
+      padding: 0.5rem;
+      margin-bottom: 0.5rem;
+      border: 1px solid #ced4da;
+      border-radius: 0.25rem;
+    }
+  
+    input[type='checkbox'] {
+      cursor: pointer;
+    }
+  }
+  
+  .group-select-container {
+    display: flex;
+    align-items: center;
+  
+    .group-select-label {
+      margin-right: 0.5rem;
+    }
+  
+    .group-select {
+      padding: 0.5rem;
+      margin-right: 1rem;
+      border: 1px solid #ced4da;
+      border-radius: 0.25rem;
+    }
+  
+    .max-group-text {
+      font-weight: bold;
+    }
+  }
+  
+  .variable-input-container {
+    margin-top: 1rem;
+  
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+    }
+  
+    input[type='text'] {
+      width: 100%;
+      padding: 0.5rem;
+      border: 1px solid #ced4da;
+      border-radius: 0.25rem;
+      margin-bottom: 1rem; 
+    }
+  }
+  
+  .button-container {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 1rem;
+  
+    .button {
+      padding: 0.5rem 1rem;
+      border: none;
+      border-radius: 0.25rem;
+      cursor: pointer;
+      font-weight: bold;
+      margin-left: 0.5rem;
+  
+      &--save {
+        background-color: #28a745; 
+        color: white;
+      }
+  
+      &--generate {
+        background-color: #007bff; 
+        color: white;
+      }
+    }
+  }
+  

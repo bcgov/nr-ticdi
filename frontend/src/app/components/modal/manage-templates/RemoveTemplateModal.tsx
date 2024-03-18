@@ -7,12 +7,20 @@ import { removeTemplate } from '../../../common/manage-templates';
 type RemoveTemplateModalProps = {
   templateId: number;
   documentTypeId: number;
+  documentTypeName: string;
   show: boolean;
   onHide: () => void;
   onRemove: () => void;
 };
 
-const RemoveTemplateModal: FC<RemoveTemplateModalProps> = ({ templateId, documentTypeId, show, onHide, onRemove }) => {
+const RemoveTemplateModal: FC<RemoveTemplateModalProps> = ({
+  templateId,
+  documentTypeId,
+  documentTypeName,
+  show,
+  onHide,
+  onRemove,
+}) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [showError, setShowError] = useState(false);
@@ -37,7 +45,7 @@ const RemoveTemplateModal: FC<RemoveTemplateModalProps> = ({ templateId, documen
   return (
     <Modal show={show} onHide={onHide} size="lg">
       <Modal.Header>
-        <Modal.Title>Remove Administrator</Modal.Title>
+        <Modal.Title>Remove Template: {documentTypeName}</Modal.Title>
         <Button
           variant="none"
           onClick={onHide}

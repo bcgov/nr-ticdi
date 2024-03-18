@@ -4,8 +4,8 @@ import { DocumentType } from 'src/document_type/entities/document_type.entity';
 
 /**
  * This entity holds group descriptions and provision maximums
- * based on group number. Every NFRProvision is associated with
- * an NFRProvisionGroup.
+ * based on group number. Every Provision is associated with
+ * a ProvisionGroup.
  */
 @Entity()
 export class ProvisionGroup {

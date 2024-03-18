@@ -2,8 +2,8 @@ import * as api from './api';
 import config from '../../config';
 import { GroupMax, Provision, ProvisionUpload, TemplateInfo, Variable, VariableUpload } from '../types/types';
 
-export const getTemplatesInfo = async (reportType: string): Promise<TemplateInfo[]> => {
-  const url = `${config.API_BASE_URL}/admin/get-templates/${reportType.toUpperCase()}`;
+export const getTemplatesInfo = async (document_type_id: number): Promise<TemplateInfo[]> => {
+  const url = `${config.API_BASE_URL}/admin/get-templates/${document_type_id}`;
   const getParameters = api.generateApiParameters(url);
   const response: TemplateInfo[] = await api.get<TemplateInfo[]>(getParameters);
   console.log('getTemplatesInfo response');
@@ -30,7 +30,7 @@ export const getProvisions = async (): Promise<Provision[]> => {
 };
 
 export const getVariables = async (): Promise<Variable[]> => {
-  const url = `${config.API_BASE_URL}/admin/nfr-variables`;
+  const url = `${config.API_BASE_URL}/admin/document-variables`;
   const getParameters = api.generateApiParameters(url);
   const response: Variable[] = await api.get<Variable[]>(getParameters);
   console.log('getVariables response');
@@ -69,7 +69,7 @@ export const removeTemplate = async (id: number, documentTypeId: number): Promis
   console.log(response);
 };
 
-export const activateTemplate = async (id: number, documentTypeId: string): Promise<void> => {
+export const activateTemplate = async (id: number, documentTypeId: number): Promise<void> => {
   const url = `${config.API_BASE_URL}/admin/activate-template/${id}/${documentTypeId}`;
   const getParameters = api.generateApiParameters(url);
   await api.get<void>(getParameters);

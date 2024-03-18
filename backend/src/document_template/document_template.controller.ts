@@ -66,7 +66,7 @@ export class DocumentTemplateController {
     return this.templateService.findOne(id);
   }
 
-  @Post('nfr-template-info')
+  @Post('document-template-info')
   getTemplatesInfoByIds(@Body() ids: number[]): Promise<any[]> {
     return this.templateService.getTemplatesInfoByIds(ids);
   }

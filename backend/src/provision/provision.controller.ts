@@ -14,12 +14,12 @@ export class ProvisionController {
     return this.provisionService.create(provision);
   }
 
-  @Post('update')
-  async update(@Body() provision: CreateProvisionDto & { id: number }) {
-    const id = provision.id;
-    delete provision['id'];
-    return this.provisionService.update(id, provision);
-  }
+  // @Post('update')
+  // async update(@Body() provision: CreateProvisionDto & { id: number }) {
+  //   const id = provision.id;
+  //   delete provision['id'];
+  //   return this.provisionService.update(id, provision);
+  // }
 
   @Post('add-variable')
   async addVariable(

@@ -57,7 +57,7 @@ export class ReportController {
   // }
 
   @Get('get-document-data/:document_type_id/:dtid')
-  getNfrData(
+  getDocumentDataByDocTypeIdAndDtid(
     @Session() session: { data?: SessionData },
     @Param('document_type_id') document_type_id: number,
     @Param('dtid') dtid: number
@@ -175,7 +175,7 @@ export class ReportController {
   }
 
   @Get('search-document-data')
-  getNFRData() {
+  getDocumentData() {
     return this.reportService.getDocumentData();
   }
 

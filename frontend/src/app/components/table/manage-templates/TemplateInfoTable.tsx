@@ -2,23 +2,23 @@ import React, { useEffect, useState } from 'react';
 import { DataTable } from '../common/DataTable';
 import { ColumnDef, createColumnHelper } from '@tanstack/react-table';
 import { activateTemplate, downloadTemplate, getTemplatesInfo } from '../../../common/manage-templates';
-import { TemplateInfo } from '../../../types/types';
+import { DocType, TemplateInfo } from '../../../types/types';
 import { Button } from 'react-bootstrap';
 
 interface TemplateInfoTableProps {
-  reportType: string;
+  documentType: DocType;
   refreshVersion: number;
-  handleRemove: (id: number, reportType: string) => void;
+  handleRemove: (id: number) => void;
 }
 
-const TemplateInfoTable: React.FC<TemplateInfoTableProps> = ({ reportType, refreshVersion, handleRemove }) => {
+const TemplateInfoTable: React.FC<TemplateInfoTableProps> = ({ documentType, refreshVersion, handleRemove }) => {
   const [templateData, setTemplateData] = useState<TemplateInfo[]>([]);
   const [currentlyActive, setCurrentlyActive] = useState<number>();
   const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchData = async () => {
-      const data = await getTemplatesInfo(reportType);
+      const data = await getTemplatesInfo(documentType.id);
       setTemplateData(data);
       for (let template of data) {
         if (template.active_flag === true) {
@@ -28,12 +28,12 @@ const TemplateInfoTable: React.FC<TemplateInfoTableProps> = ({ reportType, refre
     };
 
     fetchData();
-  }, [reportType, refreshVersion]);
+  }, [documentType, refreshVersion]);
 
   const activeRadioHandler = async (id: number) => {
     try {
       setLoading(true);
-      await activateTemplate(id, reportType);
+      await activateTemplate(id, documentType.id);
       setCurrentlyActive(id);
     } catch (error) {
       console.log('Error activating template');
@@ -57,7 +57,7 @@ const TemplateInfoTable: React.FC<TemplateInfoTableProps> = ({ reportType, refre
 
   // this opens a modal which is handled on the ManageTemplatesPage
   const handleRemoveButton = (id: number) => {
-    handleRemove(id, reportType);
+    handleRemove(id);
   };
 
   const columnHelper = createColumnHelper<TemplateInfo>();
@@ -86,7 +86,7 @@ const TemplateInfoTable: React.FC<TemplateInfoTableProps> = ({ reportType, refre
       cell: (info) => (
         <input
           type="radio"
-          name={`activeSelection_${reportType}`}
+          name={`activeSelection_document`}
           checked={currentlyActive === info.row.original.id}
           onChange={() => activeRadioHandler(info.row.original.id)}
           style={{ width: '100%' }}
@@ -99,10 +99,7 @@ const TemplateInfoTable: React.FC<TemplateInfoTableProps> = ({ reportType, refre
     columnHelper.accessor('preview', {
       id: 'preview',
       cell: (info) => (
-        <Button
-          variant="success"
-          onClick={() => console.log("")}
-        >
+        <Button variant="success" onClick={() => console.log('')}>
           Preview
         </Button>
       ),

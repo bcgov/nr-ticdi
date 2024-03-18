@@ -45,14 +45,16 @@ const EditProvisionModalForm: React.FC<EditProvisionModalFormProps> = ({
       if (provision && groupMaxArray) {
         setType(provision.type);
         setGroup(provision.provision_group);
-        const groupMax = groupMaxArray.find((group) => group.provision_group === provision.provision_group);
-        setGroupDescription(groupMax ? groupMax.provision_group_text : '');
+        if (groupMaxArray) {
+          const groupMax = groupMaxArray.find((group) => group.provision_group === provision.provision_group);
+          setGroupDescription(groupMax ? groupMax.provision_group_text : '');
+        }
         setMax(provision.max);
         setProvisionName(provision.provision_name);
         setFreeText(provision.free_text);
         setHelpText(provision.help_text);
         setCategory(provision.category);
-        setDocumentTypeIds(provision.document_type_ids);
+        provision.document_type_ids ? setDocumentTypeIds(provision.document_type_ids) : setDocumentTypeIds([]);
       }
     };
 
@@ -136,7 +138,7 @@ const EditProvisionModalForm: React.FC<EditProvisionModalFormProps> = ({
     if (e.target.checked) {
       setDocumentTypeIds((prevDocTypeIds) => [...prevDocTypeIds, documentTypeId]);
     } else {
-      setDocumentTypeIds(documentTypeIds.filter((v) => v === documentTypeId));
+      setDocumentTypeIds((prevDocTypeIds) => prevDocTypeIds.filter((id) => id !== documentTypeId));
     }
   };
 
@@ -285,9 +287,9 @@ const EditProvisionModalForm: React.FC<EditProvisionModalFormProps> = ({
           <Form.Label style={{ marginTop: '10px' }}>Document Types</Form.Label>
         </Col>
         {documentTypes &&
-          documentTypes.map((docType) => {
+          documentTypes.map((docType, index) => {
             return (
-              <Form.Group as={Row} className="mb-3 ml-2">
+              <Form.Group as={Row} className="mb-3 ml-2" key={index}>
                 <Col sm={{ span: 8 }}>
                   <FormLabelWithPeriods text={docType.name} />
                 </Col>

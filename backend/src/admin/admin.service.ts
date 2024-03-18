@@ -259,72 +259,59 @@ export class AdminService {
     return { message: 'error' };
   }
 
-  async getTemplates(document_type_id: number) {
-    const data = await this.documentTemplateService.findAll(document_type_id);
-    let documents: {
-      version: number;
-      file_name: string;
-      updated_date: string;
-      status: string;
-      active: boolean;
-      template_id: number;
-    }[] = [];
-    for (let entry of data) {
-      const document = {
-        version: entry.template_version,
-        file_name: entry.file_name,
-        updated_date: entry.update_timestamp.toString().split('T')[0],
-        status: '???',
-        active: entry.active_flag,
-        template_id: entry.id,
-      };
-      documents.push(document);
-    }
-    return documents;
-  }
+  // async getTemplates(document_type_id: number) {
+  //   const data = await this.documentTemplateService.findAll(document_type_id);
+  //   let documents: {
+  //     version: number;
+  //     file_name: string;
+  //     updated_date: string;
+  //     status: string;
+  //     active: boolean;
+  //     template_id: number;
+  //   }[] = [];
+  //   for (let entry of data) {
+  //     const document = {
+  //       version: entry.template_version,
+  //       file_name: entry.file_name,
+  //       updated_date: entry.update_timestamp.toString().split('T')[0],
+  //       status: '???',
+  //       active: entry.active_flag,
+  //       template_id: entry.id,
+  //     };
+  //     documents.push(document);
+  //   }
+  //   return documents;
+  // }
 
   async getDocumentTemplates(document_type_id: number): Promise<any> {
-    const returnItems = ['id', 'template_version', 'file_name', 'uploaded_date', 'active_flag', 'update_timestamp'];
     const documentTemplateObjects = await this.documentTemplateService.findAll(document_type_id);
-    return documentTemplateObjects.map((obj) =>
-      Object.keys(obj)
-        .filter((key) => returnItems.includes(key))
-        .reduce(
-          (acc, key) => {
-            key == 'update_timestamp' ? (acc[key] = obj[key].toString().split('T')[0]) : (acc[key] = obj[key]);
-            return acc;
-          },
-          { view: 'view', remove: 'remove' }
-        )
-    );
+    const formattedDate = (date: Date) => date.toISOString().split('T')[0];
+    return documentTemplateObjects.map((template) => {
+      return {
+        id: template.id,
+        template_version: template.template_version,
+        file_name: template.file_name,
+        active_flag: template.active_flag,
+        update_timestamp: formattedDate(template.update_timestamp),
+      };
+    });
   }
 
   async getDocumentProvisions(): Promise<any> {
-    const returnItems = [
-      'id',
-      'dtid',
-      'type',
-      'provision_group',
-      'max',
-      'provision_name',
-      'free_text',
-      'help_text',
-      'category',
-      'active_flag',
-      'variants',
-    ];
     const documentProvisions = await this.provisionService.findAll();
-    return documentProvisions.map((obj) =>
-      Object.keys(obj)
-        .filter((key) => returnItems.includes(key))
-        .reduce(
-          (acc, key) => {
-            acc[key] = obj[key];
-            return acc;
-          },
-          { edit: 'edit' }
-        )
-    );
+    return documentProvisions.map((provision) => ({
+      id: provision.id,
+      type: provision.type,
+      provision_group: provision.provision_group,
+      max: provision.max,
+      provision_name: provision.provision_name,
+      free_text: provision.free_text,
+      help_text: provision.help_text,
+      category: provision.category,
+      active_flag: provision.active_flag,
+      // transform document_types to an array of ids
+      document_type_ids: provision.document_types.map((dt) => dt.id),
+    }));
   }
 
   async getDocumentVariables(): Promise<any> {
@@ -383,11 +370,14 @@ export class AdminService {
       free_text: string;
       help_text: string;
       category: string;
-      variants: number[];
+      document_type_ids: number[];
     },
     update_userid: string
   ) {
-    return this.provisionService.update(provisionParams.id, { ...provisionParams, update_userid });
+    return this.provisionService.update(provisionParams.id, provisionParams.document_type_ids, {
+      ...provisionParams,
+      update_userid,
+    });
   }
 
   addVariable(

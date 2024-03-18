@@ -178,10 +178,10 @@ export class AdminController {
     return this.adminService.removeAdmin(input.idirUsername);
   }
 
-  @Get('templates/:reportId')
-  getTemplates(@Param('reportId') reportId: number): Promise<any> {
-    return this.adminService.getTemplates(reportId);
-  }
+  // @Get('templates/:reportId')
+  // getTemplates(@Param('reportId') reportId: number): Promise<any> {
+  //   return this.adminService.getTemplates(reportId);
+  // }
 
   @Get('open-document/:document_id')
   setSessionDocument(@Session() session: { data?: SessionData }, @Param('document_id') documentId: number): void {
@@ -251,7 +251,7 @@ export class AdminController {
       free_text: string;
       help_text: string;
       category: string;
-      variants: number[];
+      document_type_ids: number[];
     },
     @Session() session: { data?: SessionData }
   ) {

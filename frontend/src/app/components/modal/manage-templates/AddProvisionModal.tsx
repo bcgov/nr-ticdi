@@ -132,6 +132,7 @@ const AddProvisionModal: React.FC<AddProvisionModalProps> = ({
           document_type_ids: documentTypeIds,
         };
         addProvisionHandler(provisionUpload);
+        onHide();
         refreshTables();
       }
     } catch (err) {
@@ -261,9 +262,9 @@ const AddProvisionModal: React.FC<AddProvisionModalProps> = ({
           <Form.Label style={{ marginTop: '10px' }}>Document Types</Form.Label>
         </Col>
         {documentTypes &&
-          documentTypes.map((docType) => {
+          documentTypes.map((docType, index) => {
             return (
-              <Form.Group as={Row} className="mb-3 ml-2">
+              <Form.Group as={Row} className="mb-3 ml-2" key={index}>
                 <Col sm={{ span: 8 }}>
                   <FormLabelWithPeriods text={docType.name} />
                 </Col>

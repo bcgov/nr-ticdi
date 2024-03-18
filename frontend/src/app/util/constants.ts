@@ -41,16 +41,16 @@ export const PAGE = [
   },
   {
     title: 'Document Preview',
-    path: '/'
+    path: '/',
   },
   {
     title: 'Select Manage Templates',
-    path: 'manage-templates-select'
+    path: 'manage-templates-select',
   },
   {
     title: 'System Administration Menu',
-    path: 'system-admin-menu',
-  }
+    path: 'system-admin',
+  },
 ];
 
 // should eventually be stored in a table in the db and obtained from there

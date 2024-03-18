@@ -5,14 +5,14 @@ import { ProvisionGroup } from './entities/provision_group.entity';
 import { ProvisionController } from './provision.controller';
 import { ProvisionService } from './provision.service';
 import { ProvisionVariable } from './entities/provision_variable.entity';
-import { DocumentType } from 'src/document_type/entities/document_type.entity';
+import { DocumentTypeModule } from 'src/document_type/document_type.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Provision]),
     TypeOrmModule.forFeature([ProvisionGroup]),
     TypeOrmModule.forFeature([ProvisionVariable]),
-    TypeOrmModule.forFeature([DocumentType]),
+    DocumentTypeModule,
   ],
   controllers: [ProvisionController],
   providers: [ProvisionService],

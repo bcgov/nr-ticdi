@@ -18,7 +18,6 @@ const ManageProvisionsTable: React.FC<ManageProvisionsTableProps> = ({
 }) => {
   const [allProvisions, setProvisions] = useState<Provision[]>([]);
   const [allVariables, setVariables] = useState<Variable[]>([]);
-  // const [currentlyActiveProvision, setCurrentlyActiveProvision] = useState<Provision>();
   const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
@@ -80,10 +79,10 @@ const ManageProvisionsTable: React.FC<ManageProvisionsTableProps> = ({
   const columnHelper = createColumnHelper<Provision>();
 
   const columns: ColumnDef<Provision, any>[] = [
-    columnHelper.accessor('type', {
-      id: 'type',
+    columnHelper.accessor('id', {
+      id: 'id',
       cell: (info) => <input value={info.getValue()} className="readonlyInput" readOnly />,
-      header: () => 'Type',
+      header: () => 'ID',
       meta: { customCss: { width: '5%' } },
     }),
     columnHelper.accessor('provision_group', {
@@ -92,26 +91,11 @@ const ManageProvisionsTable: React.FC<ManageProvisionsTableProps> = ({
       header: () => 'Group',
       meta: { customCss: { width: '5%' } },
     }),
-    columnHelper.accessor('max', {
-      id: 'max',
-      cell: (info) => {
-        const displayValue = info.getValue() >= 999 ? '-' : info.getValue();
-        return <input value={displayValue} className="readonlyInput" readOnly />;
-      },
-      header: () => 'Max',
-      meta: { customCss: { width: '5%' } },
-    }),
     columnHelper.accessor('provision_name', {
       id: 'provision_name',
       cell: (info) => <input value={info.getValue()} className="readonlyInput" readOnly />,
       header: () => 'Provision',
       meta: { customCss: { width: '35%' } },
-    }),
-    columnHelper.accessor('free_text', {
-      id: 'free_text',
-      cell: (info) => <input value={info.getValue()} className="readonlyInput" title={info.getValue()} readOnly />,
-      header: () => 'Free Text',
-      meta: { customCss: { width: '5%' } },
     }),
     columnHelper.accessor('category', {
       id: 'category',
@@ -119,7 +103,6 @@ const ManageProvisionsTable: React.FC<ManageProvisionsTableProps> = ({
       header: () => 'Category',
       meta: { customCss: { width: '25%' } },
     }),
-    // add component that allows individual rendering
     columnHelper.accessor('active_flag', {
       id: 'active_flag',
       cell: (info) => (
@@ -138,12 +121,6 @@ const ManageProvisionsTable: React.FC<ManageProvisionsTableProps> = ({
       cell: (info) => <LinkButton text="Edit" onClick={() => openEditProvisionModal(info.row.original.id)} />,
       header: () => null,
       meta: { customCss: { width: '5%' } },
-    }),
-    columnHelper.accessor('id', {
-      id: 'id',
-      cell: () => null,
-      header: () => null,
-      meta: { customCss: { display: 'none' } },
     }),
   ];
 

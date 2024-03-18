@@ -6,6 +6,7 @@ import { Provision } from './entities/provision.entity';
 import { UpdateProvisionDto } from './dto/update-provision.dto';
 import { ProvisionGroup } from './entities/provision_group.entity';
 import { ProvisionVariable } from './entities/provision_variable.entity';
+import { DocumentTypeService } from 'src/document_type/document_type.service';
 import { DocumentType } from 'src/document_type/entities/document_type.entity';
 
 @Injectable()
@@ -17,8 +18,7 @@ export class ProvisionService {
     private provisionGroupRepository: Repository<ProvisionGroup>,
     @InjectRepository(ProvisionVariable)
     private provisionVariableRepository: Repository<ProvisionVariable>,
-    @InjectRepository(DocumentType)
-    private documentTypeRepository: Repository<DocumentType>
+    private documentTypeService: DocumentTypeService
   ) {}
 
   async create(provision: CreateProvisionDto): Promise<Provision> {
@@ -45,7 +45,7 @@ export class ProvisionService {
     return this.provisionRepository.save(newProvision);
   }
 
-  async update(id: number, provision: UpdateProvisionDto): Promise<any> {
+  async update(id: number, document_type_ids: number[], provision: UpdateProvisionDto): Promise<any> {
     const provision_group = Math.floor(provision.provision_group);
     const provision_group_text = provision.provision_group_text;
     delete provision['provision_group'];
@@ -56,12 +56,16 @@ export class ProvisionService {
       provision_group,
     });
     const existingProvision: Provision = await this.provisionRepository.findOneBy({ id });
+
+    const documentTypes: DocumentType[] = await this.documentTypeService.findByIds(document_type_ids);
+
     existingProvision.type = provision.type;
     existingProvision.provision_name = provision.provision_name;
     existingProvision.free_text = provision.free_text;
     existingProvision.help_text = provision.help_text;
     existingProvision.category = provision.category;
     existingProvision.update_userid = provision.update_userid;
+    existingProvision.document_types = documentTypes;
     const updatedProvision = this.provisionRepository.create({
       ...existingProvision,
       provision_group: provisionGroup,
@@ -117,14 +121,16 @@ export class ProvisionService {
 
   async findAll(): Promise<any[]> {
     const provisions = await this.provisionRepository.find({
-      relations: ['provision_group'],
+      relations: ['provision_group', 'document_types'],
     });
     return provisions.map((provision) => {
-      delete provision.provision_group['id'];
+      const { provision_group, document_types, ...restOfProvision } = provision;
+      delete provision_group['id'];
 
       return {
         ...provision,
-        ...provision.provision_group,
+        ...provision_group,
+        document_types,
       };
     });
   }

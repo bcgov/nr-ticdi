@@ -42,7 +42,7 @@ const Header: FC<HeaderProps> = ({ isAdmin, idirUsername }) => {
             <div className="navbar-nav" style={{ width: 'auto' }}>
               {isAdmin && (
                 <div id="adminLinkDiv" style={{ width: 'auto' }}>
-                  <a className="nav-item nav-link" id="adminLink" href="/system-admin-menu">
+                  <a className="nav-item nav-link" id="adminLink" href="/system-admin">
                     Administration
                   </a>
                 </div>

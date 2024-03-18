@@ -73,13 +73,13 @@ export class DocumentDataService {
       documentDataDto.document_type_id
     );
     documentDataDto['template_id'] = documentTemplate ? documentTemplate.id : null;
-    const newNfrData: DocumentData = this.documentDataRepository.create(documentDataDto);
-    const updatedNfrData = await this.documentDataRepository.save(newNfrData);
+    const newDocumentData: DocumentData = this.documentDataRepository.create(documentDataDto);
+    const updatedDocumentData = await this.documentDataRepository.save(newDocumentData);
 
     const documentDataProvisions = provisionArray.map(({ provision_id, free_text }) => {
       const documentProvision = documentProvisions.find((provision) => provision.id === provision_id);
       const documentDataProvision = new DocumentDataProvision();
-      documentDataProvision.document_data = updatedNfrData;
+      documentDataProvision.document_data = updatedDocumentData;
       documentDataProvision.document_provision = documentProvision;
       documentDataProvision.provision_free_text = documentProvision.free_text; // quick fix to not use the free_text from the document page
       return documentDataProvision;
@@ -87,7 +87,7 @@ export class DocumentDataService {
     const documentDataVariables = variableArray.map(({ variable_id, variable_value }) => {
       const documentVariable = documentVariables.find((variable) => variable.id === variable_id);
       const documentDataVariable = new DocumentDataVariable();
-      documentDataVariable.document_data = updatedNfrData;
+      documentDataVariable.document_data = updatedDocumentData;
       documentDataVariable.document_variable = documentVariable;
       documentDataVariable.data_variable_value = variable_value;
       return documentDataVariable;
@@ -99,7 +99,7 @@ export class DocumentDataService {
     await this.documentDataProvisionRepository.save(documentDataProvisions);
     await this.documentDataVariableRepository.save(documentDataVariables);
 
-    return updatedNfrData;
+    return updatedDocumentData;
   }
 
   async updateDocumentData(
@@ -110,14 +110,14 @@ export class DocumentDataService {
     documentProvisions: Provision[],
     documentVariables: ProvisionVariable[]
   ): Promise<DocumentData> {
-    // Update NFRData entity
+    // Update DocumentData entity
     documentData.template_id = documentDataDto.template_id;
     documentData.status = documentDataDto.status;
     documentData.update_userid = documentDataDto.create_userid;
 
-    const updatedNfrData = await this.documentDataRepository.save(documentData);
+    const updatedDocumentData = await this.documentDataRepository.save(documentData);
 
-    // Update NFRDataProvision entities
+    // Update DocumentDataProvision entities
     for (const provision of provisionArray) {
       const documentDataProvision = documentData.document_data_provisions.find(
         (p) => p.document_provision.id === provision.provision_id
@@ -125,49 +125,49 @@ export class DocumentDataService {
       const documentProvision = documentProvisions.find((p) => p.id === provision.provision_id);
 
       if (documentDataProvision && documentDataProvision.provision_free_text != documentProvision.free_text) {
-        // Update an existing NFRDataProvision entry
+        // Update an existing DocumentDataProvision entry
         documentDataProvision.provision_free_text = documentProvision.free_text;
         await this.documentDataProvisionRepository.save(documentDataProvision);
       } else if (!documentDataProvision) {
-        // No data found for this specific provision so create a new entry in NFRDataProvision
+        // No data found for this specific provision so create a new entry in DocumentDataProvision
         const documentProvisionToAdd = await this.documentProvisionRepository.findOneBy({
           id: provision.provision_id,
         });
-        const newNfrDataProvision: DocumentDataProvision = this.documentDataProvisionRepository.create({
+        const newDocumentDataProvision: DocumentDataProvision = this.documentDataProvisionRepository.create({
           document_provision: documentProvisionToAdd,
-          document_data: updatedNfrData,
+          document_data: updatedDocumentData,
           provision_free_text: documentProvisionToAdd.free_text, // quick fix
         });
-        await this.documentDataProvisionRepository.save(newNfrDataProvision);
+        await this.documentDataProvisionRepository.save(newDocumentDataProvision);
       }
     }
 
-    // Update NFRDataVariable entities
+    // Update DocumentDataVariable entities
     for (const variable of variableArray) {
       const documentDataVariable = documentData.document_data_variables.find(
         (v) => v.document_variable.id === variable.variable_id
       );
 
       if (documentDataVariable && documentDataVariable.data_variable_value != variable.variable_value) {
-        // Update an existing NFRDataVariable entry
+        // Update an existing DocumentDataVariable entry
         documentDataVariable.data_variable_value = variable.variable_value;
         await this.documentDataVariableRepository.save(documentDataVariable);
       } else if (!documentDataVariable) {
-        // No data found for this specific variable so create a new entry in NFRDataVariable
+        // No data found for this specific variable so create a new entry in DocumentDataVariable
         const documentVariable = await this.documentProvisionVariableRepository.findOneBy({
           id: variable.variable_id,
         });
-        const newNfrDataVariable: DocumentDataVariable = this.documentDataVariableRepository.create({
+        const newDocumentDataVariable: DocumentDataVariable = this.documentDataVariableRepository.create({
           document_variable: documentVariable,
-          document_data: updatedNfrData,
+          document_data: updatedDocumentData,
           data_variable_value: variable.variable_value,
         });
-        await this.documentDataVariableRepository.save(newNfrDataVariable);
+        await this.documentDataVariableRepository.save(newDocumentDataVariable);
       }
     }
     await this.deleteDataVarsAndProvs(documentData, provisionArray, variableArray);
 
-    return updatedNfrData;
+    return updatedDocumentData;
   }
 
   async deleteDataVarsAndProvs(

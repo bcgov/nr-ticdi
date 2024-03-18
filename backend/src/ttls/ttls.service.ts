@@ -347,73 +347,73 @@ export class TTLSService {
       });
   }
 
-  // TODO
-  async generateNFRReport(prdid: number, templateId: number, variables: any, username: string) {
-    const url = `${hostname}:${port}/document-data/view/${prdid}`;
-    const templateUrl = `${hostname}:${port}/document-template/find-one/${templateId}`;
-    const logUrl = `${hostname}:${port}/print-request-log/`;
-    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO get the view for specified prdid from the new NFR entity
-    const data = await axios
-      .get(url, {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      })
-      .then((res) => {
-        return res.data;
-      });
-    if (data.InspectionDate) {
-      data['InspectionDate'] = this.formatInspectedDate(data.InspectionDate);
-    }
-    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // get the document template
-    const documentTemplateObject: { id: number; the_file: string } = await axios.get(templateUrl).then((res) => {
-      return res.data;
-    });
+  // // TODO
+  // async generateNFRReport(prdid: number, templateId: number, variables: any, username: string) {
+  //   const url = `${hostname}:${port}/document-data/view/${prdid}`;
+  //   const templateUrl = `${hostname}:${port}/document-template/find-one/${templateId}`;
+  //   const logUrl = `${hostname}:${port}/print-request-log/`;
+  //   // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  //   // TODO get the view for specified prdid from the new NFR entity
+  //   const data = await axios
+  //     .get(url, {
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //       },
+  //     })
+  //     .then((res) => {
+  //       return res.data;
+  //     });
+  //   if (data.InspectionDate) {
+  //     data['InspectionDate'] = this.formatInspectedDate(data.InspectionDate);
+  //   }
+  //   // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  //   // get the document template
+  //   const documentTemplateObject: { id: number; the_file: string } = await axios.get(templateUrl).then((res) => {
+  //     return res.data;
+  //   });
 
-    // log the request
-    await axios.post(logUrl, {
-      document_template_id: templateId,
-      print_request_detail_id: prdid,
-      dtid: data.DTID,
-      request_app_user: username,
-      request_json: JSON.stringify(data),
-    });
+  //   // log the request
+  //   await axios.post(logUrl, {
+  //     document_template_id: templateId,
+  //     print_request_detail_id: prdid,
+  //     dtid: data.DTID,
+  //     request_app_user: username,
+  //     request_json: JSON.stringify(data),
+  //   });
 
-    const cdogsToken = await this.callGetToken();
-    let bufferBase64 = documentTemplateObject.the_file;
-    const md = JSON.stringify({
-      data,
-      formatters:
-        '{"myFormatter":"_function_myFormatter|function(data) { return data.slice(1); }","myOtherFormatter":"_function_myOtherFormatter|function(data) {return data.slice(2);}"}',
-      options: {
-        cacheReport: false,
-        convertTo: 'docx',
-        overwrite: true,
-        reportName: 'nfr-report',
-      },
-      template: {
-        content: `${bufferBase64}`,
-        encodingType: 'base64',
-        fileType: 'docx',
-      },
-    });
+  //   const cdogsToken = await this.callGetToken();
+  //   let bufferBase64 = documentTemplateObject.the_file;
+  //   const md = JSON.stringify({
+  //     data,
+  //     formatters:
+  //       '{"myFormatter":"_function_myFormatter|function(data) { return data.slice(1); }","myOtherFormatter":"_function_myOtherFormatter|function(data) {return data.slice(2);}"}',
+  //     options: {
+  //       cacheReport: false,
+  //       convertTo: 'docx',
+  //       overwrite: true,
+  //       reportName: 'nfr-report',
+  //     },
+  //     template: {
+  //       content: `${bufferBase64}`,
+  //       encodingType: 'base64',
+  //       fileType: 'docx',
+  //     },
+  //   });
 
-    const conf = {
-      method: 'post',
-      url: process.env.cdogs_url,
-      headers: {
-        Authorization: `Bearer ${cdogsToken}`,
-        'Content-Type': 'application/json',
-      },
-      responseType: 'arraybuffer',
-      data: md,
-    };
-    const ax = require('axios');
-    const response = await ax(conf).catch((error) => {
-      console.log(error.response);
-    });
-    return response.data;
-  }
+  //   const conf = {
+  //     method: 'post',
+  //     url: process.env.cdogs_url,
+  //     headers: {
+  //       Authorization: `Bearer ${cdogsToken}`,
+  //       'Content-Type': 'application/json',
+  //     },
+  //     responseType: 'arraybuffer',
+  //     data: md,
+  //   };
+  //   const ax = require('axios');
+  //   const response = await ax(conf).catch((error) => {
+  //     console.log(error.response);
+  //   });
+  //   return response.data;
+  // }
 }

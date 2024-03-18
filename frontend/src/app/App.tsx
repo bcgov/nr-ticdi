@@ -9,6 +9,9 @@ import SearchPage from './content/pages/SearchPage';
 import ManageTemplatesPage from './content/pages/ManageTemplatesPage';
 import AdminPage from './content/pages/AdminPage';
 import ContentWrapper from './content/ContentWrapper';
+import SystemAdministration from './content/pages/SystemAdministration';
+import UploadReportsPage from './content/pages/UploadReportsPage';
+import ManageProvisionsPage from './content/pages/ManageProvisionsPage';
 
 const App: FC = () => {
   // used to render report pages
@@ -27,24 +30,6 @@ const App: FC = () => {
       <Header idirUsername="Michael" isAdmin={true} />
       <Routes>
         <Route
-          path={`/manage-templates/:id`}
-          element={
-            <ContentWrapper>
-              <ManageTemplatesPage />
-            </ContentWrapper>
-          }
-        />
-        ;
-        <Route
-          path={`/manage-templates-select`}
-          element={
-            <ContentWrapper>
-              <ManageTemplatesPage />
-            </ContentWrapper>
-          }
-        />
-        ;
-        <Route
           path={`/search`}
           element={
             <ContentWrapper>
@@ -57,7 +42,32 @@ const App: FC = () => {
           path={`/system-admin`}
           element={
             <ContentWrapper>
+              <SystemAdministration />
+            </ContentWrapper>
+          }
+        />
+        <Route
+          path={`/manage-templates`}
+          element={
+            <ContentWrapper>
+              <UploadReportsPage />
+            </ContentWrapper>
+          }
+        />
+        ;
+        <Route
+          path={`/manage-admins`}
+          element={
+            <ContentWrapper>
               <AdminPage />
+            </ContentWrapper>
+          }
+        />
+        <Route
+          path={`/manage-provisions`}
+          element={
+            <ContentWrapper>
+              <ManageProvisionsPage />
             </ContentWrapper>
           }
         />

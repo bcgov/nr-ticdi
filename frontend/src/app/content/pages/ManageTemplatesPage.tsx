@@ -87,118 +87,119 @@ const ManageTemplatesPage: FC<ManageTemplatesPageProps> = () => {
   };
 
   return (
-    <>
-      <h1>Manage Templates</h1>
-      <hr />
-      {/** TO BE MOVED TO IT'S OWN PAGE */}
-      {reportType === 'Notice of Final Review' ? (
-        <>
-          <Collapsible title={NFR_REPORT_PAGES.NFR_DEFAULT}>
-            <TemplateInfoTable
-              reportType={NFR_REPORT_PAGES.NFR_DEFAULT}
-              refreshVersion={refreshTrigger}
-              handleRemove={openRemoveTemplateModal}
-            />
-            <Button variant="success" onClick={() => openUploadModal(NFR_REPORT_PAGES.NFR_DEFAULT)}>
-              Upload New Version
-            </Button>
-          </Collapsible>
-          <Collapsible title={NFR_REPORT_PAGES.NFR_DELAYED}>
-            <TemplateInfoTable
-              reportType={NFR_REPORT_PAGES.NFR_DELAYED}
-              refreshVersion={refreshTrigger}
-              handleRemove={openRemoveTemplateModal}
-            />
-            <Button variant="success" onClick={() => openUploadModal(NFR_REPORT_PAGES.NFR_DELAYED)}>
-              Upload New Version
-            </Button>
-          </Collapsible>
-          <Collapsible title={NFR_REPORT_PAGES.NFR_NO_FEES}>
-            <TemplateInfoTable
-              reportType={NFR_REPORT_PAGES.NFR_NO_FEES}
-              refreshVersion={refreshTrigger}
-              handleRemove={openRemoveTemplateModal}
-            />
-            <Button variant="success" onClick={() => openUploadModal(NFR_REPORT_PAGES.NFR_NO_FEES)}>
-              Upload New Version
-            </Button>
-          </Collapsible>
-          <Collapsible title={NFR_REPORT_PAGES.NFR_SURVEY_REQ}>
-            <TemplateInfoTable
-              reportType={NFR_REPORT_PAGES.NFR_SURVEY_REQ}
-              refreshVersion={refreshTrigger}
-              handleRemove={openRemoveTemplateModal}
-            />
-            <Button variant="success" onClick={() => openUploadModal(NFR_REPORT_PAGES.NFR_SURVEY_REQ)}>
-              Upload New Version
-            </Button>
-          </Collapsible>
-          <Collapsible title={NFR_REPORT_PAGES.NFR_TO_OBTAIN}>
-            <TemplateInfoTable
-              reportType={NFR_REPORT_PAGES.NFR_TO_OBTAIN}
-              refreshVersion={refreshTrigger}
-              handleRemove={openRemoveTemplateModal}
-            />
-            <Button variant="success" onClick={() => openUploadModal(NFR_REPORT_PAGES.NFR_TO_OBTAIN)}>
-              Upload New Version
-            </Button>
-          </Collapsible>
-          <Collapsible title="Manage Document Provisions">
-            <ManageProvisionsTable
-              provisions={allProvisions}
-              variables={allVariables}
-              editProvisionHandler={openEditProvisionModal}
-            />
-            <Button variant="success" onClick={() => setShowAddProvisionModal(true)}>
-              Add a Provision
-            </Button>
-          </Collapsible>
-        </>
-      ) : (
-        <Collapsible title={reportType}>
-          <TemplateInfoTable
-            reportType={reportType}
-            refreshVersion={refreshTrigger}
-            handleRemove={openRemoveTemplateModal}
-          />
-          <Button variant="success" onClick={() => openUploadModal(reportType)}>
-            Upload New Version
-          </Button>
-        </Collapsible>
-      )}
-      <UploadTemplateModal
-        show={showUploadModal}
-        onHide={() => setShowUploadModal(false)}
-        onUpload={refreshTables}
-        documentTypeId={1}
-        documentTypeName="placeholder"
-      />
-      <RemoveTemplateModal
-        show={showRemoveTemplateModal}
-        onHide={() => setShowRemoveTemplateModal(false)}
-        onRemove={refreshTables}
-        documentTypeId={1}
-        templateId={currentReportId}
-      />
-      <EditProvisionModal
-        provision={currentProvision}
-        variables={currentVariables}
-        documentTypes={[]}
-        groupMaxArray={groupMaxArray}
-        show={showEditProvisionModal}
-        onHide={() => setShowEditProvisionModal(false)}
-        updateProvisionHandler={updateProvisionHandler}
-        refreshTables={refreshTables}
-      />
-      <AddProvisionModal
-        groupMaxArray={groupMaxArray}
-        documentTypes={[]}
-        show={showAddProvisionModal}
-        onHide={() => setShowAddProvisionModal(false)}
-        addProvisionHandler={addProvisionHandler}
-        refreshTables={refreshTables}
-      />
-    </>
+    <></>
+    // <>
+    //   <h1>Manage Templates</h1>
+    //   <hr />
+    //   {/** TO BE MOVED TO IT'S OWN PAGE */}
+    //   {reportType === 'Notice of Final Review' ? (
+    //     <>
+    //       <Collapsible title={NFR_REPORT_PAGES.NFR_DEFAULT}>
+    //         <TemplateInfoTable
+    //           documentType={NFR_REPORT_PAGES.NFR_DEFAULT}
+    //           refreshVersion={refreshTrigger}
+    //           handleRemove={openRemoveTemplateModal}
+    //         />
+    //         <Button variant="success" onClick={() => openUploadModal(NFR_REPORT_PAGES.NFR_DEFAULT)}>
+    //           Upload New Version
+    //         </Button>
+    //       </Collapsible>
+    //       <Collapsible title={NFR_REPORT_PAGES.NFR_DELAYED}>
+    //         <TemplateInfoTable
+    //           reportType={NFR_REPORT_PAGES.NFR_DELAYED}
+    //           refreshVersion={refreshTrigger}
+    //           handleRemove={openRemoveTemplateModal}
+    //         />
+    //         <Button variant="success" onClick={() => openUploadModal(NFR_REPORT_PAGES.NFR_DELAYED)}>
+    //           Upload New Version
+    //         </Button>
+    //       </Collapsible>
+    //       <Collapsible title={NFR_REPORT_PAGES.NFR_NO_FEES}>
+    //         <TemplateInfoTable
+    //           reportType={NFR_REPORT_PAGES.NFR_NO_FEES}
+    //           refreshVersion={refreshTrigger}
+    //           handleRemove={openRemoveTemplateModal}
+    //         />
+    //         <Button variant="success" onClick={() => openUploadModal(NFR_REPORT_PAGES.NFR_NO_FEES)}>
+    //           Upload New Version
+    //         </Button>
+    //       </Collapsible>
+    //       <Collapsible title={NFR_REPORT_PAGES.NFR_SURVEY_REQ}>
+    //         <TemplateInfoTable
+    //           reportType={NFR_REPORT_PAGES.NFR_SURVEY_REQ}
+    //           refreshVersion={refreshTrigger}
+    //           handleRemove={openRemoveTemplateModal}
+    //         />
+    //         <Button variant="success" onClick={() => openUploadModal(NFR_REPORT_PAGES.NFR_SURVEY_REQ)}>
+    //           Upload New Version
+    //         </Button>
+    //       </Collapsible>
+    //       <Collapsible title={NFR_REPORT_PAGES.NFR_TO_OBTAIN}>
+    //         <TemplateInfoTable
+    //           reportType={NFR_REPORT_PAGES.NFR_TO_OBTAIN}
+    //           refreshVersion={refreshTrigger}
+    //           handleRemove={openRemoveTemplateModal}
+    //         />
+    //         <Button variant="success" onClick={() => openUploadModal(NFR_REPORT_PAGES.NFR_TO_OBTAIN)}>
+    //           Upload New Version
+    //         </Button>
+    //       </Collapsible>
+    //       <Collapsible title="Manage Document Provisions">
+    //         <ManageProvisionsTable
+    //           provisions={allProvisions}
+    //           variables={allVariables}
+    //           editProvisionHandler={openEditProvisionModal}
+    //         />
+    //         <Button variant="success" onClick={() => setShowAddProvisionModal(true)}>
+    //           Add a Provision
+    //         </Button>
+    //       </Collapsible>
+    //     </>
+    //   ) : (
+    //     <Collapsible title={reportType}>
+    //       <TemplateInfoTable
+    //         reportType={reportType}
+    //         refreshVersion={refreshTrigger}
+    //         handleRemove={openRemoveTemplateModal}
+    //       />
+    //       <Button variant="success" onClick={() => openUploadModal(reportType)}>
+    //         Upload New Version
+    //       </Button>
+    //     </Collapsible>
+    //   )}
+    //   <UploadTemplateModal
+    //     show={showUploadModal}
+    //     onHide={() => setShowUploadModal(false)}
+    //     onUpload={refreshTables}
+    //     documentTypeId={1}
+    //     documentTypeName="placeholder"
+    //   />
+    //   <RemoveTemplateModal
+    //     show={showRemoveTemplateModal}
+    //     onHide={() => setShowRemoveTemplateModal(false)}
+    //     onRemove={refreshTables}
+    //     documentTypeId={1}
+    //     templateId={currentReportId}
+    //   />
+    //   <EditProvisionModal
+    //     provision={currentProvision}
+    //     variables={currentVariables}
+    //     documentTypes={[]}
+    //     groupMaxArray={groupMaxArray}
+    //     show={showEditProvisionModal}
+    //     onHide={() => setShowEditProvisionModal(false)}
+    //     updateProvisionHandler={updateProvisionHandler}
+    //     refreshTables={refreshTables}
+    //   />
+    //   <AddProvisionModal
+    //     groupMaxArray={groupMaxArray}
+    //     documentTypes={[]}
+    //     show={showAddProvisionModal}
+    //     onHide={() => setShowAddProvisionModal(false)}
+    //     addProvisionHandler={addProvisionHandler}
+    //     refreshTables={refreshTables}
+    //   />
+    // </>
   );
 };
 

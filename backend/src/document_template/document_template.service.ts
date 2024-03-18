@@ -11,10 +11,9 @@ import { DocumentTypeService } from 'src/document_type/document_type.service';
 @Injectable()
 export class DocumentTemplateService {
   constructor(
+    private documentTypeService: DocumentTypeService,
     @InjectRepository(DocumentTemplate)
     private documentTemplateRepository: Repository<DocumentTemplate>,
-    @InjectRepository(DocumentType)
-    private documentTypeService: DocumentTypeService,
     @InjectRepository(DocumentData)
     private documentDataRepository: Repository<DocumentData>
   ) {}
@@ -161,7 +160,6 @@ export class DocumentTemplateService {
   // }
 
   async findAll(document_type_id: number): Promise<DocumentTemplate[]> {
-    const docType: DocumentType = await this.documentTypeService.findById(document_type_id);
     return this.documentTemplateRepository.find({
       where: { is_deleted: false, document_type: { id: document_type_id } },
     });

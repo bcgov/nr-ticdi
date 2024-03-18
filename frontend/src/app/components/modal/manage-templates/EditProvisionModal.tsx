@@ -1,16 +1,16 @@
 import { FC, useState } from 'react';
 import Modal from 'react-bootstrap/Modal';
-import { GroupMax, Provision, ProvisionUpload, Variable, VariableUpload } from '../../../types/types';
+import { DocType, GroupMax, Provision, ProvisionUpload, Variable, VariableUpload } from '../../../types/types';
 import { addVariable, removeVariable, updateProvision, updateVariable } from '../../../common/manage-templates';
 import EditProvisionModalForm from './forms/EditProvisionModalForm';
 import AddVariableModalForm from './forms/AddVariableModalForm';
 import EditVariableModalForm from './forms/EditVariableModalForm';
 import RemoveVariableModalForm from './forms/RemoveVariableModalForm';
-import { Button } from 'react-bootstrap';
 
 type EditProvisionModalProps = {
   provision: Provision | undefined;
   variables: Variable[] | undefined;
+  documentTypes: DocType[] | undefined;
   groupMaxArray: GroupMax[] | undefined;
   show: boolean;
   onHide: () => void;
@@ -21,6 +21,7 @@ type EditProvisionModalProps = {
 const EditProvisionModal: FC<EditProvisionModalProps> = ({
   provision,
   variables,
+  documentTypes,
   groupMaxArray,
   show,
   onHide,
@@ -151,6 +152,7 @@ const EditProvisionModal: FC<EditProvisionModalProps> = ({
           <EditProvisionModalForm
             provision={provision}
             variables={variables}
+            documentTypes={documentTypes}
             groupMaxArray={groupMaxArray}
             loading={loading}
             updateProvisionHandler={handleUpdateProvision}

@@ -1,6 +1,5 @@
 export class DocumentDataLogDto {
   dtid: number;
-  document_data_id: number;
   document_type_id: number;
   document_template_id: number;
   request_app_user: string;

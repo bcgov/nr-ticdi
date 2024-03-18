@@ -38,9 +38,9 @@ export class DocumentDataController {
     }
   }
 
-  @Get('dtid/:dtid')
-  findActiveByDtid(@Param('dtid') dtid: number) {
-    return this.documentDataService.findActiveByDtid(dtid);
+  @Get('dtid/:document_type_id/:dtid')
+  findActiveByDtid(@Param('dtid') dtid: number, @Param('document_type_id') document_type_id: number) {
+    return this.documentDataService.findDocumentDataByDocTypeIdAndDtid(document_type_id, dtid);
   }
 
   @Get('view/:documentDataId')

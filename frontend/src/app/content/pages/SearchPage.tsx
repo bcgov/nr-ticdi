@@ -7,17 +7,18 @@
 import { FC, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import SearchDataTable from '../../components/table/search/SearchDataTable';
+import { DocType } from '../../types/types';
 
 // TODO - redo page to include all document types, replace variant with document type
 
 const SearchPage: FC = () => {
-  const [selectedDocument, setSelectedDocument] = useState<{ dtid: number; variant: string } | null>(null);
+  const [selectedDocument, setSelectedDocument] = useState<{ dtid: number; documentType: DocType } | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const navigate = useNavigate();
 
   const handleOpenDocument = async () => {
     if (selectedDocument) {
-      navigate(`/dtid/${selectedDocument.dtid}/${selectedDocument.variant}`);
+      navigate(`/dtid/${selectedDocument.dtid}/${selectedDocument.documentType.name}`);
     }
   };
 
@@ -25,8 +26,8 @@ const SearchPage: FC = () => {
     setSearchTerm(e.target.value);
   };
 
-  const handleSelectedDocumentChange = (dtid: number, variant: string) => {
-    setSelectedDocument({ dtid, variant });
+  const handleSelectedDocumentChange = (dtid: number, documentType: DocType) => {
+    setSelectedDocument({ dtid, documentType });
   };
 
   return (

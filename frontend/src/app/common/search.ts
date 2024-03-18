@@ -13,6 +13,7 @@ export async function getSearchData(): Promise<SearchData[]> {
     const parameters = api.generateApiParameters(url);
 
     const response = await api.get<SearchData[]>(parameters);
+    console.log(response)
     if (Array.isArray(response)) {
       return response;
     } else {

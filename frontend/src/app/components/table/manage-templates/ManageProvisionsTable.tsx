@@ -72,9 +72,9 @@ const ManageProvisionsTable: React.FC<ManageProvisionsTableProps> = ({
   };
 
   const openEditProvisionModal = async (provisionId: number) => {
-    const selectedProvision = allProvisions.find((p) => p.id === provisionId);
-    const selectedVariables = allVariables.filter((v) => v.provision_id === provisionId);
-    if (selectedProvision) editProvisionHandler(selectedProvision, selectedVariables);
+    const selectedProvision = allProvisions ? allProvisions.find((p) => p.id === provisionId) : undefined;
+    const selectedVariables = allVariables ? allVariables.filter((v) => v.provision_id === provisionId) : undefined;
+    if (selectedProvision && selectedVariables) editProvisionHandler(selectedProvision, selectedVariables);
   };
 
   const columnHelper = createColumnHelper<Provision>();

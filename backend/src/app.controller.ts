@@ -367,7 +367,7 @@ export class AppController {
     // const groupMaxJsonArray = await this.reportService.getGroupMaxByVariant('NOTICE OF FINAL REVIEW');
     const groupMaxJsonArray = [];
     try {
-      const nfrDataObject = await this.reportService.getActiveNfrDataByDtid(dtid);
+      const nfrDataObject = await this.reportService.getDocumentDataByDocTypeIdAndDtid(1, dtid);
       nfrData = nfrDataObject.nfrData;
       const provisionIds = nfrDataObject.provisionIds ? nfrDataObject.provisionIds : [];
       // const mandatoryProvisionIds = await this.reportService.getMandatoryProvisionsByVariant(variantName);

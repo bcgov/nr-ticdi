@@ -3,11 +3,11 @@ import { DataTable } from '../common/DataTable';
 import { ColumnDef, createColumnHelper } from '@tanstack/react-table';
 import { getDocumentProvisionsByDocTypeIdDtid } from '../../../common/report';
 import { ProvisionData } from '../../../content/display/Provisions';
-import { DocumentType } from '../../../types/types';
+import { DocType } from '../../../types/types';
 
 interface ProvisionsTableProps {
   dtid: number;
-  docType: DocumentType;
+  docType: DocType;
   currentGroupNumber: number | null;
   currentGroupMax: number | null;
   selectedProvisionIds: number[] | undefined;

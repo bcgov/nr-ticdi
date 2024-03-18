@@ -7,8 +7,6 @@ export class DocumentDataLog {
   @Column({ nullable: true })
   dtid: number;
   @Column({ nullable: true })
-  document_data_id: number;
-  @Column({ nullable: true })
   document_type_id: number;
   @Column({ nullable: true })
   document_template_id: number;
@@ -27,7 +25,6 @@ export class DocumentDataLog {
 
   constructor(
     dtid?: number,
-    document_data_id?: number,
     document_type_id?: number,
     document_template_id?: number,
     request_app_user?: string,
@@ -36,7 +33,6 @@ export class DocumentDataLog {
     update_userid?: string
   ) {
     this.dtid = dtid || null;
-    this.document_data_id = document_data_id || null;
     this.document_type_id = document_type_id || null;
     this.document_template_id = document_template_id || null;
     this.request_app_user = request_app_user || '';

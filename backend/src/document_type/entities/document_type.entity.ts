@@ -10,6 +10,7 @@ import {
 import { DocumentTemplate } from '../../document_template/entities/document_template.entity';
 import { DocumentData } from 'src/document_data/entities/document_data.entity';
 import { Provision } from 'src/provision/entities/provision.entity';
+import { ProvisionGroup } from 'src/provision/entities/provision_group.entity';
 
 @Entity()
 export class DocumentType {
@@ -35,6 +36,10 @@ export class DocumentType {
   document_data: DocumentData[];
   @ManyToMany(() => Provision, (provision) => provision.document_types)
   provisions: Provision[];
+  @OneToMany(() => ProvisionGroup, (provisionGroup) => provisionGroup.document_type, {
+    cascade: true,
+  })
+  provision_groups: ProvisionGroup[];
 
   constructor(name?: string, create_userid?: string, update_userid?: string) {
     this.name = name || '';

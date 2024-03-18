@@ -5,12 +5,19 @@ import { Button } from 'react-bootstrap';
 
 type UploadTemplateModalProps = {
   show: boolean;
+  documentTypeName: string;
+  documentTypeId: number;
   onHide: () => void;
-  reportType: string;
   onUpload: () => void;
 };
 
-const UploadTemplateModal: FC<UploadTemplateModalProps> = ({ show, onHide, reportType, onUpload }) => {
+const UploadTemplateModal: FC<UploadTemplateModalProps> = ({
+  show,
+  documentTypeName,
+  documentTypeId,
+  onHide,
+  onUpload,
+}) => {
   const [error, setError] = useState('');
   const [showError, setShowError] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -33,7 +40,7 @@ const UploadTemplateModal: FC<UploadTemplateModalProps> = ({ show, onHide, repor
       if (selectedFile) {
         formData.append('file', selectedFile);
         formData.append('template_name', templateName);
-        formData.append('document_type', reportType.toUpperCase());
+        formData.append('document_type_id', documentTypeId.toString());
         await uploadTemplate(formData);
         setSelectedFile(null);
         setTemplateName('');
@@ -55,7 +62,7 @@ const UploadTemplateModal: FC<UploadTemplateModalProps> = ({ show, onHide, repor
   return (
     <Modal show={show} onHide={onHide} size="lg">
       <Modal.Header>
-        <Modal.Title>Upload Template: {reportType}</Modal.Title>
+        <Modal.Title>Upload Template: {documentTypeName}</Modal.Title>
         <Button
           variant="none"
           onClick={onHide}

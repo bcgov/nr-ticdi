@@ -3,10 +3,10 @@ import { DataTable } from '../common/DataTable';
 import { ColumnDef, createColumnHelper } from '@tanstack/react-table';
 import { getDocumentProvisionsByDocTypeIdDtid } from '../../../common/report';
 import { ProvisionData } from '../../../content/display/Provisions';
-import { DocumentType } from '../../../types/types';
+import { DocType } from '../../../types/types';
 
 interface SelectedProvisionsTableTableProps {
-  docType: DocumentType;
+  docType: DocType;
   dtid: number;
   selectedProvisionIds: number[] | undefined;
   updateHandler: (provisionJson: ProvisionJson[]) => void;

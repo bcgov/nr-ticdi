@@ -20,7 +20,7 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
   const appService = app.get(AppService);
-  // await appService.initializeDb();
+  await appService.initializeDb();
 
   await app.listen(3001);
 }

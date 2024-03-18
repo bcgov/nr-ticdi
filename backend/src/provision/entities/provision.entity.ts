@@ -52,7 +52,7 @@ export class Provision {
   document_data_provisions: DocumentDataProvision[];
   @ManyToMany(() => DocumentType)
   @JoinTable({
-    name: 'provision_document_type', // Name of the join table
+    name: 'provision_document_type',
     joinColumn: {
       name: 'provision_id',
       referencedColumnName: 'id',

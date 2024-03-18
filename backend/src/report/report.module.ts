@@ -9,6 +9,7 @@ import { ProvisionModule } from 'src/provision/provision.module';
 import { DocumentDataModule } from 'src/document_data/document_data.module';
 import { DocumentDataLogModule } from 'src/document_data_log/document_data_log.module';
 import { DocumentDataLogService } from 'src/document_data_log/document_data_log.service';
+import { DocumentTypeModule } from 'src/document_type/document_type.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { DocumentDataLogService } from 'src/document_data_log/document_data_log.
     ProvisionModule,
     DocumentDataModule,
     DocumentDataLogModule,
+    DocumentTypeModule,
   ],
   providers: [TTLSService, ReportService, DocumentDataLogService],
   exports: [ReportService],

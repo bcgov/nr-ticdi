@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react';
-import { GroupMax, Provision, ProvisionUpload, Variable } from '../../../../types/types';
+import { DocType, GroupMax, Provision, ProvisionUpload, Variable } from '../../../../types/types';
 import { Button, Col, Form, Modal, Row, Spinner } from 'react-bootstrap';
 import ManageVariablesTable from '../../../table/manage-templates/ManageVariablesTable';
 
 interface EditProvisionModalFormProps {
   provision: Provision | undefined;
   variables: Variable[] | undefined;
+  documentTypes: DocType[] | undefined;
   groupMaxArray: GroupMax[] | undefined;
   loading: boolean;
   updateProvisionHandler: (provision: ProvisionUpload, provisionId: number) => void;
@@ -15,11 +16,10 @@ interface EditProvisionModalFormProps {
   onDisplayRemove: (variableId: number) => void;
 }
 
-// TODO - variants to be removed, possibly add ability to assign to multiple document types
-
 const EditProvisionModalForm: React.FC<EditProvisionModalFormProps> = ({
   provision,
   variables,
+  documentTypes,
   loading,
   groupMaxArray,
   updateProvisionHandler,
@@ -38,7 +38,7 @@ const EditProvisionModalForm: React.FC<EditProvisionModalFormProps> = ({
   const [freeText, setFreeText] = useState<string>('');
   const [helpText, setHelpText] = useState<string>('');
   const [category, setCategory] = useState<string>('');
-  const [variants, setVariants] = useState<number[]>([]);
+  const [documentTypeIds, setDocumentTypeIds] = useState<number[]>([]);
 
   useEffect(() => {
     const getData = async () => {
@@ -52,7 +52,7 @@ const EditProvisionModalForm: React.FC<EditProvisionModalFormProps> = ({
         setFreeText(provision.free_text);
         setHelpText(provision.help_text);
         setCategory(provision.category);
-        setVariants(provision.variants);
+        setDocumentTypeIds(provision.document_type_ids);
       }
     };
 
@@ -131,12 +131,12 @@ const EditProvisionModalForm: React.FC<EditProvisionModalFormProps> = ({
     setCategory(e.target.value);
   };
 
-  const handleVariantIdUpdate = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const variantId: number = parseInt(e.target.value);
+  const handleDocumentTypeIdUpdate = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const documentTypeId: number = parseInt(e.target.value);
     if (e.target.checked) {
-      setVariants((prevVariants) => [...prevVariants, variantId]);
+      setDocumentTypeIds((prevDocTypeIds) => [...prevDocTypeIds, documentTypeId]);
     } else {
-      setVariants(variants.filter((v) => v === variantId));
+      setDocumentTypeIds(documentTypeIds.filter((v) => v === documentTypeId));
     }
   };
 
@@ -152,14 +152,14 @@ const EditProvisionModalForm: React.FC<EditProvisionModalFormProps> = ({
         free_text: freeText,
         help_text: helpText,
         category: category,
-        variants: variants,
+        document_type_ids: documentTypeIds,
       };
       updateProvisionHandler(provisionUpload, provision.id);
     }
   };
 
-  const isVariantChecked = (variantId: number): boolean => {
-    return variants.find((v) => v === variantId) ? true : false;
+  const isDocumentTypeChecked = (documentTypeId: number): boolean => {
+    return documentTypeIds.find((d) => d === documentTypeId) ? true : false;
   };
 
   return (
@@ -282,48 +282,26 @@ const EditProvisionModalForm: React.FC<EditProvisionModalFormProps> = ({
           </Form.Group>
         </Form>
         <Col sm="12">
-          <Form.Label style={{ marginTop: '10px' }}>Variants</Form.Label>
+          <Form.Label style={{ marginTop: '10px' }}>Document Types</Form.Label>
         </Col>
-        <Form.Group as={Row} className="mb-3 ml-2">
-          <Col sm={{ span: 8 }}>
-            <FormLabelWithPeriods text="NOTICE OF FINAL REVIEW" />
-          </Col>
-          <Col sm={{ span: 4 }}>
-            <Form.Check name="nfr-1" value="1" checked={isVariantChecked(1)} onChange={handleVariantIdUpdate} />
-          </Col>
-        </Form.Group>
-        <Form.Group as={Row} className="mb-3 ml-2">
-          <Col sm={{ span: 8 }}>
-            <FormLabelWithPeriods text="NOTICE OF FINAL REVIEW (DELAYED)" />
-          </Col>
-          <Col sm={{ span: 4 }}>
-            <Form.Check name="nfr-1" value="2" checked={isVariantChecked(2)} onChange={handleVariantIdUpdate} />
-          </Col>
-        </Form.Group>
-        <Form.Group as={Row} className="mb-3 ml-2">
-          <Col sm={{ span: 8 }}>
-            <FormLabelWithPeriods text="NOTICE OF FINAL REVIEW (NO FEES)" />
-          </Col>
-          <Col sm={{ span: 4 }}>
-            <Form.Check name="nfr-1" value="3" checked={isVariantChecked(3)} onChange={handleVariantIdUpdate} />
-          </Col>
-        </Form.Group>
-        <Form.Group as={Row} className="mb-3 ml-2">
-          <Col sm={{ span: 8 }}>
-            <FormLabelWithPeriods text="NOTICE OF FINAL REVIEW (SURVEY REQUIRED)" />
-          </Col>
-          <Col sm={{ span: 4 }}>
-            <Form.Check name="nfr-1" value="4" checked={isVariantChecked(4)} onChange={handleVariantIdUpdate} />
-          </Col>
-        </Form.Group>
-        <Form.Group as={Row} className="mb-3 ml-2">
-          <Col sm={{ span: 8 }}>
-            <FormLabelWithPeriods text="NOTICE OF FINAL REVIEW (TO OBTAIN SURVEY)" />
-          </Col>
-          <Col sm={{ span: 4 }}>
-            <Form.Check name="nfr-1" value="5" checked={isVariantChecked(5)} onChange={handleVariantIdUpdate} />
-          </Col>
-        </Form.Group>
+        {documentTypes &&
+          documentTypes.map((docType) => {
+            return (
+              <Form.Group as={Row} className="mb-3 ml-2">
+                <Col sm={{ span: 8 }}>
+                  <FormLabelWithPeriods text={docType.name} />
+                </Col>
+                <Col sm={{ span: 4 }}>
+                  <Form.Check
+                    name={`document-type-${docType.id}`}
+                    checked={isDocumentTypeChecked(docType.id)}
+                    value={docType.id}
+                    onChange={handleDocumentTypeIdUpdate}
+                  />
+                </Col>
+              </Form.Group>
+            );
+          })}
         <Col sm="12">
           <Form.Label style={{ marginTop: '10px' }}>Variables</Form.Label>
         </Col>

@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Header from './content/display/Header';
 import Footer from './content/display/Footer';
 import { getDocumentTypes } from './common/report';
-import { DocumentType } from './types/types';
+import { DocType } from './types/types';
 import ReportPage from './content/pages/ReportPage';
 import SearchPage from './content/pages/SearchPage';
 import ManageTemplatesPage from './content/pages/ManageTemplatesPage';
@@ -12,7 +12,7 @@ import ContentWrapper from './content/ContentWrapper';
 
 const App: FC = () => {
   // used to render report pages
-  const [documentTypes, setDocumentTypes] = useState<DocumentType[]>([]);
+  const [documentTypes, setDocumentTypes] = useState<DocType[]>([]);
 
   useEffect(() => {
     const getDocTypes = async () => {

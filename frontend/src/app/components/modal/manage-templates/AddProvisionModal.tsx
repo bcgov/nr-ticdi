@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
-import { GroupMax, ProvisionUpload } from '../../../types/types';
+import { DocType, GroupMax, ProvisionUpload } from '../../../types/types';
 import { Button, Col, Form, Modal, Row, Spinner } from 'react-bootstrap';
 
 interface AddProvisionModalProps {
   groupMaxArray: GroupMax[] | undefined;
   show: boolean;
+  documentTypes: DocType[] | undefined;
   addProvisionHandler: (provision: ProvisionUpload) => void;
   onHide: () => void;
   refreshTables: () => void;
@@ -15,6 +16,7 @@ interface AddProvisionModalProps {
 const AddProvisionModal: React.FC<AddProvisionModalProps> = ({
   groupMaxArray,
   show,
+  documentTypes,
   addProvisionHandler,
   onHide,
   refreshTables,
@@ -30,7 +32,7 @@ const AddProvisionModal: React.FC<AddProvisionModalProps> = ({
   const [freeText, setFreeText] = useState<string>('');
   const [helpText, setHelpText] = useState<string>('');
   const [category, setCategory] = useState<string>('');
-  const [variants, setVariants] = useState<number[]>([]);
+  const [documentTypeIds, setDocumentTypeIds] = useState<number[]>([]);
 
   useEffect(() => {
     setIsMaxUnlimited(max ? max >= 999 : false);
@@ -104,12 +106,12 @@ const AddProvisionModal: React.FC<AddProvisionModalProps> = ({
     setCategory(e.target.value);
   };
 
-  const handleVariantIdUpdate = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const variantId: number = parseInt(e.target.value);
+  const handleDocumentTypeIdUpdate = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const documentTypeId: number = parseInt(e.target.value);
     if (e.target.checked) {
-      setVariants((prevVariants) => [...prevVariants, variantId]);
+      setDocumentTypeIds((prevDocTypeIds) => [...prevDocTypeIds, documentTypeId]);
     } else {
-      setVariants(variants.filter((v) => v === variantId));
+      setDocumentTypeIds(documentTypeIds.filter((v) => v === documentTypeId));
     }
   };
 
@@ -127,7 +129,7 @@ const AddProvisionModal: React.FC<AddProvisionModalProps> = ({
           free_text: freeText,
           help_text: helpText,
           category: category,
-          variants: variants,
+          document_type_ids: documentTypeIds,
         };
         addProvisionHandler(provisionUpload);
         refreshTables();
@@ -256,48 +258,25 @@ const AddProvisionModal: React.FC<AddProvisionModalProps> = ({
           </Form.Group>
         </Form>
         <Col sm="12">
-          <Form.Label style={{ marginTop: '10px' }}>Variants</Form.Label>
+          <Form.Label style={{ marginTop: '10px' }}>Document Types</Form.Label>
         </Col>
-        <Form.Group as={Row} className="mb-3 ml-2">
-          <Col sm={{ span: 8 }}>
-            <FormLabelWithPeriods text="NOTICE OF FINAL REVIEW" />
-          </Col>
-          <Col sm={{ span: 4 }}>
-            <Form.Check name="nfr-1" value="1" onChange={handleVariantIdUpdate} />
-          </Col>
-        </Form.Group>
-        <Form.Group as={Row} className="mb-3 ml-2">
-          <Col sm={{ span: 8 }}>
-            <FormLabelWithPeriods text="NOTICE OF FINAL REVIEW (DELAYED)" />
-          </Col>
-          <Col sm={{ span: 4 }}>
-            <Form.Check name="nfr-1" value="2" onChange={handleVariantIdUpdate} />
-          </Col>
-        </Form.Group>
-        <Form.Group as={Row} className="mb-3 ml-2">
-          <Col sm={{ span: 8 }}>
-            <FormLabelWithPeriods text="NOTICE OF FINAL REVIEW (NO FEES)" />
-          </Col>
-          <Col sm={{ span: 4 }}>
-            <Form.Check name="nfr-1" value="3" onChange={handleVariantIdUpdate} />
-          </Col>
-        </Form.Group>
-        <Form.Group as={Row} className="mb-3 ml-2">
-          <Col sm={{ span: 8 }}>
-            <FormLabelWithPeriods text="NOTICE OF FINAL REVIEW (SURVEY REQUIRED)" />
-          </Col>
-          <Col sm={{ span: 4 }}>
-            <Form.Check name="nfr-1" value="4" onChange={handleVariantIdUpdate} />
-          </Col>
-        </Form.Group>
-        <Form.Group as={Row} className="mb-3 ml-2">
-          <Col sm={{ span: 8 }}>
-            <FormLabelWithPeriods text="NOTICE OF FINAL REVIEW (TO OBTAIN SURVEY)" />
-          </Col>
-          <Col sm={{ span: 4 }}>
-            <Form.Check name="nfr-1" value="5" onChange={handleVariantIdUpdate} />
-          </Col>
-        </Form.Group>
+        {documentTypes &&
+          documentTypes.map((docType) => {
+            return (
+              <Form.Group as={Row} className="mb-3 ml-2">
+                <Col sm={{ span: 8 }}>
+                  <FormLabelWithPeriods text={docType.name} />
+                </Col>
+                <Col sm={{ span: 4 }}>
+                  <Form.Check
+                    name={`document-type-${docType.id}`}
+                    value={docType.id}
+                    onChange={handleDocumentTypeIdUpdate}
+                  />
+                </Col>
+              </Form.Group>
+            );
+          })}
       </Modal.Body>
       <Modal.Footer>
         <Button variant="secondary" onClick={onHide}>

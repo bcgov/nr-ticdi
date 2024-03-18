@@ -153,7 +153,7 @@ export class ProvisionService {
   }
 
   // querybuilder is more efficient here
-  async getVariablesByDocumentTypeId(document_type_id: number): Promise<any[]> {
+  async getVariablesByDocumentTypeId(document_type_id: number) {
     const provisions = await this.provisionRepository
       .createQueryBuilder('provision')
       .innerJoin('provision.document_types', 'documentType', 'documentType.id = :document_type_id', {
@@ -184,13 +184,18 @@ export class ProvisionService {
     }
   }
 
-  async getAllProvisions(): Promise<Provision[]> {
+  async getAllProvisionsByDocTypeId(document_type_id: number): Promise<Provision[]> {
     try {
-      const provisions: Provision[] = await this.provisionRepository.find({
-        relations: ['provision_group'],
-      });
+      const provisions: Provision[] = await this.provisionRepository
+        .createQueryBuilder('provision')
+        .innerJoinAndSelect('provision.provision_group', 'provision_group')
+        .innerJoin('provision_group.document_type', 'document_type')
+        .where('document_type.id = :document_type_id', { document_type_id })
+        .getMany();
+
       return provisions;
     } catch (err) {
+      console.log('Error in getAllProvisionsByDocTypeId');
       console.log(err);
       return null;
     }
@@ -223,14 +228,9 @@ export class ProvisionService {
   }
 
   async getGroupMaxByDocTypeId(document_type_id: number): Promise<any> {
-    const provisions = await this.provisionRepository.find({
-      relations: ['provision_group'],
+    const provisionGroups = await this.provisionGroupRepository.find({
+      where: { document_type: { id: document_type_id } },
     });
-    let provisionGroups: ProvisionGroup[] = [];
-    provisions.forEach((provision) => {
-      provisionGroups.push(provision.provision_group);
-    });
-    provisionGroups = this.removeDuplicates(provisionGroups, 'provision_group');
     return Array.from(provisionGroups).sort((a, b) => a.provision_group - b.provision_group);
   }
 

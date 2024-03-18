@@ -14,7 +14,6 @@ export class DocumentDataLogService {
   async create(documentDataLog: CreateDocumentDataLogDto): Promise<DocumentDataLog> {
     const newItem = new DocumentDataLog();
     newItem.document_template_id = documentDataLog.document_template_id;
-    newItem.document_data_id = documentDataLog.document_data_id;
     newItem.dtid = documentDataLog.dtid;
     newItem.request_app_user = documentDataLog.request_app_user;
     newItem.request_json = documentDataLog.request_json;
@@ -35,10 +34,11 @@ export class DocumentDataLogService {
     });
   }
 
-  async findNextVersion(dtid: number): Promise<string> {
+  async findNextVersion(dtid: number, document_type_id: number): Promise<string> {
     const requestLogs = await this.documentDataLogRepository.findAndCount({
       where: {
         dtid: dtid,
+        document_type_id: document_type_id,
       },
     });
     let version = (requestLogs[1] + 1).toString();

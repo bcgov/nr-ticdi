@@ -1,5 +1,6 @@
-import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany, ManyToMany, ManyToOne } from 'typeorm';
 import { Provision } from './provision.entity';
+import { DocumentType } from 'src/document_type/entities/document_type.entity';
 
 /**
  * This entity holds group descriptions and provision maximums
@@ -19,6 +20,9 @@ export class ProvisionGroup {
 
   @Column({ nullable: true })
   max: number;
+
+  @ManyToOne(() => DocumentType, (documentType) => documentType.provision_groups)
+  document_type: DocumentType;
 
   @OneToMany(() => Provision, (provision) => provision.provision_group, {
     nullable: true,

@@ -90,6 +90,7 @@ const ManageTemplatesPage: FC<ManageTemplatesPageProps> = () => {
     <>
       <h1>Manage Templates</h1>
       <hr />
+      {/** TO BE MOVED TO IT'S OWN PAGE */}
       {reportType === 'Notice of Final Review' ? (
         <>
           <Collapsible title={NFR_REPORT_PAGES.NFR_DEFAULT}>
@@ -142,7 +143,7 @@ const ManageTemplatesPage: FC<ManageTemplatesPageProps> = () => {
               Upload New Version
             </Button>
           </Collapsible>
-          <Collapsible title="Manage NFR Provisions">
+          <Collapsible title="Manage Document Provisions">
             <ManageProvisionsTable
               provisions={allProvisions}
               variables={allVariables}
@@ -169,18 +170,20 @@ const ManageTemplatesPage: FC<ManageTemplatesPageProps> = () => {
         show={showUploadModal}
         onHide={() => setShowUploadModal(false)}
         onUpload={refreshTables}
-        reportType={currentReportType}
+        documentTypeId={1}
+        documentTypeName="placeholder"
       />
       <RemoveTemplateModal
         show={showRemoveTemplateModal}
         onHide={() => setShowRemoveTemplateModal(false)}
         onRemove={refreshTables}
-        reportType={currentReportType}
+        documentTypeId={1}
         templateId={currentReportId}
       />
       <EditProvisionModal
         provision={currentProvision}
         variables={currentVariables}
+        documentTypes={[]}
         groupMaxArray={groupMaxArray}
         show={showEditProvisionModal}
         onHide={() => setShowEditProvisionModal(false)}
@@ -189,6 +192,7 @@ const ManageTemplatesPage: FC<ManageTemplatesPageProps> = () => {
       />
       <AddProvisionModal
         groupMaxArray={groupMaxArray}
+        documentTypes={[]}
         show={showAddProvisionModal}
         onHide={() => setShowAddProvisionModal(false)}
         addProvisionHandler={addProvisionHandler}

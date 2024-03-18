@@ -43,7 +43,7 @@ export class DocumentDataService {
         'document_data_variables',
         'document_data_provisions',
         'document_data_variables.document_variable',
-        'document_data_provisions.provision',
+        'document_data_provisions.document_provision',
         'document_type',
       ],
     });
@@ -210,6 +210,7 @@ export class DocumentDataService {
       where: {
         active: true,
       },
+      relations: ['document_type'],
     });
   }
 
@@ -237,39 +238,46 @@ export class DocumentDataService {
       const variableIds = existingDataVariables.map((dataVariable) => dataVariable.document_variable.id);
       return { documentData, provisionIds, variableIds };
     } catch (err) {
+      console.log('Error in findByDocumentDataId');
       console.log(err);
       return null;
     }
   }
 
-  async findActiveByDtid(dtid: number): Promise<{
+  async findDocumentDataByDocTypeIdAndDtid(
+    document_type_id: number,
+    dtid: number
+  ): Promise<{
     documentData: DocumentData;
     provisionIds: number[];
     variableIds: number[];
   }> {
     try {
-      const documentData = await this.documentDataRepository.findOne({
-        where: { dtid: dtid, active: true },
+      const documentData = await this.documentDataRepository.find({
+        where: { dtid: dtid },
         join: {
           alias: 'document_data',
           leftJoinAndSelect: {
             document_data_provisions: 'document_data.document_data_provisions',
-            provision: 'document_data_provisions.provision',
+            document_provision: 'document_data_provisions.document_provision',
             document_data_variables: 'document_data.document_data_variables',
             document_variable: 'document_data_variables.document_variable',
           },
         },
       });
+      const filteredDocumentData = documentData.find((d) => d.document_type.id === document_type_id);
+      console.log(filteredDocumentData);
       const provisionIds =
-        documentData && documentData.document_data_provisions
-          ? documentData.document_data_provisions.map((dataProvision) => dataProvision.document_provision.id)
+        filteredDocumentData && filteredDocumentData.document_data_provisions
+          ? filteredDocumentData.document_data_provisions.map((dataProvision) => dataProvision.document_provision.id)
           : [];
       const variableIds =
-        documentData && documentData.document_data_variables
-          ? documentData.document_data_variables.map((dataVariable) => dataVariable.document_variable.id)
+        filteredDocumentData && filteredDocumentData.document_data_variables
+          ? filteredDocumentData.document_data_variables.map((dataVariable) => dataVariable.document_variable.id)
           : [];
-      return { documentData, provisionIds, variableIds };
+      return { documentData: filteredDocumentData, provisionIds, variableIds };
     } catch (err) {
+      console.log('Error in findActiveByDtid');
       console.log(err);
       return null;
     }
@@ -282,92 +290,95 @@ export class DocumentDataService {
   }
 
   async getVariablesByDtidAndDocType(dtid: number, document_type_id: number) {
-    // const documentType: DocumentType = await this.documentTemplateService.getDocumentType(document_type_id);
-    const documentData: DocumentData = await this.documentDataRepository.findOne({
-      where: { dtid: dtid, document_type: { id: document_type_id } },
-      join: {
-        alias: 'document_data',
-        leftJoinAndSelect: {
-          document_data_variables: 'document_data.document_data_variables',
-          document_variable: 'document_data_variables.document_variable',
+    try {
+      const documentData: DocumentData = await this.documentDataRepository.findOne({
+        where: { dtid: dtid, document_type: { id: document_type_id } },
+        join: {
+          alias: 'document_data',
+          leftJoinAndSelect: {
+            document_data_variables: 'document_data.document_data_variables',
+            document_variable: 'document_data_variables.document_variable',
+          },
         },
-      },
-    });
-    // if the documentData doesn't exist yet, return null. This null value is caught elsewhere.
-    if (!documentData) {
+      });
+      // if the documentData doesn't exist yet, return null. This null value is caught elsewhere.
+      if (!documentData) {
+        return null;
+      }
+      // saved variables attached to the documentData entry
+      const existingDataVariables: DocumentDataVariable[] = documentData.document_data_variables;
+      // all variables associated with the variant
+      const variables: ProvisionVariable[] = await this.provisionService.getVariablesByDocumentTypeId(document_type_id);
+      // inserting the existing variable_values to the set of all variables
+      for (const variable of variables) {
+        const existingDataVariable = existingDataVariables.find(
+          (dataVariable) => dataVariable.document_variable.id === variable.id
+        );
+        if (existingDataVariable) {
+          variable.variable_value = existingDataVariable.data_variable_value;
+        }
+      }
+      const variableIds = existingDataVariables.map((dataVariable) => dataVariable.document_variable.id);
+      return { variables, variableIds };
+    } catch (err) {
+      console.log('Error in getVariablesByDtidAndDocType');
+      console.log(err);
       return null;
     }
-    // saved variables attached to the documentData entry
-    const existingDataVariables: DocumentDataVariable[] = documentData.document_data_variables;
-    // all variables associated with the variant
-    const variables: ProvisionVariable[] = await this.provisionService.getVariablesByDocumentTypeId(document_type_id);
-    // inserting the existing variable_values to the set of all variables
-    for (const variable of variables) {
-      const existingDataVariable = existingDataVariables.find(
-        (dataVariable) => dataVariable.document_variable.id === variable.id
-      );
-      if (existingDataVariable) {
-        variable.variable_value = existingDataVariable.data_variable_value;
-      }
-    }
-    const variableIds = existingDataVariables.map((dataVariable) => dataVariable.document_variable.id);
-    return { variables, variableIds };
   }
 
   async getProvisionsByDocTypeIdAndDtid(document_type_id: number, dtid: number) {
-    const documentData: DocumentData = await this.documentDataRepository.findOne({
-      where: { dtid: dtid, document_type: { id: document_type_id } },
-      join: {
-        alias: 'document_data',
-        leftJoinAndSelect: {
-          document_data_provisions: 'document_data.document_data_provisions',
-          provision: 'document_data_provisions.provision',
-        },
-      },
-    });
-    // if the documentData doesn't exist yet, return null. This null value is caught elsewhere.
-    if (!documentData) {
+    try {
+      const documentData = await this.documentDataRepository
+        .createQueryBuilder('document_data')
+        .leftJoinAndSelect('document_data.document_data_provisions', 'document_data_provisions')
+        .leftJoinAndSelect('document_data_provisions.document_provision', 'provision')
+        .where('document_data.dtid = :dtid', { dtid })
+        .andWhere('document_data."documentTypeId"  = :document_type_id', { document_type_id })
+        .getOne();
+      console.log(documentData);
+
+      // if the documentData doesn't exist yet, return null. This null value is caught elsewhere.
+      if (!documentData) {
+        return null;
+      }
+
+      // saved provisions attached to the dtid
+      const existingDataProvisions: DocumentDataProvision[] = [];
+      existingDataProvisions.push(...documentData.document_data_provisions);
+      // all provisions
+      const provisions: Provision[] = await this.provisionService.getAllProvisionsByDocTypeId(document_type_id);
+      const provisionIds = existingDataProvisions.map((dataProvision) => dataProvision.document_provision.id);
+      return { provisions, provisionIds };
+    } catch (err) {
+      console.log('Error in getProvisionsByDocTypeIdAndDtid');
+      console.log(err);
       return null;
     }
-    // documentData for all variants of this dtid
-    const fullDocumentData: DocumentData[] = await this.documentDataRepository.find({
-      where: { dtid: documentData.dtid },
-      join: {
-        alias: 'document_data',
-        leftJoinAndSelect: {
-          document_data_provisions: 'document_data.document_data_provisions',
-          provision: 'document_data_provisions.provision',
-        },
-      },
-    });
-
-    // saved provisions attached to the dtid
-    const existingDataProvisions: DocumentDataProvision[] = [];
-    fullDocumentData.forEach((documentData) => {
-      existingDataProvisions.push(...documentData.document_data_provisions);
-    });
-    // all provisions
-    const provisions: Provision[] = await this.provisionService.getAllProvisions();
-    const provisionIds = existingDataProvisions.map((dataProvision) => dataProvision.document_provision.id);
-    return { provisions, provisionIds };
   }
 
   async getEnabledProvisionsByDocTypeIdAndDtid(document_type_id: number, dtid: number) {
-    const documentData: DocumentData = await this.documentDataRepository.findOne({
-      where: { dtid: dtid, document_type: { id: document_type_id } },
-      join: {
-        alias: 'document_data',
-        leftJoinAndSelect: {
-          document_data_provisions: 'document_data.document_data_provisions',
-          provision: 'document_data_provisions.provision',
+    try {
+      const documentData: DocumentData = await this.documentDataRepository.findOne({
+        where: { dtid: dtid, document_type: { id: document_type_id } },
+        join: {
+          alias: 'document_data',
+          leftJoinAndSelect: {
+            document_data_provisions: 'document_data.document_data_provisions',
+            provision: 'document_data_provisions.provision',
+          },
         },
-      },
-    });
-    const provisionIds =
-      documentData && documentData.document_data_provisions
-        ? documentData.document_data_provisions.map((dataProvision) => dataProvision.document_provision.id)
-        : [];
-    return provisionIds;
+      });
+      const provisionIds =
+        documentData && documentData.document_data_provisions
+          ? documentData.document_data_provisions.map((dataProvision) => dataProvision.document_provision.id)
+          : [];
+      return provisionIds;
+    } catch (err) {
+      console.log('Error in getEnabledProvisionsByDocTypeIdAndDtid');
+      console.log(err);
+      return null;
+    }
   }
 
   async remove(dtid: number): Promise<{ deleted: boolean; message?: string }> {

@@ -6,13 +6,13 @@ import { removeTemplate } from '../../../common/manage-templates';
 
 type RemoveTemplateModalProps = {
   templateId: number;
-  reportType: string;
+  documentTypeId: number;
   show: boolean;
   onHide: () => void;
   onRemove: () => void;
 };
 
-const RemoveTemplateModal: FC<RemoveTemplateModalProps> = ({ templateId, reportType, show, onHide, onRemove }) => {
+const RemoveTemplateModal: FC<RemoveTemplateModalProps> = ({ templateId, documentTypeId, show, onHide, onRemove }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [showError, setShowError] = useState(false);
@@ -21,7 +21,7 @@ const RemoveTemplateModal: FC<RemoveTemplateModalProps> = ({ templateId, reportT
     try {
       setLoading(true);
       setShowError(false);
-      await removeTemplate(templateId, reportType);
+      await removeTemplate(templateId, documentTypeId);
       onRemove();
       onHide();
     } catch (error) {

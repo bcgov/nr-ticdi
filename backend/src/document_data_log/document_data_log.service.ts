@@ -14,6 +14,8 @@ export class DocumentDataLogService {
   async create(documentDataLog: CreateDocumentDataLogDto): Promise<DocumentDataLog> {
     const newItem = new DocumentDataLog();
     newItem.document_template_id = documentDataLog.document_template_id;
+    newItem.document_data_id = documentDataLog.document_data_id;
+    newItem.document_type_id = documentDataLog.document_type_id;
     newItem.dtid = documentDataLog.dtid;
     newItem.request_app_user = documentDataLog.request_app_user;
     newItem.request_json = documentDataLog.request_json;
@@ -29,7 +31,7 @@ export class DocumentDataLogService {
   async findByDtid(dtid: number): Promise<DocumentDataLog[]> {
     return this.documentDataLogRepository.find({
       where: {
-        document_template_id: dtid,
+        dtid: dtid,
       },
     });
   }

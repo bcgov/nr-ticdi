@@ -43,11 +43,11 @@ export class AdminController {
     };
   }
 
-  @Get('activate-template/:id/:document_type')
+  @Get('activate-template/:id/:document_type_id')
   async activateTemplate(
     @Session() session: { data?: SessionData },
-    @Param('id') id,
-    @Param('document_type') document_type
+    @Param('id') id: number,
+    @Param('document_type_id') document_type_id: number
   ) {
     const update_userid = session?.data?.activeAccount
       ? session.data.activeAccount.idir_username
@@ -57,7 +57,7 @@ export class AdminController {
     return this.adminService.activateTemplate({
       id: id,
       update_userid: update_userid,
-      document_type: document_type,
+      document_type_id: document_type_id,
     });
   }
 
@@ -75,9 +75,9 @@ export class AdminController {
     streamableFile.pipe(res);
   }
 
-  @Get('remove-template/:reportType/:id')
-  async removeTemplate(@Param('reportType') reportType: string, @Param('id') id: number) {
-    return this.adminService.removeTemplate(reportType, id);
+  @Get('remove-template/:id/:document_type_id')
+  async removeTemplate(@Param('id') id: number, @Param('document_type_id') document_type_id: number) {
+    return this.adminService.removeTemplate(document_type_id, id);
   }
 
   @Post('upload-template')
@@ -97,7 +97,7 @@ export class AdminController {
     file: Express.Multer.File,
     @Body()
     params: {
-      document_type: string;
+      document_type_id: number;
       template_name: string;
     }
   ) {
@@ -112,7 +112,7 @@ export class AdminController {
         : ''
       : '';
     const uploadData = {
-      document_type: params.document_type,
+      document_type_id: params.document_type_id,
       active_flag: false,
       mime_type: file.mimetype,
       file_name: params.template_name,
@@ -178,29 +178,29 @@ export class AdminController {
     return this.adminService.removeAdmin(input.idirUsername);
   }
 
-  @Get('templates/:reportId')
-  getTemplates(@Param('reportId') reportId: number): Promise<any> {
-    return this.adminService.getTemplates(reportId);
+  // @Get('templates/:reportId')
+  // getTemplates(@Param('reportId') reportId: number): Promise<any> {
+  //   return this.adminService.getTemplates(reportId);
+  // }
+
+  @Get('open-document/:document_id')
+  setSessionDocument(@Session() session: { data?: SessionData }, @Param('document_id') documentId: number): void {
+    session.data.selected_document = { document_id: documentId };
   }
 
-  @Get('open-document/:nfr_id')
-  setSessionDocument(@Session() session: { data?: SessionData }, @Param('nfr_id') nfrId: number): void {
-    session.data.selected_document = { nfr_id: nfrId };
+  @Get('get-templates/:document_type_id')
+  getDocumentTemplates(@Param('document_type_id') document_type_id: number): any {
+    return this.adminService.getDocumentTemplates(document_type_id);
   }
 
-  @Get('get-templates/:document_type')
-  getDocumentTemplates(@Param('document_type') documentType: string): any {
-    return this.adminService.getDocumentTemplates(documentType);
+  @Get('provisions')
+  getDocumentProvisions(): any {
+    return this.adminService.getDocumentProvisions();
   }
 
-  @Get('nfr-provisions')
-  getNFRProvisions(): any {
-    return this.adminService.getNFRProvisions();
-  }
-
-  @Get('nfr-variables')
-  getNFRVariables(): any {
-    return this.adminService.getNFRVariables();
+  @Get('document-variables')
+  getDocumentVariables(): any {
+    return this.adminService.getDocumentVariables();
   }
 
   @Get('enable-provision/:provisionId')
@@ -230,6 +230,7 @@ export class AdminController {
       free_text: string;
       help_text: string;
       category: string;
+      order_value: number;
       variants: number[];
     },
     @Session() session: { data?: SessionData }
@@ -251,11 +252,13 @@ export class AdminController {
       free_text: string;
       help_text: string;
       category: string;
-      variants: number[];
+      order_value: number;
+      document_type_ids: number[];
     },
     @Session() session: { data?: SessionData }
   ) {
     const update_userid = session?.data?.activeAccount.idir_username;
+    console.log('order_value: ' + provisionParams.order_value);
     return this.adminService.updateProvision(provisionParams, update_userid);
   }
 
@@ -278,6 +281,7 @@ export class AdminController {
   updateVariable(
     @Body()
     variableParams: {
+      id: number;
       variable_name: string;
       variable_value: string;
       help_text: string;
@@ -286,7 +290,7 @@ export class AdminController {
     @Session() session: { data?: SessionData }
   ) {
     const update_userid = session?.data?.activeAccount.idir_username;
-    return this.adminService.updateVariable(variableParams, update_userid);
+    return this.adminService.updateVariable({ ...variableParams, update_userid });
   }
 
   @Get('remove-variable/:id')

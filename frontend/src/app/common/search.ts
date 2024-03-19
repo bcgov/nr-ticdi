@@ -9,10 +9,11 @@ import * as api from './api';
  */
 export async function getSearchData(): Promise<SearchData[]> {
   try {
-    const url = `${config.API_BASE_URL}/report/search-nfr-data`;
+    const url = `${config.API_BASE_URL}/report/search-document-data`;
     const parameters = api.generateApiParameters(url);
 
     const response = await api.get<SearchData[]>(parameters);
+    console.log(response)
     if (Array.isArray(response)) {
       return response;
     } else {

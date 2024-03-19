@@ -1,3 +1,5 @@
+// Unused page
+
 import { FC } from 'react';
 import Collapsible from '../../../app/components/common/Collapsible';
 import { DTRDisplayObject } from '../../../app/types/types';
@@ -5,7 +7,7 @@ import TenureDetails from '../display/TenureDetails';
 import AreaDetails from '../display/AreaDetails';
 import DtidDetails from '../display/DtidDetails';
 import { Button } from 'react-bootstrap';
-import { generateReport } from '../../common/report';
+// import { generateReportNew } from '../../common/report';
 import { useParams } from 'react-router';
 
 export interface IndexPageProps {
@@ -17,7 +19,7 @@ const IndexPage: FC<IndexPageProps> = ({ data }) => {
   const dtidNumber = dtid ? parseInt(dtid, 10) : null;
   const generateReportHandler = () => {
     if (dtidNumber) {
-      generateReport(dtidNumber, data!.fileNum, 'Land Use Report');
+      // generateReportNew(dtidNumber, data!.fileNum, 'Land Use Report');
     }
   };
 

@@ -2,13 +2,18 @@ import { Injectable } from '@nestjs/common';
 import * as dotenv from 'dotenv';
 import { firstValueFrom } from 'rxjs';
 import { DocumentTemplateService } from 'src/document_template/document_template.service';
-import { NFRProvisionService } from 'src/nfr_provision/nfr_provision.service';
-import { PrintRequestLogService } from 'src/print_request_log/print_request_log.service';
+import { ProvisionService } from 'src/provision/provision.service';
 import { TTLSService } from 'src/ttls/ttls.service';
 import { GL_REPORT_TYPE, LUR_REPORT_TYPE, numberWords, sectionTitles } from 'utils/constants';
 import { ProvisionJSON, VariableJSON } from 'utils/types';
 import { convertToSpecialCamelCase, formatMoney, grazingLeaseVariables, nfrAddressBuilder } from 'utils/util';
+import { DocumentDataService } from 'src/document_data/document_data.service';
+import { DocumentTemplate } from 'src/document_template/entities/document_template.entity';
+import { DocumentDataLogService } from 'src/document_data_log/document_data_log.service';
+import { DocumentTypeService } from 'src/document_type/document_type.service';
 const axios = require('axios');
+
+// generate report needs to be consolidated which is impossible until we figure out how provisions & variables will be dynamically inserted into the docx files
 
 dotenv.config();
 let hostname: string;
@@ -19,37 +24,79 @@ export class ReportService {
   constructor(
     private readonly ttlsService: TTLSService,
     private readonly documentTemplateService: DocumentTemplateService,
-    private readonly printRequestLogService: PrintRequestLogService,
-    private readonly nfrProvisionService: NFRProvisionService
+    private readonly documentDataLogService: DocumentDataLogService,
+    private readonly provisionService: ProvisionService,
+    private readonly documentDataService: DocumentDataService,
+    private readonly documentTypeService: DocumentTypeService
   ) {
     hostname = process.env.backend_url ? process.env.backend_url : `http://localhost`;
     // local development backend port is 3001, docker backend port is 3000
     port = process.env.backend_url ? 3000 : 3001;
   }
 
-  /**
-   * Generates a LUR report name using tenure file number
-   * and a version number. The version number is incremented
-   * each time someone generates a LUR report.
-   *
-   * @param tenureFileNumber
-   * @returns
-   */
-  async generateReportName(dtid: number, tenureFileNumber: string, documentType: string) {
-    const url = `${hostname}:${port}/print-request-log/version/${dtid}/${documentType}`;
-    // grab the next version string for the dtid
-    const version = await axios
-      .get(url, {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      })
-      .then((res) => {
-        return res.data;
-      });
+  // /**
+  //  * Generates a LUR report name using tenure file number
+  //  * and a version number. The version number is incremented
+  //  * each time someone generates a LUR report.
+  //  *
+  //  * @param tenureFileNumber
+  //  * @returns
+  //  */
+  // async generateReportName(dtid: number, tenureFileNumber: string, documentType: string) {
+  //   const url = `${hostname}:${port}/print-request-log/version/${dtid}/${documentType}`;
+  //   // grab the next version string for the dtid
+  //   const version = await axios
+  //     .get(url, {
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //       },
+  //     })
+  //     .then((res) => {
+  //       return res.data;
+  //     });
+  //   return {
+  //     reportName: documentType + '_' + tenureFileNumber + '_' + version + '.docx',
+  //   };
+  // }
+
+  async generateReportName(dtid: number, tenure_file_number: string, document_type_id: number) {
+    const version = await this.documentDataLogService.findNextVersion(dtid, document_type_id);
+    const documentType = await this.documentTypeService.findById(document_type_id);
+    // probably a better way of doing this
+    let prefix = 'report';
+    if (documentType) {
+      if (documentType.name.toLowerCase().includes('notice of final review')) {
+        prefix = 'NFR';
+      } else if (documentType.name.toLowerCase().includes('land use report')) {
+        prefix = 'LUR';
+      } else if (documentType.name.toLowerCase().includes('grazing')) {
+        prefix = 'GL';
+      }
+    }
     return {
-      reportName: documentType + '_' + tenureFileNumber + '_' + version + '.docx',
+      reportName: prefix + '_' + tenure_file_number + '_' + version + '.docx',
     };
+  }
+
+  async generateReport(
+    dtid: number,
+    document_type_id: number,
+    idirUsername: string,
+    idirName: string,
+    variableJson: VariableJSON[],
+    provisionJson: ProvisionJSON[]
+  ) {
+    // For now, hardcode this to call the different static report routes based on document type
+    const documentType = await this.documentTypeService.findById(document_type_id);
+    if (documentType) {
+      if (documentType.name.toLowerCase().includes('notice of final review')) {
+        return this.generateNFRReport(dtid, document_type_id, idirUsername, idirName, variableJson, provisionJson);
+      } else if (documentType.name.toLowerCase().includes('land use report')) {
+        return this.generateLURReport(dtid, idirUsername);
+      } else if (documentType.name.toLowerCase().includes('grazing')) {
+        return this.generateGLReport(dtid, idirUsername);
+      }
+    }
   }
 
   /**
@@ -59,6 +106,7 @@ export class ReportService {
    * @param username
    * @returns
    */
+  // needs a rewrite as prdid is being removed...
   async generateLURReport(prdid: number, username: string) {
     prdid = 1;
     const documentType = LUR_REPORT_TYPE;
@@ -295,40 +343,37 @@ export class ReportService {
   //   return response.data;
   // }
 
-  /**
-   * Generates an NFR report name using tenure file number
-   * and a version number. The version number is incremented
-   * each time someone generates a NFR report.
-   *
-   * @param tenureFileNumber
-   * @returns
-   */
-  async generateNFRReportName(dtid: number, tenureFileNumber: string) {
-    const url = `${hostname}:${port}/nfr-data-log/version/` + dtid;
-    // grab the next version string for the dtid
-    const version = await axios
-      .get(url, {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      })
-      .then((res) => {
-        return res.data;
-      });
-    return { reportName: 'NFR_' + tenureFileNumber + '_' + version + '.docx' };
-  }
+  // /**
+  //  * Generates an NFR report name using tenure file number
+  //  * and a version number. The version number is incremented
+  //  * each time someone generates a NFR report.
+  //  *
+  //  * @param tenureFileNumber
+  //  * @returns
+  //  */
+  // async generateNFRReportName(dtid: number, tenureFileNumber: string) {
+  //   const url = `${hostname}:${port}/document-data-log/version/` + dtid;
+  //   // grab the next version string for the dtid
+  //   const version = await axios
+  //     .get(url, {
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //       },
+  //     })
+  //     .then((res) => {
+  //       return res.data;
+  //     });
+  //   return { reportName: 'NFR_' + tenureFileNumber + '_' + version + '.docx' };
+  // }
 
   async generateNFRReport(
     dtid: number,
-    variantName: string,
+    document_type_id: number,
     idirUsername: string,
     idirName: string,
     variableJson: VariableJSON[],
     provisionJson: ProvisionJSON[]
   ) {
-    const templateUrl = `${hostname}:${port}/document-template/get-active-report/${variantName}`;
-    const logUrl = `${hostname}:${port}/nfr-data-log/`;
-
     // get raw ttls data for later
     await this.ttlsService.setWebadeToken();
     const rawData: any = await firstValueFrom(this.ttlsService.callHttp(dtid))
@@ -339,14 +384,7 @@ export class ReportService {
         console.log(err);
       });
 
-    // get the document template
-    const documentTemplateObject: {
-      id: number;
-      the_file: string;
-      document_template: string;
-    } = await axios.get(templateUrl).then((res) => {
-      return res.data;
-    });
+    const documentTemplateObject = await this.documentTemplateService.findActiveByDocumentType(document_type_id);
 
     // Format variables with names that the document template expects
     const variables: any = {};
@@ -642,16 +680,17 @@ export class ReportService {
     const data = Object.assign({}, ttlsData, variables, showProvisionSections);
 
     // Log the request
-    const document_template_id = documentTemplateObject.id;
-    await axios.post(logUrl, {
-      document_template_id: document_template_id,
+    await this.documentDataLogService.create({
       dtid: dtid,
+      document_type_id: document_type_id,
+      document_template_id: documentTemplateObject?.id,
       request_app_user: idirUsername,
       request_json: JSON.stringify(data),
+      create_userid: idirUsername,
     });
 
     // Save the NFR Data
-    await this.saveNFR(dtid, variantName, 'Complete', provisionJson, variableJson, idirUsername);
+    await this.saveDocument(dtid, document_type_id, 'Complete', provisionJson, variableJson, idirUsername);
 
     // Generate the report
     const cdogsToken = await this.ttlsService.callGetToken();
@@ -703,7 +742,7 @@ export class ReportService {
     return response2.data;
   }
 
-  async getNFRProvisionsByVariantAndDtid(variantName: string, dtid: number): Promise<any> {
+  async getDocumentProvisionsByDocTypeIdAndDtid(document_type_id: number, dtid: number): Promise<any> {
     const returnItems = [
       'type',
       'provision_name',
@@ -716,16 +755,10 @@ export class ReportService {
     ];
     let reduced, provisions;
     // nfrDataId exists so return a list of provisions with pre-existing free_text data inserted, certain provisions preselected
-    const url = `${hostname}:${port}/nfr-data/provisions/${variantName}/${dtid}`;
-    const nfrProvisions = await axios
-      .get(url)
-      .then((res) => {
-        return res.data;
-      })
-      .catch((err) => console.log(err.response.data));
-    if (nfrProvisions) {
-      const provisionIds = nfrProvisions.provisionIds;
-      provisions = nfrProvisions.provisions;
+    const documentProvisions = await this.documentDataService.getProvisionsByDocTypeIdAndDtid(document_type_id, dtid);
+    if (documentProvisions) {
+      const provisionIds = documentProvisions.provisionIds;
+      provisions = documentProvisions.provisions;
       reduced = provisions.map((obj) => {
         if (provisionIds.includes(obj.id)) {
           obj.select = true;
@@ -736,13 +769,7 @@ export class ReportService {
       });
     } else {
       // no nfrDataId so just return generic provisions with all of them deselected by default
-      const url2 = `${hostname}:${port}/nfr-provision/variant/${variantName}`;
-      provisions = await axios
-        .get(url2)
-        .then((res) => {
-          return res.data;
-        })
-        .catch((err) => console.log(err.response.data));
+      provisions = await this.provisionService.getProvisionsByDocumentTypeId(document_type_id);
       reduced = provisions.map((obj) =>
         Object.keys(obj)
           .filter((key) => returnItems.includes(key))
@@ -765,64 +792,34 @@ export class ReportService {
     });
   }
 
-  getGroupMaxByVariant(variantName: string): Promise<any> {
-    return this.nfrProvisionService.getGroupMaxByVariant(variantName);
+  getGroupMaxByDocTypeId(document_type_id: number): Promise<any> {
+    return this.provisionService.getGroupMaxByDocTypeId(document_type_id);
   }
 
-  async getNFRVariablesByVariantAndDtid(variantName: string, dtid: number): Promise<any> {
-    // if an nfrId is provided, get the variables with any existing user specified values
-    const url = `${hostname}:${port}/nfr-data/variables/${variantName}/${dtid}`;
-    const variables = await axios
-      .get(url)
-      .then((res) => {
-        return res.data.variables;
-      })
-      .catch((err) => console.log(err.response.data));
+  async getDocumentVariablesByDocumentTypeIdAndDtid(document_type_id: number, dtid: number): Promise<any> {
+    // if a dtid & document_type_id are provided, get the variables with any existing user specified values
+    const variables = await this.documentDataService.getVariablesByDtidAndDocType(dtid, document_type_id);
     if (variables) {
       return variables;
     } else {
-      // grab the basic variable list corresponding to the variant
-      const url2 = `${hostname}:${port}/nfr-provision/get-provision-variables/variant/${variantName}`;
-      return axios.get(url2).then((res) => {
-        return res.data;
-      });
+      // grab the basic variable list corresponding to the document type
+      const basicVariables = await this.provisionService.getVariablesByDocumentTypeId(document_type_id);
+      return { variables: basicVariables, variableIds: [] };
     }
   }
 
   getMandatoryProvisions() {
-    return this.nfrProvisionService.getMandatoryProvisions();
+    return this.provisionService.getMandatoryProvisions();
   }
 
-  getMandatoryProvisionsByVariant(variantName: string) {
-    return this.nfrProvisionService.getMandatoryProvisionsByVariant(variantName);
+  getMandatoryProvisionsByDocumentTypeId(document_type_id: number) {
+    return this.provisionService.getMandatoryProvisionsByDocumentTypeId(document_type_id);
   }
 
-  async getNFRData() {
-    const nfrDataUrl = `${hostname}:${port}/nfr-data`;
-    const templateUrl = `${hostname}:${port}/document-template/nfr-template-info`;
-
-    // get NFR data
-    let nfrData;
-    try {
-      const response = await axios.get(nfrDataUrl);
-      nfrData = response.data;
-    } catch (err) {
-      console.log(err.response.data);
-      return;
-    }
-
-    // get template IDs from NFR data
-    const templateIds = nfrData.map((entry) => entry.template_id);
-
-    // get templates using template IDs
-    let allTemplates;
-    try {
-      const response = await axios.post(templateUrl, templateIds);
-      allTemplates = response.data;
-    } catch (err) {
-      console.log(err.response.data);
-      return;
-    }
+  async getDocumentData() {
+    const documentData = await this.documentDataService.findAll();
+    const templateIds = documentData.map((d) => d.template_id);
+    const allTemplates = await this.documentTemplateService.getTemplatesInfoByIds(templateIds);
 
     // filter out deleted templates and create a lookup table
     const templatesLookup = allTemplates.reduce((acc, template) => {
@@ -832,101 +829,110 @@ export class ReportService {
       return acc;
     }, {});
 
-    // combine NFR data with their corresponding templates
-    const combinedArray = nfrData
-      .filter((nfr) => templatesLookup[nfr.template_id])
-      .map((nfr) => ({
-        dtid: nfr.dtid,
-        version: templatesLookup[nfr.template_id].template_version,
-        file_name: templatesLookup[nfr.template_id].file_name,
-        updated_date: nfr.update_timestamp.split('T')[0],
-        status: nfr.status,
-        active: templatesLookup[nfr.template_id].active_flag,
-        nfr_id: nfr.id,
-        variant_name: nfr.variant_name,
+    // combine Document data with their corresponding templates
+    const combinedArray = documentData
+      .filter((document) => templatesLookup[document.template_id])
+      .map((document) => ({
+        dtid: document.dtid,
+        version: templatesLookup[document.template_id].template_version,
+        file_name: templatesLookup[document.template_id].file_name,
+        updated_date: document.update_timestamp.toString().split('T')[0],
+        status: document.status,
+        active: templatesLookup[document.template_id].active_flag,
+        document_data_id: document.id,
+        document_type: document.document_type,
       }));
 
     return combinedArray;
   }
 
-  async getActiveNfrDataByDtid(dtid: number): Promise<any> {
-    const url = `${hostname}:${port}/nfr-data/dtid/${dtid}`;
-    const response = await axios
-      .get(url, {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      })
-      .then((res) => {
-        return res.data;
-      });
-    // console.log('!!!~~~~~~~~');
-    // console.log("this.getGroupMaxByVariant('NOTICE OF FINAL REVIEW')");
-    // const groupMax = await this.getGroupMaxByVariant('NOTICE OF FINAL REVIEW');
-    // // console.log(groupMax);
-    // console.log('\ngetActiveNfrDataByDtid');
-    // console.log(response);
-    // console.log('\nnfr_data_provisions');
-    // // console.log(response.nfrData.nfr_data_provisions);
-    // console.log('\nnfr_data_variables');
-    // // console.log(response.nfrData.nfr_data_variables);
-    // console.log('\nthis.getMandatoryProvisionsByVariant(NOTICE OF FINAL REVIEW)');
-    // const mandatoryProvisions = await this.getMandatoryProvisionsByVariant('NOTICE OF FINAL REVIEW');
-    // // console.log(mandatoryProvisions);
-    // console.log('~~~~~~~~!!!');
-    return response;
+  async getDocumentDataByDocTypeIdAndDtid(document_type_id: number, dtid: number): Promise<any> {
+    return this.documentDataService.findDocumentDataByDocTypeIdAndDtid(document_type_id, dtid);
+    // const url = `${hostname}:${port}/document-data/dtid/${dtid}`;
+    // const response = await axios
+    //   .get(url, {
+    //     headers: {
+    //       'Content-Type': 'application/json',
+    //     },
+    //   })
+    //   .then((res) => {
+    //     return res.data;
+    //   });
+    // // const documentData = await this.documentDataService.findActiveByDtid(dtid);
+    // // console.log('!!!~~~~~~~~');
+    // // console.log("this.getGroupMaxByVariant('NOTICE OF FINAL REVIEW')");
+    // // const groupMax = await this.getGroupMaxByVariant('NOTICE OF FINAL REVIEW');
+    // // // console.log(groupMax);
+    // // console.log('\ngetActiveNfrDataByDtid');
+    // // console.log(response);
+    // // console.log('\ndocument_data_provisions');
+    // // // console.log(response.nfrData.document_data_provisions);
+    // // console.log('\ndocument_data_variables');
+    // // // console.log(response.nfrData.document_data_variables);
+    // // console.log('\nthis.getMandatoryProvisionsByVariant(NOTICE OF FINAL REVIEW)');
+    // // const mandatoryProvisions = await this.getMandatoryProvisionsByVariant('NOTICE OF FINAL REVIEW');
+    // // // console.log(mandatoryProvisions);
+    // // console.log('~~~~~~~~!!!');
+    // return response;
   }
 
-  async saveNFR(
+  // async saveNFR(
+  //   dtid: number,
+  //   variant_name: string,
+  //   status: string,
+  //   provisionJsonArray: ProvisionJSON[],
+  //   variableJsonArray: VariableJSON[],
+  //   idir_username: string
+  // ) {
+  //   const templateUrl = `${hostname}:${port}/document-template/get-active-report/${variant_name}`;
+  //   const documentTemplate = await axios.get(templateUrl).then((res) => {
+  //     return res.data;
+  //   });
+  //   const url = `${hostname}:${port}/document-data`;
+  //   const data = {
+  //     dtid: dtid,
+  //     variant_name: variant_name,
+  //     template_id: documentTemplate.id,
+  //     status: status,
+  //     create_userid: idir_username,
+  //     ttls_data: [],
+  //     provisionJsonArray,
+  //     variableJsonArray,
+  //   };
+  //   await axios
+  //     .post(url, {
+  //       body: data,
+  //     })
+  //     .then((res) => {
+  //       return res.data;
+  //     });
+  // }
+
+  async saveDocument(
     dtid: number,
-    variant_name: string,
+    document_type_id: number,
     status: string,
     provisionJsonArray: ProvisionJSON[],
     variableJsonArray: VariableJSON[],
     idir_username: string
   ) {
-    const templateUrl = `${hostname}:${port}/document-template/get-active-report/${variant_name}`;
-    const documentTemplate = await axios.get(templateUrl).then((res) => {
-      return res.data;
-    });
-    const url = `${hostname}:${port}/nfr-data`;
+    const documentTemplate = await this.documentTemplateService.findActiveByDocumentType(document_type_id);
     const data = {
       dtid: dtid,
-      variant_name: variant_name,
+      document_type_id: document_type_id,
       template_id: documentTemplate.id,
       status: status,
       create_userid: idir_username,
       ttls_data: [],
-      provisionJsonArray,
-      variableJsonArray,
     };
-    await axios
-      .post(url, {
-        body: data,
-      })
-      .then((res) => {
-        return res.data;
-      });
+    return this.documentDataService.createOrUpdate(data, provisionJsonArray, variableJsonArray);
   }
 
-  async getEnabledProvisionsByVariant(variantName: string) {
-    const url = `${hostname}:${port}/nfr-provision/get-mandatory-provisions/variant/${variantName}`;
-    return axios.get(url).then((res) => {
-      return res.data;
-    });
+  async getEnabledProvisionsByDocTypeId(document_type_id: number) {
+    return this.provisionService.getMandatoryProvisionsByDocumentTypeId(document_type_id);
   }
 
-  async getEnabledProvisionsByVariantAndDtid(variantName: string, dtid: number) {
-    const url = `${hostname}:${port}/nfr-data/get-enabled-provisions/${variantName}/${dtid}`;
-    return axios.get(url).then((res) => {
-      return res.data;
-    });
-  }
-
-  async getVariantsWithIds() {
-    const url = `${hostname}:${port}/nfr-provision/get-variants-with-ids/0`;
-    return axios.get(url).then((res) => {
-      return res.data;
-    });
+  getEnabledProvisionsByDocTypeIdDtid(document_type_id: number, dtid: number) {
+    return this.documentDataService.getEnabledProvisionsByDocTypeIdAndDtid(document_type_id, dtid);
   }
 }

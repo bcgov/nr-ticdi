@@ -1,17 +1,17 @@
 import { FC, useState } from 'react';
-import { REPORT_TYPES } from '../../util/constants';
-import AddAdmin from '../../components/modal/admin/AddAdmin';
-import RemoveAdmin from '../../components/modal/admin/RemoveAdmin';
-import { useNavigate } from 'react-router-dom';
+// import { REPORT_TYPES } from '../../util/constants';
+import AddAdmin from '../../components/modal/admin/manage-admins/AddAdmin';
+import RemoveAdmin from '../../components/modal/admin/manage-admins/RemoveAdmin';
+// import { useNavigate } from 'react-router-dom';
 import { exportUsers } from '../../common/admin';
 import AdminDataTable, { AdminData } from '../../components/table/admin/AdminDataTable';
 
 const AdminPage: FC = () => {
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   const [selectedAdmin, setSelectedAdmin] = useState<AdminData | null>(null);
   const [showAddAdminModal, setShowAddAdminModal] = useState(false);
   const [showRemoveAdminModal, setShowRemoveAdminModal] = useState(false);
-  const [selectedReport, setSelectedReport] = useState('0');
+  // const [selectedReport, setSelectedReport] = useState('0');
   const [searchTerm, setSearchTerm] = useState('');
 
   const showAddAdminModalHandler = (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -29,18 +29,18 @@ const AdminPage: FC = () => {
     setShowRemoveAdminModal(false);
   };
 
-  const selectedReportHandler = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    setSelectedReport(event.target.value);
-  };
+  // const selectedReportHandler = (event: React.ChangeEvent<HTMLSelectElement>) => {
+  //   setSelectedReport(event.target.value);
+  // };
 
   const exportUserListHandler = async (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
     await exportUsers();
   };
 
-  const manageReportsHandler = () => {
-    navigate(`/manage-templates/${selectedReport}`);
-  };
+  // const manageReportsHandler = () => {
+  //   navigate(`/manage-templates/${selectedReport}`);
+  // };
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
@@ -48,7 +48,7 @@ const AdminPage: FC = () => {
 
   return (
     <>
-      <h1>System Administration</h1>
+      <h1>Manage Administrators</h1>
       <hr />
       <div className="form-group row d-flex justify-content-between align-items-center">
         <h3 className="ml-3">List of TICDI Administrators</h3>
@@ -85,7 +85,7 @@ const AdminPage: FC = () => {
           </button>
         </div>
       </div>
-      <hr />
+      {/* <hr />
       <div className="col-md-3">
         <h3>Manage Templates</h3>
       </div>
@@ -118,7 +118,7 @@ const AdminPage: FC = () => {
             Manage
           </button>
         </div>
-      </div>
+      </div> */}
       {showAddAdminModal && <AddAdmin show={showAddAdminModal} onHide={closeAddAdminModalHandler} />}
       {selectedAdmin && showRemoveAdminModal && (
         <RemoveAdmin admin={selectedAdmin} show={showRemoveAdminModal} onHide={closeRemoveAdminModalHandler} />

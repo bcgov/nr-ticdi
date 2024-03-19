@@ -1,5 +1,5 @@
 export class DocumentTemplateDto {
-  document_type: string;
+  document_type_id: number;
   template_version: number;
   template_author: string;
   template_creation_date: string;

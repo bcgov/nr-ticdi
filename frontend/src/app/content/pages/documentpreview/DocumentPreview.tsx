@@ -1,5 +1,9 @@
 import React, { useState } from 'react';
-import { getData, getNfrProvisionsByVariantDtid, getNfrVariablesByVariantDtid } from '../../../common/report';
+import {
+  getData,
+  getDocumentProvisionsByDocTypeIdDtid,
+  getDocumentVariablesByDocTypeIdDtid,
+} from '../../../common/report';
 import DocumentPreviewForm from './DocumentPreviewForm';
 import ContactInfoDisplay from './ContactInfoDisplay';
 import LicenseDetailDisplay from './LicenseDetailDisplay';
@@ -8,7 +12,6 @@ import GroupSelectionAndProvisions from './GroupSelectionAndProvisions';
 import ProvisionsTable from './ProvisionsTable';
 import './DocumentPreview.scss';
 import CustomCollapsible from './CustomCollapsible';
-
 
 interface DocumentPreviewResponse {
   dtid: number;
@@ -39,7 +42,6 @@ interface DocumentPreviewResponse {
     address: string;
   }>;
 }
-
 
 interface Provision {
   type: string;
@@ -85,8 +87,8 @@ const DocumentPreview: React.FC = () => {
   const handleClear = () => {
     setTenureFileNumber('');
     setDtid('');
-    setIsOpen(false)
-    setDocumentPreviewResponse(null)
+    setIsOpen(false);
+    setDocumentPreviewResponse(null);
   };
 
   const [provisions, setProvisions] = useState<Provision[]>([
@@ -97,25 +99,22 @@ const DocumentPreview: React.FC = () => {
 
   const [documentType, setDocumentType] = useState('STANDARD_LICENSE');
 
-
   const handleCheckboxChange = (index: number) => {
     provisions[index].included = !provisions[index].included;
   };
 
-
-
   const fetchData = async () => {
-    const nfrData = await getData(parseInt(dtid)) as DocumentPreviewResponse;
+    const nfrData = (await getData(1, parseInt(dtid))) as DocumentPreviewResponse;
     if (nfrData) {
-      setDocumentPreviewResponse(nfrData)
-      const dataProvisions = await getNfrProvisionsByVariantDtid("NOTICE OF FINAL REVIEW", 928437);
-      const dataVariables = await getNfrVariablesByVariantDtid("NOTICE OF FINAL REVIEW", 928437);
+      setDocumentPreviewResponse(nfrData);
+      const dataProvisions = await getDocumentProvisionsByDocTypeIdDtid(1, 928437);
+      const dataVariables = await getDocumentVariablesByDocTypeIdDtid(1, 928437);
       setIsOpen(true);
     }
   };
 
   const handleRetrieve = () => {
-    if (tenureFileNumber !== "" && dtid !== "") {
+    if (tenureFileNumber !== '' && dtid !== '') {
       fetchData();
     }
   };
@@ -123,83 +122,91 @@ const DocumentPreview: React.FC = () => {
 
   const toggleCollapsible = () => setIsOpen(!isOpen);
 
-
-
-
-
   return (
     <div>
       <DocumentPreviewForm
         tenureFileNumber={tenureFileNumber}
         dtid={dtid}
-        primaryContactName={documentPreviewResponse !== null ? documentPreviewResponse.primaryContactName : ""}
+        primaryContactName={documentPreviewResponse !== null ? documentPreviewResponse.primaryContactName : ''}
         onValidatedRetrieve={handleRetrieve}
         setTenureFileNumber={setTenureFileNumber}
         setDtid={setDtid}
         handleClear={handleClear}
       />
 
-      <CustomCollapsible title="Disposition Transaction ID Details"
+      <CustomCollapsible
+        title="Disposition Transaction ID Details"
         isOpen={isOpen}
         toggleCollapsible={toggleCollapsible}
-        isSpanRequired={false}>
-
-        {documentPreviewResponse !== null ? <ContactInfoDisplay
-          contactName={documentPreviewResponse.contactName}
-          organizationUnit={documentPreviewResponse.orgUnit}
-          incorporationNumber={documentPreviewResponse.incorporationNum}
-          emailAddress={documentPreviewResponse.contactEmail}
-          dateInspected={documentPreviewResponse.inspectionDate}
-        /> : ""}
+        isSpanRequired={false}
+      >
+        {documentPreviewResponse !== null ? (
+          <ContactInfoDisplay
+            contactName={documentPreviewResponse.contactName}
+            organizationUnit={documentPreviewResponse.orgUnit}
+            incorporationNumber={documentPreviewResponse.incorporationNum}
+            emailAddress={documentPreviewResponse.contactEmail}
+            dateInspected={documentPreviewResponse.inspectionDate}
+          />
+        ) : (
+          ''
+        )}
       </CustomCollapsible>
 
-      <CustomCollapsible title="Tenure Details"
+      <CustomCollapsible
+        title="Tenure Details"
         isOpen={isOpen}
         toggleCollapsible={toggleCollapsible}
-        isSpanRequired={false}>
-
-        {documentPreviewResponse !== null ? <LicenseDetailDisplay
-          type={documentPreviewResponse.type}
-          subtype={documentPreviewResponse.subType}
-          purpose={documentPreviewResponse.purpose}
-          subpurpose={documentPreviewResponse.subPurpose}
-          locationOfLand={documentPreviewResponse.locLand}
-          mailingAddress1={documentPreviewResponse.mailingAddress1}
-          mailingAddress2={documentPreviewResponse.mailingAddress2}
-          mailingAddress3={documentPreviewResponse.mailingAddress3} /> : ""}
+        isSpanRequired={false}
+      >
+        {documentPreviewResponse !== null ? (
+          <LicenseDetailDisplay
+            type={documentPreviewResponse.type}
+            subtype={documentPreviewResponse.subType}
+            purpose={documentPreviewResponse.purpose}
+            subpurpose={documentPreviewResponse.subPurpose}
+            locationOfLand={documentPreviewResponse.locLand}
+            mailingAddress1={documentPreviewResponse.mailingAddress1}
+            mailingAddress2={documentPreviewResponse.mailingAddress2}
+            mailingAddress3={documentPreviewResponse.mailingAddress3}
+          />
+        ) : (
+          ''
+        )}
       </CustomCollapsible>
 
-      <CustomCollapsible title="Interested Parties"
+      <CustomCollapsible
+        title="Interested Parties"
         isOpen={isOpen}
         toggleCollapsible={toggleCollapsible}
-        isSpanRequired={false}>
-
-        {documentPreviewResponse !== null ? <InterestedPartiesDisplay interestedParties={documentPreviewResponse.interestedParties} /> : ""}
+        isSpanRequired={false}
+      >
+        {documentPreviewResponse !== null ? (
+          <InterestedPartiesDisplay interestedParties={documentPreviewResponse.interestedParties} />
+        ) : (
+          ''
+        )}
       </CustomCollapsible>
 
       <div style={{ margin: '20px 0' }}>
         <h3 style={{ marginBottom: '10px' }}>Create Document</h3>
         <hr />
         <div>
-          <label htmlFor="documentType" className='createDocument'>
+          <label htmlFor="documentType" className="createDocument">
             Document Type :
           </label>
           <select
             id="documentType"
             value={documentType}
             onChange={(e) => setDocumentType(e.target.value)}
-            className='select'
+            className="select"
           >
             <option value="STANDARD_LICENSE">STANDARD LICENSE</option>
             <option value="Assignment Assumption">Assignment Assumption</option>
           </select>
         </div>
       </div>
-      <CustomCollapsible title="Provisions"
-        isOpen={isOpen}
-        toggleCollapsible={toggleCollapsible}
-        isSpanRequired={true}>
-
+      <CustomCollapsible title="Provisions" isOpen={isOpen} toggleCollapsible={toggleCollapsible} isSpanRequired={true}>
         <GroupSelectionAndProvisions
           selectedGroup={selectedGroup}
           setSelectedGroup={setSelectedGroup}
@@ -208,17 +215,17 @@ const DocumentPreview: React.FC = () => {
         />
       </CustomCollapsible>
 
-      <CustomCollapsible title="Variables"
-        isOpen={isOpen}
-        toggleCollapsible={toggleCollapsible}
-        isSpanRequired={false}>
-
+      <CustomCollapsible title="Variables" isOpen={isOpen} toggleCollapsible={toggleCollapsible} isSpanRequired={false}>
         <ProvisionsTable provisions={provisions} />
       </CustomCollapsible>
 
       <div className="button-container">
-        <button className="button button--save" onClick={handleSaveForLater}>Save For Later</button>
-        <button className="button button--generate" onClick={handleGenerateDocument}>Generate Document</button>
+        <button className="button button--save" onClick={handleSaveForLater}>
+          Save For Later
+        </button>
+        <button className="button button--generate" onClick={handleGenerateDocument}>
+          Generate Document
+        </button>
       </div>
     </div>
   );

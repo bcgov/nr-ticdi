@@ -222,7 +222,8 @@ export class AppController {
         : PAGE_TITLES.MANAGE_TEMPLATES;
     let variantJsonArray = [];
     if (reportIndex == 2) {
-      variantJsonArray = await this.reportService.getVariantsWithIds();
+      // variantJsonArray = await this.reportService.getVariantsWithIds();
+      variantJsonArray = [];
     }
     return {
       title: title,
@@ -363,12 +364,14 @@ export class AppController {
     const title =
       process.env.ticdi_environment == 'DEVELOPMENT' ? 'DEVELOPMENT - ' + PAGE_TITLES.NOFR : PAGE_TITLES.NOFR;
     const displayAdmin = isAdmin ? 'Administration' : '-';
-    const groupMaxJsonArray = await this.reportService.getGroupMaxByVariant('NOTICE OF FINAL REVIEW');
+    // const groupMaxJsonArray = await this.reportService.getGroupMaxByVariant('NOTICE OF FINAL REVIEW');
+    const groupMaxJsonArray = [];
     try {
-      const nfrDataObject = await this.reportService.getActiveNfrDataByDtid(dtid);
+      const nfrDataObject = await this.reportService.getDocumentDataByDocTypeIdAndDtid(1, dtid);
       nfrData = nfrDataObject.nfrData;
       const provisionIds = nfrDataObject.provisionIds ? nfrDataObject.provisionIds : [];
-      const mandatoryProvisionIds = await this.reportService.getMandatoryProvisionsByVariant(variantName);
+      // const mandatoryProvisionIds = await this.reportService.getMandatoryProvisionsByVariant(variantName);
+      const mandatoryProvisionIds = [];
       await this.ttlsService.setWebadeToken();
       const response: any = await firstValueFrom(this.ttlsService.callHttp(dtid))
         .then((res) => {

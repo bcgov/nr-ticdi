@@ -2,17 +2,19 @@ import React, { useEffect, useState } from 'react';
 import { DataTable } from '../common/DataTable';
 import { ColumnDef, createColumnHelper } from '@tanstack/react-table';
 import { getSearchData } from '../../../common/search';
-import { SearchData } from '../../../types/types';
+import { DocType, SearchData } from '../../../types/types';
 
 interface SearchDataTableProps {
   searchTerm: string;
-  setSelectedDocumentChange: (dtid: number, variant_name: string) => void;
+  setSelectedDocumentChange: (dtid: number, documentType: DocType) => void;
 }
+
+// TODO - update this table to receive / handle documents using document type instead of variant
 
 const SearchDataTable: React.FC<SearchDataTableProps> = ({ searchTerm, setSelectedDocumentChange }) => {
   const [searchData, setSearchData] = useState<SearchData[]>([]);
   const [filteredSearchData, setFilteredSearchData] = useState<SearchData[]>([]);
-  const [selectedDocument, setSelectedDocument] = useState<{ dtid: number; variant_name: string } | null>(null);
+  const [selectedDocument, setSelectedDocument] = useState<{ dtid: number; document_type: DocType } | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -20,9 +22,9 @@ const SearchDataTable: React.FC<SearchDataTableProps> = ({ searchTerm, setSelect
       data.sort((a, b) => a.dtid - b.dtid); // sort by dtid for now
       const firstItem: SearchData | null = data[0] ? data[0] : null;
       if (firstItem) {
-        const { dtid, variant_name } = firstItem;
-        setSelectedDocument({ dtid, variant_name });
-        setSelectedDocumentChange(dtid, variant_name);
+        const { dtid, document_type } = firstItem;
+        setSelectedDocument({ dtid, document_type });
+        setSelectedDocumentChange(dtid, document_type);
       }
       setSearchData(data);
     };
@@ -50,13 +52,14 @@ const SearchDataTable: React.FC<SearchDataTableProps> = ({ searchTerm, setSelect
     filterData();
   }, [searchTerm, searchData]);
 
-  const activeRadioHandler = (dtid: number, variant_name: string) => {
-    setSelectedDocument({ dtid, variant_name });
-    setSelectedDocumentChange(dtid, variant_name);
+  const activeRadioHandler = (dtid: number, document_type: DocType) => {
+    setSelectedDocument({ dtid, document_type });
+    setSelectedDocumentChange(dtid, document_type);
   };
 
   const columnHelper = createColumnHelper<SearchData>();
 
+  // may need to adjust
   const columns: ColumnDef<SearchData, any>[] = [
     columnHelper.accessor('dtid', {
       id: 'dtid',
@@ -95,21 +98,21 @@ const SearchDataTable: React.FC<SearchDataTableProps> = ({ searchTerm, setSelect
           type="radio"
           name="activeSelection"
           checked={info.row.original.dtid === selectedDocument?.dtid}
-          onChange={() => activeRadioHandler(info.row.original.dtid, info.row.original.variant_name)}
+          onChange={() => activeRadioHandler(info.row.original.dtid, info.row.original.document_type)}
           style={{ width: '100%' }}
         />
       ),
       header: () => '',
       meta: { customCss: { width: '5%' } },
     }),
-    columnHelper.accessor('nfr_id', {
+    columnHelper.accessor('document_data_id', {
       id: 'nfr_id',
       cell: () => null,
       header: () => null,
       meta: { customCss: { display: 'none' } },
     }),
-    columnHelper.accessor('variant_name', {
-      id: 'variant_name',
+    columnHelper.accessor('document_type', {
+      id: 'document_type',
       cell: () => null,
       header: () => null,
       meta: { customCss: { display: 'none' } },

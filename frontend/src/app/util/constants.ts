@@ -1,32 +1,32 @@
 export const PAGE = [
-  {
-    title: 'Land Use Report',
-    path: '',
-  },
-  {
-    title: 'Grazing Lease',
-    path: 'Grazing Lease',
-  },
-  {
-    title: 'Notice of Final Review',
-    path: 'Notice of Final Review',
-  },
-  {
-    title: 'Notice of Final Review (Delayed)',
-    path: 'Notice of Final Review (Delayed)',
-  },
-  {
-    title: 'Notice of Final Review (No Fees)',
-    path: 'Notice of Final Review (No Fees)',
-  },
-  {
-    title: 'Notice of Final Review (Survey Required)',
-    path: 'Notice of Final Review (Survey Required)',
-  },
-  {
-    title: 'Notice of Final Review (To Obtain Survey)',
-    path: 'Notice of Final Review (To Obtain Survey)',
-  },
+  // {
+  //   title: 'Land Use Report',
+  //   path: '',
+  // },
+  // {
+  //   title: 'Grazing Lease',
+  //   path: 'Grazing Lease',
+  // },
+  // {
+  //   title: 'Notice of Final Review',
+  //   path: 'Notice of Final Review',
+  // },
+  // {
+  //   title: 'Notice of Final Review (Delayed)',
+  //   path: 'Notice of Final Review (Delayed)',
+  // },
+  // {
+  //   title: 'Notice of Final Review (No Fees)',
+  //   path: 'Notice of Final Review (No Fees)',
+  // },
+  // {
+  //   title: 'Notice of Final Review (Survey Required)',
+  //   path: 'Notice of Final Review (Survey Required)',
+  // },
+  // {
+  //   title: 'Notice of Final Review (To Obtain Survey)',
+  //   path: 'Notice of Final Review (To Obtain Survey)',
+  // },
   {
     title: 'Search',
     path: 'search',
@@ -41,16 +41,16 @@ export const PAGE = [
   },
   {
     title: 'Document Preview',
-    path: '/'
+    path: '/',
   },
   {
     title: 'Select Manage Templates',
-    path: 'manage-templates-select'
+    path: 'manage-templates-select',
   },
   {
     title: 'System Administration Menu',
-    path: 'system-admin-menu',
-  }
+    path: 'system-admin',
+  },
 ];
 
 // should eventually be stored in a table in the db and obtained from there

@@ -2,15 +2,11 @@ import 'dotenv/config';
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
-import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { DocumentTemplateModule } from './document_template/document_template.module';
-import { PrintRequestDetailModule } from './print_request_detail/print_request_detail.module';
-import { PrintRequestLogModule } from './print_request_log/print_request_log.module';
-import { NFRDataModule } from './nfr_data/nfr_data.module';
-import { NFRDataLogModule } from './nfr_data_log/nfr_data_log.module';
-import { NFRProvisionModule } from './nfr_provision/nfr_provision.module';
-
+import { DocumentDataLogModule } from './document_data_log/document_data_log.module';
+import { ProvisionModule } from './provision/provision.module';
+import { DocumentDataModule } from './document_data/document_data.module';
 import { HttpModule } from '@nestjs/axios';
 import { TTLSService } from './ttls/ttls.service';
 import { AuthenticationModule } from './authentication/authentication.module';
@@ -18,6 +14,7 @@ import { SessionModule } from 'nestjs-session';
 import { AdminController } from './admin/admin.controller';
 import { AdminModule } from './admin/admin.module';
 import { ReportModule } from './report/report.module';
+import { DocumentTypeModule } from './document_type/document_type.module';
 import { HttpExceptionFilter } from './authentication/http-exception.filter';
 import { APP_FILTER } from '@nestjs/core';
 
@@ -37,11 +34,10 @@ if (process.env.POSTGRESQL_PASSWORD != null) {
     ConfigModule.forRoot(),
     TypeOrmModule.forRoot(config),
     DocumentTemplateModule,
-    PrintRequestDetailModule,
-    NFRDataModule,
-    NFRDataLogModule,
-    NFRProvisionModule,
-    PrintRequestLogModule,
+    DocumentTypeModule,
+    DocumentDataModule,
+    DocumentDataLogModule,
+    ProvisionModule,
     HttpModule,
     AuthenticationModule,
     AdminModule,

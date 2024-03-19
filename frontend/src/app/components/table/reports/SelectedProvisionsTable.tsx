@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { DataTable } from '../common/DataTable';
 import { ColumnDef, createColumnHelper } from '@tanstack/react-table';
-import { getNfrProvisionsByVariantDtid } from '../../../common/report';
+import { getDocumentProvisionsByDocTypeIdDtid } from '../../../common/report';
 import { ProvisionData } from '../../../content/display/Provisions';
+import { DocType } from '../../../types/types';
 
 interface SelectedProvisionsTableTableProps {
-  variant: string;
+  docType: DocType;
   dtid: number;
   selectedProvisionIds: number[] | undefined;
   updateHandler: (provisionJson: ProvisionJson[]) => void;
@@ -20,7 +21,7 @@ export type ProvisionJson = {
 };
 
 const SelectedProvisionsTable: React.FC<SelectedProvisionsTableTableProps> = ({
-  variant,
+  docType,
   dtid,
   selectedProvisionIds,
   updateHandler,
@@ -31,10 +32,10 @@ const SelectedProvisionsTable: React.FC<SelectedProvisionsTableTableProps> = ({
   // grab all provisions
   useEffect(() => {
     const fetchData = async () => {
-      setAllProvisions(await getNfrProvisionsByVariantDtid(variant, dtid));
+      setAllProvisions(await getDocumentProvisionsByDocTypeIdDtid(docType.id, dtid));
     };
     fetchData();
-  }, [variant, dtid]);
+  }, [docType, dtid]);
 
   // filter/sort allProvisions to find selected ones for displaying
   useEffect(() => {
@@ -47,7 +48,7 @@ const SelectedProvisionsTable: React.FC<SelectedProvisionsTableTableProps> = ({
       });
       setSelectedProvisions(filteredAndSorted);
     }
-  }, [allProvisions, selectedProvisionIds, variant]);
+  }, [allProvisions, selectedProvisionIds, docType]);
 
   // update provision save data array in ReportPage when selectedProvisions changes
   useEffect(() => {

@@ -1,10 +1,12 @@
 import { FC, useEffect, useState } from 'react';
-import { getNfrVariablesByVariantDtid } from '../../common/report';
+import { getDocumentVariablesByDocTypeIdDtid } from '../../common/report';
 import VariablesTable, { VariableJson } from '../../components/table/reports/VariablesTable';
+import { DocType } from '../../types/types';
+import { ProvisionData } from './Provisions';
 
 interface VariablesProps {
   dtid: number;
-  variantName: string;
+  documentType: DocType;
   updateHandler: (variableJson: VariableJson[]) => void;
   selectedProvisionIds: number[];
 }
@@ -18,26 +20,30 @@ export type VariableData = {
   update_userid: string;
   create_timestamp: string;
   update_timestamp: string;
-  provisionId: number;
+  provision: ProvisionData;
 };
 
-const Variables: FC<VariablesProps> = ({ dtid, variantName, updateHandler, selectedProvisionIds }) => {
+const Variables: FC<VariablesProps> = ({ dtid, documentType, updateHandler, selectedProvisionIds }) => {
   const [allVariables, setAllVariables] = useState<VariableData[]>([]);
+  const [variableIds, setVariableIds] = useState<number[]>([]);
   const [filteredVariables, setFilteredVariables] = useState<VariableData[]>([]); // provisions in the currently selected group
 
   useEffect(() => {
     const getData = async () => {
-      const variables: VariableData[] = await getNfrVariablesByVariantDtid(variantName, dtid);
-      setAllVariables(variables);
+      const variableData: { variables: VariableData[]; variableIds: number[] } =
+        await getDocumentVariablesByDocTypeIdDtid(documentType.id, dtid);
+      setAllVariables(variableData.variables);
+      setVariableIds(variableIds);
     };
     getData();
-  }, [dtid, variantName]);
+  }, [dtid, documentType]);
 
   useEffect(() => {
-    const filtered: VariableData[] = allVariables.filter((variable) =>
-      selectedProvisionIds.includes(variable.provisionId)
-    );
-    setFilteredVariables(filtered);
+    console.log(allVariables);
+    const filtered: VariableData[] | null = allVariables
+      ? allVariables.filter((variable) => selectedProvisionIds.includes(variable.provision.id))
+      : null;
+    if (filtered) setFilteredVariables(filtered);
   }, [allVariables, selectedProvisionIds]);
 
   return (

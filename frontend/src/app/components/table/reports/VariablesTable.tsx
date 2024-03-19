@@ -28,7 +28,7 @@ const VariablesTable: React.FC<VariablesTableProps> = React.memo(({ variables, u
       variable.id === variableId ? { ...variable, variable_value: newValue } : variable
     );
     const variableJson = updatedVariables.map((variable) => ({
-      provision_id: variable.provisionId,
+      provision_id: variable.provision.id,
       variable_id: variable.id,
       variable_name: variable.variable_name,
       variable_value: variable.variable_value,
@@ -42,7 +42,7 @@ const VariablesTable: React.FC<VariablesTableProps> = React.memo(({ variables, u
       setInitialized(true);
       updateHandler(
         variables.map((variable) => ({
-          provision_id: variable.provisionId,
+          provision_id: variable.provision.id,
           variable_id: variable.id,
           variable_name: variable.variable_name,
           variable_value: variable.variable_value,

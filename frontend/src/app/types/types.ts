@@ -112,13 +112,13 @@ export interface InterestedParties {
   address: string | null;
 }
 
-export type NfrDataVariableObject = {
+export type DocumentDataVariableObject = {
   data_variable_value: string;
   id: number;
-  nfr_variable: NfrVariableObject;
+  provision_variable: ProvisionVariableObject;
 };
 
-export type NfrVariableObject = {
+export type ProvisionVariableObject = {
   id: number;
   variable_name: string;
   variable_value: string;
@@ -129,13 +129,13 @@ export type NfrVariableObject = {
   update_timestamp: string;
 };
 
-export type NfrDataProvisionObject = {
+export type DocumentDataProvisionObject = {
   provision_free_text: string;
   id: number;
-  nfr_provision: NfrProvisionObject;
+  provision: ProvisionObject;
 };
 
-export type NfrProvisionObject = {
+export type ProvisionObject = {
   type: string;
   provision_name: string;
   free_text: string;
@@ -146,6 +146,7 @@ export type NfrProvisionObject = {
   provision_group: number; // will always be null
   id: number;
   help_text: string;
+  order_value: number;
   create_timestamp: string;
   update_timestamp: string;
 };
@@ -157,10 +158,9 @@ export type ProvisionGroup = {
   max: number;
 };
 
-export type NfrDataObject = {
-  nfrData: {
+export type DocumentDataObject = {
+  documentData: {
     dtid: number;
-    variant_name: string;
     template_id: number;
     status: string;
     create_userid: string;
@@ -169,8 +169,9 @@ export type NfrDataObject = {
     active: boolean;
     create_timestamp: string;
     update_timestamp: string;
-    nfr_data_provisions: NfrDataProvisionObject;
-    nfr_data_variables: NfrDataVariableObject;
+    document_data_provisions: DocumentDataProvisionObject;
+    document_data_variables: DocumentDataVariableObject;
+    document_type: any; //
   };
   provisionIds: number[];
   variableIds: number[];
@@ -203,8 +204,9 @@ export type Provision = {
   active_flag: boolean;
   edit: any; // remove from route
   help_text: string;
+  order_value: number;
   id: number;
-  variants: any; // seems to be a string array which gets converted to string and saved in the cell
+  document_type_ids: number[]; //
 };
 
 export type Variable = {
@@ -226,7 +228,8 @@ export type ProvisionUpload = {
   free_text: string;
   help_text: string;
   category: string;
-  variants: any;
+  order_value: number;
+  document_type_ids: number[]; //
 };
 
 export type VariableUpload = {
@@ -243,6 +246,17 @@ export type SearchData = {
   updated_date: string;
   status: string;
   active: boolean;
-  nfr_id: number;
-  variant_name: string;
+  document_data_id: number; //
+  document_type: DocType; //
+};
+
+export type DocType = {
+  id: number;
+  name: string;
+  created_by: string;
+  created_date: string;
+  create_userid: string;
+  update_userid: string;
+  create_timestamp: string;
+  update_timestamp: string;
 };

@@ -19,48 +19,46 @@ export class DocumentTemplateController {
     file: Express.Multer.File,
     @Body() params: CreateDocumentTemplateDto
   ): Promise<any> {
-    console.log('Uploading new template!!!');
-    //
-    const params2 = {
-      document_type: params.document_type,
+    const newDocumentParams: CreateDocumentTemplateDto = {
+      document_type_id: params.document_type_id,
       template_author: params.template_author,
       mime_type: params.mime_type,
       file_name: params.file_name,
       comments: params.comments,
       create_userid: params.create_userid,
     };
-    const newTemplate = await this.templateService.create(params2, file);
+    const newTemplate: DocumentTemplate = await this.templateService.create(newDocumentParams, file);
     return await this.templateService.checkForActiveTemplates({
       id: newTemplate.id,
       update_userid: newTemplate.update_userid,
-      document_type: newTemplate.document_type,
+      document_type_id: params.document_type_id,
     });
   }
 
   @Post('activate-template')
-  activateTemplate(@Body() data: { id: number; update_userid: string; document_type: string }): Promise<any> {
+  activateTemplate(@Body() data: { id: number; update_userid: string; document_type_id: number }): Promise<void> {
     return this.templateService.activateTemplate(data);
   }
 
-  @Post('update')
-  update(@Body() data: UpdateDocumentTemplateDto): Promise<DocumentTemplate> {
-    return this.templateService.update(data);
-  }
+  // @Post('update')
+  // update(@Body() data: UpdateDocumentTemplateDto): Promise<DocumentTemplate> {
+  //   return this.templateService.update(data);
+  // }
 
   @Get('remove/:document_type/:id')
-  remove(@Param('document_type') document_type: string, @Param('id') id: number): Promise<{ id: number }> {
-    return this.templateService.remove(document_type, id);
+  remove(@Param('document_type') document_type_id: number, @Param('id') id: number): Promise<{ id: number }> {
+    return this.templateService.remove(document_type_id, id);
   }
 
-  @Get(':document_type')
-  async findAll(@Param('document_type') document_type: string): Promise<TrimmedDocumentTemplate[]> {
-    let documents: DocumentTemplate[] = await this.templateService.findAll(document_type);
+  @Get(':document_type_id')
+  async findAll(@Param('document_type_id') document_type_id: number): Promise<TrimmedDocumentTemplate[]> {
+    let documents: DocumentTemplate[] = await this.templateService.findAll(document_type_id);
     return documents.map(({ the_file, ...rest }) => rest);
   }
 
   @Get('get-active-report/:document_type')
-  findActiveByDocumentType(@Param('document_type') document_type: string): Promise<DocumentTemplate> {
-    return this.templateService.findActiveByDocumentType(document_type);
+  findActiveByDocumentType(@Param('document_type') document_type_id: number): Promise<DocumentTemplate> {
+    return this.templateService.findActiveByDocumentType(document_type_id);
   }
 
   @Get('find-one/:id')
@@ -68,7 +66,7 @@ export class DocumentTemplateController {
     return this.templateService.findOne(id);
   }
 
-  @Post('nfr-template-info')
+  @Post('document-template-info')
   getTemplatesInfoByIds(@Body() ids: number[]): Promise<any[]> {
     return this.templateService.getTemplatesInfoByIds(ids);
   }

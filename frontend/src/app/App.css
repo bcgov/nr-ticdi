@@ -26,3 +26,8 @@
 .linkButton:hover {
   color: blue;
 }
+
+.removeAdminInput {
+  color: gray;
+  min-width: 270px;
+}

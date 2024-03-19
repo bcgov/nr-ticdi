@@ -10,8 +10,8 @@ import ManageTemplatesPage from './content/pages/ManageTemplatesPage';
 import AdminPage from './content/pages/AdminPage';
 import ContentWrapper from './content/ContentWrapper';
 import SystemAdministration from './content/pages/SystemAdministration';
-import UploadReportsPage from './content/pages/UploadReportsPage';
 import ManageProvisionsPage from './content/pages/ManageProvisionsPage';
+import ManageDocumentsPage from './content/pages/ManageDocumentsPage';
 
 const App: FC = () => {
   // used to render report pages
@@ -47,19 +47,26 @@ const App: FC = () => {
           }
         />
         <Route
-          path={`/manage-templates`}
-          element={
-            <ContentWrapper>
-              <UploadReportsPage />
-            </ContentWrapper>
-          }
-        />
-        ;
-        <Route
           path={`/manage-admins`}
           element={
             <ContentWrapper>
               <AdminPage />
+            </ContentWrapper>
+          }
+        />
+        <Route
+          path={`/manage-doc-types`}
+          element={
+            <ContentWrapper>
+              <ManageDocumentsPage />
+            </ContentWrapper>
+          }
+        />
+        <Route
+          path={`/manage-templates`}
+          element={
+            <ContentWrapper>
+              <ManageTemplatesPage />
             </ContentWrapper>
           }
         />
@@ -71,7 +78,6 @@ const App: FC = () => {
             </ContentWrapper>
           }
         />
-        ;
         {documentTypes.map((docType) => (
           <Route
             key={docType.id}

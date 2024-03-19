@@ -11,5 +11,6 @@ export class UpdateProvisionDto extends PickType(ProvisionDto, [
   'free_text',
   'help_text',
   'category',
+  'order_value',
   'update_userid',
 ] as const) {}

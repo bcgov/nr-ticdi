@@ -1,11 +1,10 @@
 import { FC, useState } from 'react';
-import '../modals.css';
-import { AdminData } from '../../table/admin/AdminDataTable';
+import { AdminData } from '../../../table/admin/AdminDataTable';
 import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import { Col, Row } from 'react-bootstrap';
-import { removeAdmin } from '../../../common/admin';
+import { removeAdmin } from '../../../../common/admin';
 
 type RemoveAdminProps = {
   admin: AdminData;

@@ -23,7 +23,7 @@ const SystemAdministration: React.FC = () => {
         navigate(`/manage-admins`);
         break;
       case 'documentTypes':
-        console.log('Go to Manage Document Types');
+        navigate(`/manage-doc-types`);
         break;
       case 'templates':
         navigate(`/manage-templates`);

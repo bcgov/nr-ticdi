@@ -1,7 +1,7 @@
 import { FC, useState } from 'react';
 // import { REPORT_TYPES } from '../../util/constants';
-import AddAdmin from '../../components/modal/admin/AddAdmin';
-import RemoveAdmin from '../../components/modal/admin/RemoveAdmin';
+import AddAdmin from '../../components/modal/admin/manage-admins/AddAdmin';
+import RemoveAdmin from '../../components/modal/admin/manage-admins/RemoveAdmin';
 // import { useNavigate } from 'react-router-dom';
 import { exportUsers } from '../../common/admin';
 import AdminDataTable, { AdminData } from '../../components/table/admin/AdminDataTable';

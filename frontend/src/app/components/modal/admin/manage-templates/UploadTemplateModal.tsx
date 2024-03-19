@@ -1,6 +1,6 @@
 import { FC, useState } from 'react';
 import Modal from 'react-bootstrap/Modal';
-import { uploadTemplate } from '../../../common/manage-templates';
+import { uploadTemplate } from '../../../../common/manage-templates';
 import { Button } from 'react-bootstrap';
 
 type UploadTemplateModalProps = {

@@ -1,8 +1,7 @@
 import { FC, useState } from 'react';
-import '../modals.css';
 import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
-import { removeTemplate } from '../../../common/manage-templates';
+import { removeTemplate } from '../../../../common/manage-templates';
 
 type RemoveTemplateModalProps = {
   templateId: number;

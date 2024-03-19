@@ -18,6 +18,10 @@ export class DocumentType {
   id: number;
   @Column()
   name: string;
+  @Column({ nullable: true })
+  created_by: string;
+  @Column({ nullable: true })
+  created_date: Date;
   @Column()
   create_userid: string;
   @Column()
@@ -41,8 +45,10 @@ export class DocumentType {
   })
   provision_groups: ProvisionGroup[];
 
-  constructor(name?: string, create_userid?: string, update_userid?: string) {
+  constructor(name?: string, created_by?: string, created_date?: Date, create_userid?: string, update_userid?: string) {
     this.name = name || '';
+    this.created_by = created_by || '';
+    this.created_date = created_date || null;
     this.create_userid = create_userid || '';
     this.update_userid = update_userid || '';
   }

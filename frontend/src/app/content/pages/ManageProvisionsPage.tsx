@@ -2,10 +2,18 @@ import { FC, useEffect, useState } from 'react';
 import ManageProvisionsTable from '../../components/table/manage-templates/ManageProvisionsTable';
 import { Button } from 'react-bootstrap';
 import { DocType, GroupMax, Provision, ProvisionUpload, Variable } from '../../types/types';
-import { addProvision, getGroupMax, getProvisions, getVariables, updateProvision } from '../../common/manage-templates';
-import EditProvisionModal from '../../components/modal/manage-templates/EditProvisionModal';
-import AddProvisionModal from '../../components/modal/manage-templates/AddProvisionModal';
+import {
+  addProvision,
+  getGroupMax,
+  getProvisions,
+  getVariables,
+  removeProvision,
+  updateProvision,
+} from '../../common/manage-templates';
+import EditProvisionModal from '../../components/modal/admin/manage-templates/EditProvisionModal';
+import AddProvisionModal from '../../components/modal/admin/manage-templates/AddProvisionModal';
 import { getDocumentTypes } from '../../common/report';
+import RemoveProvisionModal from '../../components/modal/admin/manage-templates/RemoveProvisionModal';
 
 interface ManageProvisionsPageProps {}
 
@@ -19,6 +27,7 @@ const ManageProvisionsPage: FC<ManageProvisionsPageProps> = () => {
   const [currentProvision, setCurrentProvision] = useState<Provision>();
   const [showEditProvisionModal, setShowEditProvisionModal] = useState<boolean>(false);
   const [showAddProvisionModal, setShowAddProvisionModal] = useState<boolean>(false);
+  const [showRemoveProvisionModal, setShowRemoveProvisionModal] = useState<boolean>(false);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   useEffect(() => {
@@ -48,12 +57,21 @@ const ManageProvisionsPage: FC<ManageProvisionsPageProps> = () => {
     setShowEditProvisionModal(true);
   };
 
+  const openRemoveProvisionModal = (provision: Provision) => {
+    setCurrentProvision(provision);
+    setShowRemoveProvisionModal(true);
+  };
+
   const updateProvisionHandler = async (provisionUpload: ProvisionUpload, provisionId: number) => {
     await updateProvision({ ...provisionUpload, id: provisionId });
   };
 
   const addProvisionHandler = async (provisionUpload: ProvisionUpload) => {
     await addProvision(provisionUpload);
+  };
+  const removeProvisionHandler = async (id: number) => {
+    await removeProvision(id);
+    refreshTables();
   };
 
   const currentVariables = data.allVariables?.filter((v) => v.provision_id === currentProvision?.id) || [];
@@ -66,6 +84,7 @@ const ManageProvisionsPage: FC<ManageProvisionsPageProps> = () => {
         provisions={data.allProvisions}
         variables={data.allVariables}
         editProvisionHandler={openEditProvisionModal}
+        removeProvisionHandler={openRemoveProvisionModal}
       />
       <Button variant="success" onClick={() => setShowAddProvisionModal(true)}>
         Add a Provision
@@ -88,6 +107,12 @@ const ManageProvisionsPage: FC<ManageProvisionsPageProps> = () => {
         onHide={() => setShowAddProvisionModal(false)}
         addProvisionHandler={addProvisionHandler}
         refreshTables={refreshTables}
+      />
+      <RemoveProvisionModal
+        provision={currentProvision}
+        show={showRemoveProvisionModal}
+        onHide={() => setShowRemoveProvisionModal(false)}
+        onRemove={removeProvisionHandler}
       />
     </>
   );

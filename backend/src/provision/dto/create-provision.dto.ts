@@ -11,5 +11,6 @@ export class CreateProvisionDto extends PickType(ProvisionDto, [
   'free_text',
   'help_text',
   'category',
+  'order_value',
   'create_userid',
 ] as const) {}

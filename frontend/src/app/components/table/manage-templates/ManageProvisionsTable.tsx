@@ -9,12 +9,14 @@ interface ManageProvisionsTableProps {
   provisions: Provision[] | undefined;
   variables: Variable[] | undefined;
   editProvisionHandler: (provision: Provision, variables: Variable[]) => void;
+  removeProvisionHandler: (provision: Provision) => void;
 }
 
 const ManageProvisionsTable: React.FC<ManageProvisionsTableProps> = ({
   provisions,
   variables,
   editProvisionHandler,
+  removeProvisionHandler,
 }) => {
   const [allProvisions, setProvisions] = useState<Provision[]>([]);
   const [allVariables, setVariables] = useState<Variable[]>([]);
@@ -76,6 +78,11 @@ const ManageProvisionsTable: React.FC<ManageProvisionsTableProps> = ({
     if (selectedProvision && selectedVariables) editProvisionHandler(selectedProvision, selectedVariables);
   };
 
+  const openRemoveProvisionModal = async (provision: Provision) => {
+    const selectedProvision = allProvisions ? allProvisions.find((p) => p.id === provision.id) : undefined;
+    if (selectedProvision) removeProvisionHandler(selectedProvision);
+  };
+
   const columnHelper = createColumnHelper<Provision>();
 
   const columns: ColumnDef<Provision, any>[] = [
@@ -101,7 +108,7 @@ const ManageProvisionsTable: React.FC<ManageProvisionsTableProps> = ({
       id: 'category',
       cell: (info) => <input value={info.getValue()} className="readonlyInput" readOnly />,
       header: () => 'Category',
-      meta: { customCss: { width: '25%' } },
+      meta: { customCss: { width: '20%' } },
     }),
     columnHelper.accessor('active_flag', {
       id: 'active_flag',
@@ -116,9 +123,15 @@ const ManageProvisionsTable: React.FC<ManageProvisionsTableProps> = ({
       header: () => 'Active',
       meta: { customCss: { width: '5%' } },
     }),
-    columnHelper.accessor('edit', {
+    columnHelper.display({
       id: 'edit',
       cell: (info) => <LinkButton text="Edit" onClick={() => openEditProvisionModal(info.row.original.id)} />,
+      header: () => null,
+      meta: { customCss: { width: '5%' } },
+    }),
+    columnHelper.display({
+      id: 'remove',
+      cell: (info) => <LinkButton text="Remove" onClick={() => openRemoveProvisionModal(info.row.original)} />,
       header: () => null,
       meta: { customCss: { width: '5%' } },
     }),

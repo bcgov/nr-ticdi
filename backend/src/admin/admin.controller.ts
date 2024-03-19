@@ -230,6 +230,7 @@ export class AdminController {
       free_text: string;
       help_text: string;
       category: string;
+      order_value: number;
       variants: number[];
     },
     @Session() session: { data?: SessionData }
@@ -251,11 +252,13 @@ export class AdminController {
       free_text: string;
       help_text: string;
       category: string;
+      order_value: number;
       document_type_ids: number[];
     },
     @Session() session: { data?: SessionData }
   ) {
     const update_userid = session?.data?.activeAccount.idir_username;
+    console.log('order_value: ' + provisionParams.order_value);
     return this.adminService.updateProvision(provisionParams, update_userid);
   }
 

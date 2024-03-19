@@ -64,6 +64,7 @@ export class ProvisionService {
     existingProvision.free_text = provision.free_text;
     existingProvision.help_text = provision.help_text;
     existingProvision.category = provision.category;
+    existingProvision.order_value = provision.order_value;
     existingProvision.update_userid = provision.update_userid;
     existingProvision.document_types = documentTypes;
     const updatedProvision = this.provisionRepository.create({
@@ -121,6 +122,7 @@ export class ProvisionService {
 
   async findAll(): Promise<any[]> {
     const provisions = await this.provisionRepository.find({
+      where: { is_deleted: false },
       relations: ['provision_group', 'document_types'],
     });
     return provisions.map((provision) => {
@@ -153,6 +155,7 @@ export class ProvisionService {
       .innerJoinAndSelect('provision.document_types', 'documentType')
       .innerJoinAndSelect('provision.provision_group', 'provisionGroup')
       .where('documentType.id = :documentTypeId', { documentTypeId: document_type_id })
+      .andWhere('is_deleted = false')
       .getMany();
 
     return provisions;
@@ -165,6 +168,7 @@ export class ProvisionService {
       .innerJoin('provision.document_types', 'documentType', 'documentType.id = :document_type_id', {
         document_type_id,
       })
+      .where('is_deleted = false')
       .getMany();
     if (!provisions.length) {
       return [];
@@ -197,6 +201,7 @@ export class ProvisionService {
         .innerJoinAndSelect('provision.provision_group', 'provision_group')
         .innerJoin('provision_group.document_type', 'document_type')
         .where('document_type.id = :document_type_id', { document_type_id })
+        .andWhere('is_deleted = false')
         .getMany();
 
       return provisions;
@@ -219,6 +224,11 @@ export class ProvisionService {
       active_flag: false,
     });
     return { message: 'Provision Disabled' };
+  }
+
+  async remove(id: number): Promise<any> {
+    await this.provisionRepository.update(id, { is_deleted: true });
+    return { message: 'Provision deleted' };
   }
 
   async getGroupMax(): Promise<any> {
@@ -274,14 +284,14 @@ export class ProvisionService {
     return provisions.map((provision) => provision.id);
   }
 
-  async remove(id: number): Promise<{ deleted: boolean; message?: string }> {
-    try {
-      await this.provisionRepository.delete(id);
-      return { deleted: true };
-    } catch (err) {
-      return { deleted: false, message: err.message };
-    }
-  }
+  // async remove(id: number): Promise<{ deleted: boolean; message?: string }> {
+  //   try {
+  //     await this.provisionRepository.delete(id);
+  //     return { deleted: true };
+  //   } catch (err) {
+  //     return { deleted: false, message: err.message };
+  //   }
+  // }
 
   async updateGroupMaximums(provision_group: number, max: number, provision_group_text: string) {
     let provisionGroup: ProvisionGroup = await this.provisionGroupRepository.findOneBy({

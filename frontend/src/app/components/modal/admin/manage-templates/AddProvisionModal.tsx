@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { DocType, GroupMax, ProvisionUpload } from '../../../types/types';
+import { DocType, GroupMax, ProvisionUpload } from '../../../../types/types';
 import { Button, Col, Form, Modal, Row, Spinner } from 'react-bootstrap';
 
 interface AddProvisionModalProps {
@@ -10,8 +10,6 @@ interface AddProvisionModalProps {
   onHide: () => void;
   refreshTables: () => void;
 }
-
-// TODO - variants to be removed, possibly add ability to assign to multiple document types
 
 const AddProvisionModal: React.FC<AddProvisionModalProps> = ({
   groupMaxArray,
@@ -32,6 +30,7 @@ const AddProvisionModal: React.FC<AddProvisionModalProps> = ({
   const [freeText, setFreeText] = useState<string>('');
   const [helpText, setHelpText] = useState<string>('');
   const [category, setCategory] = useState<string>('');
+  const [order, setOrder] = useState<number>(1);
   const [documentTypeIds, setDocumentTypeIds] = useState<number[]>([]);
 
   useEffect(() => {
@@ -106,6 +105,10 @@ const AddProvisionModal: React.FC<AddProvisionModalProps> = ({
     setCategory(e.target.value);
   };
 
+  const handleOrderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setOrder(parseInt(e.target.value));
+  };
+
   const handleDocumentTypeIdUpdate = (e: React.ChangeEvent<HTMLInputElement>) => {
     const documentTypeId: number = parseInt(e.target.value);
     if (e.target.checked) {
@@ -129,6 +132,7 @@ const AddProvisionModal: React.FC<AddProvisionModalProps> = ({
           free_text: freeText,
           help_text: helpText,
           category: category,
+          order_value: order,
           document_type_ids: documentTypeIds,
         };
         addProvisionHandler(provisionUpload);
@@ -169,9 +173,8 @@ const AddProvisionModal: React.FC<AddProvisionModalProps> = ({
             <Col sm={12}>
               <Form.Select value="O" className="form-control" onChange={handleTypeChange}>
                 <option value="O">O</option>
-                <option value="V">V</option>
-                <option value="B">B</option>
                 <option value="M">M</option>
+                <option value="B">B</option>
               </Form.Select>
             </Col>
           </Form.Group>
@@ -255,6 +258,14 @@ const AddProvisionModal: React.FC<AddProvisionModalProps> = ({
             </Form.Label>
             <Col sm="12">
               <Form.Control type="text" name="category" onChange={handleCategoryTextChange} />
+            </Col>
+          </Form.Group>
+          <Form.Group className="mb-3">
+            <Form.Label column sm="12">
+              Order
+            </Form.Label>
+            <Col sm="12">
+              <Form.Control type="number" name="order" defaultValue={order} onChange={handleOrderChange} />
             </Col>
           </Form.Group>
         </Form>

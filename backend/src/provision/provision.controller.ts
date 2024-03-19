@@ -95,7 +95,7 @@ export class ProvisionController {
     return this.provisionService.getMandatoryProvisions();
   }
 
-  @Delete(':id')
+  @Get('remove/:id')
   remove(@Param('id') id: number) {
     return this.provisionService.remove(id);
   }

@@ -29,7 +29,11 @@ export class Provision {
   @Column({ nullable: true })
   category: string;
   @Column({ nullable: true })
+  order_value: number;
+  @Column({ nullable: true })
   active_flag: boolean;
+  @Column({ nullable: true })
+  is_deleted: boolean;
   @Column({ nullable: true })
   create_userid: string;
   @Column({ nullable: true })
@@ -70,6 +74,7 @@ export class Provision {
     free_text?: string,
     category?: string,
     active_flag?: boolean,
+    order_value?: number,
     create_userid?: string,
     update_userid?: string,
     provision_group?: ProvisionGroup
@@ -78,9 +83,11 @@ export class Provision {
     this.provision_name = provision_name || '';
     this.free_text = free_text || '';
     this.category = category || '';
-    this.active_flag = active_flag;
+    this.active_flag = active_flag || true;
+    this.order_value = order_value || null;
     this.create_userid = create_userid || '';
     this.update_userid = update_userid || '';
     this.provision_group = provision_group || null;
+    this.is_deleted = false;
   }
 }

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
-import { DocType, GroupMax, Provision, ProvisionUpload, Variable } from '../../../../types/types';
+import { DocType, GroupMax, Provision, ProvisionUpload, Variable } from '../../../../../types/types';
 import { Button, Col, Form, Modal, Row, Spinner } from 'react-bootstrap';
-import ManageVariablesTable from '../../../table/manage-templates/ManageVariablesTable';
+import ManageVariablesTable from '../../../../table/manage-templates/ManageVariablesTable';
 
 interface EditProvisionModalFormProps {
   provision: Provision | undefined;
@@ -38,6 +38,7 @@ const EditProvisionModalForm: React.FC<EditProvisionModalFormProps> = ({
   const [freeText, setFreeText] = useState<string>('');
   const [helpText, setHelpText] = useState<string>('');
   const [category, setCategory] = useState<string>('');
+  const [order, setOrder] = useState<number | undefined>();
   const [documentTypeIds, setDocumentTypeIds] = useState<number[]>([]);
 
   useEffect(() => {
@@ -54,6 +55,8 @@ const EditProvisionModalForm: React.FC<EditProvisionModalFormProps> = ({
         setFreeText(provision.free_text);
         setHelpText(provision.help_text);
         setCategory(provision.category);
+        setOrder(provision.order_value);
+        console.log('setOrder:' + provision.order_value);
         provision.document_type_ids ? setDocumentTypeIds(provision.document_type_ids) : setDocumentTypeIds([]);
       }
     };
@@ -133,6 +136,10 @@ const EditProvisionModalForm: React.FC<EditProvisionModalFormProps> = ({
     setCategory(e.target.value);
   };
 
+  const handleOrderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setOrder(parseInt(e.target.value));
+  };
+
   const handleDocumentTypeIdUpdate = (e: React.ChangeEvent<HTMLInputElement>) => {
     const documentTypeId: number = parseInt(e.target.value);
     if (e.target.checked) {
@@ -154,6 +161,7 @@ const EditProvisionModalForm: React.FC<EditProvisionModalFormProps> = ({
         free_text: freeText,
         help_text: helpText,
         category: category,
+        order_value: order ? order : 1,
         document_type_ids: documentTypeIds,
       };
       updateProvisionHandler(provisionUpload, provision.id);
@@ -178,9 +186,8 @@ const EditProvisionModalForm: React.FC<EditProvisionModalFormProps> = ({
             <Col sm={12}>
               <Form.Select value={type} className="form-control" onChange={handleTypeChange}>
                 <option value="O">O</option>
-                <option value="V">V</option>
-                <option value="B">B</option>
                 <option value="M">M</option>
+                <option value="B">B</option>
               </Form.Select>
             </Col>
           </Form.Group>
@@ -280,6 +287,15 @@ const EditProvisionModalForm: React.FC<EditProvisionModalFormProps> = ({
             </Form.Label>
             <Col sm="12">
               <Form.Control type="text" defaultValue={category} name="category" onChange={handleCategoryTextChange} />
+            </Col>
+          </Form.Group>
+
+          <Form.Group className="mb-3">
+            <Form.Label column sm="12">
+              Order
+            </Form.Label>
+            <Col sm="12">
+              <Form.Control type="number" name="order" defaultValue={order} onChange={handleOrderChange} />
             </Col>
           </Form.Group>
         </Form>

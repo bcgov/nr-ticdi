@@ -89,6 +89,14 @@ export const addProvision = async (data: ProvisionUpload): Promise<void> => {
   console.log(response);
 };
 
+export const removeProvision = async (id: number): Promise<void> => {
+  const url = `${config.API_BASE_URL}/provision/remove/${id}`;
+  const getParameters = api.generateApiParameters(url);
+  const response = await api.get<void>(getParameters);
+  console.log('removeProvision response');
+  console.log(response);
+};
+
 export const updateProvision = async (data: ProvisionUpload & { id: number }): Promise<void> => {
   const url = `${config.API_BASE_URL}/admin/update-provision`;
   const postParameters = api.generateApiParameters(url, data);

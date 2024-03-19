@@ -1,5 +1,5 @@
 import { Button, Modal, Spinner } from 'react-bootstrap';
-import { Variable } from '../../../../types/types';
+import { Variable } from '../../../../../types/types';
 
 interface RemoveVariableModalFormProps {
   variable: Variable | undefined;

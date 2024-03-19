@@ -56,7 +56,6 @@ const EditProvisionModalForm: React.FC<EditProvisionModalFormProps> = ({
         setHelpText(provision.help_text);
         setCategory(provision.category);
         setOrder(provision.order_value);
-        console.log('setOrder:' + provision.order_value);
         provision.document_type_ids ? setDocumentTypeIds(provision.document_type_ids) : setDocumentTypeIds([]);
       }
     };

@@ -679,18 +679,26 @@ export class ReportService {
     // combine the formatted TTLS data, variables, and provision sections
     const data = Object.assign({}, ttlsData, variables, showProvisionSections);
 
+    // Save the NFR Data
+    const documentData = await this.saveDocument(
+      dtid,
+      document_type_id,
+      'Complete',
+      provisionJson,
+      variableJson,
+      idirUsername
+    );
+
     // Log the request
     await this.documentDataLogService.create({
       dtid: dtid,
       document_type_id: document_type_id,
+      document_data_id: documentData.id,
       document_template_id: documentTemplateObject?.id,
       request_app_user: idirUsername,
       request_json: JSON.stringify(data),
       create_userid: idirUsername,
     });
-
-    // Save the NFR Data
-    await this.saveDocument(dtid, document_type_id, 'Complete', provisionJson, variableJson, idirUsername);
 
     // Generate the report
     const cdogsToken = await this.ttlsService.callGetToken();

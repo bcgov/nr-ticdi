@@ -12,9 +12,8 @@ interface ProvisionsProps {
   updateSelectedProvisionIds: (selectedProvisionIds: number[]) => void;
 }
 
-// TODO - variants are being removed, provisions will now have an array of document types instead of variants
-
 export type ProvisionData = {
+  id: number;
   type: string;
   provision_name: string;
   free_text: string;
@@ -22,13 +21,13 @@ export type ProvisionData = {
   active_flag: boolean;
   create_userid: string;
   update_userid: string;
-  id: number;
   help_text: string;
   create_timestamp: string;
   update_timestamp: string;
   select: boolean;
   max: number;
-  provision_group: number;
+  provision_group: ProvisionGroup;
+  is_deleted: boolean;
 };
 
 const Provisions: FC<ProvisionsProps> = ({
@@ -38,28 +37,22 @@ const Provisions: FC<ProvisionsProps> = ({
   updateHandler,
   updateSelectedProvisionIds,
 }) => {
-  const [documentData, setDocumentData] = useState<DocumentDataObject | null>(null);
   const [selectedProvisionIds, setSelectedProvisionIds] = useState<number[]>([]);
   const [selectedProvisionGroup, setSelectedProvisionGroup] = useState<number | null>(null);
   const [selectedProvisionGroupMax, setSelectedProvisionGroupMax] = useState<number | null>(null);
   const [viewedProvisionGroups, setViewedProvisionGroups] = useState<Set<number>>(new Set());
 
-  // Fetch NFR data if we are on the NFR page
   useEffect(() => {
     const fetchData = async () => {
-      if (documentType && documentType.name) {
-        if (dtid) {
-          const documentData: DocumentDataObject = await getDocumentDataByDocTypeIdAndDtid(documentType.id, dtid);
-          console.log(documentData);
-          if (documentData) {
-            setDocumentData(documentData);
-            setSelectedProvisionIds(documentData.provisionIds);
-          }
+      if (dtid && documentType && documentType.id) {
+        const documentData: DocumentDataObject = await getDocumentDataByDocTypeIdAndDtid(documentType.id, dtid);
+        if (documentData) {
+          setSelectedProvisionIds(documentData.provisionIds);
         }
       }
     };
     fetchData();
-  }, [dtid, documentType]);
+  }, [dtid, documentType.id]);
 
   const handleProvisionGroupChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const value = parseInt(event.target.value);

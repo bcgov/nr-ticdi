@@ -32,7 +32,9 @@ const SelectedProvisionsTable: React.FC<SelectedProvisionsTableTableProps> = ({
   // grab all provisions
   useEffect(() => {
     const fetchData = async () => {
-      setAllProvisions(await getDocumentProvisionsByDocTypeIdDtid(docType.id, dtid));
+      const provisionData: { provisions: ProvisionData[]; provisionIds: number[] } =
+        await getDocumentProvisionsByDocTypeIdDtid(docType.id, dtid);
+      setAllProvisions(provisionData.provisions);
     };
     fetchData();
   }, [docType, dtid]);
@@ -55,7 +57,7 @@ const SelectedProvisionsTable: React.FC<SelectedProvisionsTableTableProps> = ({
     const collectProvisionData = () => {
       const provisionJson: ProvisionJson[] = selectedProvisions.map((provision) => ({
         provision_id: provision.id,
-        provision_group: provision.provision_group,
+        provision_group: provision.provision_group.provision_group,
         provision_name: provision.provision_name,
         free_text: provision.free_text,
       }));
@@ -75,7 +77,7 @@ const SelectedProvisionsTable: React.FC<SelectedProvisionsTableTableProps> = ({
     }),
     columnHelper.accessor('provision_group', {
       id: 'provision_group',
-      cell: (info) => <input value={info.getValue()} className="readonlyInput" readOnly />,
+      cell: (info) => <input value={info.getValue().provision_group} className="readonlyInput" readOnly />,
       header: () => 'Group',
       meta: { customCss: { width: '5%' } },
     }),

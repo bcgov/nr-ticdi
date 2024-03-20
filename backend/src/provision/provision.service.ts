@@ -199,16 +199,15 @@ export class ProvisionService {
       const provisions: Provision[] = await this.provisionRepository
         .createQueryBuilder('provision')
         .innerJoinAndSelect('provision.provision_group', 'provision_group')
-        .innerJoin('provision_group.document_type', 'document_type')
-        .where('document_type.id = :document_type_id', { document_type_id })
-        .andWhere('is_deleted = false')
+        .innerJoin('provision.document_types', 'document_type', 'document_type.id = :document_type_id', {
+          document_type_id,
+        })
+        .where('provision.is_deleted = false')
         .getMany();
-
       return provisions;
     } catch (err) {
-      console.log('Error in getAllProvisionsByDocTypeId');
-      console.log(err);
-      return null;
+      console.error('Error in getAllProvisionsByDocTypeId', err);
+      return [];
     }
   }
 

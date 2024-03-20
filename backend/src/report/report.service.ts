@@ -11,6 +11,7 @@ import { DocumentDataService } from 'src/document_data/document_data.service';
 import { DocumentTemplate } from 'src/document_template/entities/document_template.entity';
 import { DocumentDataLogService } from 'src/document_data_log/document_data_log.service';
 import { DocumentTypeService } from 'src/document_type/document_type.service';
+import { Provision } from 'src/provision/entities/provision.entity';
 const axios = require('axios');
 
 // generate report needs to be consolidated which is impossible until we figure out how provisions & variables will be dynamically inserted into the docx files
@@ -750,54 +751,11 @@ export class ReportService {
     return response2.data;
   }
 
-  async getDocumentProvisionsByDocTypeIdAndDtid(document_type_id: number, dtid: number): Promise<any> {
-    const returnItems = [
-      'type',
-      'provision_name',
-      'help_text',
-      'free_text',
-      'category',
-      'provision_group',
-      'id',
-      'mandatory',
-    ];
-    let reduced, provisions;
-    // nfrDataId exists so return a list of provisions with pre-existing free_text data inserted, certain provisions preselected
-    const documentProvisions = await this.documentDataService.getProvisionsByDocTypeIdAndDtid(document_type_id, dtid);
-    if (documentProvisions) {
-      const provisionIds = documentProvisions.provisionIds;
-      provisions = documentProvisions.provisions;
-      reduced = provisions.map((obj) => {
-        if (provisionIds.includes(obj.id)) {
-          obj.select = true;
-        } else {
-          obj.select = false;
-        }
-        return obj;
-      });
-    } else {
-      // no nfrDataId so just return generic provisions with all of them deselected by default
-      provisions = await this.provisionService.getProvisionsByDocumentTypeId(document_type_id);
-      reduced = provisions.map((obj) =>
-        Object.keys(obj)
-          .filter((key) => returnItems.includes(key))
-          .reduce(
-            (acc, key) => {
-              acc[key] = obj[key];
-              return acc;
-            },
-            { select: false }
-          )
-      );
-    }
-    // make the returned data readable for the ajax request
-    return reduced.map((obj) => {
-      const groupObj = obj.provision_group;
-      delete obj['provision_group'];
-      obj['max'] = groupObj.max;
-      obj['provision_group'] = groupObj.provision_group;
-      return obj;
-    });
+  async getDocumentProvisionsByDocTypeIdAndDtid(
+    document_type_id: number,
+    dtid: number
+  ): Promise<{ provisions: Provision[]; provisionIds: number[] }> {
+    return this.documentDataService.getProvisionsByDocTypeIdAndDtid(document_type_id, dtid);
   }
 
   getGroupMaxByDocTypeId(document_type_id: number): Promise<any> {
@@ -856,32 +814,6 @@ export class ReportService {
 
   async getDocumentDataByDocTypeIdAndDtid(document_type_id: number, dtid: number): Promise<any> {
     return this.documentDataService.findDocumentDataByDocTypeIdAndDtid(document_type_id, dtid);
-    // const url = `${hostname}:${port}/document-data/dtid/${dtid}`;
-    // const response = await axios
-    //   .get(url, {
-    //     headers: {
-    //       'Content-Type': 'application/json',
-    //     },
-    //   })
-    //   .then((res) => {
-    //     return res.data;
-    //   });
-    // // const documentData = await this.documentDataService.findActiveByDtid(dtid);
-    // // console.log('!!!~~~~~~~~');
-    // // console.log("this.getGroupMaxByVariant('NOTICE OF FINAL REVIEW')");
-    // // const groupMax = await this.getGroupMaxByVariant('NOTICE OF FINAL REVIEW');
-    // // // console.log(groupMax);
-    // // console.log('\ngetActiveNfrDataByDtid');
-    // // console.log(response);
-    // // console.log('\ndocument_data_provisions');
-    // // // console.log(response.nfrData.document_data_provisions);
-    // // console.log('\ndocument_data_variables');
-    // // // console.log(response.nfrData.document_data_variables);
-    // // console.log('\nthis.getMandatoryProvisionsByVariant(NOTICE OF FINAL REVIEW)');
-    // // const mandatoryProvisions = await this.getMandatoryProvisionsByVariant('NOTICE OF FINAL REVIEW');
-    // // // console.log(mandatoryProvisions);
-    // // console.log('~~~~~~~~!!!');
-    // return response;
   }
 
   // async saveNFR(
@@ -928,7 +860,7 @@ export class ReportService {
     const data = {
       dtid: dtid,
       document_type_id: document_type_id,
-      template_id: documentTemplate.id,
+      template_id: documentTemplate ? documentTemplate.id : null,
       status: status,
       create_userid: idir_username,
       ttls_data: [],

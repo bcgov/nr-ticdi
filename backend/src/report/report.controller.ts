@@ -38,23 +38,21 @@ export class ReportController {
     };
   }
 
-  // @Get('get-data/:dtid')
-  // async getData(@Session() session: { data?: SessionData }, @Param('dtid') dtid: number) {
-  //   console.log(dtid);
-  //   console.log(session);
-  //   await this.reportService.getTtlsDataByDtid(dtid);
-  //   await this.ttlsService.setWebadeToken();
-  //   const response: any = await firstValueFrom(this.ttlsService.callHttp(dtid))
-  //     .then((res) => {
-  //       return res;
-  //     })
-  //     .catch((err) => {
-  //       console.log('callHttp failed');
-  //       console.log(err);
-  //       console.log(err.response.data);
-  //     });
-  //   return response;
-  // }
+  // Gets data from ttls route for displaying on report page
+  @Get('get-data/:dtid')
+  async getData(@Session() session: { data?: SessionData }, @Param('dtid') dtid: number) {
+    await this.ttlsService.setWebadeToken();
+    const response: any = await firstValueFrom(this.ttlsService.callHttp(dtid))
+      .then((res) => {
+        return res;
+      })
+      .catch((err) => {
+        console.log('callHttp failed');
+        console.log(err);
+        console.log(err.response.data);
+      });
+    return response;
+  }
 
   @Get('get-document-data/:document_type_id/:dtid')
   getDocumentDataByDocTypeIdAndDtid(
@@ -62,7 +60,6 @@ export class ReportController {
     @Param('document_type_id') document_type_id: number,
     @Param('dtid') dtid: number
   ) {
-    console.log('get-document-data ~ dtid:' + dtid + ', doctypeid: ' + document_type_id);
     return this.reportService.getDocumentDataByDocTypeIdAndDtid(document_type_id, dtid);
   }
 

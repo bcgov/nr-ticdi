@@ -7,29 +7,20 @@ import { DTR, DTRDisplayObject, DocType, DocumentDataObject, ProvisionGroup } fr
 import { buildDTRDisplayData } from '../util/util';
 import * as api from './api';
 
-// /**
-//  * Gets ttls data and parses it for displaying
-//  *
-//  * @param dtid
-//  * @returns
-//  */
-// export async function getData(dtid: number): Promise<DTRDisplayObject> {
-//   const dataUrl = `${config.API_BASE_URL}/report/get-data/${dtid}`;
-
-//   const data: DTR = await api.get({ url: dataUrl });
-//   const displayData = buildDTRDisplayData(data);
-//   return displayData;
-// }
-
-export async function getData(document_type_id: number, dtid: number): Promise<DTRDisplayObject> {
-  const dataUrl = `${config.API_BASE_URL}/report/get-document-data/${document_type_id}/${dtid}`;
-  const data: DTR = await api.get({ url: dataUrl });
-  console.log(data);
+/**
+ * Gets ttls data and parses it for displaying
+ *
+ * @param dtid
+ * @returns
+ */
+export async function getDisplayData(dtid: number): Promise<DTRDisplayObject> {
+  const url = `${config.API_BASE_URL}/report/get-data/${dtid}`;
+  const getParameters = api.generateApiParameters(url);
+  const data: DTR = await api.get<DTR>(getParameters);
   const displayData = buildDTRDisplayData(data);
   return displayData;
 }
 
-/** Section for Notice of Final Review which has lots of custom logic */
 export const getDocumentDataByDocTypeIdAndDtid = async (document_type_id: number, dtid: number) => {
   const url = `${config.API_BASE_URL}/report/get-document-data/${document_type_id}/${dtid}`;
   const getParameters = api.generateApiParameters(url);
@@ -54,10 +45,13 @@ export const getMandatoryProvisionsByDocTypeId = async (document_type_id: number
 export const getDocumentProvisionsByDocTypeIdDtid = async (
   document_type_id: number,
   dtid: number
-): Promise<ProvisionData[]> => {
+): Promise<{ provisions: ProvisionData[]; provisionIds: number[] }> => {
   const url = `${config.API_BASE_URL}/report/provisions/${document_type_id}/${dtid}`;
   const getParameters = api.generateApiParameters(url);
-  const response: ProvisionData[] = await api.get<ProvisionData[]>(getParameters);
+  const response: { provisions: ProvisionData[]; provisionIds: number[] } = await api.get<{
+    provisions: ProvisionData[];
+    provisionIds: number[];
+  }>(getParameters);
   return response;
 };
 

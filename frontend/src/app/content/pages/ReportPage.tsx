@@ -1,16 +1,17 @@
 import { FC, useCallback, useEffect, useState } from 'react';
 import Collapsible from '../../../app/components/common/Collapsible';
-import { DTRDisplayObject, DocType, ProvisionGroup } from '../../../app/types/types';
+import { DTRDisplayObject, DocType, DocumentDataObject, ProvisionGroup } from '../../../app/types/types';
 import TenureDetails from '../display/TenureDetails';
 import AreaDetails from '../display/AreaDetails';
 import DtidDetails from '../display/DtidDetails';
 import {
   generateReport,
-  getData,
+  getDisplayData,
   getDocumentProvisionsByDocTypeIdDtid,
   saveDocument,
   getMandatoryProvisionsByDocTypeId,
   getGroupMaxByDocTypeId,
+  getDocumentDataByDocTypeIdAndDtid,
 } from '../../common/report';
 import { CURRENT_REPORT_PAGES } from '../../util/constants';
 import InterestedParties from '../display/InterestedParties';
@@ -39,33 +40,39 @@ const ReportPage: FC<ReportPageProps> = ({ documentType }) => {
   const [selectedProvisionIds, setSelectedProvisionIds] = useState<number[]>([]);
   const [mandatoryProvisionIds, setMandatoryProvisionIds] = useState<number[]>([]);
   const [provisionGroups, setProvisionGroups] = useState<ProvisionGroup[]>([]);
-
   useEffect(() => {
     const fetchData = async () => {
-      if (dtidNumber) {
-        try {
-          setLoading(true);
-          const fetchedData: DTRDisplayObject = await getData(documentType.id, dtidNumber);
-          setData(fetchedData);
-          const fetchProvisions: ProvisionData[] = await getDocumentProvisionsByDocTypeIdDtid(
-            documentType.id,
-            dtidNumber
-          );
-          setAllProvisions(fetchProvisions);
-          const mpIds: number[] = await getMandatoryProvisionsByDocTypeId(documentType.id);
-          setMandatoryProvisionIds(mpIds);
-          const provisionGroupsObject: ProvisionGroup[] = await getGroupMaxByDocTypeId(documentType.id);
-          setProvisionGroups(provisionGroupsObject);
-        } catch (error) {
-          console.error('Failed to fetch data', error);
-          setData(null);
-        } finally {
-          setLoading(false);
-        }
+      if (!dtidNumber) return;
+      try {
+        setLoading(true);
+        // Fetch any existing documentData
+        const displayData: DTRDisplayObject = await getDisplayData(dtidNumber);
+        setData(displayData);
+        // provisions, will be validated against
+        const fetchProvisions: { provisions: ProvisionData[]; provisionIds: number[] } =
+          await getDocumentProvisionsByDocTypeIdDtid(documentType.id, dtidNumber);
+        setAllProvisions(fetchProvisions.provisions);
+        const activeProvisionIDs = new Set(
+          fetchProvisions.provisions
+            .filter((provision) => provision.active_flag && !provision.is_deleted)
+            .map((provision) => provision.provision_group.id)
+        );
+        // mandatory provisions, will be validated against
+        const mpIds: number[] = await getMandatoryProvisionsByDocTypeId(documentType.id);
+        setMandatoryProvisionIds(mpIds);
+        // get provision groups and filter out the empty ones
+        const provisionGroupsObject: ProvisionGroup[] = await getGroupMaxByDocTypeId(documentType.id);
+        const activeProvisionGroups = provisionGroupsObject.filter((group) => activeProvisionIDs.has(group.id));
+        setProvisionGroups(activeProvisionGroups);
+      } catch (error) {
+        console.error('Failed to fetch data', error);
+        setData(null);
+      } finally {
+        setLoading(false);
       }
     };
     fetchData();
-  }, [dtidNumber, documentType]);
+  }, [dtidNumber, documentType.id]);
 
   const handleGenerateReport = () => {
     if (dtidNumber) {
@@ -98,6 +105,8 @@ const ReportPage: FC<ReportPageProps> = ({ documentType }) => {
   }, []);
 
   const updateVariableArray = useCallback((variableJsonData: VariableJson[]) => {
+    console.log('variableJsonData');
+    console.log(variableJsonData);
     // used for saving
     setVariableArray(
       variableJsonData.map((variable) => {
@@ -124,6 +133,9 @@ const ReportPage: FC<ReportPageProps> = ({ documentType }) => {
   }, []);
 
   const handleDocumentSave = () => {
+    console.log('saving...');
+    console.log('variableArray');
+    console.log(variableArray);
     const saveData = async () => {
       if (dtidNumber) {
         try {

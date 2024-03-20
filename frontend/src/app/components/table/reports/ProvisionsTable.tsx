@@ -29,7 +29,9 @@ const ProvisionsTable: React.FC<ProvisionsTableProps> = ({
   // get data
   useEffect(() => {
     const fetchData = async () => {
-      setAllProvisions(await getDocumentProvisionsByDocTypeIdDtid(docType.id, dtid));
+      const fetchedProvisions: { provisions: ProvisionData[]; provisionIds: number[] } =
+        await getDocumentProvisionsByDocTypeIdDtid(docType.id, dtid);
+      setAllProvisions(fetchedProvisions.provisions);
     };
 
     fetchData();
@@ -37,8 +39,14 @@ const ProvisionsTable: React.FC<ProvisionsTableProps> = ({
 
   // filter based on current group
   useEffect(() => {
-    let filtered = allProvisions.filter((provision) => provision.provision_group === currentGroupNumber);
-    setFilteredProvisions(filtered);
+    if (allProvisions) {
+      console.log('allProvisions');
+      console.log(allProvisions);
+      const filtered = allProvisions.filter(
+        (provision) => provision.provision_group.provision_group === currentGroupNumber
+      );
+      setFilteredProvisions(filtered);
+    }
   }, [allProvisions, currentGroupNumber]);
 
   // xor logic for the two provisions which can't be selected at the same time.

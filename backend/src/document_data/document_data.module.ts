@@ -10,6 +10,7 @@ import { DocumentDataVariable } from './entities/document_data_variable.entity';
 import { DocumentDataController } from './document_data.controller';
 import { DocumentDataService } from './document_data.service';
 import { DocumentDataLog } from 'src/document_data_log/entities/document_data_log.entity';
+import { DocumentTypeModule } from 'src/document_type/document_type.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { DocumentDataLog } from 'src/document_data_log/entities/document_data_lo
     TypeOrmModule.forFeature([Provision]),
     ProvisionModule,
     DocumentTemplateModule,
+    DocumentTypeModule,
   ],
   controllers: [DocumentDataController],
   providers: [DocumentDataService],

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import {
-  getData,
+  getDisplayData,
   getDocumentProvisionsByDocTypeIdDtid,
   getDocumentVariablesByDocTypeIdDtid,
 } from '../../../common/report';
@@ -104,7 +104,7 @@ const DocumentPreview: React.FC = () => {
   };
 
   const fetchData = async () => {
-    const nfrData = (await getData(1, parseInt(dtid))) as DocumentPreviewResponse;
+    const nfrData = (await getDisplayData(parseInt(dtid))) as DocumentPreviewResponse;
     if (nfrData) {
       setDocumentPreviewResponse(nfrData);
       const dataProvisions = await getDocumentProvisionsByDocTypeIdDtid(1, 928437);

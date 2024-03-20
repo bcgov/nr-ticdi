@@ -12,6 +12,7 @@ import ContentWrapper from './content/ContentWrapper';
 import SystemAdministration from './content/pages/SystemAdministration';
 import ManageProvisionsPage from './content/pages/ManageProvisionsPage';
 import ManageDocumentsPage from './content/pages/ManageDocumentsPage';
+import DocumentPreview from './content/pages/documentpreview/DocumentPreview';
 
 const App: FC = () => {
   // used to render report pages
@@ -29,6 +30,14 @@ const App: FC = () => {
     <Router>
       <Header idirUsername="Michael" isAdmin={true} />
       <Routes>
+        <Route
+          path={`/`}
+          element={
+            <ContentWrapper>
+              <DocumentPreview />
+            </ContentWrapper>
+          }
+        />
         <Route
           path={`/search`}
           element={

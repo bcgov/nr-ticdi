@@ -11,6 +11,7 @@ import { DocumentDataView } from './entities/document_data_vw';
 import { ProvisionService } from 'src/provision/provision.service';
 import { DocumentTemplateService } from 'src/document_template/document_template.service';
 import { DocumentType } from 'src/document_type/entities/document_type.entity';
+import { DocumentTypeService } from 'src/document_type/document_type.service';
 
 @Injectable()
 export class DocumentDataService {
@@ -27,6 +28,7 @@ export class DocumentDataService {
     private documentDataVariableRepository: Repository<DocumentDataVariable>,
     private provisionService: ProvisionService,
     private documentTemplateService: DocumentTemplateService,
+    private documentTypeService: DocumentTypeService,
     private dataSource: DataSource
   ) {}
 
@@ -35,8 +37,8 @@ export class DocumentDataService {
     provisionArray: { provision_id: number; free_text: string }[],
     variableArray: { variable_id: number; variable_value: string }[]
   ): Promise<DocumentData> {
+    console.log(variableArray);
     const { dtid, document_type_id } = documentDataDto;
-    // const documentType: DocumentType = await this.documentTemplateService.getDocumentType(document_type_id);
     const documentData: DocumentData = await this.documentDataRepository.findOne({
       where: { dtid: dtid, document_type: { id: document_type_id } },
       relations: [
@@ -73,6 +75,8 @@ export class DocumentDataService {
       documentDataDto.document_type_id
     );
     documentDataDto['template_id'] = documentTemplate ? documentTemplate.id : null;
+    documentDataDto['document_type'] = await this.documentTypeService.findById(document_type_id);
+    delete documentDataDto['document_type_id'];
     const newDocumentData: DocumentData = this.documentDataRepository.create(documentDataDto);
     const updatedDocumentData = await this.documentDataRepository.save(newDocumentData);
 
@@ -252,34 +256,31 @@ export class DocumentDataService {
     provisionIds: number[];
     variableIds: number[];
   }> {
+    console.log(`document_type_id: ${document_type_id}, dtid: ${dtid}`);
     try {
       const documentData = await this.documentDataRepository.find({
         where: { dtid: dtid },
-        join: {
-          alias: 'document_data',
-          leftJoinAndSelect: {
-            document_data_provisions: 'document_data.document_data_provisions',
-            document_provision: 'document_data_provisions.document_provision',
-            document_data_variables: 'document_data.document_data_variables',
-            document_variable: 'document_data_variables.document_variable',
+        relations: {
+          document_data_provisions: {
+            document_provision: true,
           },
+          document_data_variables: {
+            document_variable: true,
+          },
+          document_type: true,
         },
       });
-      const filteredDocumentData = documentData.find((d) => d.document_type.id === document_type_id);
-      console.log(filteredDocumentData);
+      const filteredDocumentData = documentData.find((d) => d.document_type && d.document_type.id === document_type_id);
       const provisionIds =
-        filteredDocumentData && filteredDocumentData.document_data_provisions
-          ? filteredDocumentData.document_data_provisions.map((dataProvision) => dataProvision.document_provision.id)
-          : [];
+        filteredDocumentData?.document_data_provisions?.map((dataProvision) => dataProvision.document_provision.id) ??
+        [];
       const variableIds =
-        filteredDocumentData && filteredDocumentData.document_data_variables
-          ? filteredDocumentData.document_data_variables.map((dataVariable) => dataVariable.document_variable.id)
-          : [];
-      return { documentData: filteredDocumentData, provisionIds, variableIds };
+        filteredDocumentData?.document_data_variables?.map((dataVariable) => dataVariable.document_variable.id) ?? [];
+      return { documentData: filteredDocumentData || null, provisionIds, variableIds };
     } catch (err) {
-      console.log('Error in findActiveByDtid');
+      console.log('Error in findDocumentDataByDocTypeIdAndDtid');
       console.log(err);
-      return null;
+      return { documentData: null, provisionIds: [], variableIds: [] };
     }
   }
 
@@ -336,17 +337,11 @@ export class DocumentDataService {
         .where('document_data.dtid = :dtid', { dtid })
         .andWhere('document_data."documentTypeId"  = :document_type_id', { document_type_id })
         .getOne();
-      console.log(documentData);
-
-      // if the documentData doesn't exist yet, return null. This null value is caught elsewhere.
-      if (!documentData) {
-        return null;
-      }
 
       // saved provisions attached to the dtid
       const existingDataProvisions: DocumentDataProvision[] = [];
-      existingDataProvisions.push(...documentData.document_data_provisions);
-      // all provisions
+      if (documentData) existingDataProvisions.push(...documentData.document_data_provisions);
+      // all provisions with the specified document_type_id
       const provisions: Provision[] = await this.provisionService.getAllProvisionsByDocTypeId(document_type_id);
       const provisionIds = existingDataProvisions.map((dataProvision) => dataProvision.document_provision.id);
       return { provisions, provisionIds };

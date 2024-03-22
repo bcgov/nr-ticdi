@@ -1,13 +1,20 @@
 import { FC, useEffect, useState } from 'react';
-import { Button } from 'react-bootstrap';
-import { DocType, ProvisionGroup } from '../../types/types';
+import { Button, Col } from 'react-bootstrap';
+import { DocType, ProvisionGroup, Variable } from '../../types/types';
 import { getDocumentTypes, getGroupMaxByDocTypeId } from '../../common/report';
 import ManageDocTypesTable from '../../components/table/manage-doc-types/ManageDocTypesTable';
 import AddDocTypeModal from '../../components/modal/manage-doc-types/AddDocTypeModal';
-import EditDocTypeModal from '../../components/modal/manage-doc-types/EditDocTypeModal';
 import RemoveDocTypeModal from '../../components/modal/manage-doc-types/RemoveDocTypeModal';
-import { addDocType, removeDocType, updateDocType } from '../../common/manage-doc-types';
+import {
+  ManageDocTypeProvision,
+  addDocType,
+  getManageDocumentTypeProvisions,
+  removeDocType,
+} from '../../common/manage-doc-types';
 import EditProvisionGroupsModal from '../../components/modal/manage-doc-types/EditProvisionGroupsModal';
+import ManageDocumentProvisionsTable from '../../components/table/manage-doc-types/ManageDocumentProvisionsTable';
+import { getVariables } from '../../common/manage-templates';
+import EditDocTypeTable from '../../components/table/manage-doc-types/EditDocTypeTable';
 
 const ManageDocumentsPage: FC = () => {
   const [showMain, setShowMain] = useState<boolean>(true);
@@ -24,6 +31,8 @@ const ManageDocumentsPage: FC = () => {
   });
   const [allDocTypes, setAllDocTypes] = useState<DocType[]>([]);
   const [provisionGroups, setProvisionGroups] = useState<ProvisionGroup[]>([]);
+  const [provisions, setProvisions] = useState<ManageDocTypeProvision[]>([]);
+  const [variables, setVariables] = useState<Variable[]>([]);
 
   const [showAddDocTypeModal, setShowAddDocTypeModal] = useState<boolean>(false);
   const [showEditDocTypeModal, setShowEditDocTypeModal] = useState<boolean>(false);
@@ -43,9 +52,25 @@ const ManageDocumentsPage: FC = () => {
   useEffect(() => {
     const getData = async () => {
       console.log('getting groupData for currentDocType.id = ' + currentDocType.id);
-      const groupData = currentDocType.id !== -1 ? await getGroupMaxByDocTypeId(currentDocType.id) : [];
-      setProvisionGroups(groupData);
-      console.log(groupData);
+      if (currentDocType.id !== -1) {
+        console.log('~~~~~~~~~~~~~');
+        console.log('~~~~~~~~~~~~~');
+        console.log('~~~~~~~~~~~~~');
+        const groupData = await getGroupMaxByDocTypeId(currentDocType.id);
+        setProvisionGroups(groupData);
+        console.log('groupData');
+        console.log(groupData);
+        const provisionData = await getManageDocumentTypeProvisions(currentDocType.id);
+        console.log('provisionData');
+        console.log(provisionData);
+        setProvisions(provisionData);
+        const variables = await getVariables();
+        setVariables(variables);
+      } else {
+        setProvisionGroups([]);
+        setProvisions([]);
+        setVariables([]);
+      }
     };
     getData();
   }, [refreshTrigger, currentDocType]);
@@ -165,6 +190,7 @@ const ManageDocumentsPage: FC = () => {
           <hr />
           {/** Doc Type info / edit single row table */}
           {/** Document Type Name - Date Created - Created By - Last Updated Date - Last Updated By */}
+          <EditDocTypeTable documentType={[currentDocType]} />
           <hr />
           <h1>Associate Provisions to {currentDocType.name}</h1>
           <hr />
@@ -175,12 +201,26 @@ const ManageDocumentsPage: FC = () => {
           </Button>
           {/** Advanced Search: different inputs - id, type, group, free text, category */}
           {/** Global Provisions table */}
+          <ManageDocumentProvisionsTable
+            documentTypeId={currentDocType.id}
+            provisions={provisions}
+            refreshTables={refreshTables}
+          />
           {/** ID - Type - Group - Seq - Max - Provision Name - Free Text - Category - Associated */}
           <EditProvisionGroupsModal
             provisionGroups={provisionGroups}
             show={showEditProvisionGroupsModal}
             onHide={() => setShowEditProvisionGroupsModal(false)}
           />
+          {/** Save and Go Back Buttons */}
+          <Col sm={12} className="d-flex justify-content-end align-items-center">
+            <Button variant="secondary" onClick={showMainPage} style={{ margin: '10px' }}>
+              Go Back
+            </Button>
+            <Button variant="success" onClick={() => {}} style={{ margin: '10px', marginRight: '50px' }}>
+              Save
+            </Button>
+          </Col>
         </>
       )}
     </>

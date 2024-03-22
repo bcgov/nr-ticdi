@@ -283,6 +283,86 @@ export class ProvisionService {
     return provisions.map((provision) => provision.id);
   }
 
+  async getManageDocTypeProvisions(document_type_id: number) {
+    type ManageDocTypeProvision = {
+      id: number;
+      type: string;
+      provision_name: string;
+      free_text: string;
+      help_text: string;
+      category: string;
+      active_flag: boolean;
+      order_value: number;
+      associated: boolean; // is the provision currently associated with the doc type
+      provision_group: ProvisionGroup;
+    };
+
+    // get all provisions with provision_group relation
+    const provisions = await this.provisionRepository.find({ relations: ['provision_group'] });
+    // get provision ids which are associated with the document type
+    const rawAssociatedProvisions = await this.provisionRepository
+      .createQueryBuilder('provision')
+      .select('provision.id', 'id')
+      .innerJoin('provision.document_types', 'documentType', 'documentType.id = :document_type_id', {
+        document_type_id,
+      })
+      .getRawMany();
+    // map them to a more readable format
+    const associatedProvisionIds = rawAssociatedProvisions.map((raw) => raw.id);
+    // map 'provisions' to include a variable called 'associated' which is true or false
+    const managedProvisions: ManageDocTypeProvision[] = provisions.map((provision) => ({
+      id: provision.id,
+      type: provision.type,
+      provision_name: provision.provision_name,
+      free_text: provision.free_text,
+      help_text: provision.help_text,
+      category: provision.category,
+      active_flag: provision.active_flag,
+      order_value: provision.order_value,
+      associated: associatedProvisionIds.includes(provision.id),
+      provision_group: provision.provision_group,
+    }));
+    return managedProvisions;
+  }
+
+  async associateDocType(provision_id: number, document_type_id: number) {
+    try {
+      console.log(`associating provision id ${provision_id} to doc type ${document_type_id}`);
+      const documentType: DocumentType = await this.documentTypeService.findById(document_type_id);
+      const provision: Provision = await this.provisionRepository.findOneBy({ id: provision_id });
+      // make sure they aren't already related
+      const existingProvision = documentType.provisions.find((p) => p.id === provision.id);
+      if (documentType && provision && !existingProvision) {
+        documentType.provisions.push(provision);
+        await this.documentTypeService.save(documentType);
+      } else {
+        throw new Error(`Failed to associate Provision with Document Type`);
+      }
+    } catch (err) {
+      console.log(err);
+      throw err;
+    }
+  }
+
+  async disassociateDocType(provision_id: number, document_type_id: number) {
+    try {
+      console.log(`disassociating provision id ${provision_id} from doc type ${document_type_id}`);
+      const documentType: DocumentType = await this.documentTypeService.findById(document_type_id);
+      const provisionIndex = documentType.provisions.findIndex((p) => {
+        return p.id === provision_id;
+      });
+      if (documentType && provisionIndex > -1) {
+        documentType.provisions.splice(provisionIndex, 1);
+        await this.documentTypeService.save(documentType);
+      } else {
+        throw new Error(`Failed to disassociate Provision and Document Type`);
+      }
+    } catch (err) {
+      console.log(err);
+      throw err;
+    }
+  }
+
   // async remove(id: number): Promise<{ deleted: boolean; message?: string }> {
   //   try {
   //     await this.provisionRepository.delete(id);

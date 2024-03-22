@@ -54,7 +54,7 @@ export class Provision {
     cascade: true,
   })
   document_data_provisions: DocumentDataProvision[];
-  @ManyToMany(() => DocumentType)
+  @ManyToMany((type) => DocumentType, (docType) => docType.provisions)
   @JoinTable({
     name: 'provision_document_type',
     joinColumn: {

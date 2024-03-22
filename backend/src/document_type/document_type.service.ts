@@ -10,9 +10,16 @@ export class DocumentTypeService {
     private documentTypeRepository: Repository<DocumentType>
   ) {}
 
-  findById(id: number): Promise<DocumentType> {
-    console.log('findById function');
-    return this.documentTypeRepository.findOneBy({ id: id });
+  async findById(id: number): Promise<DocumentType | undefined> {
+    try {
+      return this.documentTypeRepository.findOne({
+        where: { id: id },
+        relations: { provisions: true },
+      });
+    } catch (error) {
+      console.error('Error fetching DocumentType:', error);
+      throw error;
+    }
   }
 
   findByIds(ids: number[]): Promise<DocumentType[]> {
@@ -55,5 +62,9 @@ export class DocumentTypeService {
     if (result.affected === 0) {
       throw new Error(`DocumentType with ID ${id} not found`);
     }
+  }
+
+  save(docType: DocumentType) {
+    return this.documentTypeRepository.save(docType);
   }
 }

@@ -98,4 +98,22 @@ export class ProvisionController {
   remove(@Param('id') id: number) {
     return this.provisionService.remove(id);
   }
+
+  @Get('get-manage-doc-type-provisions/:document_type_id')
+  getManageDocTypeProvisions(@Param('document_type_id') document_type_id: number) {
+    return this.provisionService.getManageDocTypeProvisions(document_type_id);
+  }
+
+  @Get('associate-doc-type/:provision_id/:document_type_id')
+  associateDocType(@Param('provision_id') provision_id: number, @Param('document_type_id') document_type_id: number) {
+    return this.provisionService.associateDocType(provision_id, document_type_id);
+  }
+
+  @Get('disassociate-doc-type/:provision_id/:document_type_id')
+  disassociateDocType(
+    @Param('provision_id') provision_id: number,
+    @Param('document_type_id') document_type_id: number
+  ) {
+    return this.provisionService.disassociateDocType(+provision_id, document_type_id);
+  }
 }

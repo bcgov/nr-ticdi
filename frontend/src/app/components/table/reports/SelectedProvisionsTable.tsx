@@ -73,29 +73,43 @@ const SelectedProvisionsTable: React.FC<SelectedProvisionsTableTableProps> = ({
       id: 'type',
       cell: (info) => <input value={info.getValue()} className="readonlyInput" readOnly />,
       header: () => 'Type',
+      enableSorting: true,
       meta: { customCss: { width: '5%' } },
     }),
     columnHelper.accessor('provision_group', {
       id: 'provision_group',
       cell: (info) => <input value={info.getValue().provision_group} className="readonlyInput" readOnly />,
       header: () => 'Group',
+      enableSorting: true,
       meta: { customCss: { width: '5%' } },
     }),
     columnHelper.accessor('provision_name', {
       id: 'provision_name',
       cell: (info) => <input value={info.getValue()} className="readonlyInput" readOnly />,
       header: () => 'Provision',
+      enableSorting: true,
       meta: { customCss: { width: '50%' } },
     }),
     columnHelper.accessor('category', {
       id: 'category',
       cell: (info) => <input value={info.getValue()} className="readonlyInput" readOnly />,
       header: () => 'Category',
+      enableSorting: true,
       meta: { customCss: { width: '30%' } },
     }),
   ];
 
-  return <DataTable columns={columns} data={selectedProvisions} />;
+  return (
+    <DataTable
+      columns={columns}
+      data={selectedProvisions}
+      enableSorting={true}
+      initialSorting={[
+        { id: 'provision_group', desc: false }, // unsure if this will be seen as an object, may need to map the data beforehand
+        { id: 'provision_name', desc: false },
+      ]}
+    />
+  );
 };
 
 export default SelectedProvisionsTable;

@@ -1,6 +1,6 @@
 import { FC, useEffect, useState } from 'react';
 import { ProvisionGroup } from '../../../types/types';
-import { Column, ColumnDef, ColumnMeta, Row, Table, createColumnHelper } from '@tanstack/react-table';
+import { Column, ColumnDef, Row, createColumnHelper } from '@tanstack/react-table';
 import LinkButton from '../../common/LinkButton';
 import { DataTable } from '../common/DataTable';
 
@@ -43,8 +43,8 @@ const ProvisionGroupsTable: FC<ProvisionGroupsTableProps> = ({ provisionGroups, 
       cell: (info) => (
         <TableCell getValue={info.getValue} row={info.row} column={info.column} onCellUpdate={handleCellUpdate} />
       ),
-
       header: () => 'Group',
+      enableSorting: true,
       meta: { customCss: { width: '12%' }, type: 'text' },
     }),
     columnHelper.accessor('provision_group_text', {
@@ -53,6 +53,7 @@ const ProvisionGroupsTable: FC<ProvisionGroupsTableProps> = ({ provisionGroups, 
         <TableCell getValue={info.getValue} row={info.row} column={info.column} onCellUpdate={handleCellUpdate} />
       ),
       header: () => 'Description',
+      enableSorting: true,
       meta: { customCss: { width: '64%', margin: '0px' }, type: 'text' },
     }),
     columnHelper.accessor('max', {
@@ -61,17 +62,26 @@ const ProvisionGroupsTable: FC<ProvisionGroupsTableProps> = ({ provisionGroups, 
         <TableCell getValue={info.getValue} row={info.row} column={info.column} onCellUpdate={handleCellUpdate} />
       ),
       header: () => 'Max',
+      enableSorting: false,
       meta: { customCss: { width: '12%' }, type: 'text' },
     }),
     columnHelper.display({
       id: 'remove',
       cell: (info) => <LinkButton text="Remove" onClick={() => showRemoveHandler(info.row.original)} />,
       header: () => null,
+      enableSorting: false,
       meta: { customCss: { width: '12%' } },
     }),
   ];
 
-  return <DataTable columns={columns} data={updatedProvisionGroups} />;
+  return (
+    <DataTable
+      columns={columns}
+      data={updatedProvisionGroups}
+      enableSorting={true}
+      initialSorting={[{ id: 'provision_group', desc: false }]}
+    />
+  );
 };
 export default ProvisionGroupsTable;
 
@@ -97,5 +107,13 @@ const TableCell: FC<TableCellProps<ProvisionGroup>> = ({ getValue, row, column, 
     }
   };
 
-  return <input value={value} onChange={(e) => setValue(e.target.value)} onBlur={onBlur} type={'text'} />;
+  return (
+    <input
+      value={value}
+      onChange={(e) => setValue(e.target.value)}
+      onBlur={onBlur}
+      type={'text'}
+      style={{ width: '100%' }}
+    />
+  );
 };

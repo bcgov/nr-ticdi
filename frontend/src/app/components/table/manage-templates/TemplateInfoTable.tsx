@@ -67,18 +67,21 @@ const TemplateInfoTable: React.FC<TemplateInfoTableProps> = ({ documentType, ref
       id: 'template_version',
       cell: (info) => <input value={info.getValue()} className="readonlyInput" readOnly />,
       header: () => 'Doc No.',
+      enableSorting: true,
       meta: { customCss: { width: '5%' } },
     }),
     columnHelper.accessor('file_name', {
       id: 'file_name',
       cell: (info) => <input value={info.getValue()} className="readonlyInput" readOnly />,
       header: () => 'Template Name',
+      enableSorting: true,
       meta: { customCss: { width: '50%' } },
     }),
     columnHelper.accessor('update_timestamp', {
       id: 'update_timestamp',
       cell: (info) => <input value={info.getValue()} className="readonlyInput" readOnly />,
       header: () => 'Uploaded Date',
+      enableSorting: true,
       meta: { customCss: { width: '15%' } },
     }),
     columnHelper.accessor('active_flag', {
@@ -94,6 +97,7 @@ const TemplateInfoTable: React.FC<TemplateInfoTableProps> = ({ documentType, ref
         />
       ),
       header: () => 'Active',
+      enableSorting: false,
       meta: { customCss: { width: '5%' } },
     }),
     columnHelper.accessor('preview', {
@@ -104,6 +108,7 @@ const TemplateInfoTable: React.FC<TemplateInfoTableProps> = ({ documentType, ref
         </Button>
       ),
       header: () => null,
+      enableSorting: false,
       meta: { customCss: { width: '10%' } },
     }),
     columnHelper.accessor('view', {
@@ -117,6 +122,7 @@ const TemplateInfoTable: React.FC<TemplateInfoTableProps> = ({ documentType, ref
         </Button>
       ),
       header: () => null,
+      enableSorting: false,
       meta: { customCss: { width: '12%' } },
     }),
     columnHelper.accessor('remove', {
@@ -127,17 +133,26 @@ const TemplateInfoTable: React.FC<TemplateInfoTableProps> = ({ documentType, ref
         </Button>
       ),
       header: () => null,
+      enableSorting: false,
       meta: { customCss: { width: '15%' } },
     }),
     columnHelper.accessor('id', {
       id: 'id',
       cell: () => null,
       header: () => null,
+      enableSorting: false,
       meta: { customCss: { display: 'none' } },
     }),
   ];
 
-  return <DataTable columns={columns} data={templateData} />;
+  return (
+    <DataTable
+      columns={columns}
+      data={templateData}
+      enableSorting={true}
+      initialSorting={[{ id: 'template_version', desc: false }]}
+    />
+  );
 };
 
 export default TemplateInfoTable;

@@ -1,37 +1,51 @@
-import { FC, useState } from 'react';
+import { FC, useEffect, useState } from 'react';
 import { Button, Col, Form, Modal, Row, Spinner } from 'react-bootstrap';
-import { DocType } from '../../../../types/types';
+import { DocType } from '../../../types/types';
 
-interface AddDocTypeModalProps {
+interface EditDocTypeModalProps {
+  documentType: DocType;
   allDocTypes: DocType[];
   show: boolean;
   onHide: () => void;
-  onAdd: (name: string, created_by: string, created_date: string) => void;
+  onEdit: (id: number, name: string, created_by: string, created_date: string) => void;
 }
 
-const AddDocTypeModal: FC<AddDocTypeModalProps> = ({ allDocTypes, show, onHide, onAdd }) => {
+const EditDocTypeModal: FC<EditDocTypeModalProps> = ({ documentType, allDocTypes, show, onHide, onEdit }) => {
   const [name, setName] = useState<string>('');
   const [createdBy, setCreatedBy] = useState<string>('');
-  const [createdDate, setCreatedDate] = useState<string>(new Date().toISOString().substring(0, 10));
+  const [createdDate, setCreatedDate] = useState<string>('');
+  const [defaultDisabled, setDefaultDisabled] = useState<boolean>(true);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
   const [showError, setShowError] = useState<boolean>(false);
-  const [defaultDisabled, setDefaultDisabled] = useState<boolean>(true);
 
-  const addDocTypeHandler = async () => {
+  useEffect(() => {
+    setName(documentType.name);
+    setCreatedBy(documentType.created_by);
+    setCreatedDate(documentType.created_date?.substring(0, 10));
+  }, [documentType]);
+
+  const editDocTypeHandler = async () => {
     try {
       setLoading(true);
       setShowError(false);
-      const isNameUnique = !allDocTypes.some((docType) => docType.name === name);
-      if (isNameUnique) {
-        onAdd(name, createdBy, createdDate);
+      const sameDocTypes = allDocTypes.filter((docType) => {
+        return docType.name === name;
+      });
+      const isNameUnique = sameDocTypes.length <= 1; // there should only be up to one docType (the current one) that has the same name
+      const isNameNotEmpty = name.length !== 0;
+      console.log('name: ' + name);
+      console.log(sameDocTypes);
+      console.log(isNameUnique);
+      if (isNameUnique && isNameNotEmpty) {
+        onEdit(documentType.id, name, createdBy, createdDate);
         onHide();
       } else {
         setError('That document type name already exists');
         setShowError(true);
       }
     } catch (err) {
-      setError('Error adding new Document Type');
+      setError('Error updating Document Type');
       setShowError(true);
       console.log(err);
     } finally {
@@ -45,28 +59,28 @@ const AddDocTypeModal: FC<AddDocTypeModalProps> = ({ allDocTypes, show, onHide, 
   };
 
   const handleCreatedByChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    console.log(e.target.value);
+    if (defaultDisabled) setDefaultDisabled(false);
     setCreatedBy(e.target.value);
   };
 
   const handleCreatedDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    console.log(e.target.value);
+    if (defaultDisabled) setDefaultDisabled(false);
     setCreatedDate(e.target.value);
   };
 
   return (
     <Modal show={show} onHide={onHide} size="lg">
       <Modal.Header closeButton>
-        <Modal.Title>Add Document Type</Modal.Title>
+        <Modal.Title>Edit Document Type</Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <Form>
           <Form.Group as={Row} className="mb-3">
             <Form.Label column sm="10">
-              Document Type Name:
+              Name:
             </Form.Label>
             <Col sm="10">
-              <Form.Control type="text" onChange={handleNameChange} />
+              <Form.Control type="text" defaultValue={documentType.name} onChange={handleNameChange} />
             </Col>
           </Form.Group>
           <Form.Group as={Row} className="mb-3">
@@ -74,7 +88,7 @@ const AddDocTypeModal: FC<AddDocTypeModalProps> = ({ allDocTypes, show, onHide, 
               Created By:
             </Form.Label>
             <Col sm="10">
-              <Form.Control type="text" onChange={handleCreatedByChange} />
+              <Form.Control type="text" defaultValue={documentType.created_by} onChange={handleCreatedByChange} />
             </Col>
           </Form.Group>
           <Form.Group as={Row} className="mb-3">
@@ -93,12 +107,12 @@ const AddDocTypeModal: FC<AddDocTypeModalProps> = ({ allDocTypes, show, onHide, 
           Cancel
         </Button>
 
-        <Button variant="primary" onClick={addDocTypeHandler} disabled={loading || !name || defaultDisabled}>
-          {loading ? <Spinner as="span" animation="border" size="sm" role="status" aria-hidden="true" /> : 'Add'}
+        <Button variant="primary" onClick={editDocTypeHandler} disabled={loading || defaultDisabled}>
+          {loading ? <Spinner as="span" animation="border" size="sm" role="status" aria-hidden="true" /> : 'Update'}
         </Button>
       </Modal.Footer>
     </Modal>
   );
 };
 
-export default AddDocTypeModal;
+export default EditDocTypeModal;

@@ -3,7 +3,7 @@ import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import { Col, Row, Spinner } from 'react-bootstrap';
-import { findIdirUser } from '../../../../common/admin';
+import { findIdirUser } from '../../../common/admin';
 
 type AddAdminProps = {
   show: boolean;

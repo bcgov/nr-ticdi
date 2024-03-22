@@ -1,5 +1,5 @@
 import { FC, useEffect, useState } from 'react';
-import ManageProvisionsTable from '../../components/table/manage-templates/ManageProvisionsTable';
+import ManageProvisionsTable from '../../components/table/manage-provisions/ManageProvisionsTable';
 import { Button } from 'react-bootstrap';
 import { DocType, GroupMax, Provision, ProvisionUpload, Variable } from '../../types/types';
 import {
@@ -10,10 +10,10 @@ import {
   removeProvision,
   updateProvision,
 } from '../../common/manage-templates';
-import EditProvisionModal from '../../components/modal/admin/manage-templates/EditProvisionModal';
-import AddProvisionModal from '../../components/modal/admin/manage-templates/AddProvisionModal';
+import EditProvisionModal from '../../components/modal/manage-provisions/EditProvisionModal';
+import AddProvisionModal from '../../components/modal/manage-provisions/AddProvisionModal';
 import { getDocumentTypes } from '../../common/report';
-import RemoveProvisionModal from '../../components/modal/admin/manage-templates/RemoveProvisionModal';
+import RemoveProvisionModal from '../../components/modal/manage-provisions/RemoveProvisionModal';
 
 interface ManageProvisionsPageProps {}
 

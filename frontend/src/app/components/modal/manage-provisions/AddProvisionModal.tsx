@@ -1,35 +1,27 @@
 import { useEffect, useState } from 'react';
-import { DocType, GroupMax, Provision, ProvisionUpload, Variable } from '../../../../../types/types';
+import { DocType, GroupMax, ProvisionUpload } from '../../../types/types';
 import { Button, Col, Form, Modal, Row, Spinner } from 'react-bootstrap';
-import ManageVariablesTable from '../../../../table/manage-templates/ManageVariablesTable';
 
-interface EditProvisionModalFormProps {
-  provision: Provision | undefined;
-  variables: Variable[] | undefined;
-  documentTypes: DocType[] | undefined;
+interface AddProvisionModalProps {
   groupMaxArray: GroupMax[] | undefined;
-  loading: boolean;
-  updateProvisionHandler: (provision: ProvisionUpload, provisionId: number) => void;
+  show: boolean;
+  documentTypes: DocType[] | undefined;
+  addProvisionHandler: (provision: ProvisionUpload) => void;
   onHide: () => void;
-  onDisplayAdd: () => void;
-  onDisplayEdit: (variableId: number) => void;
-  onDisplayRemove: (variableId: number) => void;
+  refreshTables: () => void;
 }
 
-const EditProvisionModalForm: React.FC<EditProvisionModalFormProps> = ({
-  provision,
-  variables,
-  documentTypes,
-  loading,
+const AddProvisionModal: React.FC<AddProvisionModalProps> = ({
   groupMaxArray,
-  updateProvisionHandler,
+  show,
+  documentTypes,
+  addProvisionHandler,
   onHide,
-  onDisplayAdd,
-  onDisplayEdit,
-  onDisplayRemove,
+  refreshTables,
 }) => {
+  const [loading, setLoading] = useState<boolean>(false);
   const [type, setType] = useState<string>('M');
-  const [group, setGroup] = useState<number | null>(null);
+  const [group, setGroup] = useState<number>(1);
   const [groupDescription, setGroupDescription] = useState<string>('');
   const [max, setMax] = useState<number | null>(null);
   const [maxInputValue, setMaxInputValue] = useState<string>('');
@@ -38,30 +30,8 @@ const EditProvisionModalForm: React.FC<EditProvisionModalFormProps> = ({
   const [freeText, setFreeText] = useState<string>('');
   const [helpText, setHelpText] = useState<string>('');
   const [category, setCategory] = useState<string>('');
-  const [order, setOrder] = useState<number | undefined>();
+  const [order, setOrder] = useState<number>(1);
   const [documentTypeIds, setDocumentTypeIds] = useState<number[]>([]);
-
-  useEffect(() => {
-    const getData = async () => {
-      if (provision && groupMaxArray) {
-        setType(provision.type);
-        setGroup(provision.provision_group);
-        if (groupMaxArray) {
-          const groupMax = groupMaxArray.find((group) => group.provision_group === provision.provision_group);
-          setGroupDescription(groupMax ? groupMax.provision_group_text : '');
-        }
-        setMax(provision.max);
-        setProvisionName(provision.provision_name);
-        setFreeText(provision.free_text);
-        setHelpText(provision.help_text);
-        setCategory(provision.category);
-        setOrder(provision.order_value);
-        provision.document_type_ids ? setDocumentTypeIds(provision.document_type_ids) : setDocumentTypeIds([]);
-      }
-    };
-
-    getData();
-  }, [provision, groupMaxArray]);
 
   useEffect(() => {
     setIsMaxUnlimited(max ? max >= 999 : false);
@@ -144,37 +114,55 @@ const EditProvisionModalForm: React.FC<EditProvisionModalFormProps> = ({
     if (e.target.checked) {
       setDocumentTypeIds((prevDocTypeIds) => [...prevDocTypeIds, documentTypeId]);
     } else {
-      setDocumentTypeIds((prevDocTypeIds) => prevDocTypeIds.filter((id) => id !== documentTypeId));
+      setDocumentTypeIds(documentTypeIds.filter((v) => v === documentTypeId));
     }
   };
 
   const handleSaveButton = () => {
-    if (provision && max) {
-      const trueMax = isMaxUnlimited ? 999 : max;
-      const provisionUpload: ProvisionUpload = {
-        type: type,
-        provision_group: group ? group : 1,
-        provision_group_text: groupDescription,
-        max: trueMax,
-        provision_name: provisionName,
-        free_text: freeText,
-        help_text: helpText,
-        category: category,
-        order_value: order ? order : 1,
-        document_type_ids: documentTypeIds,
-      };
-      updateProvisionHandler(provisionUpload, provision.id);
+    try {
+      setLoading(true);
+      if (max) {
+        const trueMax = isMaxUnlimited ? 999 : max;
+        const provisionUpload: ProvisionUpload = {
+          type: type,
+          provision_group: group,
+          provision_group_text: groupDescription,
+          max: trueMax,
+          provision_name: provisionName,
+          free_text: freeText,
+          help_text: helpText,
+          category: category,
+          order_value: order,
+          document_type_ids: documentTypeIds,
+        };
+        addProvisionHandler(provisionUpload);
+        onHide();
+        refreshTables();
+      }
+    } catch (err) {
+      console.log('Error adding provision');
+      console.log(err);
+    } finally {
+      setLoading(false);
     }
   };
 
-  const isDocumentTypeChecked = (documentTypeId: number): boolean => {
-    return documentTypeIds.find((d) => d === documentTypeId) ? true : false;
-  };
-
   return (
-    <>
-      <Modal.Header closeButton>
-        <Modal.Title>Edit Provision</Modal.Title>
+    <Modal show={show} onHide={onHide} size="lg">
+      <Modal.Header>
+        <Modal.Title>Add Provision</Modal.Title>
+        <Button
+          variant="none"
+          onClick={onHide}
+          style={{
+            marginLeft: 'auto',
+            border: 'none',
+            backgroundColor: 'transparent',
+            color: 'black',
+          }}
+        >
+          &times;
+        </Button>
       </Modal.Header>
       <Modal.Body>
         <Form>
@@ -183,7 +171,7 @@ const EditProvisionModalForm: React.FC<EditProvisionModalFormProps> = ({
               Type:
             </Form.Label>
             <Col sm={12}>
-              <Form.Select value={type} className="form-control" onChange={handleTypeChange}>
+              <Form.Select value="O" className="form-control" onChange={handleTypeChange}>
                 <option value="O">O</option>
                 <option value="M">M</option>
                 <option value="B">B</option>
@@ -195,12 +183,7 @@ const EditProvisionModalForm: React.FC<EditProvisionModalFormProps> = ({
               Group
             </Form.Label>
             <Col sm="12">
-              <Form.Control
-                type="number"
-                defaultValue={group ? group : ''}
-                name="provision_group"
-                onChange={handleGroupChange}
-              />
+              <Form.Control type="number" name="provision_group" onChange={handleGroupChange} />
             </Col>
           </Form.Group>
 
@@ -211,8 +194,8 @@ const EditProvisionModalForm: React.FC<EditProvisionModalFormProps> = ({
             <Col sm="12">
               <Form.Control
                 type="text"
-                defaultValue={groupDescription}
                 name="provision_group_text"
+                value={groupDescription}
                 onChange={handleGroupDescriptionChange}
               />
             </Col>
@@ -225,8 +208,8 @@ const EditProvisionModalForm: React.FC<EditProvisionModalFormProps> = ({
             <Col sm="12">
               <Form.Control
                 type="number"
-                value={maxInputValue}
                 name="max"
+                value={maxInputValue}
                 onChange={handleMaxChange}
                 disabled={isMaxUnlimited}
               />
@@ -247,12 +230,7 @@ const EditProvisionModalForm: React.FC<EditProvisionModalFormProps> = ({
               Provision
             </Form.Label>
             <Col sm="10">
-              <Form.Control
-                type="text"
-                defaultValue={provisionName}
-                name="provision"
-                onChange={handleProvisionNameChange}
-              />
+              <Form.Control type="text" name="provision" onChange={handleProvisionNameChange} />
             </Col>
           </Form.Group>
 
@@ -261,13 +239,7 @@ const EditProvisionModalForm: React.FC<EditProvisionModalFormProps> = ({
               Free Text
             </Form.Label>
             <Col sm="10">
-              <Form.Control
-                as="textarea"
-                rows={3}
-                name="free_text"
-                defaultValue={freeText}
-                onChange={handleFreeTextChange}
-              />
+              <Form.Control as="textarea" rows={3} name="free_text" onChange={handleFreeTextChange} />
             </Col>
           </Form.Group>
 
@@ -276,7 +248,7 @@ const EditProvisionModalForm: React.FC<EditProvisionModalFormProps> = ({
               Help Text
             </Form.Label>
             <Col sm="12">
-              <Form.Control type="text" defaultValue={helpText} name="help_text" onChange={handleHelpTextChange} />
+              <Form.Control type="text" name="help_text" onChange={handleHelpTextChange} />
             </Col>
           </Form.Group>
 
@@ -285,10 +257,9 @@ const EditProvisionModalForm: React.FC<EditProvisionModalFormProps> = ({
               Category
             </Form.Label>
             <Col sm="12">
-              <Form.Control type="text" defaultValue={category} name="category" onChange={handleCategoryTextChange} />
+              <Form.Control type="text" name="category" onChange={handleCategoryTextChange} />
             </Col>
           </Form.Group>
-
           <Form.Group className="mb-3">
             <Form.Label column sm="12">
               Order
@@ -311,7 +282,6 @@ const EditProvisionModalForm: React.FC<EditProvisionModalFormProps> = ({
                 <Col sm={{ span: 4 }}>
                   <Form.Check
                     name={`document-type-${docType.id}`}
-                    checked={isDocumentTypeChecked(docType.id)}
                     value={docType.id}
                     onChange={handleDocumentTypeIdUpdate}
                   />
@@ -319,32 +289,17 @@ const EditProvisionModalForm: React.FC<EditProvisionModalFormProps> = ({
               </Form.Group>
             );
           })}
-        <Col sm="12">
-          <Form.Label style={{ marginTop: '10px' }}>Variables</Form.Label>
-        </Col>
-        <Col sm="12">
-          <ManageVariablesTable
-            variables={variables ? variables : []}
-            onDisplayEdit={onDisplayEdit}
-            onDisplayRemove={onDisplayRemove}
-          />
-        </Col>
-        <Col sm="12">
-          <Button onClick={onDisplayAdd} variant="success">
-            Add a Variable
-          </Button>
-        </Col>
       </Modal.Body>
       <Modal.Footer>
         <Button variant="secondary" onClick={onHide}>
           Cancel
         </Button>
 
-        <Button variant="primary" onClick={handleSaveButton} disabled={loading || !provision}>
+        <Button variant="primary" onClick={handleSaveButton} disabled={loading}>
           {loading ? <Spinner as="span" animation="border" size="sm" role="status" aria-hidden="true" /> : 'Save'}
         </Button>
       </Modal.Footer>
-    </>
+    </Modal>
   );
 };
 
@@ -371,4 +326,4 @@ const FormLabelWithPeriods: React.FC<{ text: string }> = ({ text }) => {
   );
 };
 
-export default EditProvisionModalForm;
+export default AddProvisionModal;

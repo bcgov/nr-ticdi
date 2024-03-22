@@ -84,10 +84,9 @@ export class ProvisionController {
     return this.provisionService.disable(id);
   }
 
-  // nestjs gets upset when there is no parameter, id is unused
-  @Get('get-group-max/:id')
-  getGroupMax(@Param('id') id: number) {
-    return this.provisionService.getGroupMax();
+  @Get('get-group-max/:document_type_id')
+  getGroupMax(@Param('document_type_id') document_type_id: number) {
+    return this.provisionService.getGroupMaxByDocTypeId(document_type_id);
   }
 
   @Get('get-all-mandatory-provisions/:id')

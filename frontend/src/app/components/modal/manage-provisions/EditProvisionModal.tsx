@@ -1,7 +1,7 @@
 import { FC, useState } from 'react';
 import Modal from 'react-bootstrap/Modal';
-import { DocType, GroupMax, Provision, ProvisionUpload, Variable, VariableUpload } from '../../../../types/types';
-import { addVariable, removeVariable, updateProvision, updateVariable } from '../../../../common/manage-templates';
+import { DocType, GroupMax, Provision, ProvisionUpload, Variable, VariableUpload } from '../../../types/types';
+import { addVariable, removeVariable, updateProvision, updateVariable } from '../../../common/manage-templates';
 import EditProvisionModalForm from './forms/EditProvisionModalForm';
 import AddVariableModalForm from './forms/AddVariableModalForm';
 import EditVariableModalForm from './forms/EditVariableModalForm';

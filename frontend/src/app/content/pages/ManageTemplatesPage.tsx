@@ -2,8 +2,8 @@ import { FC, useEffect, useState } from 'react';
 import TemplateInfoTable from '../../components/table/manage-templates/TemplateInfoTable';
 import { Button } from 'react-bootstrap';
 import { DocType } from '../../types/types';
-import UploadTemplateModal from '../../components/modal/admin/manage-templates/UploadTemplateModal';
-import RemoveTemplateModal from '../../components/modal/admin/manage-templates/RemoveTemplateModal';
+import UploadTemplateModal from '../../components/modal/manage-templates/UploadTemplateModal';
+import RemoveTemplateModal from '../../components/modal/manage-templates/RemoveTemplateModal';
 import { getDocumentTypes } from '../../common/report';
 
 const ManageTemplatesPage: FC = () => {

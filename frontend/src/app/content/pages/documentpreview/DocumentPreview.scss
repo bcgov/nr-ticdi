@@ -41,6 +41,8 @@
     .max-group-text {
         margin-left: 20px;
         font-size: 12px;
+        font-weight: bold;
+        margin-top: 10px;
     }
 }
 
@@ -196,4 +198,7 @@ input[type="text"] {
 }
 .help--algin{
   margin-right: 10px;
+}
+.dtid-text{
+  margin-left: 7rem !important;
 }

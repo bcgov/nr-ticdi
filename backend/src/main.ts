@@ -22,6 +22,6 @@ async function bootstrap() {
   const appService = app.get(AppService);
   // await appService.initializeDb();
 
-  await app.listen(3000);
+  await app.listen(3001);
 }
 bootstrap();

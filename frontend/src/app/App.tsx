@@ -87,6 +87,14 @@ const App: FC = () => {
             </ContentWrapper>
           }
         />
+        <Route
+          path={`/`}
+          element={
+            <ContentWrapper>
+              <DocumentPreview />
+            </ContentWrapper>
+          }
+        />
         {documentTypes.map((docType) => (
           <Route
             key={docType.id}

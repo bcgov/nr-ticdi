@@ -88,7 +88,7 @@ const Provisions: FC<ProvisionsProps> = ({
 
   return (
     <>
-      <div>
+      {/* <div>
         <label htmlFor="provisionGroupSelect" style={{ marginRight: '10px' }}>
           Select A Group
         </label>
@@ -109,7 +109,7 @@ const Provisions: FC<ProvisionsProps> = ({
             </option>
           ))}
         </select>
-      </div>
+      </div> */}
       <ProvisionsTable
         dtid={dtid}
         docType={documentType}

@@ -759,7 +759,7 @@ export class ReportService {
   }
 
   getGroupMaxByDocTypeId(document_type_id: number): Promise<any> {
-    return this.provisionService.getGroupMaxByDocTypeId(document_type_id);
+    return this.documentTypeService.getGroupMaxByDocTypeId(document_type_id);
   }
 
   async getDocumentVariablesByDocumentTypeIdAndDtid(document_type_id: number, dtid: number): Promise<any> {
@@ -775,11 +775,11 @@ export class ReportService {
   }
 
   getMandatoryProvisions() {
-    return this.provisionService.getMandatoryProvisions();
+    return this.documentTypeService.getMandatoryProvisions();
   }
 
   getMandatoryProvisionsByDocumentTypeId(document_type_id: number) {
-    return this.provisionService.getMandatoryProvisionsByDocumentTypeId(document_type_id);
+    return this.documentTypeService.getMandatoryProvisionsByDocumentTypeId(document_type_id);
   }
 
   async getDocumentData() {
@@ -869,7 +869,7 @@ export class ReportService {
   }
 
   async getEnabledProvisionsByDocTypeId(document_type_id: number) {
-    return this.provisionService.getMandatoryProvisionsByDocumentTypeId(document_type_id);
+    return this.documentTypeService.getMandatoryProvisionsByDocumentTypeId(document_type_id);
   }
 
   getEnabledProvisionsByDocTypeIdDtid(document_type_id: number, dtid: number) {

@@ -22,5 +22,5 @@ export class ProvisionGroup {
   @OneToMany(() => DocumentTypeProvision, (documentTypeProvision) => documentTypeProvision.provision_group, {
     nullable: true,
   })
-  provisions: DocumentTypeProvision[];
+  document_type_provisions: DocumentTypeProvision[];
 }

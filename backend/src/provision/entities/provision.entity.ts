@@ -1,7 +1,7 @@
 import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 import { ProvisionVariable } from './provision_variable.entity';
 import { DocumentDataProvision } from 'src/document_data/entities/document_data_provision.entity';
-import { DocumentTypeProvision } from './document_type_provision';
+import { DocumentTypeProvision } from '../../document_type/entities/document_type_provision';
 
 @Entity()
 export class Provision {
@@ -56,7 +56,10 @@ export class Provision {
   })
   document_data_provisions: DocumentDataProvision[];
 
-  @OneToMany(() => DocumentTypeProvision, (documentTypeProvision) => documentTypeProvision.provision)
+  @OneToMany(() => DocumentTypeProvision, (documentTypeProvision) => documentTypeProvision.provision, {
+    nullable: true,
+    cascade: true,
+  })
   document_type_provisions: DocumentTypeProvision[];
 
   constructor(

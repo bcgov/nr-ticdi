@@ -1,7 +1,7 @@
 import { DocumentDataProvision } from 'src/document_data/entities/document_data_provision.entity';
 import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { ProvisionGroup } from './provision_group.entity';
-import { Provision } from './provision.entity';
+import { Provision } from '../../provision/entities/provision.entity';
 import { DocumentType } from 'src/document_type/entities/document_type.entity';
 
 @Entity()
@@ -21,7 +21,7 @@ export class DocumentTypeProvision {
   @ManyToOne(() => Provision, (provision) => provision.document_type_provisions)
   provision: Provision;
 
-  @ManyToOne(() => ProvisionGroup)
+  @ManyToOne(() => ProvisionGroup, (provisionGroup) => provisionGroup.document_type_provisions)
   provision_group: ProvisionGroup;
 
   @OneToMany(() => DocumentDataProvision, (documentDataProvision) => documentDataProvision.document_type_provision, {

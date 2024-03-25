@@ -6,8 +6,9 @@ import { DocumentDataLog } from './document_data_log/entities/document_data_log.
 import { DocumentTemplate } from './document_template/entities/document_template.entity';
 import { DocumentType } from './document_type/entities/document_type.entity';
 import { Provision } from './provision/entities/provision.entity';
-import { ProvisionGroup } from './provision/entities/provision_group.entity';
+import { ProvisionGroup } from './document_type/entities/provision_group.entity';
 import { ProvisionVariable } from './provision/entities/provision_variable.entity';
+import { DocumentTypeProvision } from './document_type/entities/document_type_provision';
 
 const config: TypeOrmModuleOptions = {
   type: 'postgres',
@@ -26,6 +27,7 @@ const config: TypeOrmModuleOptions = {
     ProvisionVariable,
     DocumentTemplate,
     DocumentType,
+    DocumentTypeProvision,
   ],
   synchronize: true,
 };

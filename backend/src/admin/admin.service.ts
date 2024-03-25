@@ -1,11 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import * as dotenv from 'dotenv';
 import { HttpService } from '@nestjs/axios';
-import { ExportDataObject, SearchResultsItem, UserObject } from 'utils/types';
-import { REPORT_TYPES } from 'utils/constants';
+import { SearchResultsItem, UserObject } from 'utils/types';
 import { DocumentTemplateService } from 'src/document_template/document_template.service';
-import { DocumentType } from 'src/document_type/entities/document_type.entity';
 import { ProvisionService } from 'src/provision/provision.service';
+import { DocumentTypeService } from 'src/document_type/document_type.service';
 const axios = require('axios');
 const FormData = require('form-data');
 
@@ -18,7 +17,8 @@ export class AdminService {
   constructor(
     private readonly httpService: HttpService,
     private readonly documentTemplateService: DocumentTemplateService,
-    private readonly provisionService: ProvisionService
+    private readonly provisionService: ProvisionService,
+    private readonly documentTypeService: DocumentTypeService
   ) {
     hostname = process.env.backend_url ? process.env.backend_url : `http://localhost`;
     // local development backend port is 3001, docker backend port is 3000
@@ -340,7 +340,7 @@ export class AdminService {
   }
 
   getGroupMax(): Promise<any> {
-    return this.provisionService.getGroupMax();
+    return this.documentTypeService.getGroupMax();
   }
 
   addProvision(

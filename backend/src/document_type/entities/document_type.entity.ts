@@ -1,8 +1,8 @@
 import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 import { DocumentTemplate } from '../../document_template/entities/document_template.entity';
 import { DocumentData } from 'src/document_data/entities/document_data.entity';
-import { ProvisionGroup } from 'src/provision/entities/provision_group.entity';
-import { DocumentTypeProvision } from 'src/provision/entities/document_type_provision';
+import { ProvisionGroup } from 'src/document_type/entities/provision_group.entity';
+import { DocumentTypeProvision } from 'src/document_type/entities/document_type_provision';
 
 @Entity()
 export class DocumentType {

@@ -124,7 +124,7 @@ export class DocumentTypeService {
       help_text: string;
       category: string;
       active_flag: boolean;
-      order_value: number;
+      sequence_value: number;
       associated: boolean; // is the provision currently associated with the doc type
       provision_group: ProvisionGroup;
     };
@@ -152,7 +152,7 @@ export class DocumentTypeService {
       help_text: docTypeProvision.provision.help_text,
       category: docTypeProvision.provision.category,
       active_flag: docTypeProvision.provision.active_flag,
-      order_value: docTypeProvision.order_value,
+      sequence_value: docTypeProvision.sequence_value,
       associated: associatedProvisionIds.includes(docTypeProvision.id),
       provision_group: docTypeProvision.provision_group,
     }));

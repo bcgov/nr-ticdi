@@ -38,7 +38,7 @@ const EditProvisionModalForm: React.FC<EditProvisionModalFormProps> = ({
   const [freeText, setFreeText] = useState<string>('');
   const [helpText, setHelpText] = useState<string>('');
   const [category, setCategory] = useState<string>('');
-  const [order, setOrder] = useState<number | undefined>();
+  const [sequence, setSequence] = useState<number | undefined>();
   const [documentTypeIds, setDocumentTypeIds] = useState<number[]>([]);
 
   useEffect(() => {
@@ -55,7 +55,7 @@ const EditProvisionModalForm: React.FC<EditProvisionModalFormProps> = ({
         setFreeText(provision.free_text);
         setHelpText(provision.help_text);
         setCategory(provision.category);
-        setOrder(provision.order_value);
+        setSequence(provision.sequence_value);
         provision.document_type_ids ? setDocumentTypeIds(provision.document_type_ids) : setDocumentTypeIds([]);
       }
     };
@@ -135,8 +135,8 @@ const EditProvisionModalForm: React.FC<EditProvisionModalFormProps> = ({
     setCategory(e.target.value);
   };
 
-  const handleOrderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setOrder(parseInt(e.target.value));
+  const handleSequenceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSequence(parseInt(e.target.value));
   };
 
   const handleDocumentTypeIdUpdate = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -160,7 +160,7 @@ const EditProvisionModalForm: React.FC<EditProvisionModalFormProps> = ({
         free_text: freeText,
         help_text: helpText,
         category: category,
-        order_value: order ? order : 1,
+        sequence_value: sequence ? sequence : 1,
         document_type_ids: documentTypeIds,
       };
       updateProvisionHandler(provisionUpload, provision.id);
@@ -291,10 +291,10 @@ const EditProvisionModalForm: React.FC<EditProvisionModalFormProps> = ({
 
           <Form.Group className="mb-3">
             <Form.Label column sm="12">
-              Order
+              Sequence Value
             </Form.Label>
             <Col sm="12">
-              <Form.Control type="number" name="order" defaultValue={order} onChange={handleOrderChange} />
+              <Form.Control type="number" name="order" defaultValue={sequence} onChange={handleSequenceChange} />
             </Col>
           </Form.Group>
         </Form>

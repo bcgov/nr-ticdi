@@ -10,7 +10,7 @@ export class DocumentTypeProvision {
   id: number;
 
   @Column({ nullable: true })
-  order_value: number;
+  sequence_value: number;
 
   @Column({ nullable: true })
   type: string;

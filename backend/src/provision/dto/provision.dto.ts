@@ -8,7 +8,7 @@ export class ProvisionDto {
   free_text?: string;
   help_text?: string;
   category?: string;
-  order_value?: number;
+  sequence_value?: number;
   create_userid?: string;
   update_userid?: string;
 }

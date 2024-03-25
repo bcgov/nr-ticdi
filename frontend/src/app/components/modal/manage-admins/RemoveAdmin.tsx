@@ -4,7 +4,7 @@ import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import { Col, Row } from 'react-bootstrap';
-import { removeAdmin } from '../../../common/admin';
+import { removeAdmin } from '../../../common/manage-admins';
 
 type RemoveAdminProps = {
   admin: AdminData;

@@ -146,7 +146,7 @@ export type ProvisionObject = {
   provision_group: number; // will always be null
   id: number;
   help_text: string;
-  order_value: number;
+  sequence_value: number;
   create_timestamp: string;
   update_timestamp: string;
 };
@@ -204,7 +204,7 @@ export type Provision = {
   active_flag: boolean;
   edit: any; // remove from route
   help_text: string;
-  order_value: number;
+  sequence_value: number;
   id: number;
   document_type_ids: number[]; //
 };
@@ -228,7 +228,7 @@ export type ProvisionUpload = {
   free_text: string;
   help_text: string;
   category: string;
-  order_value: number;
+  sequence_value: number;
   document_type_ids: number[]; //
 };
 

@@ -308,7 +308,7 @@ export class AdminService {
       free_text: provision.free_text,
       help_text: provision.help_text,
       category: provision.category,
-      order_value: provision.order_value,
+      sequence_value: provision.sequence_value,
       active_flag: provision.active_flag,
       // transform document_types to an array of ids
       document_type_ids: provision.document_types.map((dt) => dt.id),
@@ -343,6 +343,7 @@ export class AdminService {
     return this.documentTypeService.getGroupMax();
   }
 
+  // TODO - UPDATE/MOVE THIS
   addProvision(
     provisionParams: {
       type: string;
@@ -353,7 +354,7 @@ export class AdminService {
       free_text: string;
       help_text: string;
       category: string;
-      order_value: number;
+      sequence_value: number;
       variants: number[];
     },
     create_userid: string
@@ -361,6 +362,7 @@ export class AdminService {
     return this.provisionService.create({ ...provisionParams, create_userid });
   }
 
+  // TODO - UPDATE/MOVE THIS
   updateProvision(
     provisionParams: {
       id: number;
@@ -372,7 +374,7 @@ export class AdminService {
       free_text: string;
       help_text: string;
       category: string;
-      order_value: number;
+      sequence_value: number;
       document_type_ids: number[];
     },
     update_userid: string

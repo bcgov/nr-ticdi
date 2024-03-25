@@ -9,9 +9,6 @@ export class Provision {
   id: number;
 
   @Column({ nullable: true })
-  type: string;
-
-  @Column({ nullable: true })
   provision_name: string;
 
   @Column({ nullable: true })
@@ -22,9 +19,6 @@ export class Provision {
 
   @Column({ nullable: true })
   category: string;
-
-  @Column({ nullable: true })
-  order_value: number;
 
   @Column({ nullable: true })
   active_flag: boolean;
@@ -63,21 +57,17 @@ export class Provision {
   document_type_provisions: DocumentTypeProvision[];
 
   constructor(
-    type?: string,
     provision_name?: string,
     free_text?: string,
     category?: string,
     active_flag?: boolean,
-    order_value?: number,
     create_userid?: string,
     update_userid?: string
   ) {
-    this.type = type || '';
     this.provision_name = provision_name || '';
     this.free_text = free_text || '';
     this.category = category || '';
     this.active_flag = active_flag || true;
-    this.order_value = order_value || null;
     this.create_userid = create_userid || '';
     this.update_userid = update_userid || '';
     this.is_deleted = false;

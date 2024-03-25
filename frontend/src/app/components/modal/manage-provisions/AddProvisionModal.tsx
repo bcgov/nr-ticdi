@@ -30,7 +30,7 @@ const AddProvisionModal: React.FC<AddProvisionModalProps> = ({
   const [freeText, setFreeText] = useState<string>('');
   const [helpText, setHelpText] = useState<string>('');
   const [category, setCategory] = useState<string>('');
-  const [order, setOrder] = useState<number>(1);
+  const [sequence, setSequence] = useState<number>(1);
   const [documentTypeIds, setDocumentTypeIds] = useState<number[]>([]);
 
   useEffect(() => {
@@ -105,8 +105,8 @@ const AddProvisionModal: React.FC<AddProvisionModalProps> = ({
     setCategory(e.target.value);
   };
 
-  const handleOrderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setOrder(parseInt(e.target.value));
+  const handleSequenceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSequence(parseInt(e.target.value));
   };
 
   const handleDocumentTypeIdUpdate = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -132,7 +132,7 @@ const AddProvisionModal: React.FC<AddProvisionModalProps> = ({
           free_text: freeText,
           help_text: helpText,
           category: category,
-          order_value: order,
+          sequence_value: sequence,
           document_type_ids: documentTypeIds,
         };
         addProvisionHandler(provisionUpload);
@@ -265,7 +265,7 @@ const AddProvisionModal: React.FC<AddProvisionModalProps> = ({
               Order
             </Form.Label>
             <Col sm="12">
-              <Form.Control type="number" name="order" defaultValue={order} onChange={handleOrderChange} />
+              <Form.Control type="number" name="order" defaultValue={sequence} onChange={handleSequenceChange} />
             </Col>
           </Form.Group>
         </Form>

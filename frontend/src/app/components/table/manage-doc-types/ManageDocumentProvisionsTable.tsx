@@ -85,8 +85,8 @@ const ManageDocumentProvisionsTable: React.FC<ManageDocumentProvisionsTableProps
       enableSorting: true,
       meta: { customCss: { width: '10%' } },
     }),
-    columnHelper.accessor('order_value', {
-      id: 'order_value',
+    columnHelper.accessor('sequence_value', {
+      id: 'sequence_value',
       cell: (info) => <input defaultValue={info.getValue()} style={{ width: '100%' }} />,
       header: () => 'Seq',
       enableSorting: false,

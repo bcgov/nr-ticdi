@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { DataTable } from '../common/DataTable';
 import { ColumnDef, createColumnHelper } from '@tanstack/react-table';
-import { getAdminData } from '../../../common/admin';
+import { getAdminData } from '../../../common/manage-admins';
 
 export type AdminData = {
   name: string;

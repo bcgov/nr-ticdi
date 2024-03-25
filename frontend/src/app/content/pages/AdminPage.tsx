@@ -3,7 +3,7 @@ import { FC, useState } from 'react';
 import AddAdmin from '../../components/modal/manage-admins/AddAdmin';
 import RemoveAdmin from '../../components/modal/manage-admins/RemoveAdmin';
 // import { useNavigate } from 'react-router-dom';
-import { exportUsers } from '../../common/admin';
+import { exportUsers } from '../../common/manage-admins';
 import AdminDataTable, { AdminData } from '../../components/table/manage-admins/AdminDataTable';
 
 const AdminPage: FC = () => {

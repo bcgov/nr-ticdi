@@ -1,5 +1,5 @@
 import config from '../../config';
-import { DocType, ProvisionGroup } from '../types/types';
+import { DocType, GroupMax, ProvisionGroup } from '../types/types';
 import * as api from './api';
 
 export type ManageDocTypeProvision = {
@@ -10,7 +10,7 @@ export type ManageDocTypeProvision = {
   help_text: string;
   category: string;
   active_flag: boolean;
-  order_value: number;
+  sequence_value: number;
   associated: boolean;
   provision_group: ProvisionGroup;
   // create_userid: string;
@@ -70,4 +70,13 @@ export const disassociateProvisionFromDocType = (provision_id: number, document_
   const url = `${config.API_BASE_URL}/provision/disassociate-doc-type/${provision_id}/${document_type_id}`;
   const getParameters = api.generateApiParameters(url);
   return api.get<any>(getParameters);
+};
+
+export const getGroupMax = async (): Promise<GroupMax[]> => {
+  const url = `${config.API_BASE_URL}/admin/get-group-max`;
+  const getParameters = api.generateApiParameters(url);
+  const response: GroupMax[] = await api.get<GroupMax[]>(getParameters);
+  console.log('getGroupMax response');
+  console.log(response);
+  return response;
 };

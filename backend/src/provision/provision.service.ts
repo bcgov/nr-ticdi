@@ -53,12 +53,11 @@ export class ProvisionService {
 
     // const documentTypes: DocumentType[] = await this.documentTypeService.findByIds(document_type_ids);
 
-    existingProvision.type = provision.type;
+    // existingProvision.type = provision.type;
     existingProvision.provision_name = provision.provision_name;
     existingProvision.free_text = provision.free_text;
     existingProvision.help_text = provision.help_text;
     existingProvision.category = provision.category;
-    existingProvision.order_value = provision.order_value;
     existingProvision.update_userid = provision.update_userid;
     // existingProvision.document_types = documentTypes;
     const updatedProvision = this.provisionRepository.create({

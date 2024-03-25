@@ -54,19 +54,21 @@ ADD CONSTRAINT "FK_76bc71b9b4fbbcdd622bab0ff19" FOREIGN KEY (document_data_id) R
 CREATE TABLE public.document_type (
     id serial PRIMARY KEY,
     name varchar NOT NULL,
+    created_by character varying,
+    created_date timestamp NULL DEFAULT now(),
     create_userid varchar NOT NULL,
     update_userid varchar NOT NULL,
     create_timestamp timestamp NOT NULL DEFAULT now(),
     update_timestamp timestamp NOT NULL DEFAULT now()
 );
-INSERT INTO public.document_type (name, create_userid, update_userid)
-VALUES ('Land Use Report', 'system', 'system');
-VALUES ('Notice of Final Review', 'system', 'system');
-VALUES ('Notice of Final Review (Delayed)', 'system', 'system');
-VALUES ('Notice of Final Review (No Fees)', 'system', 'system');
-VALUES ('Notice of Final Review (Survey Required)', 'system', 'system');
-VALUES ('Notice of Final Review (To Obtain Survey)', 'system', 'system');
-VALUES ('Grazing Lease', 'system', 'system');
+INSERT INTO public.document_type (name, created_by, created_date, create_userid, update_userid)
+VALUES ('Land Use Report', 'system', '2024-03-19 00:00:00', 'system', 'system');
+VALUES ('Notice of Final Review', 'system', '2024-03-19 00:00:00', 'system', 'system');
+VALUES ('Notice of Final Review (Delayed)', 'system', '2024-03-19 00:00:00', 'system', 'system');
+VALUES ('Notice of Final Review (No Fees)', 'system', '2024-03-19 00:00:00', 'system', 'system');
+VALUES ('Notice of Final Review (Survey Required)', 'system', '2024-03-19 00:00:00', 'system', 'system');
+VALUES ('Notice of Final Review (To Obtain Survey)', 'system', '2024-03-19 00:00:00', 'system', 'system');
+VALUES ('Grazing Lease', 'system', '2024-03-19 00:00:00', 'system', 'system');
 
 ALTER TABLE public.document_template ADD COLUMN document_type_id int4;
 ALTER TABLE public.document_template DROP COLUMN document_type;

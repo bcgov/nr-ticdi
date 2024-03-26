@@ -45,7 +45,7 @@ const CustomCollapsible: FC<CustomCollapsibleProps> = ({ title, children, isOpen
             <div className="mb-2 d-flex align-items-center" >
                 <FontAwesomeIcon icon={icon as IconProp} className="inlineDiv collapsibleTitle" onClick={toggleCollapsibleOnClick} />
                 <div className="ml-2 inlineDiv collapsibleTitle boldText" onClick={toggleCollapsibleOnClick}>{title}</div>
-                {isSpanRequired ? <div className="group-select-container">
+                {(isSpanRequired && isOpenonClick) ? <div className="group-select-container d-flex">
                     <label htmlFor="groupSelect" className="group-select-label">Select a Group:</label>
                     <select id="groupSelect" className="group-select"
                         onClick={handleClick}

@@ -289,10 +289,6 @@ export class AdminService {
     return this.provisionService.disable(id);
   }
 
-  getGroupMax(): Promise<any> {
-    return this.documentTypeService.getGroupMax();
-  }
-
   /**
    * @param data
    * @returns formatted user data for displaying on the frontend

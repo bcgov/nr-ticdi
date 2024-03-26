@@ -1,6 +1,6 @@
-import { Entity, Column, PrimaryGeneratedColumn, OneToMany, ManyToMany, ManyToOne } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany, ManyToOne } from 'typeorm';
 import { DocumentType } from 'src/document_type/entities/document_type.entity';
-import { DocumentTypeProvision } from './document_type_provision';
+import { DocumentTypeProvision } from '../../provision/entities/document_type_provision';
 
 @Entity()
 export class ProvisionGroup {

@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post, Session } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Session } from '@nestjs/common';
 import { CreateProvisionDto } from './dto/create-provision.dto';
 import { ProvisionService } from './provision.service';
 import { SessionData } from 'utils/types';
@@ -118,5 +118,32 @@ export class ProvisionController {
   @Get('disable/:id')
   disableProvision(@Param('id') id: number) {
     return this.provisionService.disable(id);
+  }
+
+  /**
+   * Document Type Provisions
+   */
+  @Get('get-all-mandatory-provisions/:id')
+  getMandatoryProvisions(@Param('id') document_type_id: number) {
+    return this.provisionService.getMandatoryProvisionsByDocumentTypeId(document_type_id);
+  }
+
+  @Get('get-manage-doc-type-provisions/:id')
+  getManageDocTypeProvisions(@Param('id') document_type_id: number) {
+    console.log('getManageDocTypeProvisions');
+    return this.provisionService.getManageDocTypeProvisions(document_type_id);
+  }
+
+  @Get('associate-doc-type/:provision_id/:document_type_id')
+  associateDocType(@Param('provision_id') provision_id: number, @Param('document_type_id') document_type_id: number) {
+    return this.provisionService.associateDocType(provision_id, document_type_id);
+  }
+
+  @Get('disassociate-doc-type/:provision_id/:document_type_id')
+  disassociateDocType(
+    @Param('provision_id') provision_id: number,
+    @Param('document_type_id') document_type_id: number
+  ) {
+    return this.provisionService.disassociateDocType(+provision_id, document_type_id);
   }
 }

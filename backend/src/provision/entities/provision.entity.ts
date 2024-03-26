@@ -1,7 +1,7 @@
 import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 import { ProvisionVariable } from './provision_variable.entity';
 import { DocumentDataProvision } from 'src/document_data/entities/document_data_provision.entity';
-import { DocumentTypeProvision } from '../../document_type/entities/document_type_provision';
+import { DocumentTypeProvision } from './document_type_provision';
 
 @Entity()
 export class Provision {

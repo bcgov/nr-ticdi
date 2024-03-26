@@ -212,9 +212,4 @@ export class AdminController {
   disableProvision(@Param('provisionId') id: number): any {
     return this.adminService.disableProvision(id);
   }
-
-  @Get('get-group-max')
-  getGroupMax() {
-    return this.adminService.getGroupMax();
-  }
 }

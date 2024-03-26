@@ -8,7 +8,7 @@ import { DocumentType } from './document_type/entities/document_type.entity';
 import { Provision } from './provision/entities/provision.entity';
 import { ProvisionGroup } from './document_type/entities/provision_group.entity';
 import { ProvisionVariable } from './provision/entities/provision_variable.entity';
-import { DocumentTypeProvision } from './document_type/entities/document_type_provision';
+import { DocumentTypeProvision } from './provision/entities/document_type_provision';
 
 const config: TypeOrmModuleOptions = {
   type: 'postgres',

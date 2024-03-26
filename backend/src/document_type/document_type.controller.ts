@@ -44,6 +44,19 @@ export class DocumentTypeController {
     return this.documentTypeService.findAll();
   }
 
+  @Get('associate-doc-type/:provision_id/:document_type_id')
+  associateDocType(@Param('provision_id') provision_id: number, @Param('document_type_id') document_type_id: number) {
+    return this.documentTypeService.associateDocType(provision_id, document_type_id);
+  }
+
+  @Get('disassociate-doc-type/:provision_id/:document_type_id')
+  disassociateDocType(
+    @Param('provision_id') provision_id: number,
+    @Param('document_type_id') document_type_id: number
+  ) {
+    return this.documentTypeService.disassociateDocType(+provision_id, document_type_id);
+  }
+
   @Get('get-group-max/:document_type_id')
   getGroupMax(@Param('document_type_id') document_type_id: number) {
     return this.documentTypeService.getGroupMaxByDocTypeId(document_type_id);
@@ -56,19 +69,7 @@ export class DocumentTypeController {
 
   @Get('get-manage-doc-type-provisions/:document_type_id')
   getManageDocTypeProvisions(@Param('document_type_id') document_type_id: number) {
+    console.log('getManageDocTypeProvisions');
     return this.documentTypeService.getManageDocTypeProvisions(document_type_id);
-  }
-
-  @Get('associate-doc-type/:provision_id/:document_type_id')
-  associateDocType(@Param('provision_id') provision_id: number, @Param('document_type_id') document_type_id: number) {
-    return this.documentTypeService.associateDocType(provision_id, document_type_id);
-  }
-
-  @Get('disassociate-doc-type/:provision_id/:document_type_id')
-  disassociateDocType(
-    @Param('provision_id') provision_id: number,
-    @Param('document_type_id') document_type_id: number
-  ) {
-    return this.documentTypeService.disassociateDocType(+provision_id, document_type_id);
   }
 }

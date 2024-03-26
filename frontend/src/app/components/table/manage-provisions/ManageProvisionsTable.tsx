@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { DataTable } from '../common/DataTable';
 import { ColumnDef, createColumnHelper } from '@tanstack/react-table';
-import { disableProvision, enableProvision } from '../../../common/manage-templates';
+import { disableProvision, enableProvision } from '../../../common/manage-provisions';
 import { Provision, Variable } from '../../../types/types';
 import LinkButton from '../../common/LinkButton';
 // import { Button } from 'react-bootstrap';
@@ -103,13 +103,13 @@ const ManageProvisionsTable: React.FC<ManageProvisionsTableProps> = ({
       header: () => 'ID',
       meta: { customCss: { width: '5%' } },
     }),
-    columnHelper.accessor('provision_group', {
-      id: 'provision_group',
-      cell: (info) => <input value={info.getValue()} className="readonlyInput" readOnly />,
-      header: () => 'Group',
-      enableSorting: true,
-      meta: { customCss: { width: '8%' } },
-    }),
+    // columnHelper.accessor('provision_group', {
+    //   id: 'provision_group',
+    //   cell: (info) => <input value={info.getValue()} className="readonlyInput" readOnly />,
+    //   header: () => 'Group',
+    //   enableSorting: true,
+    //   meta: { customCss: { width: '8%' } },
+    // }),
     columnHelper.accessor('provision_name', {
       id: 'provision_name',
       cell: (info) => <input value={info.getValue()} className="readonlyInput" readOnly />,

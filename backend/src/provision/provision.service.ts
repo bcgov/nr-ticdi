@@ -39,7 +39,7 @@ export class ProvisionService {
     return this.provisionRepository.save(newProvision);
   }
 
-  async update(id: number, document_type_ids: number[], provision: UpdateProvisionDto): Promise<any> {
+  async update(id: number, provision: UpdateProvisionDto): Promise<any> {
     // const provision_group = Math.floor(provision.provision_group);
     // const provision_group_text = provision.provision_group_text;
     // delete provision['provision_group'];
@@ -74,12 +74,13 @@ export class ProvisionService {
     provision_id: number;
     create_userid: string;
   }) {
-    const provision = await this.findById(variable.provision_id);
+    const provision: Provision = await this.findById(variable.provision_id);
     delete variable['provision_id'];
     const newVariable = this.provisionVariableRepository.create({
       ...variable,
       provision: provision,
     });
+    console.log(newVariable);
     return this.provisionVariableRepository.save(newVariable);
   }
 
@@ -181,7 +182,6 @@ export class ProvisionService {
     try {
       return this.provisionRepository.findOne({
         where: { id: provisionId },
-        relations: ['provision_group'],
       });
     } catch (err) {
       console.log(err);

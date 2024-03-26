@@ -3,7 +3,7 @@ import config from '../../config';
 import { Provision, ProvisionUpload, Variable, VariableUpload } from '../types/types';
 
 export const getProvisions = async (): Promise<Provision[]> => {
-  const url = `${config.API_BASE_URL}/admin/provisions`;
+  const url = `${config.API_BASE_URL}/provision/`;
   const getParameters = api.generateApiParameters(url);
   const response: Provision[] = await api.get<Provision[]>(getParameters);
   console.log('getProvisions response');
@@ -12,7 +12,7 @@ export const getProvisions = async (): Promise<Provision[]> => {
 };
 
 export const getVariables = async (): Promise<Variable[]> => {
-  const url = `${config.API_BASE_URL}/admin/document-variables`;
+  const url = `${config.API_BASE_URL}/provision/variables`;
   const getParameters = api.generateApiParameters(url);
   const response: Variable[] = await api.get<Variable[]>(getParameters);
   console.log('getVariables response');
@@ -37,10 +37,18 @@ export const disableProvision = async (provisionId: number): Promise<void> => {
 };
 
 export const addProvision = async (data: ProvisionUpload): Promise<void> => {
-  const url = `${config.API_BASE_URL}/admin/add-provision`;
+  const url = `${config.API_BASE_URL}/provision/add`;
   const postParameters = api.generateApiParameters(url, data);
   const response = await api.post<void>(postParameters);
   console.log('addProvision response');
+  console.log(response);
+};
+
+export const updateProvision = async (data: ProvisionUpload & { id: number }): Promise<void> => {
+  const url = `${config.API_BASE_URL}/provision/update`;
+  const postParameters = api.generateApiParameters(url, data);
+  const response = await api.post<void>(postParameters);
+  console.log('updateProvision response');
   console.log(response);
 };
 
@@ -52,16 +60,8 @@ export const removeProvision = async (id: number): Promise<void> => {
   console.log(response);
 };
 
-export const updateProvision = async (data: ProvisionUpload & { id: number }): Promise<void> => {
-  const url = `${config.API_BASE_URL}/admin/update-provision`;
-  const postParameters = api.generateApiParameters(url, data);
-  const response = await api.post<void>(postParameters);
-  console.log('updateProvision response');
-  console.log(response);
-};
-
 export const addVariable = async (data: VariableUpload): Promise<void> => {
-  const url = `${config.API_BASE_URL}/admin/add-variable`;
+  const url = `${config.API_BASE_URL}/provision/add-variable`;
   const postParameters = api.generateApiParameters(url, data);
   const response = await api.post<void>(postParameters);
   console.log('addVariable response');
@@ -69,7 +69,7 @@ export const addVariable = async (data: VariableUpload): Promise<void> => {
 };
 
 export const updateVariable = async (data: VariableUpload & { id: number }): Promise<void> => {
-  const url = `${config.API_BASE_URL}/admin/update-variable`;
+  const url = `${config.API_BASE_URL}/provision/update-variable`;
   const postParameters = api.generateApiParameters(url, data);
   const response = await api.post<void>(postParameters);
   console.log('updateVariable response');
@@ -77,7 +77,7 @@ export const updateVariable = async (data: VariableUpload & { id: number }): Pro
 };
 
 export const removeVariable = async (id: number) => {
-  const url = `${config.API_BASE_URL}/admin/remove-variable/${id}`;
+  const url = `${config.API_BASE_URL}/provision/remove-variable/${id}`;
   const getParameters = api.generateApiParameters(url);
   const response = await api.get<void>(getParameters);
   console.log('removeVariable response');

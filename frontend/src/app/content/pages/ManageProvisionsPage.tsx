@@ -1,19 +1,17 @@
 import { FC, useEffect, useState } from 'react';
-import ManageProvisionsTable from '../../components/table/manage-provisions/ManageProvisionsTable';
 import { Button } from 'react-bootstrap';
-import { DocType, GroupMax, Provision, ProvisionUpload, Variable } from '../../types/types';
+import { Provision, ProvisionUpload, Variable } from '../../types/types';
+import ManageProvisionsTable from '../../components/table/manage-provisions/ManageProvisionsTable';
+import EditProvisionModal from '../../components/modal/manage-provisions/EditProvisionModal';
+import AddProvisionModal from '../../components/modal/manage-provisions/AddProvisionModal';
+import RemoveProvisionModal from '../../components/modal/manage-provisions/RemoveProvisionModal';
 import {
   addProvision,
-  getGroupMax,
   getProvisions,
   getVariables,
   removeProvision,
   updateProvision,
-} from '../../common/manage-templates';
-import EditProvisionModal from '../../components/modal/manage-provisions/EditProvisionModal';
-import AddProvisionModal from '../../components/modal/manage-provisions/AddProvisionModal';
-import { getDocumentTypes } from '../../common/report';
-import RemoveProvisionModal from '../../components/modal/manage-provisions/RemoveProvisionModal';
+} from '../../common/manage-provisions';
 
 interface ManageProvisionsPageProps {}
 
@@ -21,8 +19,6 @@ const ManageProvisionsPage: FC<ManageProvisionsPageProps> = () => {
   const [data, setData] = useState<{
     allProvisions?: Provision[];
     allVariables?: Variable[];
-    groupMaxArray?: GroupMax[];
-    documentTypes?: DocType[];
   }>({});
   const [currentProvision, setCurrentProvision] = useState<Provision>();
   const [showEditProvisionModal, setShowEditProvisionModal] = useState<boolean>(false);
@@ -32,11 +28,9 @@ const ManageProvisionsPage: FC<ManageProvisionsPageProps> = () => {
 
   useEffect(() => {
     const getData = async () => {
-      const groupMaxArray = await getGroupMax();
       const provisions = await getProvisions();
       const variables = await getVariables();
-      const documentTypes = await getDocumentTypes();
-      setData({ allProvisions: provisions, allVariables: variables, groupMaxArray, documentTypes });
+      setData({ allProvisions: provisions, allVariables: variables });
     };
     getData();
   }, [refreshTrigger]);
@@ -93,16 +87,12 @@ const ManageProvisionsPage: FC<ManageProvisionsPageProps> = () => {
       <EditProvisionModal
         provision={currentProvision}
         variables={currentVariables}
-        documentTypes={data.documentTypes}
-        groupMaxArray={data.groupMaxArray}
         show={showEditProvisionModal}
         onHide={() => setShowEditProvisionModal(false)}
         updateProvisionHandler={updateProvisionHandler}
         refreshTables={refreshTables}
       />
       <AddProvisionModal
-        groupMaxArray={data.groupMaxArray}
-        documentTypes={data.documentTypes}
         show={showAddProvisionModal}
         onHide={() => setShowAddProvisionModal(false)}
         addProvisionHandler={addProvisionHandler}

@@ -194,8 +194,8 @@ export class AdminController {
   }
 
   @Get('provisions')
-  getDocumentProvisions(): any {
-    return this.adminService.getDocumentProvisions();
+  getProvisions(): any {
+    return this.adminService.getProvisions();
   }
 
   @Get('document-variables')
@@ -216,85 +216,5 @@ export class AdminController {
   @Get('get-group-max')
   getGroupMax() {
     return this.adminService.getGroupMax();
-  }
-
-  @Post('add-provision')
-  addProvision(
-    @Body()
-    provisionParams: {
-      type: string;
-      provision_group: number;
-      provision_group_text: string;
-      max: number;
-      provision: string;
-      free_text: string;
-      help_text: string;
-      category: string;
-      sequence_value: number;
-      variants: number[];
-    },
-    @Session() session: { data?: SessionData }
-  ) {
-    const create_userid = session?.data?.activeAccount.idir_username;
-    return this.adminService.addProvision(provisionParams, create_userid);
-  }
-
-  @Post('update-provision')
-  updateProvision(
-    @Body()
-    provisionParams: {
-      id: number;
-      type: string;
-      provision_group: number;
-      provision_group_text: string;
-      max: number;
-      provision: string;
-      free_text: string;
-      help_text: string;
-      category: string;
-      sequence_value: number;
-      document_type_ids: number[];
-    },
-    @Session() session: { data?: SessionData }
-  ) {
-    const update_userid = session?.data?.activeAccount.idir_username;
-    console.log('sequence_value: ' + provisionParams.sequence_value);
-    return this.adminService.updateProvision(provisionParams, update_userid);
-  }
-
-  @Post('add-variable')
-  addVariable(
-    @Body()
-    variableParams: {
-      variable_name: string;
-      variable_value: string;
-      help_text: string;
-      provision_id: number;
-    },
-    @Session() session: { data?: SessionData }
-  ) {
-    const create_userid = session?.data?.activeAccount.idir_username;
-    return this.adminService.addVariable(variableParams, create_userid);
-  }
-
-  @Post('update-variable')
-  updateVariable(
-    @Body()
-    variableParams: {
-      id: number;
-      variable_name: string;
-      variable_value: string;
-      help_text: string;
-      provision_id: number;
-    },
-    @Session() session: { data?: SessionData }
-  ) {
-    const update_userid = session?.data?.activeAccount.idir_username;
-    return this.adminService.updateVariable({ ...variableParams, update_userid });
-  }
-
-  @Get('remove-variable/:id')
-  removeVariable(@Param('id') id: number) {
-    return this.adminService.removeVariable(id);
   }
 }

@@ -126,23 +126,21 @@ export class DocumentTypeService {
       active_flag: boolean;
       sequence_value: number;
       associated: boolean; // is the provision currently associated with the doc type
-      provision_group: ProvisionGroup;
+      provision_group: ProvisionGroup | null;
     };
 
     // get all docTypeProvisions with provision_group relation
     const docTypeProvisions = await this.documentTypeProvisionRepository.find({
       relations: ['provision_group', 'provision'],
     });
-    // get provision ids which are associated with the document type
-    const rawAssociatedProvisions = await this.documentTypeProvisionRepository
-      .createQueryBuilder('provision')
-      .select('provision.id', 'id')
-      .innerJoin('provision.document_types', 'documentType', 'documentType.id = :document_type_id', {
-        document_type_id,
-      })
-      .getRawMany();
+    console.log(docTypeProvisions);
+    // get provisions which are associated with the document type
+    const associatedProvisions = await this.documentTypeProvisionRepository.find({
+      where: { document_type: { id: document_type_id } },
+    });
+    console.log(associatedProvisions);
     // map them to a more readable format
-    const associatedProvisionIds = rawAssociatedProvisions.map((raw) => raw.id);
+    const associatedProvisionIds = associatedProvisions.map((raw) => raw.id);
     // map 'docTypeProvisions' to include a variable called 'associated' which is true or false
     const managedProvisions: ManageDocTypeProvision[] = docTypeProvisions.map((docTypeProvision) => ({
       id: docTypeProvision.id,

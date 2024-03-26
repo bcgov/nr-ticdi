@@ -135,6 +135,7 @@ export type DocumentDataProvisionObject = {
   provision: ProvisionObject;
 };
 
+// Used on manage-templates page?
 export type ProvisionObject = {
   type: string;
   provision_name: string;
@@ -212,24 +213,23 @@ export type Provision = {
 export type Variable = {
   variable_name: string;
   variable_value: string;
-  edit: any; // remove
-  remove: any; // remove
   help_text: string;
   id: number;
   provision_id: number;
 };
 
+// used on Manage Provisions page
 export type ProvisionUpload = {
-  type: string;
-  provision_group: number;
-  provision_group_text: string;
-  max: number;
+  // type: string;
+  // provision_group: number;
+  // provision_group_text: string;
+  // max: number;
   provision_name: string;
   free_text: string;
   help_text: string;
   category: string;
-  sequence_value: number;
-  document_type_ids: number[]; //
+  // sequence_value: number;
+  // document_type_ids: number[]; //
 };
 
 export type VariableUpload = {

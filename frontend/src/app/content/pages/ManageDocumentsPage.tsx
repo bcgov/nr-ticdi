@@ -13,7 +13,7 @@ import {
 } from '../../common/manage-doc-types';
 import EditProvisionGroupsModal from '../../components/modal/manage-doc-types/EditProvisionGroupsModal';
 import ManageDocumentProvisionsTable from '../../components/table/manage-doc-types/ManageDocumentProvisionsTable';
-import { getVariables } from '../../common/manage-templates';
+import { getVariables } from '../../common/manage-provisions';
 import EditDocTypeTable from '../../components/table/manage-doc-types/EditDocTypeTable';
 
 const ManageDocumentsPage: FC = () => {
@@ -35,7 +35,6 @@ const ManageDocumentsPage: FC = () => {
   const [variables, setVariables] = useState<Variable[]>([]);
 
   const [showAddDocTypeModal, setShowAddDocTypeModal] = useState<boolean>(false);
-  const [showEditDocTypeModal, setShowEditDocTypeModal] = useState<boolean>(false);
   const [showRemoveDocTypeModal, setShowRemoveDocTypeModal] = useState<boolean>(false);
   const [showEditProvisionGroupsModal, setShowEditProvisionGroupsModal] = useState<boolean>(false);
 

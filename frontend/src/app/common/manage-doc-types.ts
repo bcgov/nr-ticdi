@@ -55,19 +55,19 @@ export const removeDocType = (id: number) => {
 };
 
 export const getManageDocumentTypeProvisions = (document_type_id: number) => {
-  const url = `${config.API_BASE_URL}/provision/get-manage-doc-type-provisions/${document_type_id}`;
+  const url = `${config.API_BASE_URL}/document-type/get-manage-doc-type-provisions/${document_type_id}`;
   const getParameters = api.generateApiParameters(url);
   return api.get<ManageDocTypeProvision[]>(getParameters);
 };
 
 export const associateProvisionToDocType = (provision_id: number, document_type_id: number) => {
-  const url = `${config.API_BASE_URL}/provision/associate-doc-type/${provision_id}/${document_type_id}`;
+  const url = `${config.API_BASE_URL}/document-type/associate-doc-type/${provision_id}/${document_type_id}`;
   const getParameters = api.generateApiParameters(url);
   return api.get<any>(getParameters);
 };
 
 export const disassociateProvisionFromDocType = (provision_id: number, document_type_id: number) => {
-  const url = `${config.API_BASE_URL}/provision/disassociate-doc-type/${provision_id}/${document_type_id}`;
+  const url = `${config.API_BASE_URL}/document-type/disassociate-doc-type/${provision_id}/${document_type_id}`;
   const getParameters = api.generateApiParameters(url);
   return api.get<any>(getParameters);
 };

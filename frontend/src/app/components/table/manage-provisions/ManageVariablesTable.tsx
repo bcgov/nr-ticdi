@@ -56,14 +56,14 @@ const ManageVariablesTable: React.FC<ManageVariablesTableProps> = ({ variables, 
       enableSorting: false,
       meta: { customCss: { width: '40%' } },
     }),
-    columnHelper.accessor('edit', {
+    columnHelper.display({
       id: 'edit',
       cell: (info) => <LinkButton onClick={() => displayEditVariable(info.row.original.id)} text="Edit" />,
       header: () => null,
       enableSorting: false,
       meta: { customCss: { width: '10%' } },
     }),
-    columnHelper.accessor('remove', {
+    columnHelper.display({
       id: 'remove',
       cell: (info) => <LinkButton onClick={() => displayRemoveVariable(info.row.original.id)} text="Remove" />,
       header: () => null,

@@ -1,7 +1,7 @@
 import { FC, useState } from 'react';
 import Modal from 'react-bootstrap/Modal';
-import { DocType, GroupMax, Provision, ProvisionUpload, Variable, VariableUpload } from '../../../types/types';
-import { addVariable, removeVariable, updateProvision, updateVariable } from '../../../common/manage-templates';
+import { Provision, ProvisionUpload, Variable, VariableUpload } from '../../../types/types';
+import { addVariable, removeVariable, updateProvision, updateVariable } from '../../../common/manage-provisions';
 import EditProvisionModalForm from './forms/EditProvisionModalForm';
 import AddVariableModalForm from './forms/AddVariableModalForm';
 import EditVariableModalForm from './forms/EditVariableModalForm';
@@ -10,23 +10,13 @@ import RemoveVariableModalForm from './forms/RemoveVariableModalForm';
 type EditProvisionModalProps = {
   provision: Provision | undefined;
   variables: Variable[] | undefined;
-  documentTypes: DocType[] | undefined;
-  groupMaxArray: GroupMax[] | undefined;
   show: boolean;
   onHide: () => void;
   updateProvisionHandler: (provision: ProvisionUpload, provisionId: number) => void;
   refreshTables: () => void;
 };
 
-const EditProvisionModal: FC<EditProvisionModalProps> = ({
-  provision,
-  variables,
-  documentTypes,
-  groupMaxArray,
-  show,
-  onHide,
-  refreshTables,
-}) => {
+const EditProvisionModal: FC<EditProvisionModalProps> = ({ provision, variables, show, onHide, refreshTables }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [showError, setShowError] = useState(false);
@@ -42,6 +32,7 @@ const EditProvisionModal: FC<EditProvisionModalProps> = ({
     setDisplayRemoveVariable(false);
     setDisplayEditVariable(false);
     setDisplayAddVariable(true);
+    setShowError(false);
   };
 
   const handleDisplayEditVariable = (variableId: number) => {
@@ -50,6 +41,7 @@ const EditProvisionModal: FC<EditProvisionModalProps> = ({
     setDisplayAddVariable(false);
     setDisplayRemoveVariable(false);
     setDisplayEditVariable(true);
+    setShowError(false);
   };
 
   const handleDisplayRemoveVariable = (variableId: number) => {
@@ -58,6 +50,7 @@ const EditProvisionModal: FC<EditProvisionModalProps> = ({
     setDisplayAddVariable(false);
     setDisplayEditVariable(false);
     setDisplayRemoveVariable(true);
+    setShowError(false);
   };
 
   const returnToEditProvision = () => {
@@ -65,6 +58,7 @@ const EditProvisionModal: FC<EditProvisionModalProps> = ({
     setDisplayEditVariable(false);
     setDisplayRemoveVariable(false);
     setDisplayEditProvision(true);
+    setShowError(false);
   };
 
   const handleAddVariable = async (variable_name: string, variable_value: string, help_text: string) => {
@@ -80,6 +74,7 @@ const EditProvisionModal: FC<EditProvisionModalProps> = ({
         await addVariable(variableUpload);
         refreshTables();
         returnToEditProvision();
+        setShowError(false);
       }
     } catch (err) {
       console.log('Error adding variable');
@@ -146,8 +141,6 @@ const EditProvisionModal: FC<EditProvisionModalProps> = ({
           <EditProvisionModalForm
             provision={provision}
             variables={variables}
-            documentTypes={documentTypes}
-            groupMaxArray={groupMaxArray}
             loading={loading}
             updateProvisionHandler={handleUpdateProvision}
             onHide={onHide}

@@ -1,6 +1,7 @@
-import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Session } from '@nestjs/common';
 import { CreateProvisionDto } from './dto/create-provision.dto';
 import { ProvisionService } from './provision.service';
+import { SessionData } from 'utils/types';
 
 @Controller('provision')
 export class ProvisionController {
@@ -14,12 +15,55 @@ export class ProvisionController {
     return this.provisionService.create(provision);
   }
 
-  // @Post('update')
-  // async update(@Body() provision: CreateProvisionDto & { id: number }) {
-  //   const id = provision.id;
-  //   delete provision['id'];
-  //   return this.provisionService.update(id, provision);
-  // }
+  @Get()
+  findAll() {
+    return this.provisionService.findAll();
+  }
+
+  @Get('variables')
+  findAllVariables() {
+    return this.provisionService.findAllVariables();
+  }
+
+  @Post('add')
+  addProvision(
+    @Body()
+    provisionParams: {
+      provision: string;
+      free_text: string;
+      help_text: string;
+      category: string;
+    },
+    @Session() session: { data?: SessionData }
+  ) {
+    const create_userid = session?.data?.activeAccount.idir_username;
+    return this.provisionService.create({ ...provisionParams, create_userid });
+  }
+
+  @Post('update')
+  updateProvision(
+    @Body()
+    provisionParams: {
+      id: number;
+      provision: string;
+      free_text: string;
+      help_text: string;
+      category: string;
+    },
+    @Session() session: { data?: SessionData }
+  ) {
+    const update_userid = session?.data?.activeAccount.idir_username;
+    const { id, ...paramsMinusId } = provisionParams;
+    return this.provisionService.update(id, {
+      ...paramsMinusId,
+      update_userid,
+    });
+  }
+
+  @Get('remove/:id')
+  removeProvision(@Param('id') id: number) {
+    return this.provisionService.remove(id);
+  }
 
   @Post('add-variable')
   async addVariable(
@@ -29,10 +73,11 @@ export class ProvisionController {
       variable_value: string;
       help_text: string;
       provision_id: number;
-      create_userid: string;
-    }
+    },
+    @Session() session: { data?: SessionData }
   ) {
-    return this.provisionService.addVariable(variable);
+    const create_userid = session?.data?.activeAccount.idir_username;
+    return this.provisionService.addVariable({ ...variable, create_userid });
   }
 
   @Post('update-variable')
@@ -44,25 +89,16 @@ export class ProvisionController {
       help_text: string;
       provision_id: number;
       id: number;
-      update_userid: string;
-    }
+    },
+    @Session() session: { data?: SessionData }
   ) {
-    return this.provisionService.updateVariable(variable);
+    const update_userid = session?.data?.activeAccount.idir_username;
+    return this.provisionService.updateVariable({ ...variable, update_userid });
   }
 
   @Get('remove-variable/:id')
   async removeVariable(@Param('id') id: number) {
     return this.provisionService.removeVariable(id);
-  }
-
-  @Get()
-  findAll() {
-    return this.provisionService.findAll();
-  }
-
-  @Get('variables')
-  findAllVariables() {
-    return this.provisionService.findAllVariables();
   }
 
   @Get(':provisionId')

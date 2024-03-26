@@ -29,7 +29,7 @@ const config: TypeOrmModuleOptions = {
     DocumentType,
     DocumentTypeProvision,
   ],
-  synchronize: true,
+  synchronize: false,
 };
 
 export default config;

@@ -1,6 +1,6 @@
 import { FC, useEffect, useState } from 'react';
 import { Button, Col } from 'react-bootstrap';
-import { DocType, ProvisionGroup, Variable } from '../../types/types';
+import { DocType, ProvisionGroup } from '../../types/types';
 import { getDocumentTypes, getGroupMaxByDocTypeId } from '../../common/report';
 import ManageDocTypesTable from '../../components/table/manage-doc-types/ManageDocTypesTable';
 import AddDocTypeModal from '../../components/modal/manage-doc-types/AddDocTypeModal';
@@ -13,7 +13,6 @@ import {
 } from '../../common/manage-doc-types';
 import EditProvisionGroupsModal from '../../components/modal/manage-doc-types/EditProvisionGroupsModal';
 import ManageDocumentProvisionsTable from '../../components/table/manage-doc-types/ManageDocumentProvisionsTable';
-import { getVariables } from '../../common/manage-provisions';
 import EditDocTypeTable from '../../components/table/manage-doc-types/EditDocTypeTable';
 
 const ManageDocumentsPage: FC = () => {
@@ -32,7 +31,6 @@ const ManageDocumentsPage: FC = () => {
   const [allDocTypes, setAllDocTypes] = useState<DocType[]>([]);
   const [provisionGroups, setProvisionGroups] = useState<ProvisionGroup[]>([]);
   const [provisions, setProvisions] = useState<ManageDocTypeProvision[]>([]);
-  const [variables, setVariables] = useState<Variable[]>([]);
 
   const [showAddDocTypeModal, setShowAddDocTypeModal] = useState<boolean>(false);
   const [showRemoveDocTypeModal, setShowRemoveDocTypeModal] = useState<boolean>(false);
@@ -52,9 +50,6 @@ const ManageDocumentsPage: FC = () => {
     const getData = async () => {
       console.log('getting groupData for currentDocType.id = ' + currentDocType.id);
       if (currentDocType.id !== -1) {
-        console.log('~~~~~~~~~~~~~');
-        console.log('~~~~~~~~~~~~~');
-        console.log('~~~~~~~~~~~~~');
         const groupData = await getGroupMaxByDocTypeId(currentDocType.id);
         setProvisionGroups(groupData);
         console.log('groupData');
@@ -63,12 +58,9 @@ const ManageDocumentsPage: FC = () => {
         console.log('provisionData');
         console.log(provisionData);
         setProvisions(provisionData);
-        const variables = await getVariables();
-        setVariables(variables);
       } else {
         setProvisionGroups([]);
         setProvisions([]);
-        setVariables([]);
       }
     };
     getData();
@@ -105,24 +97,6 @@ const ManageDocumentsPage: FC = () => {
       console.log(err);
     }
   };
-
-  // const openEditDocTypeModal = (id: number) => {
-  //   const selectedDocType = allDocTypes.find((docType) => docType.id === id);
-  //   if (selectedDocType) {
-  //     setCurrentDocType(selectedDocType);
-  //     showEditPage();
-  //   }
-  // };
-
-  // const editDocTypeHandler = async (id: number, name: string, created_by: string, created_date: string) => {
-  //   try {
-  //     await updateDocType(id, name, created_by, created_date);
-  //     refreshTables();
-  //   } catch (err) {
-  //     console.log('Error updating doc type');
-  //     console.log(err);
-  //   }
-  // };
 
   const openRemoveDocTypeModal = (id: number) => {
     const selectedDocType = allDocTypes.find((docType) => docType.id === id);
@@ -162,16 +136,6 @@ const ManageDocumentsPage: FC = () => {
             onHide={() => setShowAddDocTypeModal(false)}
             onAdd={addDocTypeHandler}
           />
-
-          {/* {currentDocType && (
-            <EditDocTypeModal
-              documentType={currentDocType}
-              allDocTypes={allDocTypes}
-              show={showEditDocTypeModal}
-              onHide={() => setShowEditDocTypeModal(false)}
-              onEdit={editDocTypeHandler}
-            />
-          )} */}
 
           {currentDocType && (
             <RemoveDocTypeModal

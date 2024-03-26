@@ -17,12 +17,13 @@ export class DocumentTypeController {
     return this.documentTypeService.findById(id);
   }
 
-  @Post('add')
-  add(@Body() data: { name: string; created_by: string; created_date: string }, @Session() session: SessionData) {
-    const create_userid = session?.activeAccount?.idir_username;
-    console.log(data);
-    return this.documentTypeService.add(data.name, data.created_by, data.created_date, create_userid);
-  }
+  // moved to admin
+  // @Post('add')
+  // add(@Body() data: { name: string; created_by: string; created_date: string }, @Session() session: SessionData) {
+  //   const create_userid = session?.activeAccount?.idir_username;
+  //   console.log(data);
+  //   return this.documentTypeService.add(data.name, data.created_by, data.created_date, create_userid);
+  // }
 
   @Post('update')
   update(
@@ -33,19 +34,25 @@ export class DocumentTypeController {
     return this.documentTypeService.update(data.id, data.name, data.created_by, data.created_date, update_userid);
   }
 
-  @Get('remove/:id')
-  remove(@Param('id') id: number) {
-    console.log('in remove');
-    return this.documentTypeService.remove(id);
-  }
+  // moved to admin
+  // @Get('remove/:id')
+  // remove(@Param('id') id: number) {
+  //   console.log('in remove');
+  //   return this.documentTypeService.remove(id);
+  // }
 
   @Get()
   findAll() {
     return this.documentTypeService.findAll();
   }
 
+  @Get('get-group-max')
+  getGroupMax() {
+    return this.documentTypeService.getGroupMax();
+  }
+
   @Get('get-group-max/:document_type_id')
-  getGroupMax(@Param('document_type_id') document_type_id: number) {
+  getGroupMaxByDocTypeId(@Param('document_type_id') document_type_id: number) {
     return this.documentTypeService.getGroupMaxByDocTypeId(document_type_id);
   }
 }

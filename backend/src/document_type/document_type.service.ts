@@ -71,6 +71,13 @@ export class DocumentTypeService {
     return this.documentTypeRepository.save(docType);
   }
 
+  async getGroupMax(): Promise<any> {
+    const provisionGroups = await this.provisionGroupRepository.find({
+      relations: ['document_type'],
+    });
+    return Array.from(provisionGroups).sort((a, b) => a.provision_group - b.provision_group);
+  }
+
   async getGroupMaxByDocTypeId(document_type_id: number): Promise<any> {
     const provisionGroups = await this.provisionGroupRepository.find({
       where: { document_type: { id: document_type_id } },

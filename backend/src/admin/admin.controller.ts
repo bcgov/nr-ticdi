@@ -212,4 +212,22 @@ export class AdminController {
   disableProvision(@Param('provisionId') id: number): any {
     return this.adminService.disableProvision(id);
   }
+
+  @Post('add-document-type')
+  addDocumentType(
+    @Session() session: { data?: SessionData },
+    @Body() data: { name: string; created_by: string; created_date: string }
+  ) {
+    const create_userid = session?.data?.activeAccount
+      ? session.data.activeAccount.idir_username
+        ? session.data.activeAccount.idir_username
+        : ''
+      : '';
+    return this.adminService.addDocumentType(data.name, data.created_by, data.created_date, create_userid);
+  }
+
+  @Get('remove-document-type/:id')
+  removeDocumentType(@Param('id') document_type_id: number) {
+    return this.adminService.removeDocumentType(document_type_id);
+  }
 }

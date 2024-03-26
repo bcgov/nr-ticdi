@@ -26,7 +26,7 @@ export const getDocumentTypes = () => {
 };
 
 export const addDocType = (name: string, created_by: string, created_date: string) => {
-  const url = `${config.API_BASE_URL}/document-type/add`;
+  const url = `${config.API_BASE_URL}/admin/add-document-type`;
   const data = {
     name,
     created_by,
@@ -49,31 +49,42 @@ export const updateDocType = (id: number, name: string, created_by: string, crea
 };
 
 export const removeDocType = (id: number) => {
-  const url = `${config.API_BASE_URL}/document-type/remove/${id}`;
+  const url = `${config.API_BASE_URL}/admin/remove-document-type/${id}`;
   const getParameters = api.generateApiParameters(url);
   return api.get<DocType>(getParameters);
 };
 
 export const getManageDocumentTypeProvisions = (document_type_id: number) => {
-  const url = `${config.API_BASE_URL}/document-type/get-manage-doc-type-provisions/${document_type_id}`;
+  const url = `${config.API_BASE_URL}/provision/get-manage-doc-type-provisions/${document_type_id}`;
   const getParameters = api.generateApiParameters(url);
   return api.get<ManageDocTypeProvision[]>(getParameters);
 };
 
 export const associateProvisionToDocType = (provision_id: number, document_type_id: number) => {
-  const url = `${config.API_BASE_URL}/document-type/associate-doc-type/${provision_id}/${document_type_id}`;
+  const url = `${config.API_BASE_URL}/provision/associate-doc-type/${provision_id}/${document_type_id}`;
   const getParameters = api.generateApiParameters(url);
   return api.get<any>(getParameters);
 };
 
 export const disassociateProvisionFromDocType = (provision_id: number, document_type_id: number) => {
-  const url = `${config.API_BASE_URL}/document-type/disassociate-doc-type/${provision_id}/${document_type_id}`;
+  const url = `${config.API_BASE_URL}/provision/disassociate-doc-type/${provision_id}/${document_type_id}`;
   const getParameters = api.generateApiParameters(url);
   return api.get<any>(getParameters);
 };
 
+// used on manage doc types page
 export const getGroupMax = async (): Promise<GroupMax[]> => {
-  const url = `${config.API_BASE_URL}/admin/get-group-max`;
+  const url = `${config.API_BASE_URL}/document-type/get-group-max`;
+  const getParameters = api.generateApiParameters(url);
+  const response: GroupMax[] = await api.get<GroupMax[]>(getParameters);
+  console.log('getGroupMax response');
+  console.log(response);
+  return response;
+};
+
+// to be used on report page
+export const getGroupMaxByDocTypeId = async (document_type_id: number): Promise<GroupMax[]> => {
+  const url = `${config.API_BASE_URL}/document-type/get-group-max/${document_type_id}`;
   const getParameters = api.generateApiParameters(url);
   const response: GroupMax[] = await api.get<GroupMax[]>(getParameters);
   console.log('getGroupMax response');

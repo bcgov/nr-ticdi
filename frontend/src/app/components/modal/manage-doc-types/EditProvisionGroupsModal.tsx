@@ -2,6 +2,8 @@ import { FC, useEffect, useState } from 'react';
 import { ProvisionGroup } from '../../../types/types';
 import ProvisionGroupsTable from '../../table/manage-doc-types/ProvisionGroupsTable';
 import { Button, Col, Form, Modal, Row, Spinner } from 'react-bootstrap';
+import EditProvisionGroupsModalForm from './forms/EditProvisionGroupsModalForm';
+import AddProvisionGroupModalForm from './forms/AddProvisionGroupModalForm';
 
 interface EditProvisionGroupsModalProps {
   show: boolean;
@@ -30,21 +32,14 @@ const EditProvisionGroupsModal: FC<EditProvisionGroupsModalProps> = ({ show, onH
     setUpdatedProvisionGroups(provisionGroups);
   }, [provisionGroups]);
 
-  // Group, Description, Max, Remove
-
-  const setDisplayRemoveHandler = () => {
-    setDisplayAdd(false);
-    setDisplayEdit(false);
-    setDisplayRemove(true);
-  };
-
-  const setDisplayEditHandler = () => {
+  const displayEditHandler = () => {
     setDisplayAdd(false);
     setDisplayRemove(false);
     setDisplayEdit(true);
   };
 
-  const setDisplayAddHandler = () => {
+  const displayAddHandler = () => {
+    console.log('click');
     setDisplayEdit(false);
     setDisplayRemove(false);
     setDisplayAdd(true);
@@ -52,7 +47,9 @@ const EditProvisionGroupsModal: FC<EditProvisionGroupsModalProps> = ({ show, onH
 
   const displayRemoveHandler = (provisionGroup: ProvisionGroup) => {
     setGroupToRemove(provisionGroup);
-    setDisplayRemoveHandler();
+    setDisplayAdd(false);
+    setDisplayEdit(false);
+    setDisplayRemove(true);
   };
 
   // this gets called every time a cell in the table is changed, could be more efficient
@@ -67,36 +64,39 @@ const EditProvisionGroupsModal: FC<EditProvisionGroupsModalProps> = ({ show, onH
     // await updateProvisionGroups(updatedProvisionGroups);
   };
 
+  const addNewGroupHandler = (provision_group: number, provision_group_text: string, max: number) => {
+    if (provisionGroups.find((pg) => pg.provision_group === provision_group)) {
+      setError('A provision group with that group number already exists.');
+      return;
+    }
+    if (provisionGroups.find((pg) => pg.provision_group_text === provision_group_text)) {
+      setError('A provision group with that description already exists.');
+      return;
+    }
+    // create provision group
+  };
+
   return (
     <>
       <Modal show={show} onHide={onHide} size="lg">
-        <Modal.Header closeButton>
-          <Modal.Title>Edit Provision Groups</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <Col sm="12">
-            <ProvisionGroupsTable
-              provisionGroups={provisionGroups}
-              onUpdate={updateProvisionGroupsState}
-              showRemove={displayRemoveHandler}
-            />
-          </Col>
-          <Col sm="12">
-            <Button onClick={setDisplayAddHandler} variant="primary">
-              Add Provision Group
-            </Button>
-          </Col>
-          {showError && <div className="alert alert-danger">{error}</div>}
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={onHide}>
-            Cancel
-          </Button>
-
-          <Button variant="success" onClick={saveProvisionGroups} disabled={loading}>
-            {loading ? <Spinner as="span" animation="border" size="sm" role="status" aria-hidden="true" /> : 'Save'}
-          </Button>
-        </Modal.Footer>
+        {displayEdit && (
+          <EditProvisionGroupsModalForm
+            provisionGroups={provisionGroups}
+            loading={loading}
+            onHide={onHide}
+            saveProvisionGroups={saveProvisionGroups}
+            updateProvisionGroupsState={updateProvisionGroupsState}
+            displayRemoveHandler={displayRemoveHandler}
+            displayAddHandler={displayAddHandler}
+          />
+        )}
+        {displayAdd && (
+          <AddProvisionGroupModalForm
+            loading={loading}
+            displayEditHandler={displayEditHandler}
+            onAdd={addNewGroupHandler}
+          />
+        )}
       </Modal>
     </>
   );

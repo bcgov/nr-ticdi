@@ -5,6 +5,7 @@ import { SearchResultsItem, UserObject } from 'utils/types';
 import { DocumentTemplateService } from 'src/document_template/document_template.service';
 import { ProvisionService } from 'src/provision/provision.service';
 import { DocumentTypeService } from 'src/document_type/document_type.service';
+import { DocumentType } from 'src/document_type/entities/document_type.entity';
 const axios = require('axios');
 const FormData = require('form-data');
 
@@ -287,6 +288,28 @@ export class AdminService {
 
   disableProvision(id: number): Promise<any> {
     return this.provisionService.disable(id);
+  }
+
+  async addDocumentType(name: string, created_by: string, created_date: string, create_userid: string) {
+    const documentType: DocumentType = await this.documentTypeService.add(
+      name,
+      created_by,
+      created_date,
+      create_userid
+    );
+    await this.provisionService.generateDocTypeProvisions(documentType);
+  }
+
+  async removeDocumentType(document_type_id: number) {
+    try {
+      // remove the related doc type provisions
+      await this.provisionService.removeDocTypeProvisions(document_type_id);
+      // remove the doc type
+      await this.documentTypeService.remove(document_type_id);
+    } catch (err) {
+      console.log(err);
+      throw new Error('Error in removeDocumentType');
+    }
   }
 
   /**

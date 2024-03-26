@@ -16,7 +16,6 @@ interface ManageDocumentProvisionsTableProps {
 const ManageDocumentProvisionsTable: React.FC<ManageDocumentProvisionsTableProps> = ({
   documentTypeId,
   provisions,
-
   refreshTables,
 }) => {
   const [allProvisions, setAllProvisions] = useState<ManageDocTypeProvision[]>([]);
@@ -78,7 +77,7 @@ const ManageDocumentProvisionsTable: React.FC<ManageDocumentProvisionsTableProps
       enableSorting: true,
       meta: { customCss: { width: '7%' } },
     }),
-    columnHelper.accessor((row) => row.provision_group.provision_group, {
+    columnHelper.accessor((row) => row.provision_group?.provision_group, {
       id: 'provision_group',
       cell: (info) => <input defaultValue={info.getValue()} style={{ width: '100%' }} />,
       header: () => 'Group',
@@ -94,7 +93,9 @@ const ManageDocumentProvisionsTable: React.FC<ManageDocumentProvisionsTableProps
     }),
     columnHelper.accessor('provision_group', {
       id: 'provision_group_max',
-      cell: (info) => <input defaultValue={info.getValue().max} className="readonlyInput" readOnly />,
+      cell: (info) => (
+        <input defaultValue={info.getValue() ? info.getValue().max : ''} className="readonlyInput" readOnly />
+      ),
       header: () => 'Max',
       enableSorting: false,
       meta: { customCss: { width: '6%' } },

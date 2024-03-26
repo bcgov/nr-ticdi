@@ -26,8 +26,21 @@ export class ProvisionService {
     const newProvision: Provision = this.provisionRepository.create({
       ...provision,
     });
-    const documentTypes = await this.documentTypeService.findAll();
-    return this.provisionRepository.save(newProvision);
+    const savedProvision = await this.provisionRepository.save(newProvision);
+    const documentTypes: DocumentType[] = await this.documentTypeService.findAll();
+
+    // create an array of DocumentTypeProvision entries, one for each document type, each using the newly saved provision
+    const documentTypeProvisions = documentTypes.map((documentType) => {
+      const documentTypeProvision = new DocumentTypeProvision();
+      documentTypeProvision.document_type = documentType;
+      documentTypeProvision.provision = savedProvision;
+      return documentTypeProvision;
+    });
+
+    // save the new document_type_provision entries to the db
+    await this.documentTypeProvisionRepository.save(documentTypeProvisions);
+
+    return savedProvision;
   }
 
   async update(id: number, provision: UpdateProvisionDto): Promise<any> {
@@ -187,6 +200,8 @@ export class ProvisionService {
 
   async remove(id: number): Promise<any> {
     await this.provisionRepository.update(id, { is_deleted: true });
+    // update downstream document type provisions
+    await this.documentTypeProvisionRepository.delete({ provision: { id: id } });
     return { message: 'Provision deleted' };
   }
 
@@ -287,5 +302,28 @@ export class ProvisionService {
       console.log(err);
       throw err;
     }
+  }
+
+  /**
+   * When a new document type is created, a document type provision for each existing global provision needs to be created
+   * @param documentType
+   */
+  async generateDocTypeProvisions(documentType: DocumentType): Promise<void> {
+    const allProvisions: Provision[] = await this.findAll();
+    const documentTypeProvisions = allProvisions.map((provision) => {
+      const documentTypeProvision = new DocumentTypeProvision();
+      documentTypeProvision.document_type = documentType;
+      documentTypeProvision.provision = provision;
+      return documentTypeProvision;
+    });
+    await this.documentTypeProvisionRepository.save(documentTypeProvisions);
+  }
+
+  /**
+   * Deletes all document type provisions for a given document type which is being deleted.
+   * @param document_type_id
+   */
+  async removeDocTypeProvisions(document_type_id: number): Promise<void> {
+    await this.documentTypeProvisionRepository.delete({ document_type: { id: document_type_id } });
   }
 }

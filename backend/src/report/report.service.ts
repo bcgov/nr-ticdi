@@ -4,7 +4,7 @@ import { firstValueFrom } from 'rxjs';
 import { DocumentTemplateService } from 'src/document_template/document_template.service';
 import { ProvisionService } from 'src/provision/provision.service';
 import { TTLSService } from 'src/ttls/ttls.service';
-import { GL_REPORT_TYPE, LUR_REPORT_TYPE, numberWords, sectionTitles } from 'utils/constants';
+import { GL_REPORT_TYPE, LUR_REPORT_TYPE, SL_REPORT_TYPE, numberWords, sectionTitles } from 'utils/constants';
 import { ProvisionJSON, VariableJSON } from 'utils/types';
 import { convertToSpecialCamelCase, formatMoney, grazingLeaseVariables, nfrAddressBuilder } from 'utils/util';
 import { DocumentDataService } from 'src/document_data/document_data.service';
@@ -72,6 +72,8 @@ export class ReportService {
         prefix = 'LUR';
       } else if (documentType.name.toLowerCase().includes('grazing')) {
         prefix = 'GL';
+      } else if(documentType.name.toLowerCase().includes('standard licence')) {
+        prefix = 'SL';
       }
     }
     return {
@@ -89,6 +91,8 @@ export class ReportService {
   ) {
     // For now, hardcode this to call the different static report routes based on document type
     const documentType = await this.documentTypeService.findById(document_type_id);
+    console.log("::::::::::::::::::::::::::")
+    console.log(documentType)
     if (documentType) {
       if (documentType.name.toLowerCase().includes('notice of final review')) {
         return this.generateNFRReport(dtid, document_type_id, idirUsername, idirName, variableJson, provisionJson);
@@ -96,6 +100,8 @@ export class ReportService {
         return this.generateLURReport(dtid, idirUsername);
       } else if (documentType.name.toLowerCase().includes('grazing')) {
         return this.generateGLReport(dtid, idirUsername);
+      }  else if (documentType.name.toLowerCase().includes('standard licence')) {
+        return this.generateSLReport(dtid, document_type_id, idirUsername, idirName, variableJson, provisionJson);
       }
     }
   }
@@ -190,7 +196,8 @@ export class ReportService {
    * @returns
    */
   async generateGLReport(dtid: number, username: string) {
-    const documentType = GL_REPORT_TYPE;
+   // const documentType = GL_REPORT_TYPE; 
+   const documentType = SL_REPORT_TYPE;
     const templateUrl = `${hostname}:${port}/document-template/get-active-report/${documentType}`;
     const logUrl = `${hostname}:${port}/print-request-log/`;
 
@@ -203,7 +210,6 @@ export class ReportService {
       .catch((err) => {
         console.log(err);
       });
-
     // get the document template
     const documentTemplateObject: { id: number; the_file: string } = await axios.get(templateUrl).then((res) => {
       return res.data;
@@ -680,6 +686,395 @@ export class ReportService {
     // combine the formatted TTLS data, variables, and provision sections
     const data = Object.assign({}, ttlsData, variables, showProvisionSections);
 
+    // Save the NFR Data
+    const documentData = await this.saveDocument(
+      dtid,
+      document_type_id,
+      'Complete',
+      provisionJson,
+      variableJson,
+      idirUsername
+    );
+
+    // Log the request
+    await this.documentDataLogService.create({
+      dtid: dtid,
+      document_type_id: document_type_id,
+      document_data_id: documentData.id,
+      document_template_id: documentTemplateObject?.id,
+      request_app_user: idirUsername,
+      request_json: JSON.stringify(data),
+      create_userid: idirUsername,
+    });
+
+    // Generate the report
+    const cdogsToken = await this.ttlsService.callGetToken();
+    let bufferBase64 = documentTemplateObject.the_file;
+    let cdogsData = {
+      data,
+      formatters:
+        '{"myFormatter":"_function_myFormatter|function(data) { return data.slice(1); }","myOtherFormatter":"_function_myOtherFormatter|function(data) {return data.slice(2);}"}',
+      options: {
+        cacheReport: false,
+        convertTo: 'docx',
+        overwrite: true,
+        reportName: 'nfr-report',
+      },
+      template: {
+        content: `${bufferBase64}`,
+        encodingType: 'base64',
+        fileType: 'docx',
+      },
+    };
+    const md = JSON.stringify(cdogsData);
+
+    let conf = {
+      method: 'post',
+      url: process.env.cdogs_url,
+      headers: {
+        Authorization: `Bearer ${cdogsToken}`,
+        'Content-Type': 'application/json',
+      },
+      responseType: 'arraybuffer',
+      data: md,
+    };
+    const ax = require('axios');
+    const response = await ax(conf).catch((error) => {
+      console.log(error.response);
+    });
+    // response.data is the docx file after the first insertions
+    const firstFile = response.data;
+    // convert the docx file buffer to base64 for a second cdogs conversion
+    const base64File = Buffer.from(firstFile).toString('base64');
+    cdogsData.template.content = base64File;
+    const md2 = JSON.stringify(cdogsData);
+    conf.data = md2;
+    const response2 = await ax(conf).catch((error) => {
+      console.log(error.response);
+    });
+    // response2.data is the docx file after the second insertions
+    // (anything nested in a variable or provision should be inserted at this point)
+    return response2.data;
+  }
+
+  async generateSLReport(
+    dtid: number,
+    document_type_id: number,
+    idirUsername: string,
+    idirName: string,
+    variableJson: VariableJSON[],
+    provisionJson: ProvisionJSON[]
+  ) {
+    // get raw ttls data for later
+    await this.ttlsService.setWebadeToken();
+    const rawData: any = await firstValueFrom(this.ttlsService.callHttp(dtid))
+      .then((res) => {
+        return res;
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+    const documentTemplateObject = await this.documentTemplateService.findActiveByDocumentType(document_type_id);
+
+    // Format variables with names that the document template expects
+    const variables: any = {};
+    variableJson.forEach(({ variable_name, variable_value }) => {
+      const newVariableName = variable_name
+        .replace(/_/g, ' ')
+        .toLowerCase()
+        .replace(/\b\w/g, (match) => match.toUpperCase())
+        .replace(/\s/g, '_')
+        .replace(/^(\w)/, (match) => match.toUpperCase());
+
+      if (variable_value.includes('«')) {
+        // regex which converts «DB_TENURE_TYPE» to {d.DB_Tenure_Type}, also works for VAR_
+        variable_value = variable_value.replace(/<<([^>>]+)>>/g, function (match, innerText) {
+          innerText = convertToSpecialCamelCase(innerText);
+          return '{d.' + innerText + '}';
+        });
+      } else if (variable_value.includes('<<')) {
+        // regex which converts <<DB_TENURE_TYPE>> to {d.DB_Tenure_Type}, also works for VAR_
+        variable_value = variable_value.replace(/<<([^>>]+)>>/g, function (match, innerText) {
+          innerText = convertToSpecialCamelCase(innerText);
+          return '{d.' + innerText + '}';
+        });
+      }
+
+      variables[`VAR_${newVariableName}`] = variable_value;
+      variables[`${variable_name}`] = variable_value;
+    });
+
+    // Format provisions in a way that the document template expects
+    const groupIndexMap = new Map<number, number>();
+    const showProvisionSections: Record<string, any> = {};
+    provisionJson.forEach((provision) => {
+      const group = provision.provision_group;
+      const index = (groupIndexMap.get(group) ?? 0) + 1;
+      groupIndexMap.set(group, index);
+
+      const groupText = numberWords[group];
+      const varName = `Section${groupText}_${index}_Text`;
+      if (provision.free_text.includes('«')) {
+        // regex which converts «DB_TENURE_TYPE» to {d.DB_Tenure_Type}, also works for VAR_
+        provision.free_text = provision.free_text.replace(/«([^»]+)»/g, function (match, innerText) {
+          innerText = convertToSpecialCamelCase(innerText);
+          return '{d.' + innerText + '}';
+        });
+      } else if (provision.free_text.includes('<<')) {
+        // regex which converts <<DB_TENURE_TYPE>> to {d.DB_Tenure_Type}, also works for VAR_
+        provision.free_text = provision.free_text.replace(/<<([^>>]+)>>/g, function (match, innerText) {
+          innerText = convertToSpecialCamelCase(innerText);
+          return '{d.' + innerText + '}';
+        });
+      }
+      showProvisionSections[varName] = provision.free_text;
+      // workaround for template formatting
+      if (showProvisionSections[varName] != '') {
+        showProvisionSections[varName] = showProvisionSections[varName] + '\r\n\r\n';
+      }
+
+      const showVarName = `showSection${groupText}_${index}`;
+      showProvisionSections[showVarName] = 1;
+    });
+
+    // Logic for including section titles based on which sections are displaying information
+    for (const key in showProvisionSections) {
+      if (key.startsWith('showSection')) {
+        const number = key.match(/Section(\w+)_\d+/)[1];
+        if (number === 'Twenty' || number === 'TwentyFive' || number === 'TwentySeven') {
+          const titleKey = `Section${number}_Title`; // titleKey = Section<Number>_Title
+          showProvisionSections[key] = showProvisionSections[key]; // key = showSection<Number>_<#>
+          showProvisionSections[titleKey] = sectionTitles[number]; // set title text
+          showProvisionSections[`show${titleKey}`] = 1; // set show title to true
+        }
+      }
+    }
+
+    // Format the raw ttls data
+    const tenantAddr = rawData.tenantAddr;
+    const interestParcels = rawData.interestParcel;
+    let concatLegalDescriptions = '';
+    if (interestParcels && interestParcels.length > 0) {
+      interestParcels.sort((a, b) => b.interestParcelId - a.interestParcelId);
+      let legalDescArray = [];
+      for (let ip of interestParcels) {
+        if (ip.legalDescription && ip.legalDescription != '') {
+          legalDescArray.push(ip.legalDescription);
+        }
+      }
+      if (legalDescArray.length > 0) {
+        concatLegalDescriptions = legalDescArray.join('\n');
+      }
+    }
+
+    const DB_Address_Mailing_Tenant = tenantAddr[0] ? nfrAddressBuilder(tenantAddr) : '';
+
+    const VAR_Fee_Documentation_Amount: number =
+      variables && variables.VAR_Fee_Documentation_Amount
+        ? !isNaN(variables.VAR_Fee_Documentation_Amount)
+          ? parseFloat(variables.VAR_Fee_Documentation_Amount)
+          : 0
+        : 0;
+    if (variables && variables.VAR_Fee_Documentation_Amount) {
+      !isNaN(variables.VAR_Fee_Documentation_Amount)
+        ? (variables.VAR_Fee_Documentation_Amount = formatMoney(parseFloat(variables.VAR_Fee_Documentation_Amount)))
+        : (variables.VAR_Fee_Documentation_Amount = '0.00');
+    }
+
+    const VAR_Fee_Application_Amount: number =
+      variables && variables.VAR_Fee_Application_Amount
+        ? !isNaN(variables.VAR_Fee_Application_Amount)
+          ? parseFloat(variables.VAR_Fee_Application_Amount)
+          : 0
+        : 0;
+    if (variables && variables.VAR_Fee_Application_Amount) {
+      !isNaN(variables.VAR_Fee_Application_Amount)
+        ? (variables.VAR_Fee_Application_Amount = formatMoney(parseFloat(variables.VAR_Fee_Application_Amount)))
+        : (variables.VAR_Fee_Application_Amount = '0.00');
+    }
+
+    const VAR_Fee_Occupational_Rental_Amount: number =
+      variables && variables.VAR_Fee_Occupational_Rental_Amount
+        ? !isNaN(variables.VAR_Fee_Occupational_Rental_Amount)
+          ? parseFloat(variables.VAR_Fee_Occupational_Rental_Amount)
+          : 0
+        : 0;
+    if (variables && variables.VAR_Fee_Occupational_Rental_Amount) {
+      if (
+        !isNaN(variables.VAR_Fee_Occupational_Rental_Amount) &&
+        parseFloat(variables.VAR_Fee_Occupational_Rental_Amount) != 0
+      ) {
+        variables.VAR_Fee_Occupational_Rental_Amount = formatMoney(
+          parseFloat(variables.VAR_Fee_Occupational_Rental_Amount)
+        );
+      } else {
+        variables.VAR_Fee_Occupational_Rental_Amount = '0.00';
+      }
+    }
+
+    const VAR_Fee_Other_Credit_Amount: number =
+      variables && variables.VAR_Fee_Other_Credit_Amount
+        ? !isNaN(variables.VAR_Fee_Other_Credit_Amount)
+          ? parseFloat(variables.VAR_Fee_Other_Credit_Amount)
+          : 0
+        : 0;
+    if (variables && variables.VAR_Fee_Other_Credit_Amount) {
+      !isNaN(variables.VAR_Fee_Other_Credit_Amount)
+        ? (variables.VAR_Fee_Other_Credit_Amount = formatMoney(parseFloat(variables.VAR_Fee_Other_Credit_Amount)))
+        : (variables.VAR_Fee_Other_Credit_Amount = '0.00');
+    }
+
+    const GST_Rate: number = rawData && rawData.gstRate ? rawData.gstRate : 0;
+    const DB_Fee_Payable_Type: string = rawData.feePayableType;
+    const DB_Fee_Payable_Amount: number = rawData.feePayableAmount ? rawData.feePayableAmount : 0;
+    const DB_Fee_Payable_Amount_GST: number = rawData.feePayableAmountGst ? rawData.feePayableAmountGst : 0;
+    const DB_GST_Exempt: string = rawData.gstExempt ? rawData.gstExempt : 'N';
+    const DB_GST_Exempt_Area: number = rawData.gstExemptArea ? rawData.gstExemptArea : 0;
+    let DB_Total_GST_Amount: number;
+    const DB_FP_Asterisk: string = DB_GST_Exempt === 'Y' ? '' : '*';
+
+    let totalArea = 0;
+    if (rawData.interestParcel && rawData.interestParcel[0]) {
+      for (let parcel of rawData.interestParcel) {
+        totalArea += parcel.areaInHectares;
+      }
+    }
+    // Take the total area in hectares and subtract the exempt amount to get the taxable area
+    const taxableArea = totalArea - DB_GST_Exempt_Area;
+    // Get the ratio of the taxable are to the totalArea
+    const areaRatio = totalArea !== 0 ? taxableArea / totalArea : 0;
+
+    if (DB_GST_Exempt === 'Y') {
+      DB_Total_GST_Amount =
+        ((DB_Fee_Payable_Amount_GST * areaRatio + VAR_Fee_Documentation_Amount + VAR_Fee_Application_Amount) *
+          GST_Rate) /
+        100.0;
+    } else {
+      DB_Total_GST_Amount =
+        ((DB_Fee_Payable_Amount_GST * areaRatio +
+          VAR_Fee_Occupational_Rental_Amount +
+          VAR_Fee_Documentation_Amount +
+          VAR_Fee_Application_Amount) *
+          GST_Rate) /
+        100.0;
+    }
+
+    const DB_Total_Monies_Payable: number =
+      DB_Total_GST_Amount +
+      DB_Fee_Payable_Amount_GST +
+      DB_Fee_Payable_Amount +
+      VAR_Fee_Documentation_Amount +
+      VAR_Fee_Occupational_Rental_Amount +
+      VAR_Fee_Application_Amount -
+      VAR_Fee_Other_Credit_Amount;
+
+    let monies = [];
+    const Show_Fee_Payable_Amount_GST = DB_Fee_Payable_Amount_GST ? (DB_Fee_Payable_Amount_GST > 0 ? 1 : 0) : 0;
+    if (Show_Fee_Payable_Amount_GST === 1) {
+      monies.push({
+        description: DB_Fee_Payable_Type,
+        dollarSign: '*$',
+        value: formatMoney(DB_Fee_Payable_Amount_GST),
+      });
+    }
+    const Show_Fee_Payable_Amount = DB_Fee_Payable_Amount ? (DB_Fee_Payable_Amount > 0 ? 1 : 0) : 0;
+    if (Show_Fee_Payable_Amount === 1) {
+      monies.push({
+        description: DB_Fee_Payable_Type,
+        dollarSign: '$',
+        value: formatMoney(DB_Fee_Payable_Amount),
+      });
+    }
+    const Show_Fee_Occupational_Rental_Amount = VAR_Fee_Occupational_Rental_Amount
+      ? VAR_Fee_Occupational_Rental_Amount > 0
+        ? 1
+        : 0
+      : 0;
+    if (Show_Fee_Occupational_Rental_Amount === 1) {
+      monies.push({
+        description: 'Occupational Rental Amount',
+        dollarSign: `${DB_FP_Asterisk}$`,
+        value: formatMoney(VAR_Fee_Occupational_Rental_Amount),
+      });
+    }
+    const Show_Fee_Documentation_Amount = VAR_Fee_Documentation_Amount ? (VAR_Fee_Documentation_Amount > 0 ? 1 : 0) : 0;
+    if (Show_Fee_Documentation_Amount === 1) {
+      monies.push({
+        description: 'Documentation Amount',
+        dollarSign: '*$',
+        value: formatMoney(VAR_Fee_Documentation_Amount),
+      });
+    }
+    const Show_Fee_Application_Amount = VAR_Fee_Application_Amount ? (VAR_Fee_Application_Amount > 0 ? 1 : 0) : 0;
+    if (Show_Fee_Application_Amount === 1) {
+      monies.push({
+        description: 'Application Amount',
+        dollarSign: '*$',
+        value: formatMoney(VAR_Fee_Application_Amount),
+      });
+    }
+    const Show_Fee_Other_Credit_Amount = VAR_Fee_Other_Credit_Amount ? (VAR_Fee_Other_Credit_Amount > 0 ? 1 : 0) : 0;
+    if (Show_Fee_Other_Credit_Amount === 1) {
+      monies.push({
+        description: 'Other (credit)',
+        dollarSign: '$',
+        value: formatMoney(VAR_Fee_Other_Credit_Amount),
+      });
+    }
+    monies.push({
+      description: 'GST Total',
+      dollarSign: '$',
+      value: formatMoney(DB_Total_GST_Amount),
+    });
+    const moniesTotal = {
+      description: 'Total Fees Payable',
+      dollarSign: '$',
+      value: formatMoney(DB_Total_Monies_Payable),
+    };
+
+    const ttlsData = {
+      DB_Name_Tenant : rawData.contactFirstName +" "+ rawData.contactLastName,
+      DB_Name_Corporation : tenantAddr[0] ? tenantAddr[0].legalName : '',
+      monies: monies,
+      moniesTotal: moniesTotal,
+      DB_Address_Regional_Office: nfrAddressBuilder([
+        {
+          addrLine1: rawData.regOfficeStreet,
+          city: rawData.regOfficeCity,
+          provAbbr: rawData.regOfficeProv,
+          postalCode: rawData.regOfficePostalCode,
+        },
+      ]),
+      
+      DB_Name_BCAL_Contact: idirName,
+      DB_File_Number: rawData.fileNum,
+      DB_Address_Mailing_Tenant: DB_Address_Mailing_Tenant,
+      DB_Tenure_Type: rawData.type // convert a tenure type like LICENSE to License
+        ? rawData.type.toLowerCase().charAt(0).toUpperCase() + rawData.type.toLowerCase().slice(1)
+        : '',
+      DB_Legal_Description: concatLegalDescriptions,
+      DB_Fee_Payable_Type: DB_Fee_Payable_Type,
+      DB_Fee_Payable_Amount_GST: DB_Fee_Payable_Amount_GST == 0 ? '' : formatMoney(DB_Fee_Payable_Amount_GST),
+      DB_Fee_Payable_Amount: formatMoney(DB_Fee_Payable_Amount),
+      DB_FP_Asterisk: DB_FP_Asterisk,
+      DB_Total_GST_Amount: formatMoney(DB_Total_GST_Amount),
+      DB_Total_Monies_Payable: formatMoney(DB_Total_Monies_Payable),
+      DB_Address_Line_Regional_Office: nfrAddressBuilder([
+        {
+          addrLine1: rawData.regOfficeStreet,
+          city: rawData.regOfficeCity,
+          provAbbr: rawData.regOfficeProv,
+          postalCode: rawData.regOfficePostalCode,
+        },
+      ]),
+    }; // parse out the rawData, variableJson, and provisionJson into something useable
+// Shiv Satya
+console.log("first log:::::::::::::::::")
+console.log(ttlsData)
+    // combine the formatted TTLS data, variables, and provision sections
+    const data = Object.assign({}, ttlsData, variables, showProvisionSections);
+    console.log("Second log:::::::::::::::::")
+    console.log(data)
     // Save the NFR Data
     const documentData = await this.saveDocument(
       dtid,

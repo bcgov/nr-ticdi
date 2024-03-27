@@ -157,19 +157,21 @@ table {
   }
 }
 
-
-label {
-  display: block; 
-  margin: 0.5rem 0;
+.document-preview {
+  label {
+    display: block; 
+    margin: 0.5rem 0;
+  }
+  
+  input[type="text"] {
+    // width: 100%;
+    padding: $table-cell-padding;
+    margin-bottom: 1rem; 
+    border: 1px solid $input-border-color;
+    border-radius: $input-border-radius;
+  }
 }
 
-input[type="text"] {
-  // width: 100%;
-  padding: $table-cell-padding;
-  margin-bottom: 1rem; 
-  border: 1px solid $input-border-color;
-  border-radius: $input-border-radius;
-}
 
 
 .button {

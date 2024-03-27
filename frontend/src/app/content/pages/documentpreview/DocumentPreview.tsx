@@ -213,7 +213,7 @@ const DocumentPreview: React.FC = () => {
   };
 
   return (
-    <>
+    <div className="document-preview">
       <div className="h1">Document Preview</div>
       <hr className="document-preview__divider" />
       <div className="mb-3 mt-3 d-flex">
@@ -324,7 +324,7 @@ const DocumentPreview: React.FC = () => {
           </Button>
         </>
       </div>
-    </>
+    </div>
   );
 };
 

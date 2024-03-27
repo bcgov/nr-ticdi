@@ -23,7 +23,7 @@ const GroupSelectionAndProvisions: React.FC<GroupSelectionAndProvisionsProps> = 
   handleCheckboxChange,
 }) => {
   return (
-    <>
+    <div className="group-selection-provis">
       <div className="document-preview">
 
 
@@ -52,7 +52,7 @@ const GroupSelectionAndProvisions: React.FC<GroupSelectionAndProvisionsProps> = 
 
 
       </div>
-    </>
+    </div>
   );
 };
 

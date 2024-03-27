@@ -12,11 +12,9 @@ export type ManageDocTypeProvision = {
   active_flag: boolean;
   sequence_value: number;
   associated: boolean;
-  provision_group: ProvisionGroup;
-  // create_userid: string;
-  // update_userid: string;
-  // create_timestamp: string;
-  // update_timestamp: string;
+  provision_group: number;
+  max: number;
+  provision_group_object: ProvisionGroup | null;
 };
 
 export const getDocumentTypes = () => {
@@ -72,6 +70,19 @@ export const disassociateProvisionFromDocType = (provision_id: number, document_
   return api.get<any>(getParameters);
 };
 
+export const updateManageDocTypeProvisions = (
+  document_type_id: number,
+  updatedProvisions: ManageDocTypeProvision[]
+) => {
+  const url = `${config.API_BASE_URL}/provision/update-manage-doc-type-provisions`;
+  const data = {
+    document_type_id: document_type_id,
+    provisions: updatedProvisions,
+  };
+  const postParameters = api.generateApiParameters(url, data);
+  return api.post<ManageDocTypeProvision[]>(postParameters);
+};
+
 // used on manage doc types page
 export const getGroupMax = async (): Promise<GroupMax[]> => {
   const url = `${config.API_BASE_URL}/document-type/get-group-max`;
@@ -88,6 +99,45 @@ export const getGroupMaxByDocTypeId = async (document_type_id: number): Promise<
   const getParameters = api.generateApiParameters(url);
   const response: GroupMax[] = await api.get<GroupMax[]>(getParameters);
   console.log('getGroupMax response');
+  console.log(response);
+  return response;
+};
+
+export const addProvisionGroup = async (
+  provision_group: number,
+  provision_group_text: string,
+  max: number,
+  document_type_id: number
+) => {
+  const url = `${config.API_BASE_URL}/document-type/add-provision-group`;
+  const data = {
+    provision_group,
+    provision_group_text,
+    max,
+    document_type_id,
+  };
+  const postParameters = api.generateApiParameters(url, data);
+  const response = await api.post<any>(postParameters);
+  console.log(response);
+  return response;
+};
+
+export const updateProvisionGroups = async (updatedProvisionGroups: ProvisionGroup[], document_type_id: number) => {
+  const url = `${config.API_BASE_URL}/document-type/update-provision-groups`;
+  const data = {
+    provision_groups: updatedProvisionGroups,
+    document_type_id,
+  };
+  const postParameters = api.generateApiParameters(url, data);
+  const response = await api.post<any>(postParameters);
+  console.log(response);
+  return response;
+};
+
+export const removeProvisionGroup = async (provision_group_id: number) => {
+  const url = `${config.API_BASE_URL}/document-type/remove-provision-group`;
+  const getParameters = api.generateApiParameters(url);
+  const response = await api.post<any>(getParameters);
   console.log(response);
   return response;
 };

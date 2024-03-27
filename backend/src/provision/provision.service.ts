@@ -9,6 +9,7 @@ import { DocumentTypeService } from 'src/document_type/document_type.service';
 import { DocumentType } from 'src/document_type/entities/document_type.entity';
 import { DocumentTypeProvision } from './entities/document_type_provision';
 import { ProvisionGroup } from 'src/document_type/entities/provision_group.entity';
+import { ManageDocTypeProvision } from 'utils/types';
 
 @Injectable()
 export class ProvisionService {
@@ -220,24 +221,11 @@ export class ProvisionService {
   }
 
   async getManageDocTypeProvisions(document_type_id: number) {
-    // type used by the frontend for displaying data in a table
-    type ManageDocTypeProvision = {
-      id: number;
-      type: string;
-      provision_name: string;
-      free_text: string;
-      help_text: string;
-      category: string;
-      active_flag: boolean;
-      sequence_value: number;
-      associated: boolean; // is the provision currently associated with the doc type
-      provision_group: ProvisionGroup | null;
-    };
-
     const provisions: Provision[] = await this.findAll();
     console.log(provisions);
     // get all docTypeProvisions with provision_group relation
     const docTypeProvisions = await this.documentTypeProvisionRepository.find({
+      where: { document_type: { id: document_type_id } },
       relations: ['provision_group', 'provision'],
     });
     console.log(docTypeProvisions);
@@ -258,50 +246,68 @@ export class ProvisionService {
       category: docTypeProvision.provision.category,
       active_flag: docTypeProvision.provision.active_flag,
       sequence_value: docTypeProvision.sequence_value,
-      associated: associatedProvisionIds.includes(docTypeProvision.id),
-      provision_group: docTypeProvision.provision_group,
+      associated: docTypeProvision.associated,
+      provision_group: docTypeProvision?.provision_group ? docTypeProvision.provision_group.provision_group : null,
+      max: docTypeProvision?.provision_group ? docTypeProvision.provision_group.max : null,
+      provision_group_object: docTypeProvision.provision_group,
     }));
     return managedProvisions;
   }
 
   async associateDocType(provision_id: number, document_type_id: number) {
     try {
-      console.log(`associating provision id ${provision_id} to doc type ${document_type_id}`);
-      const documentType: DocumentType = await this.documentTypeService.findById(document_type_id);
-      const dtProvision: DocumentTypeProvision = await this.documentTypeProvisionRepository.findOneBy({
-        id: provision_id,
+      console.log(`associating provision id ${provision_id} from doc type ${document_type_id}`);
+      const documentTypeProvision = await this.documentTypeProvisionRepository.findOneOrFail({
+        where: { id: provision_id },
       });
-      // make sure they aren't already related
-      const existingProvision = documentType.document_type_provisions.find((p) => p.id === dtProvision.id);
-      if (documentType && dtProvision && !existingProvision) {
-        documentType.document_type_provisions.push(dtProvision);
-        await this.documentTypeService.save(documentType);
-      } else {
-        throw new Error(`Failed to associate Provision with Document Type`);
-      }
+      await this.documentTypeProvisionRepository.save({
+        ...documentTypeProvision,
+        associated: true,
+      });
     } catch (err) {
       console.log(err);
-      throw err;
+      throw new Error('Error associating provision.');
     }
   }
 
   async disassociateDocType(provision_id: number, document_type_id: number) {
     try {
       console.log(`disassociating provision id ${provision_id} from doc type ${document_type_id}`);
-      const documentType: DocumentType = await this.documentTypeService.findById(document_type_id);
-      const provisionIndex = documentType.document_type_provisions.findIndex((p) => {
-        return p.id === provision_id;
+      const documentTypeProvision = await this.documentTypeProvisionRepository.findOneOrFail({
+        where: { id: provision_id },
       });
-      if (documentType && provisionIndex > -1) {
-        documentType.document_type_provisions.splice(provisionIndex, 1);
-        await this.documentTypeService.save(documentType);
-      } else {
-        throw new Error(`Failed to disassociate Provision and Document Type`);
-      }
+      await this.documentTypeProvisionRepository.save({
+        ...documentTypeProvision,
+        associated: false,
+      });
     } catch (err) {
       console.log(err);
-      throw err;
+      throw new Error('Error disassociating provision.');
     }
+  }
+
+  async updateManageDocTypeProvisions(document_type_id: number, docTypeProvisions: ManageDocTypeProvision[]) {
+    const existingDocTypeProvisions: DocumentTypeProvision[] = await this.documentTypeProvisionRepository.find({
+      where: {
+        document_type: { id: document_type_id },
+      },
+    });
+    const updatedProvisions = existingDocTypeProvisions.map((existingProv) => {
+      const matchingProv = docTypeProvisions.find((dtp) => dtp.id === existingProv.id);
+
+      if (matchingProv) {
+        return {
+          ...existingProv,
+          type: matchingProv.type,
+          associated: matchingProv.associated,
+          sequence_value: matchingProv.sequence_value,
+          provision_group: matchingProv.provision_group_object,
+        };
+      }
+      return existingProv;
+    });
+    await this.documentTypeProvisionRepository.save(updatedProvisions);
+    console.log('Provisions updated successfully!');
   }
 
   /**

@@ -24,7 +24,16 @@ const ProvisionGroupsTable: FC<ProvisionGroupsTableProps> = ({ provisionGroups, 
   const handleCellUpdate = (rowIndex: number, columnId: keyof ProvisionGroup, newValue: any) => {
     const newProvisionGroups = updatedProvisionGroups.map((group, index) => {
       if (index === rowIndex) {
-        const updatedValue = columnId === 'provision_group' || columnId === 'max' ? parseInt(newValue, 10) : newValue;
+        let updatedValue;
+        console.log(updatedValue);
+        console.log(updatedValue === '');
+        if (columnId === 'max') {
+          updatedValue = !updatedValue || updatedValue === '' ? 999 : parseInt(newValue, 10);
+        } else if (columnId === 'provision_group') {
+          updatedValue = parseInt(newValue, 10);
+        } else {
+          updatedValue = newValue;
+        }
 
         return { ...group, [columnId]: updatedValue };
       }

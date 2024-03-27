@@ -1,7 +1,7 @@
 import { Body, Controller, Get, Param, Post, Session } from '@nestjs/common';
 import { CreateProvisionDto } from './dto/create-provision.dto';
 import { ProvisionService } from './provision.service';
-import { SessionData } from 'utils/types';
+import { ManageDocTypeProvision, SessionData } from 'utils/types';
 
 @Controller('provision')
 export class ProvisionController {
@@ -145,5 +145,14 @@ export class ProvisionController {
     @Param('document_type_id') document_type_id: number
   ) {
     return this.provisionService.disassociateDocType(+provision_id, document_type_id);
+  }
+
+  @Post('update-manage-doc-type-provisions')
+  updateManageDocTypeProvisions(@Body() data: { document_type_id: number; provisions: ManageDocTypeProvision[] }) {
+    console.log('~~~~~~');
+    console.log(data.document_type_id);
+    console.log(data.provisions);
+    console.log('~~~~~~');
+    return this.provisionService.updateManageDocTypeProvisions(data.document_type_id, data.provisions);
   }
 }

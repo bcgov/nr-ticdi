@@ -1,5 +1,5 @@
 import { FC, useEffect, useState } from 'react';
-import { Button, Col } from 'react-bootstrap';
+import { Button, Col, Row } from 'react-bootstrap';
 import { DocType, ProvisionGroup } from '../../types/types';
 import { getDocumentTypes, getGroupMaxByDocTypeId } from '../../common/report';
 import ManageDocTypesTable from '../../components/table/manage-doc-types/ManageDocTypesTable';
@@ -10,15 +10,31 @@ import {
   addDocType,
   getManageDocumentTypeProvisions,
   removeDocType,
+  updateDocType,
+  updateManageDocTypeProvisions,
 } from '../../common/manage-doc-types';
 import EditProvisionGroupsModal from '../../components/modal/manage-doc-types/EditProvisionGroupsModal';
 import ManageDocumentProvisionsTable from '../../components/table/manage-doc-types/ManageDocumentProvisionsTable';
 import EditDocTypeTable from '../../components/table/manage-doc-types/EditDocTypeTable';
+import DocumentProvisionSearch, {
+  DocumentProvisionSearchState,
+} from '../../components/common/manage-doc-types/DocumentProvisionSearch';
 
 const ManageDocumentsPage: FC = () => {
+  const [loading, setLoading] = useState<boolean>(false);
   const [showMain, setShowMain] = useState<boolean>(true);
   const [showEdit, setShowEdit] = useState<boolean>(false);
   const [currentDocType, setCurrentDocType] = useState<DocType>({
+    id: -1,
+    name: '',
+    created_by: '',
+    created_date: '',
+    create_userid: '',
+    create_timestamp: '',
+    update_timestamp: '',
+    update_userid: '',
+  });
+  const [updatedDocType, setUpdatedDocType] = useState<DocType>({
     id: -1,
     name: '',
     created_by: '',
@@ -37,6 +53,19 @@ const ManageDocumentsPage: FC = () => {
   const [showEditProvisionGroupsModal, setShowEditProvisionGroupsModal] = useState<boolean>(false);
 
   const [refreshTrigger, setRefreshTrigger] = useState(0);
+  const [refreshDocTypesTrigger, setRefreshDocTypesTrigger] = useState(0);
+
+  const [updatedProvisions, setUpdatedProvisions] = useState<ManageDocTypeProvision[]>([]);
+  const [searchState, setSearchState] = useState<DocumentProvisionSearchState>({
+    provisionName: '',
+    id: '',
+    type: '',
+    group: '',
+    freeText: '',
+    category: '',
+    associated: true,
+    isAdvancedSearch: false,
+  });
 
   useEffect(() => {
     const getData = async () => {
@@ -44,19 +73,14 @@ const ManageDocumentsPage: FC = () => {
       setAllDocTypes(docTypeData);
     };
     getData();
-  }, [refreshTrigger]);
+  }, [refreshDocTypesTrigger]);
 
   useEffect(() => {
     const getData = async () => {
-      console.log('getting groupData for currentDocType.id = ' + currentDocType.id);
       if (currentDocType.id !== -1) {
         const groupData = await getGroupMaxByDocTypeId(currentDocType.id);
         setProvisionGroups(groupData);
-        console.log('groupData');
-        console.log(groupData);
         const provisionData = await getManageDocumentTypeProvisions(currentDocType.id);
-        console.log('provisionData');
-        console.log(provisionData);
         setProvisions(provisionData);
       } else {
         setProvisionGroups([]);
@@ -65,6 +89,18 @@ const ManageDocumentsPage: FC = () => {
     };
     getData();
   }, [refreshTrigger, currentDocType]);
+
+  useEffect(() => {
+    setUpdatedDocType(currentDocType);
+  }, [currentDocType]);
+
+  useEffect(() => {
+    setUpdatedProvisions(provisions);
+  }, [provisions]);
+
+  const refreshDocTypes = () => {
+    setRefreshDocTypesTrigger((prev) => prev + 1);
+  };
 
   const refreshTables = () => {
     setRefreshTrigger((prev) => prev + 1);
@@ -91,7 +127,7 @@ const ManageDocumentsPage: FC = () => {
   const addDocTypeHandler = async (name: string, created_by: string, created_date: string) => {
     try {
       await addDocType(name, created_by, created_date);
-      refreshTables();
+      refreshDocTypes();
     } catch (err) {
       console.log('Error adding doc type');
       console.log(err);
@@ -109,11 +145,59 @@ const ManageDocumentsPage: FC = () => {
   const removeDocTypeHandler = async (id: number) => {
     try {
       await removeDocType(id);
-      refreshTables();
+      refreshDocTypes();
     } catch (err) {
       console.log('Error removing doc type');
       console.log(err);
     }
+  };
+
+  const handleUpdateDocTypeState = (updatedDocType: DocType) => {
+    setUpdatedDocType(updatedDocType);
+  };
+
+  const updateProvisionsState = (newProvisionsState: ManageDocTypeProvision[]) => {
+    setUpdatedProvisions(newProvisionsState);
+  };
+
+  const saveButtonHandler = async () => {
+    await saveDocType();
+    await saveProvisions();
+  };
+
+  const saveDocType = async () => {
+    try {
+      setLoading(true);
+      console.log('Saving Doc Type...');
+      // console.log(updatedDocType);
+      await updateDocType(
+        currentDocType.id,
+        updatedDocType.name,
+        updatedDocType.created_by,
+        updatedDocType.created_date
+      );
+      // refreshDocTypes();
+    } catch (err) {
+      console.log('Error saving doc type');
+      console.log(err);
+    }
+  };
+
+  const saveProvisions = async () => {
+    try {
+      setLoading(true);
+      console.log('Saving Provisions...');
+      await updateManageDocTypeProvisions(currentDocType.id, updatedProvisions);
+    } catch (err) {
+      console.log('Error updating provisions');
+      console.log(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const setSearchStateHandler = (searchState: DocumentProvisionSearchState) => {
+    setSearchState(searchState);
   };
 
   return (
@@ -153,26 +237,37 @@ const ManageDocumentsPage: FC = () => {
           <hr />
           {/** Doc Type info / edit single row table */}
           {/** Document Type Name - Date Created - Created By - Last Updated Date - Last Updated By */}
-          <EditDocTypeTable documentType={[currentDocType]} />
+          <EditDocTypeTable documentType={[currentDocType]} onUpdate={handleUpdateDocTypeState} />
           <hr />
           <h1>Associate Provisions to {currentDocType.name}</h1>
           <hr />
           {/** Search implementation */}
-          {/** Name/group search box - Advanced Search - Associated - Edit Provision Groups*/}
-          <Button variant="primary" onClick={() => setShowEditProvisionGroupsModal(true)}>
-            Edit Provision Groups
-          </Button>
           {/** Advanced Search: different inputs - id, type, group, free text, category */}
+          <Row className="mt-3">
+            <DocumentProvisionSearch onSearch={setSearchStateHandler} />
+            {/** Name/group search box - Advanced Search - Associated - Edit Provision Groups*/}
+            <Col sm={4}>
+              <Button variant="primary" onClick={() => setShowEditProvisionGroupsModal(true)}>
+                Edit Provision Groups
+              </Button>
+            </Col>
+          </Row>
+
           {/** Global Provisions table */}
           <ManageDocumentProvisionsTable
             documentTypeId={currentDocType.id}
             provisions={provisions}
+            provisionGroups={provisionGroups}
+            searchState={searchState}
             refreshTables={refreshTables}
+            onUpdate={updateProvisionsState}
           />
           {/** ID - Type - Group - Seq - Max - Provision Name - Free Text - Category - Associated */}
           <EditProvisionGroupsModal
             provisionGroups={provisionGroups}
+            documentTypeId={currentDocType.id}
             show={showEditProvisionGroupsModal}
+            refreshTables={refreshTables}
             onHide={() => setShowEditProvisionGroupsModal(false)}
           />
           {/** Save and Go Back Buttons */}
@@ -180,7 +275,12 @@ const ManageDocumentsPage: FC = () => {
             <Button variant="secondary" onClick={showMainPage} style={{ margin: '10px' }}>
               Go Back
             </Button>
-            <Button variant="success" onClick={() => {}} style={{ margin: '10px', marginRight: '50px' }}>
+            <Button
+              variant="success"
+              onClick={saveButtonHandler}
+              style={{ margin: '10px', marginRight: '50px' }}
+              disabled={loading}
+            >
               Save
             </Button>
           </Col>

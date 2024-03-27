@@ -85,6 +85,46 @@ export class DocumentTypeService {
     return Array.from(provisionGroups).sort((a, b) => a.provision_group - b.provision_group);
   }
 
+  async addProvisionGroup(
+    provision_group: number,
+    provision_group_text: string,
+    max: number,
+    document_type_id: number
+  ): Promise<any> {
+    const newProvisionGroup = new ProvisionGroup();
+    newProvisionGroup.provision_group = provision_group;
+    newProvisionGroup.provision_group_text = provision_group_text;
+    newProvisionGroup.max = max;
+    newProvisionGroup.document_type = await this.documentTypeRepository.findOne({ where: { id: document_type_id } });
+    await this.provisionGroupRepository.save(newProvisionGroup);
+  }
+
+  async updateProvisionGroups(document_type_id: number, provision_groups: ProvisionGroup[]): Promise<any> {
+    const existingProvisionGroups = await this.provisionGroupRepository.find({
+      where: { document_type: { id: document_type_id } },
+    });
+    const updatedProvisionGroups: ProvisionGroup[] = [];
+
+    provision_groups.map((pg) => {
+      const existingGroup = existingProvisionGroups.find((eg) => eg.id === pg.id);
+      if (existingGroup) {
+        existingGroup.max = pg.max;
+        existingGroup.provision_group = pg.provision_group;
+        existingGroup.provision_group_text = pg.provision_group_text;
+        updatedProvisionGroups.push(existingGroup);
+      }
+    });
+    return this.provisionGroupRepository.save(updatedProvisionGroups);
+  }
+
+  async removeProvisionGroup(provision_group_id: number) {
+    const result = await this.provisionGroupRepository.delete(provision_group_id);
+
+    if (result.affected === 0) {
+      throw new Error(`Provision group with ID ${provision_group_id} not found`);
+    }
+  }
+
   async updateGroupMaximums(provision_group: number, max: number, provision_group_text: string) {
     let provisionGroup: ProvisionGroup = await this.provisionGroupRepository.findOneBy({
       provision_group: provision_group,

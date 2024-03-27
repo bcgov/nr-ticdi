@@ -6,14 +6,21 @@ import { Column, ColumnDef, Row, createColumnHelper } from '@tanstack/react-tabl
 
 interface EditDocTypeTableProps {
   documentType: DocType[];
+  onUpdate: (documentType: DocType) => void;
 }
 
-const EditDocTypeTable: FC<EditDocTypeTableProps> = ({ documentType }) => {
-  const handleCellUpdate = (rowIndex: number, columnId: keyof DocType, newValue: any) => {
-    console.log('cell updated');
-    console.log('rowIndex ' + rowIndex);
-    console.log('columnId ' + columnId);
-    console.log('newValue ' + newValue);
+const EditDocTypeTable: FC<EditDocTypeTableProps> = ({ documentType, onUpdate }) => {
+  const [updatedDocType, setUpdatedDocType] = useState(documentType[0]);
+
+  useEffect(() => {
+    onUpdate(updatedDocType);
+  }, [updatedDocType, onUpdate]);
+
+  const handleCellUpdate = (columnId: string, newValue: any) => {
+    setUpdatedDocType((prev) => ({
+      ...prev,
+      [columnId]: newValue,
+    }));
   };
 
   const columnHelper = createColumnHelper<DocType>();
@@ -22,7 +29,7 @@ const EditDocTypeTable: FC<EditDocTypeTableProps> = ({ documentType }) => {
     columnHelper.accessor('name', {
       id: 'name',
       cell: (info) => (
-        <TableCell getValue={info.getValue} row={info.row} column={info.column} onCellUpdate={handleCellUpdate} />
+        <TableCell getValue={info.getValue} row={info.row} columnId={info.column.id} onCellUpdate={handleCellUpdate} />
       ),
       header: () => 'Document Type Name',
       enableSorting: false,
@@ -31,7 +38,7 @@ const EditDocTypeTable: FC<EditDocTypeTableProps> = ({ documentType }) => {
     columnHelper.accessor('created_date', {
       id: 'created_date',
       cell: (info) => (
-        <TableCell getValue={info.getValue} row={info.row} column={info.column} onCellUpdate={handleCellUpdate} />
+        <TableCell getValue={info.getValue} row={info.row} columnId={info.column.id} onCellUpdate={handleCellUpdate} />
       ),
       header: () => 'Date Created',
       enableSorting: false,
@@ -40,7 +47,7 @@ const EditDocTypeTable: FC<EditDocTypeTableProps> = ({ documentType }) => {
     columnHelper.accessor('created_by', {
       id: 'created_by',
       cell: (info) => (
-        <TableCell getValue={info.getValue} row={info.row} column={info.column} onCellUpdate={handleCellUpdate} />
+        <TableCell getValue={info.getValue} row={info.row} columnId={info.column.id} onCellUpdate={handleCellUpdate} />
       ),
       header: () => 'Created By',
       enableSorting: false,
@@ -70,24 +77,25 @@ export default EditDocTypeTable;
 interface TableCellProps<T> {
   getValue: () => any;
   row: Row<T>;
-  column: Column<T, any>;
-  onCellUpdate: (rowIndex: number, columnId: keyof DocType, newValue: any) => void; // Updated type
+  columnId: string;
+  onCellUpdate: (columnId: string, newValue: any) => void;
 }
 
-const TableCell: FC<TableCellProps<DocType>> = ({ getValue, row, column, onCellUpdate }) => {
-  const initialValue = column.id === 'created_date' ? getValue().substring(0, 10) : getValue();
+const TableCell: FC<TableCellProps<DocType>> = ({ getValue, row, columnId, onCellUpdate }) => {
+  const initialValue = getValue() ? (columnId === 'created_date' ? getValue().substring(0, 10) : getValue()) : '';
   const [value, setValue] = useState(initialValue);
 
   useEffect(() => {
     setValue(initialValue);
   }, [initialValue]);
 
-  const onBlur = () => {
-    const validKeys: (keyof DocType)[] = ['name', 'created_by', 'created_date'];
-    if (validKeys.includes(column.id as keyof DocType)) {
-      onCellUpdate(row.index, column.id as keyof DocType, value);
-    }
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setValue(e.target.value);
   };
 
-  return <input value={value} onChange={(e) => setValue(e.target.value)} onBlur={onBlur} type={'text'} />;
+  const onBlur = () => {
+    onCellUpdate(columnId, value);
+  };
+
+  return <input type="text" value={value} onChange={handleChange} onBlur={onBlur} style={{ width: '100%' }} />;
 };

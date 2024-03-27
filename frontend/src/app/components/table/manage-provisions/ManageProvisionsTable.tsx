@@ -4,7 +4,6 @@ import { ColumnDef, createColumnHelper } from '@tanstack/react-table';
 import { disableProvision, enableProvision } from '../../../common/manage-provisions';
 import { Provision, Variable } from '../../../types/types';
 import LinkButton from '../../common/LinkButton';
-// import { Button } from 'react-bootstrap';
 
 interface ManageProvisionsTableProps {
   provisions: Provision[] | undefined;
@@ -34,7 +33,6 @@ const ManageProvisionsTable: React.FC<ManageProvisionsTableProps> = ({
     }
   }, [provisions, variables]);
 
-  // will add column sorting to table later
   const basicSort = (data: Provision[]): Provision[] => {
     const sortedData: Provision[] = [...data];
     sortedData.sort((a, b) => {
@@ -162,7 +160,7 @@ const ManageProvisionsTable: React.FC<ManageProvisionsTableProps> = ({
         // paginationSetup={{ enabled: true, pageSize: 10 }}
         enableSorting={true}
         initialSorting={[
-          { id: 'provision_group', desc: false },
+          // { id: 'provision_group', desc: false },
           { id: 'provision_name', desc: false },
         ]}
       />

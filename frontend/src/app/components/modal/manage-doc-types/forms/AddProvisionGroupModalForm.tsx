@@ -1,5 +1,6 @@
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { FC, useState } from 'react';
-import { Button, Col, Form, Modal, Spinner } from 'react-bootstrap';
+import { Button, Col, Form, Modal, OverlayTrigger, Spinner, Tooltip } from 'react-bootstrap';
 
 interface AddProvisionGroupModalFormProps {
   loading: boolean;
@@ -8,11 +9,9 @@ interface AddProvisionGroupModalFormProps {
 }
 
 const AddProvisionGroupModalForm: FC<AddProvisionGroupModalFormProps> = ({ loading, onAdd, displayEditHandler }) => {
-  const [error, setError] = useState('');
-  const [showError, setShowError] = useState(false);
   const [group, setGroup] = useState<number>();
   const [groupDescription, setGroupDescription] = useState<string>('');
-  const [max, setMax] = useState<number>();
+  const [max, setMax] = useState<number>(999);
 
   const handleGroupChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newGroup = parseInt(e.target.value);
@@ -24,13 +23,17 @@ const AddProvisionGroupModalForm: FC<AddProvisionGroupModalFormProps> = ({ loadi
   };
 
   const handleMaxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newMax = parseInt(e.target.value);
+    let newMax = 999;
+    if (e.target.value.trim() !== '') {
+      newMax = parseInt(e.target.value);
+    }
     setMax(newMax);
   };
 
   const handleAdd = () => {
     if (group && groupDescription && max) {
       onAdd(group, groupDescription, max);
+      displayEditHandler();
     }
   };
 
@@ -60,20 +63,29 @@ const AddProvisionGroupModalForm: FC<AddProvisionGroupModalFormProps> = ({ loadi
           <Form.Group className="mb-3">
             <Form.Label column sm="12">
               Max
+              <OverlayTrigger
+                placement="right"
+                overlay={
+                  <Tooltip id="max-tooltip">
+                    Leave Max blank if you want no maximum number of provisions for this group.
+                  </Tooltip>
+                }
+              >
+                <FontAwesomeIcon icon={'question-circle'} className="ml-2" />
+              </OverlayTrigger>
             </Form.Label>
             <Col sm="10">
               <Form.Control type="number" name="max" onChange={handleMaxChange} />
             </Col>
           </Form.Group>
         </Form>
-        {showError && <div className="alert alert-danger">{error}</div>}
       </Modal.Body>
       <Modal.Footer>
         <Button variant="secondary" onClick={displayEditHandler}>
           Go Back
         </Button>
 
-        <Button variant="success" onClick={handleAdd} disabled={loading}>
+        <Button variant="success" onClick={handleAdd} disabled={loading || !group || !groupDescription || max < 1}>
           {loading ? <Spinner as="span" animation="border" size="sm" role="status" aria-hidden="true" /> : 'Add'}
         </Button>
       </Modal.Footer>

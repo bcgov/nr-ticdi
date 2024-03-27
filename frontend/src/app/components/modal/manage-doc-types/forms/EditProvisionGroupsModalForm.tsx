@@ -22,9 +22,6 @@ const EditProvisionGroupsModalForm: FC<EditProvisionGroupsModalFormProps> = ({
   displayRemoveHandler,
   displayAddHandler,
 }) => {
-  const [error, setError] = useState('');
-  const [showError, setShowError] = useState(false);
-
   return (
     <>
       <Modal.Header closeButton>
@@ -43,7 +40,6 @@ const EditProvisionGroupsModalForm: FC<EditProvisionGroupsModalFormProps> = ({
             Add Provision Group
           </Button>
         </Col>
-        {showError && <div className="alert alert-danger">{error}</div>}
       </Modal.Body>
       <Modal.Footer>
         <Button variant="secondary" onClick={onHide}>

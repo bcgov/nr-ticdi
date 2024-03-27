@@ -4,6 +4,7 @@ import { AuthenticationGuard } from 'src/authentication/authentication.guard';
 import { GenerateReportGuard } from 'src/authentication/generate-report.guard';
 import { DocumentTypeService } from './document_type.service';
 import { SessionData } from 'utils/types';
+import { ProvisionGroup } from './entities/provision_group.entity';
 
 // @UseFilters(AuthenticationFilter)
 // @UseGuards(AuthenticationGuard)
@@ -17,13 +18,7 @@ export class DocumentTypeController {
     return this.documentTypeService.findById(id);
   }
 
-  // moved to admin
-  // @Post('add')
-  // add(@Body() data: { name: string; created_by: string; created_date: string }, @Session() session: SessionData) {
-  //   const create_userid = session?.activeAccount?.idir_username;
-  //   console.log(data);
-  //   return this.documentTypeService.add(data.name, data.created_by, data.created_date, create_userid);
-  // }
+  // Add is done through Admin controller due to circular dependency issues
 
   @Post('update')
   update(
@@ -33,13 +28,6 @@ export class DocumentTypeController {
     const update_userid = session?.activeAccount?.idir_username;
     return this.documentTypeService.update(data.id, data.name, data.created_by, data.created_date, update_userid);
   }
-
-  // moved to admin
-  // @Get('remove/:id')
-  // remove(@Param('id') id: number) {
-  //   console.log('in remove');
-  //   return this.documentTypeService.remove(id);
-  // }
 
   @Get()
   findAll() {
@@ -54,5 +42,27 @@ export class DocumentTypeController {
   @Get('get-group-max/:document_type_id')
   getGroupMaxByDocTypeId(@Param('document_type_id') document_type_id: number) {
     return this.documentTypeService.getGroupMaxByDocTypeId(document_type_id);
+  }
+
+  @Post('add-provision-group')
+  addProvisionGroup(
+    @Body() data: { provision_group: number; provision_group_text: string; max: number; document_type_id: number }
+  ) {
+    return this.documentTypeService.addProvisionGroup(
+      data.provision_group,
+      data.provision_group_text,
+      data.max,
+      data.document_type_id
+    );
+  }
+
+  @Post('update-provision-groups')
+  updateProvisionGroups(@Body() data: { document_type_id: number; provision_groups: ProvisionGroup[] }) {
+    return this.documentTypeService.updateProvisionGroups(data.document_type_id, data.provision_groups);
+  }
+
+  @Get('remove-provision-group/:provision_group_id')
+  removeProvisionGroup(@Param('provision_group_id') provision_group_id: number) {
+    return this.documentTypeService.removeProvisionGroup(provision_group_id);
   }
 }

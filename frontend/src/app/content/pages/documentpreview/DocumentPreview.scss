@@ -131,31 +131,7 @@ $button-background-save: #28a745;
 $button-background-generate: #007bff; 
 
 
-table {
-  width: 100%;
-  border-collapse: collapse;
 
-  th {
-    text-align: left;
-    padding: $table-cell-padding;
-  }
-
-  td {
-    padding: $table-cell-padding;
-
-    input[type="text"] {
-      width: 100%;
-      padding: $table-cell-padding;
-      border: 1px solid $input-border-color;
-      border-radius: $input-border-radius;
-
-      &:focus {
-        outline: none;
-        border-color: darken($input-border-color, 10%);
-      }
-    }
-  }
-}
 
 .document-preview {
   label {
@@ -169,6 +145,31 @@ table {
     margin-bottom: 1rem; 
     border: 1px solid $input-border-color;
     border-radius: $input-border-radius;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  
+    th {
+      text-align: left;
+      padding: $table-cell-padding;
+    }
+  
+    td {
+      padding: $table-cell-padding;
+  
+      input[type="text"] {
+        width: 100%;
+        padding: $table-cell-padding;
+        border: 1px solid $input-border-color;
+        border-radius: $input-border-radius;
+  
+        &:focus {
+          outline: none;
+          border-color: darken($input-border-color, 10%);
+        }
+      }
+    }
   }
 }
 

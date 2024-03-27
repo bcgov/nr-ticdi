@@ -2,7 +2,7 @@ import { FC, useEffect, useState } from 'react';
 import { DataTable } from '../common/DataTable';
 import { DocType } from '../../../types/types';
 
-import { Column, ColumnDef, Row, createColumnHelper } from '@tanstack/react-table';
+import { ColumnDef, Row, createColumnHelper } from '@tanstack/react-table';
 
 interface EditDocTypeTableProps {
   documentType: DocType[];
@@ -69,7 +69,7 @@ const EditDocTypeTable: FC<EditDocTypeTableProps> = ({ documentType, onUpdate })
     }),
   ];
 
-  return <DataTable columns={columns} data={documentType} />;
+  return <DataTable columns={columns} data={[updatedDocType]} />;
 };
 
 export default EditDocTypeTable;

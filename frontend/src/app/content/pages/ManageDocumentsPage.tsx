@@ -176,7 +176,7 @@ const ManageDocumentsPage: FC = () => {
         updatedDocType.created_by,
         updatedDocType.created_date
       );
-      // refreshDocTypes();
+      refreshDocTypes();
     } catch (err) {
       console.log('Error saving doc type');
       console.log(err);

@@ -1,6 +1,8 @@
-# RedHat UBI 8 with nodejs 14
+# RedHat UBI 8 with an updated version of Node.js
 FROM registry.access.redhat.com/ubi8/ubi as builder
-RUN dnf module install -y nodejs:14
+
+# Replace nodejs:14 with the version you need, for example, nodejs:16
+RUN dnf module enable -y nodejs:16 && dnf install -y nodejs
 
 # Install packages, build and keep only prod packages
 WORKDIR /app
@@ -11,7 +13,7 @@ RUN npm ci --only=prod && \
 # Deployment container
 FROM registry.access.redhat.com/ubi8/ubi-micro
 
-# Set node to production 
+# Set node to production
 ENV NODE_ENV production
 
 # Node packages and dependencies

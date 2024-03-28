@@ -1,5 +1,5 @@
 import { FC, useEffect, useState } from 'react';
-import { DocType, DocumentDataObject, ProvisionGroup } from '../../types/types';
+import { DocType, DocumentDataObject, ProvisionDataObject, ProvisionGroup } from '../../types/types';
 import { getDocumentDataByDocTypeIdAndDtid } from '../../common/report';
 import ProvisionsTable from '../../components/table/reports/ProvisionsTable';
 import SelectedProvisionsTable, { ProvisionJson } from '../../components/table/reports/SelectedProvisionsTable';
@@ -8,32 +8,16 @@ interface ProvisionsProps {
   dtid: number;
   documentType: DocType;
   provisionGroups: ProvisionGroup[] | undefined;
+  provisions: ProvisionDataObject[] | undefined;
   updateHandler: (provisionJson: ProvisionJson[]) => void;
   updateSelectedProvisionIds: (selectedProvisionIds: number[]) => void;
 }
-
-export type ProvisionData = {
-  id: number;
-  type: string;
-  provision_name: string;
-  free_text: string;
-  category: string;
-  active_flag: boolean;
-  create_userid: string;
-  update_userid: string;
-  help_text: string;
-  create_timestamp: string;
-  update_timestamp: string;
-  select: boolean;
-  max: number;
-  provision_group: ProvisionGroup;
-  is_deleted: boolean;
-};
 
 const Provisions: FC<ProvisionsProps> = ({
   dtid,
   documentType,
   provisionGroups,
+  provisions,
   updateHandler,
   updateSelectedProvisionIds,
 }) => {
@@ -88,7 +72,7 @@ const Provisions: FC<ProvisionsProps> = ({
 
   return (
     <>
-      {/* <div>
+      <div>
         <label htmlFor="provisionGroupSelect" style={{ marginRight: '10px' }}>
           Select A Group
         </label>
@@ -109,10 +93,11 @@ const Provisions: FC<ProvisionsProps> = ({
             </option>
           ))}
         </select>
-      </div> */}
+      </div>
       <ProvisionsTable
         dtid={dtid}
         docType={documentType}
+        provisions={provisions}
         currentGroupNumber={selectedProvisionGroup}
         currentGroupMax={selectedProvisionGroupMax}
         selectedProvisionIds={selectedProvisionIds}
@@ -124,6 +109,7 @@ const Provisions: FC<ProvisionsProps> = ({
         dtid={dtid}
         docType={documentType}
         selectedProvisionIds={selectedProvisionIds}
+        provisions={provisions}
         updateHandler={updateHandler}
       />
     </>

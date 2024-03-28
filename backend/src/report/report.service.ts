@@ -11,6 +11,7 @@ import { DocumentDataService } from 'src/document_data/document_data.service';
 import { DocumentDataLogService } from 'src/document_data_log/document_data_log.service';
 import { DocumentTypeService } from 'src/document_type/document_type.service';
 import { Provision } from 'src/provision/entities/provision.entity';
+import { DocumentTypeProvision } from 'src/provision/entities/document_type_provision';
 const axios = require('axios');
 
 // generate report needs to be consolidated which is impossible until we figure out how provisions & variables will be dynamically inserted into the docx files
@@ -71,7 +72,7 @@ export class ReportService {
         prefix = 'LUR';
       } else if (documentType.name.toLowerCase().includes('grazing')) {
         prefix = 'GL';
-      } else if(documentType.name.toLowerCase().includes('standard licence')) {
+      } else if (documentType.name.toLowerCase().includes('standard licence')) {
         prefix = 'SL';
       }
     }
@@ -90,8 +91,8 @@ export class ReportService {
   ) {
     // For now, hardcode this to call the different static report routes based on document type
     const documentType = await this.documentTypeService.findById(document_type_id);
-    console.log("::::::::::::::::::::::::::")
-    console.log(documentType)
+    console.log('::::::::::::::::::::::::::');
+    console.log(documentType);
     if (documentType) {
       if (documentType.name.toLowerCase().includes('notice of final review')) {
         return this.generateNFRReport(dtid, document_type_id, idirUsername, idirName, variableJson, provisionJson);
@@ -99,7 +100,7 @@ export class ReportService {
         return this.generateLURReport(dtid, idirUsername);
       } else if (documentType.name.toLowerCase().includes('grazing')) {
         return this.generateGLReport(dtid, idirUsername);
-      }  else if (documentType.name.toLowerCase().includes('standard licence')) {
+      } else if (documentType.name.toLowerCase().includes('standard licence')) {
         return this.generateSLReport(dtid, document_type_id, idirUsername, idirName, variableJson, provisionJson);
       }
     }
@@ -195,8 +196,8 @@ export class ReportService {
    * @returns
    */
   async generateGLReport(dtid: number, username: string) {
-   // const documentType = GL_REPORT_TYPE; 
-   const documentType = SL_REPORT_TYPE;
+    // const documentType = GL_REPORT_TYPE;
+    const documentType = SL_REPORT_TYPE;
     const templateUrl = `${hostname}:${port}/document-template/get-active-report/${documentType}`;
     const logUrl = `${hostname}:${port}/print-request-log/`;
 
@@ -1032,8 +1033,8 @@ export class ReportService {
     };
 
     const ttlsData = {
-      DB_Name_Tenant : rawData.contactFirstName +" "+ rawData.contactLastName,
-      DB_Name_Corporation : tenantAddr[0] ? tenantAddr[0].legalName : '',
+      DB_Name_Tenant: rawData.contactFirstName + ' ' + rawData.contactLastName,
+      DB_Name_Corporation: tenantAddr[0] ? tenantAddr[0].legalName : '',
       monies: monies,
       moniesTotal: moniesTotal,
       DB_Address_Regional_Office: nfrAddressBuilder([
@@ -1044,7 +1045,7 @@ export class ReportService {
           postalCode: rawData.regOfficePostalCode,
         },
       ]),
-      
+
       DB_Name_BCAL_Contact: idirName,
       DB_File_Number: rawData.fileNum,
       DB_Address_Mailing_Tenant: DB_Address_Mailing_Tenant,
@@ -1067,13 +1068,13 @@ export class ReportService {
         },
       ]),
     }; // parse out the rawData, variableJson, and provisionJson into something useable
-// Shiv Satya
-console.log("first log:::::::::::::::::")
-console.log(ttlsData)
+    // Shiv Satya
+    console.log('first log:::::::::::::::::');
+    console.log(ttlsData);
     // combine the formatted TTLS data, variables, and provision sections
     const data = Object.assign({}, ttlsData, variables, showProvisionSections);
-    console.log("Second log:::::::::::::::::")
-    console.log(data)
+    console.log('Second log:::::::::::::::::');
+    console.log(data);
     // Save the NFR Data
     const documentData = await this.saveDocument(
       dtid,
@@ -1145,10 +1146,7 @@ console.log(ttlsData)
     return response2.data;
   }
 
-  async getDocumentProvisionsByDocTypeIdAndDtid(
-    document_type_id: number,
-    dtid: number
-  ): Promise<{ provisions: Provision[]; provisionIds: number[] }> {
+  async getDocumentProvisionsByDocTypeIdAndDtid(document_type_id: number, dtid: number): Promise<any> {
     return this.documentDataService.getProvisionsByDocTypeIdAndDtid(document_type_id, dtid);
   }
 

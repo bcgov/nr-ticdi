@@ -1,14 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { DataTable } from '../common/DataTable';
 import { ColumnDef, createColumnHelper } from '@tanstack/react-table';
-import { getDocumentProvisionsByDocTypeIdDtid } from '../../../common/report';
-import { ProvisionData } from '../../../content/display/Provisions';
-import { DocType } from '../../../types/types';
+import { DocType, ProvisionDataObject } from '../../../types/types';
 
 interface SelectedProvisionsTableTableProps {
   docType: DocType;
   dtid: number;
   selectedProvisionIds: number[] | undefined;
+  provisions: ProvisionDataObject[] | undefined;
   updateHandler: (provisionJson: ProvisionJson[]) => void;
 }
 
@@ -24,26 +23,21 @@ const SelectedProvisionsTable: React.FC<SelectedProvisionsTableTableProps> = ({
   docType,
   dtid,
   selectedProvisionIds,
+  provisions,
   updateHandler,
 }) => {
-  const [allProvisions, setAllProvisions] = useState<ProvisionData[]>([]);
-  const [selectedProvisions, setSelectedProvisions] = useState<ProvisionData[]>([]);
+  const [allProvisions, setAllProvisions] = useState<ProvisionDataObject[]>([]);
+  const [selectedProvisions, setSelectedProvisions] = useState<ProvisionDataObject[]>([]);
 
-  // grab all provisions
   useEffect(() => {
-    const fetchData = async () => {
-      const provisionData: { provisions: ProvisionData[]; provisionIds: number[] } =
-        await getDocumentProvisionsByDocTypeIdDtid(docType.id, dtid);
-      setAllProvisions(provisionData.provisions);
-    };
-    fetchData();
-  }, [docType, dtid]);
+    setAllProvisions(provisions);
+  }, [provisions]);
 
   // filter/sort allProvisions to find selected ones for displaying
   useEffect(() => {
     if (allProvisions) {
       const filtered = allProvisions.filter((provision) => selectedProvisionIds?.includes(provision.id));
-      const filteredAndSorted: ProvisionData[] = [...filtered].sort((a, b) => {
+      const filteredAndSorted: ProvisionDataObject[] = [...filtered].sort((a, b) => {
         if (a.provision_group < b.provision_group) return -1;
         if (a.provision_group > b.provision_group) return 1;
         return a.provision_name.localeCompare(b.provision_name);
@@ -65,10 +59,10 @@ const SelectedProvisionsTable: React.FC<SelectedProvisionsTableTableProps> = ({
       updateHandler(provisionJson);
     };
     collectProvisionData();
-  }, [selectedProvisions]);
+  }, [selectedProvisions, updateHandler]);
 
-  const columnHelper = createColumnHelper<ProvisionData>();
-  const columns: ColumnDef<ProvisionData, any>[] = [
+  const columnHelper = createColumnHelper<ProvisionDataObject>();
+  const columns: ColumnDef<ProvisionDataObject, any>[] = [
     columnHelper.accessor('type', {
       id: 'type',
       cell: (info) => <input value={info.getValue()} className="readonlyInput" readOnly />,

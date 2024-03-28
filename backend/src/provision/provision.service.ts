@@ -210,12 +210,14 @@ export class ProvisionService {
    * Document Type Provisions
    */
   async getMandatoryProvisionsByDocumentTypeId(document_type_id: number): Promise<number[]> {
-    const docTypeProvisions = await this.documentTypeProvisionRepository
-      .createQueryBuilder('provision')
-      .innerJoinAndSelect('provision.document_types', 'documentType')
-      .where('provision.type = :type', { type: 'M' })
-      .andWhere('documentType.id = :documentTypeId', { documentTypeId: document_type_id })
-      .getMany();
+    const docTypeProvisions = await this.documentTypeProvisionRepository.find({
+      where: {
+        type: 'M',
+        document_type: {
+          id: document_type_id,
+        },
+      },
+    });
 
     return docTypeProvisions.map((provision) => provision.id);
   }
@@ -252,6 +254,44 @@ export class ProvisionService {
       provision_group_object: docTypeProvision.provision_group,
     }));
     return managedProvisions;
+  }
+
+  async getDocumentTypeProvisionsByDocumentTypeId(document_type_id: number): Promise<DocumentTypeProvision[]> {
+    type DocTypeProvisionData = {
+      id: number;
+      type: string;
+      sequence_value: number;
+      associated: boolean;
+      provision_id: number;
+      provision_name: string;
+      free_text: string;
+      help_text: string;
+      category: string;
+      active_flag: boolean;
+      is_deleted: boolean;
+      provision_group: ProvisionGroup;
+      create_userid: string;
+      update_userid: string;
+      create_timestamp: string;
+      update_timestamp: string;
+    };
+    const docTypeProvisions = await this.documentTypeProvisionRepository.find({
+      where: { document_type: { id: document_type_id } },
+      relations: ['document_type', 'provision', 'provision_group', 'document_data_provisions'],
+    });
+    const provisions = await this.provisionRepository.find({ relations: ['provision_variables'] });
+    const fullDocTypeProvisions = docTypeProvisions.flatMap((docTypeProvision) => {
+      const correspondingProvision = provisions.find((provision) => provision.id === docTypeProvision.provision.id);
+      const dtProv = docTypeProvision.provision;
+      delete docTypeProvision['provision'];
+      return {
+        ...docTypeProvision,
+        ...dtProv,
+        id: docTypeProvision.id,
+        provision_id: dtProv.id,
+      };
+    });
+    return fullDocTypeProvisions;
   }
 
   async associateDocType(provision_id: number, document_type_id: number) {

@@ -2,8 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { DataTable } from '../common/DataTable';
 import { ColumnDef, createColumnHelper } from '@tanstack/react-table';
 import { getDocumentProvisionsByDocTypeIdDtid } from '../../../common/report';
-import { ProvisionData } from '../../../content/display/Provisions';
-import { DocType } from '../../../types/types';
+// import { ProvisionData } from '../../../content/display/Provisions';
+import { DocType, ProvisionDataObject } from '../../../types/types';
 
 interface ProvisionsTableProps {
   dtid: number;
@@ -11,6 +11,7 @@ interface ProvisionsTableProps {
   currentGroupNumber: number | null;
   currentGroupMax: number | null;
   selectedProvisionIds: number[] | undefined;
+  provisions: ProvisionDataObject[] | undefined;
   selectProvision: (id: number, checked: boolean) => void;
 }
 
@@ -20,30 +21,24 @@ const ProvisionsTable: React.FC<ProvisionsTableProps> = ({
   currentGroupNumber,
   currentGroupMax,
   selectedProvisionIds,
+  provisions,
   selectProvision,
 }) => {
-  const [allProvisions, setAllProvisions] = useState<ProvisionData[]>([]);
-  const [filteredProvisions, setFilteredProvisions] = useState<ProvisionData[]>([]); // provisions in the currently selected group
-  const [currentGroupProvisions, setCurrentGroupProvisions] = useState<ProvisionData[]>([]);
+  const [allProvisions, setAllProvisions] = useState<ProvisionDataObject[]>([]);
+  const [filteredProvisions, setFilteredProvisions] = useState<ProvisionDataObject[]>([]); // provisions in the currently selected group
+  const [currentGroupProvisions, setCurrentGroupProvisions] = useState<ProvisionDataObject[]>([]);
 
-  // get data
   useEffect(() => {
-    const fetchData = async () => {
-      const fetchedProvisions: { provisions: ProvisionData[]; provisionIds: number[] } =
-        await getDocumentProvisionsByDocTypeIdDtid(docType.id, dtid);
-      setAllProvisions(fetchedProvisions.provisions);
-    };
-
-    fetchData();
-  }, [dtid, docType, currentGroupNumber]);
+    setAllProvisions(provisions);
+  }, [provisions]);
 
   // filter based on current group
   useEffect(() => {
-    if (allProvisions) {
+    if (allProvisions && currentGroupNumber) {
       console.log('allProvisions');
       console.log(allProvisions);
       const filtered = allProvisions.filter(
-        (provision) => provision.provision_group.provision_group === currentGroupNumber
+        (provision) => provision.provision_group && provision.provision_group.provision_group === currentGroupNumber
       );
       setFilteredProvisions(filtered);
     }
@@ -76,8 +71,8 @@ const ProvisionsTable: React.FC<ProvisionsTableProps> = ({
     return false;
   };
 
-  const columnHelper = createColumnHelper<ProvisionData>();
-  const columns: ColumnDef<ProvisionData, any>[] = [
+  const columnHelper = createColumnHelper<ProvisionDataObject>();
+  const columns: ColumnDef<ProvisionDataObject, any>[] = [
     columnHelper.accessor('type', {
       id: 'type',
       cell: (info) => <input value={info.getValue()} className="readonlyInput" readOnly />,

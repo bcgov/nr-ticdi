@@ -13,6 +13,7 @@ import SystemAdministration from './content/pages/SystemAdministration';
 import ManageProvisionsPage from './content/pages/ManageProvisionsPage';
 import ManageDocumentsPage from './content/pages/ManageDocumentsPage';
 import DocumentPreview from './content/pages/documentpreview/DocumentPreview';
+import LandingPage from './content/pages/LandingPage';
 
 const App: FC = () => {
   // used to render report pages
@@ -88,10 +89,18 @@ const App: FC = () => {
           }
         />
         <Route
-          path={`/`}
+          path={`/dp`}
           element={
             <ContentWrapper>
               <DocumentPreview />
+            </ContentWrapper>
+          }
+        />
+        <Route
+          path={`/lp`}
+          element={
+            <ContentWrapper>
+              <LandingPage />
             </ContentWrapper>
           }
         />

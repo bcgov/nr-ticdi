@@ -12,6 +12,7 @@ import {
   removeProvision,
   updateProvision,
 } from '../../common/manage-provisions';
+import SimpleSearch from '../../components/common/SimpleSearch';
 
 interface ManageProvisionsPageProps {}
 
@@ -25,6 +26,7 @@ const ManageProvisionsPage: FC<ManageProvisionsPageProps> = () => {
   const [showAddProvisionModal, setShowAddProvisionModal] = useState<boolean>(false);
   const [showRemoveProvisionModal, setShowRemoveProvisionModal] = useState<boolean>(false);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
+  const [filteredProvisions, setFilteredProvisions] = useState<Provision[]>([]);
 
   useEffect(() => {
     const getData = async () => {
@@ -41,6 +43,12 @@ const ManageProvisionsPage: FC<ManageProvisionsPageProps> = () => {
       if (updatedProvision) setCurrentProvision(updatedProvision);
     }
   }, [currentProvision, data.allProvisions]);
+
+  useEffect(() => {
+    if (data.allProvisions) {
+      setFilteredProvisions(data.allProvisions);
+    }
+  }, [data.allProvisions]);
 
   const refreshTables = () => {
     setRefreshTrigger((prev) => prev + 1);
@@ -68,14 +76,23 @@ const ManageProvisionsPage: FC<ManageProvisionsPageProps> = () => {
     refreshTables();
   };
 
+  const handleSearch = (filteredProvisions: Provision[]) => {
+    setFilteredProvisions(filteredProvisions);
+  };
+
   const currentVariables = data.allVariables?.filter((v) => v.provision_id === currentProvision?.id) || [];
 
   return (
     <>
       <h1>Manage Provisions</h1>
       <hr />
+      <SimpleSearch
+        searchKeys={['provision_name', 'category']}
+        data={data.allProvisions ? data.allProvisions : []}
+        onSearch={handleSearch}
+      />
       <ManageProvisionsTable
-        provisions={data.allProvisions}
+        provisions={filteredProvisions}
         variables={data.allVariables}
         editProvisionHandler={openEditProvisionModal}
         removeProvisionHandler={openRemoveProvisionModal}

@@ -10,6 +10,7 @@ export const PAGE_TITLES = {
 
 export const LUR_REPORT_TYPE = 'LAND USE REPORT';
 export const GL_REPORT_TYPE = 'GRAZING LEASE';
+export const SL_REPORT_TYPE = 'STANDARD LICENCE';
 
 // Used for admin page dropdown for manage templates page
 export const REPORT_TYPES = ['Land Use Report', 'Notice of Final Review', 'Grazing Lease'];

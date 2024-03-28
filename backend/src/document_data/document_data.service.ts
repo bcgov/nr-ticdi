@@ -85,7 +85,6 @@ export class DocumentDataService {
       const documentDataProvision = new DocumentDataProvision();
       documentDataProvision.document_data = updatedDocumentData;
       documentDataProvision.document_provision = documentProvision;
-      documentDataProvision.provision_free_text = documentProvision.free_text; // quick fix to not use the free_text from the document page
       return documentDataProvision;
     });
     const documentDataVariables = variableArray.map(({ variable_id, variable_value }) => {
@@ -128,9 +127,8 @@ export class DocumentDataService {
       );
       const documentProvision = documentProvisions.find((p) => p.id === provision.provision_id);
 
-      if (documentDataProvision && documentDataProvision.provision_free_text != documentProvision.free_text) {
+      if (documentDataProvision) {
         // Update an existing DocumentDataProvision entry
-        documentDataProvision.provision_free_text = documentProvision.free_text;
         await this.documentDataProvisionRepository.save(documentDataProvision);
       } else if (!documentDataProvision) {
         // No data found for this specific provision so create a new entry in DocumentDataProvision
@@ -140,7 +138,6 @@ export class DocumentDataService {
         const newDocumentDataProvision: DocumentDataProvision = this.documentDataProvisionRepository.create({
           document_provision: documentProvisionToAdd,
           document_data: updatedDocumentData,
-          provision_free_text: documentProvisionToAdd.free_text, // quick fix
         });
         await this.documentDataProvisionRepository.save(newDocumentDataProvision);
       }

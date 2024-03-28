@@ -15,32 +15,43 @@ import { DocumentType } from 'src/document_type/entities/document_type.entity';
 export class DocumentData {
   @PrimaryGeneratedColumn()
   id: number;
+
   @Column({ nullable: true })
   dtid: number;
+
   @Column({ nullable: true })
   template_id: number;
+
   @Column({ nullable: true })
   status: string;
+
   @Column({ nullable: true })
   active: boolean;
+
   @Column({ nullable: true })
   create_userid: string;
+
   @Column({ nullable: true })
   update_userid: string;
+
   @CreateDateColumn()
   create_timestamp: Date;
+
   @UpdateDateColumn()
   update_timestamp: Date;
+
   @OneToMany(() => DocumentDataProvision, (documentDataProvision) => documentDataProvision.document_data, {
     nullable: true,
     cascade: true,
   })
   document_data_provisions: DocumentDataProvision[];
+
   @OneToMany(() => DocumentDataVariable, (documentDataVariable) => documentDataVariable.document_data, {
     nullable: true,
     cascade: true,
   })
   document_data_variables: DocumentDataVariable[];
+
   @ManyToOne(() => DocumentType, (document_type) => document_type.document_data, {})
   document_type: DocumentType;
 

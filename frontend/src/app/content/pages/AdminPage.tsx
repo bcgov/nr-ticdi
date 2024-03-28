@@ -1,10 +1,10 @@
 import { FC, useState } from 'react';
 // import { REPORT_TYPES } from '../../util/constants';
-import AddAdmin from '../../components/modal/admin/manage-admins/AddAdmin';
-import RemoveAdmin from '../../components/modal/admin/manage-admins/RemoveAdmin';
+import AddAdmin from '../../components/modal/manage-admins/AddAdmin';
+import RemoveAdmin from '../../components/modal/manage-admins/RemoveAdmin';
 // import { useNavigate } from 'react-router-dom';
-import { exportUsers } from '../../common/admin';
-import AdminDataTable, { AdminData } from '../../components/table/admin/AdminDataTable';
+import { exportUsers } from '../../common/manage-admins';
+import AdminDataTable, { AdminData } from '../../components/table/manage-admins/AdminDataTable';
 
 const AdminPage: FC = () => {
   // const navigate = useNavigate();

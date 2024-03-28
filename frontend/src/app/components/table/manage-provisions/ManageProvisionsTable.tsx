@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { DataTable } from '../common/DataTable';
 import { ColumnDef, createColumnHelper } from '@tanstack/react-table';
-import { disableProvision, enableProvision } from '../../../common/manage-templates';
+import { disableProvision, enableProvision } from '../../../common/manage-provisions';
 import { Provision, Variable } from '../../../types/types';
 import LinkButton from '../../common/LinkButton';
 
@@ -18,21 +18,21 @@ const ManageProvisionsTable: React.FC<ManageProvisionsTableProps> = ({
   editProvisionHandler,
   removeProvisionHandler,
 }) => {
-  const [allProvisions, setProvisions] = useState<Provision[]>([]);
-  const [allVariables, setVariables] = useState<Variable[]>([]);
+  const [allProvisions, setAllProvisions] = useState<Provision[]>([]);
+  const [allVariables, setAllVariables] = useState<Variable[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
+  // const [pagination, setPagination] = useState({ enabled: false, pageSize: 10 });
 
   useEffect(() => {
     if (provisions) {
       const sortedData = basicSort(provisions);
-      setProvisions(sortedData);
+      setAllProvisions(sortedData);
     }
     if (variables) {
-      setVariables(variables);
+      setAllVariables(variables);
     }
   }, [provisions, variables]);
 
-  // will add column sorting to table later
   const basicSort = (data: Provision[]): Provision[] => {
     const sortedData: Provision[] = [...data];
     sortedData.sort((a, b) => {
@@ -53,7 +53,7 @@ const ManageProvisionsTable: React.FC<ManageProvisionsTableProps> = ({
       } else {
         await disableProvision(provisionId);
       }
-      setProvisions((prevProvisions) => {
+      setAllProvisions((prevProvisions) => {
         let newProvisions = prevProvisions.map((provision) => {
           if (provision.id === provisionId) {
             return { ...provision, active_flag: newValue };
@@ -83,6 +83,15 @@ const ManageProvisionsTable: React.FC<ManageProvisionsTableProps> = ({
     if (selectedProvision) removeProvisionHandler(selectedProvision);
   };
 
+  // const paginationHandler = () => {
+  //   setPagination((prevState) => ({ enabled: !prevState.enabled, pageSize: prevState.pageSize }));
+  // };
+
+  // const pageSizeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   const newValue = parseInt(e.target.value);
+  //   setPagination((prevState) => ({ enabled: prevState.enabled, pageSize: newValue }));
+  // };
+
   const columnHelper = createColumnHelper<Provision>();
 
   const columns: ColumnDef<Provision, any>[] = [
@@ -92,22 +101,25 @@ const ManageProvisionsTable: React.FC<ManageProvisionsTableProps> = ({
       header: () => 'ID',
       meta: { customCss: { width: '5%' } },
     }),
-    columnHelper.accessor('provision_group', {
-      id: 'provision_group',
-      cell: (info) => <input value={info.getValue()} className="readonlyInput" readOnly />,
-      header: () => 'Group',
-      meta: { customCss: { width: '5%' } },
-    }),
+    // columnHelper.accessor('provision_group', {
+    //   id: 'provision_group',
+    //   cell: (info) => <input value={info.getValue()} className="readonlyInput" readOnly />,
+    //   header: () => 'Group',
+    //   enableSorting: true,
+    //   meta: { customCss: { width: '8%' } },
+    // }),
     columnHelper.accessor('provision_name', {
       id: 'provision_name',
       cell: (info) => <input value={info.getValue()} className="readonlyInput" readOnly />,
       header: () => 'Provision',
+      enableSorting: true,
       meta: { customCss: { width: '35%' } },
     }),
     columnHelper.accessor('category', {
       id: 'category',
       cell: (info) => <input value={info.getValue()} className="readonlyInput" readOnly />,
       header: () => 'Category',
+      enableSorting: true,
       meta: { customCss: { width: '20%' } },
     }),
     columnHelper.accessor('active_flag', {
@@ -121,23 +133,43 @@ const ManageProvisionsTable: React.FC<ManageProvisionsTableProps> = ({
         />
       ),
       header: () => 'Active',
-      meta: { customCss: { width: '5%' } },
+      enableSorting: true,
+      meta: { customCss: { width: '7%' } },
     }),
     columnHelper.display({
       id: 'edit',
       cell: (info) => <LinkButton text="Edit" onClick={() => openEditProvisionModal(info.row.original.id)} />,
       header: () => null,
+      enableSorting: false,
       meta: { customCss: { width: '5%' } },
     }),
     columnHelper.display({
       id: 'remove',
       cell: (info) => <LinkButton text="Remove" onClick={() => openRemoveProvisionModal(info.row.original)} />,
       header: () => null,
+      enableSorting: false,
       meta: { customCss: { width: '5%' } },
     }),
   ];
 
-  return <DataTable columns={columns} data={allProvisions} />;
+  return (
+    <>
+      <DataTable
+        columns={columns}
+        data={allProvisions}
+        // paginationSetup={{ enabled: true, pageSize: 10 }}
+        enableSorting={true}
+        initialSorting={[
+          // { id: 'provision_group', desc: false },
+          { id: 'provision_name', desc: false },
+        ]}
+      />
+      {/* <input type="number" defaultValue={pagination.pageSize} onChange={pageSizeHandler} />
+      <Button variant="primary" onClick={paginationHandler}>
+        Enable Pagination
+      </Button> */}
+    </>
+  );
 };
 
 interface CheckboxCellProps {

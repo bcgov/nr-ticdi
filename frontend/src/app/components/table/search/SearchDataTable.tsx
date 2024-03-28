@@ -65,30 +65,35 @@ const SearchDataTable: React.FC<SearchDataTableProps> = ({ searchTerm, setSelect
       id: 'dtid',
       cell: (info) => <input value={info.getValue()} className="readonlyInput" readOnly />,
       header: () => 'DTID',
+      enableSorting: true,
       meta: { customCss: { width: '10%' } },
     }),
     columnHelper.accessor('version', {
       id: 'version',
       cell: (info) => <input value={info.getValue()} className="readonlyInput" readOnly />,
       header: () => 'Version',
+      enableSorting: false,
       meta: { customCss: { width: '10%' } },
     }),
     columnHelper.accessor('file_name', {
       id: 'file_name',
       cell: (info) => <input value={info.getValue()} className="readonlyInput" readOnly />,
       header: () => 'Template Name',
+      enableSorting: false,
       meta: { customCss: { width: '50%' } },
     }),
     columnHelper.accessor('updated_date', {
       id: 'updated_date',
       cell: (info) => <input value={info.getValue()} className="readonlyInput" readOnly />,
       header: () => 'Uploaded Date',
+      enableSorting: true,
       meta: { customCss: { width: '15%' } },
     }),
     columnHelper.accessor('status', {
       id: 'status',
       cell: (info) => <input value={info.getValue()} className="readonlyInput" readOnly />,
       header: () => 'Status',
+      enableSorting: true,
       meta: { customCss: { width: '10%' } },
     }),
     columnHelper.accessor('active', {
@@ -103,23 +108,34 @@ const SearchDataTable: React.FC<SearchDataTableProps> = ({ searchTerm, setSelect
         />
       ),
       header: () => '',
+      enableSorting: false,
       meta: { customCss: { width: '5%' } },
     }),
     columnHelper.accessor('document_data_id', {
       id: 'nfr_id',
       cell: () => null,
       header: () => null,
+      enableSorting: false,
       meta: { customCss: { display: 'none' } },
     }),
     columnHelper.accessor('document_type', {
       id: 'document_type',
       cell: () => null,
       header: () => null,
+      enableSorting: false,
       meta: { customCss: { display: 'none' } },
     }),
   ];
 
-  return <DataTable columns={columns} data={filteredSearchData} />;
+  return (
+    <DataTable
+      columns={columns}
+      data={filteredSearchData}
+      // paginationSetup={{ enabled: true, pageSize: 10 }}
+      enableSorting={true}
+      initialSorting={[{ id: 'dtid', desc: false }]}
+    />
+  );
 };
 
 export default SearchDataTable;

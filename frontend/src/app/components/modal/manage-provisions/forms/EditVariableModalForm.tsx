@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Button, Col, Form, Modal, Spinner } from 'react-bootstrap';
-import { Variable, VariableUpload } from '../../../../../types/types';
+import { Variable, VariableUpload } from '../../../../types/types';
 
 interface EditVariableModalFormProps {
   variable: Variable | undefined;

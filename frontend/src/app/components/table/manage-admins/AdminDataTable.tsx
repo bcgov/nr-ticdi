@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { DataTable } from '../common/DataTable';
 import { ColumnDef, createColumnHelper } from '@tanstack/react-table';
-import { getAdminData } from '../../../common/admin';
+import { getAdminData } from '../../../common/manage-admins';
 
 export type AdminData = {
   name: string;
@@ -60,18 +60,21 @@ const AdminDataTable: React.FC<AdminDataTableProps> = ({ searchTerm, removeAdmin
       id: 'name',
       cell: (info) => <input value={info.getValue()} className="readonlyInput" readOnly />,
       header: () => 'Name',
+      enableSorting: true,
       meta: { customCss: { width: '30%' } },
     }),
     columnHelper.accessor('username', {
       id: 'username',
       cell: (info) => <input value={info.getValue()} className="readonlyInput" readOnly />,
       header: () => 'User Name',
+      enableSorting: true,
       meta: { customCss: { width: '30%' } },
     }),
     columnHelper.accessor('email', {
       id: 'email',
       cell: (info) => <input value={info.getValue()} className="readonlyInput" readOnly />,
       header: () => 'Email',
+      enableSorting: true,
       meta: { customCss: { width: '30%' } },
     }),
     columnHelper.accessor('remove', {
@@ -92,17 +95,26 @@ const AdminDataTable: React.FC<AdminDataTableProps> = ({ searchTerm, removeAdmin
         </button>
       ),
       header: () => null,
+      enableSorting: false,
       meta: { customCss: { width: '10%' } },
     }),
     columnHelper.accessor('idirUsername', {
       id: 'idirUsername',
       cell: () => null,
       header: () => null,
+      enableSorting: false,
       meta: { customCss: { display: 'none' } },
     }),
   ];
 
-  return <DataTable columns={columns} data={filteredAdminData} />;
+  return (
+    <DataTable
+      columns={columns}
+      data={filteredAdminData}
+      enableSorting={true}
+      initialSorting={[{ id: 'name', desc: false }]}
+    />
+  );
 };
 
 export default AdminDataTable;

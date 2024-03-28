@@ -46,35 +46,47 @@ const ManageVariablesTable: React.FC<ManageVariablesTableProps> = ({ variables, 
       id: 'variable_name',
       cell: (info) => <input value={info.getValue()} className="readonlyInput" readOnly />,
       header: () => 'Name',
+      enableSorting: true,
       meta: { customCss: { width: '40%' } },
     }),
     columnHelper.accessor('variable_value', {
       id: 'variable_value',
       cell: (info) => <input value={info.getValue()} className="readonlyInput" title={info.getValue()} readOnly />,
       header: () => 'Value',
+      enableSorting: false,
       meta: { customCss: { width: '40%' } },
     }),
-    columnHelper.accessor('edit', {
+    columnHelper.display({
       id: 'edit',
       cell: (info) => <LinkButton onClick={() => displayEditVariable(info.row.original.id)} text="Edit" />,
       header: () => null,
+      enableSorting: false,
       meta: { customCss: { width: '10%' } },
     }),
-    columnHelper.accessor('remove', {
+    columnHelper.display({
       id: 'remove',
       cell: (info) => <LinkButton onClick={() => displayRemoveVariable(info.row.original.id)} text="Remove" />,
       header: () => null,
+      enableSorting: false,
       meta: { customCss: { width: '10%' } },
     }),
     columnHelper.accessor('id', {
       id: 'id',
       cell: () => null,
       header: () => null,
+      enableSorting: false,
       meta: { customCss: { display: 'none' } },
     }),
   ];
 
-  return <DataTable columns={columns} data={sortedVariables} />;
+  return (
+    <DataTable
+      columns={columns}
+      data={sortedVariables}
+      enableSorting={true}
+      initialSorting={[{ id: 'variable_name', desc: false }]}
+    />
+  );
 };
 
 export default ManageVariablesTable;

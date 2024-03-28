@@ -78,6 +78,7 @@ const VariablesTable: React.FC<VariablesTableProps> = React.memo(({ variables, u
       id: 'variable_name',
       cell: (info) => <input value={info.getValue()} className="readonlyInput" title={info.getValue()} readOnly />,
       header: () => 'Variable',
+      enableSorting: true,
       meta: { customCss: { width: '28%' } },
     }),
     columnHelper.accessor('variable_value', {
@@ -86,23 +87,33 @@ const VariablesTable: React.FC<VariablesTableProps> = React.memo(({ variables, u
         <VariableValueCell value={info.getValue()} updateValue={handleEdit} variableId={info.row.original.id} />
       ),
       header: () => 'Enter Text',
+      enableSorting: false,
       meta: { customCss: { width: '36%' } },
     }),
     columnHelper.accessor('help_text', {
       id: 'help_text',
       cell: (info) => <input value={info.getValue()} className="readonlyInput" title={info.getValue()} readOnly />,
       header: () => 'Help',
+      enableSorting: false,
       meta: { customCss: { width: '36%' } },
     }),
     columnHelper.accessor('id', {
       id: 'id',
       cell: () => null,
       header: () => null,
+      enableSorting: false,
       meta: { customCss: { display: 'none' } },
     }),
   ];
 
-  return <DataTable columns={columns} data={variables} />;
+  return (
+    <DataTable
+      columns={columns}
+      data={variables}
+      enableSorting={true}
+      initialSorting={[{ id: 'variable_name', desc: false }]}
+    />
+  );
 });
 
 interface VariableValueCellProps {

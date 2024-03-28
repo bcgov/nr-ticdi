@@ -1,3 +1,5 @@
+import { ProvisionGroup } from 'src/document_type/entities/provision_group.entity';
+
 /**
  * DocumentTemplate object without the base64 file.
  */
@@ -85,4 +87,20 @@ export type SearchResultsItem = {
     idir_username: [string];
     display_name: [string];
   };
+};
+
+// type used by the frontend for displaying data in a table
+export type ManageDocTypeProvision = {
+  id: number;
+  type: string;
+  provision_name: string;
+  free_text: string;
+  help_text: string;
+  category: string;
+  active_flag: boolean;
+  sequence_value: number;
+  associated: boolean; // is the provision currently associated with the doc type
+  provision_group: number;
+  max: number;
+  provision_group_object: ProvisionGroup;
 };

@@ -8,7 +8,6 @@ import { GL_REPORT_TYPE, LUR_REPORT_TYPE, SL_REPORT_TYPE, numberWords, sectionTi
 import { ProvisionJSON, VariableJSON } from 'utils/types';
 import { convertToSpecialCamelCase, formatMoney, grazingLeaseVariables, nfrAddressBuilder } from 'utils/util';
 import { DocumentDataService } from 'src/document_data/document_data.service';
-import { DocumentTemplate } from 'src/document_template/entities/document_template.entity';
 import { DocumentDataLogService } from 'src/document_data_log/document_data_log.service';
 import { DocumentTypeService } from 'src/document_type/document_type.service';
 import { Provision } from 'src/provision/entities/provision.entity';
@@ -1154,7 +1153,7 @@ console.log(ttlsData)
   }
 
   getGroupMaxByDocTypeId(document_type_id: number): Promise<any> {
-    return this.provisionService.getGroupMaxByDocTypeId(document_type_id);
+    return this.documentTypeService.getGroupMaxByDocTypeId(document_type_id);
   }
 
   async getDocumentVariablesByDocumentTypeIdAndDtid(document_type_id: number, dtid: number): Promise<any> {
@@ -1167,10 +1166,6 @@ console.log(ttlsData)
       const basicVariables = await this.provisionService.getVariablesByDocumentTypeId(document_type_id);
       return { variables: basicVariables, variableIds: [] };
     }
-  }
-
-  getMandatoryProvisions() {
-    return this.provisionService.getMandatoryProvisions();
   }
 
   getMandatoryProvisionsByDocumentTypeId(document_type_id: number) {

@@ -1,19 +1,18 @@
 import { FC, useEffect, useState } from 'react';
-import ManageProvisionsTable from '../../components/table/manage-templates/ManageProvisionsTable';
 import { Button } from 'react-bootstrap';
-import { DocType, GroupMax, Provision, ProvisionUpload, Variable } from '../../types/types';
+import { Provision, ProvisionUpload, Variable } from '../../types/types';
+import ManageProvisionsTable from '../../components/table/manage-provisions/ManageProvisionsTable';
+import EditProvisionModal from '../../components/modal/manage-provisions/EditProvisionModal';
+import AddProvisionModal from '../../components/modal/manage-provisions/AddProvisionModal';
+import RemoveProvisionModal from '../../components/modal/manage-provisions/RemoveProvisionModal';
 import {
   addProvision,
-  getGroupMax,
   getProvisions,
   getVariables,
   removeProvision,
   updateProvision,
-} from '../../common/manage-templates';
-import EditProvisionModal from '../../components/modal/admin/manage-templates/EditProvisionModal';
-import AddProvisionModal from '../../components/modal/admin/manage-templates/AddProvisionModal';
-import { getDocumentTypes } from '../../common/report';
-import RemoveProvisionModal from '../../components/modal/admin/manage-templates/RemoveProvisionModal';
+} from '../../common/manage-provisions';
+import SimpleSearch from '../../components/common/SimpleSearch';
 
 interface ManageProvisionsPageProps {}
 
@@ -21,22 +20,19 @@ const ManageProvisionsPage: FC<ManageProvisionsPageProps> = () => {
   const [data, setData] = useState<{
     allProvisions?: Provision[];
     allVariables?: Variable[];
-    groupMaxArray?: GroupMax[];
-    documentTypes?: DocType[];
   }>({});
   const [currentProvision, setCurrentProvision] = useState<Provision>();
   const [showEditProvisionModal, setShowEditProvisionModal] = useState<boolean>(false);
   const [showAddProvisionModal, setShowAddProvisionModal] = useState<boolean>(false);
   const [showRemoveProvisionModal, setShowRemoveProvisionModal] = useState<boolean>(false);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
+  const [filteredProvisions, setFilteredProvisions] = useState<Provision[]>([]);
 
   useEffect(() => {
     const getData = async () => {
-      const groupMaxArray = await getGroupMax();
       const provisions = await getProvisions();
       const variables = await getVariables();
-      const documentTypes = await getDocumentTypes();
-      setData({ allProvisions: provisions, allVariables: variables, groupMaxArray, documentTypes });
+      setData({ allProvisions: provisions, allVariables: variables });
     };
     getData();
   }, [refreshTrigger]);
@@ -47,6 +43,12 @@ const ManageProvisionsPage: FC<ManageProvisionsPageProps> = () => {
       if (updatedProvision) setCurrentProvision(updatedProvision);
     }
   }, [currentProvision, data.allProvisions]);
+
+  useEffect(() => {
+    if (data.allProvisions) {
+      setFilteredProvisions(data.allProvisions);
+    }
+  }, [data.allProvisions]);
 
   const refreshTables = () => {
     setRefreshTrigger((prev) => prev + 1);
@@ -74,14 +76,23 @@ const ManageProvisionsPage: FC<ManageProvisionsPageProps> = () => {
     refreshTables();
   };
 
+  const handleSearch = (filteredProvisions: Provision[]) => {
+    setFilteredProvisions(filteredProvisions);
+  };
+
   const currentVariables = data.allVariables?.filter((v) => v.provision_id === currentProvision?.id) || [];
 
   return (
     <>
       <h1>Manage Provisions</h1>
       <hr />
+      <SimpleSearch
+        searchKeys={['provision_name', 'category']}
+        data={data.allProvisions ? data.allProvisions : []}
+        onSearch={handleSearch}
+      />
       <ManageProvisionsTable
-        provisions={data.allProvisions}
+        provisions={filteredProvisions}
         variables={data.allVariables}
         editProvisionHandler={openEditProvisionModal}
         removeProvisionHandler={openRemoveProvisionModal}
@@ -93,16 +104,12 @@ const ManageProvisionsPage: FC<ManageProvisionsPageProps> = () => {
       <EditProvisionModal
         provision={currentProvision}
         variables={currentVariables}
-        documentTypes={data.documentTypes}
-        groupMaxArray={data.groupMaxArray}
         show={showEditProvisionModal}
         onHide={() => setShowEditProvisionModal(false)}
         updateProvisionHandler={updateProvisionHandler}
         refreshTables={refreshTables}
       />
       <AddProvisionModal
-        groupMaxArray={data.groupMaxArray}
-        documentTypes={data.documentTypes}
         show={showAddProvisionModal}
         onHide={() => setShowAddProvisionModal(false)}
         addProvisionHandler={addProvisionHandler}

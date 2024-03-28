@@ -66,9 +66,9 @@ const ManageDocumentProvisionsTable: React.FC<ManageDocumentProvisionsTableProps
           : true
         : true;
       const matchesAssociated = searchState.isAdvancedSearch
-        ? searchState.associated
+        ? typeof searchState.associated === 'boolean'
           ? provision.associated === searchState.associated
-          : false
+          : true
         : true;
 
       return (

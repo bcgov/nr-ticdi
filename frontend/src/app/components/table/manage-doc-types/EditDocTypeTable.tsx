@@ -1,7 +1,9 @@
-import { FC, useEffect, useState } from 'react';
+import { FC, useEffect, useMemo, useState } from 'react';
 import { DataTable } from '../common/DataTable';
 import { DocType } from '../../../types/types';
-
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
+import { format } from 'date-fns';
 import { ColumnDef, Row, createColumnHelper } from '@tanstack/react-table';
 
 interface EditDocTypeTableProps {
@@ -38,7 +40,12 @@ const EditDocTypeTable: FC<EditDocTypeTableProps> = ({ documentType, onUpdate })
     columnHelper.accessor('created_date', {
       id: 'created_date',
       cell: (info) => (
-        <TableCell getValue={info.getValue} row={info.row} columnId={info.column.id} onCellUpdate={handleCellUpdate} />
+        <DateTableCell
+          getValue={info.getValue}
+          row={info.row}
+          columnId={info.column.id}
+          onCellUpdate={handleCellUpdate}
+        />
       ),
       header: () => 'Date Created',
       enableSorting: false,
@@ -55,14 +62,14 @@ const EditDocTypeTable: FC<EditDocTypeTableProps> = ({ documentType, onUpdate })
     }),
     columnHelper.accessor('update_timestamp', {
       id: 'update_timestamp',
-      cell: (info) => <input value={info.getValue().substring(0, 10)} className="readonlyInput" readOnly />,
+      cell: (info) => <input value={info.getValue().substring(0, 10)} className="form-control" readOnly />,
       header: () => 'Last Updated Date',
       enableSorting: false,
       meta: { customCss: { width: '20%' }, type: 'text' },
     }),
     columnHelper.accessor('update_userid', {
       id: 'update_userid',
-      cell: (info) => <input value={info.getValue()} className="readonlyInput" readOnly />,
+      cell: (info) => <input value={info.getValue()} className="form-control" readOnly />,
       header: () => 'Last Updated By',
       enableSorting: false,
       meta: { customCss: { width: '20%' }, type: 'text' },
@@ -97,5 +104,37 @@ const TableCell: FC<TableCellProps<DocType>> = ({ getValue, row, columnId, onCel
     onCellUpdate(columnId, value);
   };
 
-  return <input type="text" value={value} onChange={handleChange} onBlur={onBlur} style={{ width: '100%' }} />;
+  return (
+    <input
+      type="text"
+      value={value}
+      onChange={handleChange}
+      onBlur={onBlur}
+      style={{ width: '100%' }}
+      className="form-control"
+    />
+  );
+};
+
+const DateTableCell: FC<TableCellProps<DocType>> = ({ getValue, columnId, onCellUpdate }) => {
+  const initialValue = useMemo(() => {
+    const dateValue = getValue();
+    return dateValue ? new Date(dateValue) : null;
+  }, [getValue]);
+  const [value, setValue] = useState(initialValue);
+
+  useEffect(() => {
+    setValue(initialValue);
+  }, [initialValue]);
+
+  const handleDateChange = (date: Date | null) => {
+    setValue(date);
+    if (date) {
+      const formattedDate = format(date, 'yyyy-MM-dd');
+      console.log(formattedDate);
+      onCellUpdate(columnId, formattedDate);
+    }
+  };
+
+  return <DatePicker selected={value} onChange={handleDateChange} dateFormat="yyyy-MM-dd" className="form-control" />;
 };

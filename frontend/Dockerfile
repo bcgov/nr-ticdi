@@ -1,7 +1,6 @@
 # RedHat UBI 8 with nodejs 16
 FROM registry.access.redhat.com/ubi8/ubi as builder
 
-# Enable the Node.js 16 module and install it
 RUN dnf module enable -y nodejs:16 && dnf install -y nodejs
 
 # Install packages, build and keep only prod packages

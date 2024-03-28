@@ -120,6 +120,31 @@ const fileDownloadPost = <T, M = {}>(parameters: ApiRequestParameters<M>): Promi
 };
 
 /**
+ * Used for file Preview through get request
+ *
+ * @param url
+ * @param filename
+ */
+export const handleFilePreviewGet = async (url: string, filename: string): Promise<Blob | null> => {
+  try {
+    const getParameters = generateApiParameters(url);
+    return new Promise<Blob>((resolve, reject) => {
+      fileDownloadGet<Blob>(getParameters)
+        .then(blob => {
+          resolve(blob);
+        })
+        .catch(error => {
+          console.error('Preview error:', error);
+          reject(error);
+        });
+    });
+  } catch (error) {
+    console.error('Preview error:', error);
+    return null;
+  }
+};
+
+/**
  * Used for file downloads through get request
  *
  * @param url

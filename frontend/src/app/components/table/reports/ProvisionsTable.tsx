@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { DataTable } from '../common/DataTable';
 import { ColumnDef, createColumnHelper } from '@tanstack/react-table';
-import { getDocumentProvisionsByDocTypeIdDtid } from '../../../common/report';
+// import { getDocumentProvisionsByDocTypeIdDtid } from '../../../common/report';
 // import { ProvisionData } from '../../../content/display/Provisions';
 import { DocType, ProvisionDataObject } from '../../../types/types';
 
@@ -29,7 +29,7 @@ const ProvisionsTable: React.FC<ProvisionsTableProps> = ({
   const [currentGroupProvisions, setCurrentGroupProvisions] = useState<ProvisionDataObject[]>([]);
 
   useEffect(() => {
-    setAllProvisions(provisions);
+    if (provisions) setAllProvisions(provisions);
   }, [provisions]);
 
   // filter based on current group
@@ -94,7 +94,7 @@ const ProvisionsTable: React.FC<ProvisionsTableProps> = ({
       enableSorting: false,
       meta: { customCss: { width: '45%' } },
     }),
-    columnHelper.accessor('select', {
+    columnHelper.display({
       id: 'select',
       cell: (info) => (
         <input
@@ -112,13 +112,6 @@ const ProvisionsTable: React.FC<ProvisionsTableProps> = ({
       header: () => null,
       enableSorting: false,
       meta: { customCss: { width: '5%' } },
-    }),
-    columnHelper.accessor('id', {
-      id: 'id',
-      cell: () => null,
-      header: () => null,
-      enableSorting: false,
-      meta: { customCss: { display: 'none' } },
     }),
   ];
 

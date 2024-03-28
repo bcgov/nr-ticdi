@@ -16,6 +16,7 @@ import {
   getMandatoryProvisionsByDocTypeId,
   getGroupMaxByDocTypeId,
   getDocumentData,
+  getAllProvisionGroups,
 } from '../../common/report';
 import InterestedParties from '../display/InterestedParties';
 import Skeleton from 'react-loading-skeleton';
@@ -30,6 +31,7 @@ const LandingPage: FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [data, setData] = useState<DTRDisplayObject | null>(null);
   const [allProvisions, setAllProvisions] = useState<ProvisionDataObject[]>([]);
+  // const [allVariables, setAllVariables] = useState<ProvisionVariable[]>([]);
   const [variableArray, setVariableArray] = useState<SaveVariableData[]>([]);
   const [provisionArray, setProvisionArray] = useState<SaveProvisionData[]>([]);
   const [variableJsonArray, setVariableJsonArray] = useState<VariableJson[]>([]);
@@ -42,7 +44,7 @@ const LandingPage: FC = () => {
 
   const [dtid, setDtid] = useState<number>();
   const [selectedDocTypeId, setSelectedDocTypeId] = useState<number | null>(null);
-  const [documentType, setDocumentType] = useState<DocType>();
+  const [documentType, setDocumentType] = useState<DocType | null>(null);
   const [documentTypes, setDocumentTypes] = useState<DocType[]>([]);
 
   useEffect(() => {
@@ -52,7 +54,8 @@ const LandingPage: FC = () => {
         documentTypes.sort((a, b) => a.name.localeCompare(b.name));
         setDocumentTypes(documentTypes);
         const pgs: ProvisionGroup[] = await getAllProvisionGroups();
-        pgs.sort((a, b) => a.provision_group - b.provision_group);
+        console.log(pgs);
+        // pgs.sort((a, b) => a.provision_group - b.provision_group);
         setAllProvisionGroups(pgs);
       } catch (error) {
         console.error('Failed to fetch doc types', error);
@@ -67,55 +70,61 @@ const LandingPage: FC = () => {
 
   useEffect(() => {
     if (documentTypes && selectedDocTypeId) {
-      setDocumentType(documentTypes.find((docType) => docType.id === selectedDocTypeId));
+      setDocumentType(documentTypes.find((docType) => docType.id === selectedDocTypeId) || null);
     }
   }, [documentTypes, selectedDocTypeId]);
 
   const fetchDataHandler = async () => {
-    console.log('fetchDatahandler');
-    console.log('1: ' + dtid);
-    console.log('2: ' + documentType);
-    console.log('3: ' + documentType?.id);
-    if (dtid && documentType && documentType.id) {
+    if (dtid) {
       try {
         setLoading(true);
         // Fetch any existing documentData
         const displayData: DTRDisplayObject = await getDisplayData(dtid);
         setData(displayData);
-        // provisions, will be validated against
-        const documentData: DocumentDataDTO = await getDocumentData(documentType.id, dtid);
-        console.log('documentData');
-        console.log(documentData);
-        // const fetchProvisions: { provisions: ProvisionData[]; provisionIds: number[] } =
-        //   await getDocumentProvisionsByDocTypeIdDtid(documentType.id, dtid);
-        setAllProvisions(documentData.provisions);
-        const activeProvisionIDs = new Set(
-          documentData.provisions
-            .filter((provision) => provision.active_flag && !provision.is_deleted && provision.provision_group)
-            .map((provision) => provision.provision_group.id)
-        );
-        // mandatory provisions, will be validated against
-        const mpIds: number[] = await getMandatoryProvisionsByDocTypeId(documentType.id);
-        setMandatoryProvisionIds(mpIds);
-        // get provision groups and filter out the empty ones
-        const provisionGroupsObject: ProvisionGroup[] = await getGroupMaxByDocTypeId(documentType.id);
-        console.log('provision groups!!!');
-        console.log(provisionGroupsObject);
-        const activeProvisionGroups = provisionGroupsObject.filter((group) => activeProvisionIDs.has(group.id));
-        console.log('activeProvisionIDs');
-        console.log(activeProvisionIDs);
-        console.log(activeProvisionGroups);
-        setProvisionGroups(activeProvisionGroups);
-      } catch (error) {
-        console.error('Failed to fetch data', error);
-        setData(null);
+      } catch (err) {
+        console.log(err);
       } finally {
         setLoading(false);
       }
-    } else {
-      // show an error
     }
   };
+
+  useEffect(() => {
+    const fetchDocData = async () => {
+      if (dtid && documentType && documentType.id) {
+        try {
+          setLoading(true);
+          // provisions, will be validated against
+          const documentData: DocumentDataDTO = await getDocumentData(documentType.id, dtid);
+          console.log('documentData');
+          console.log(documentData);
+          // const fetchProvisions: { provisions: ProvisionData[]; provisionIds: number[] } =
+          //   await getDocumentProvisionsByDocTypeIdDtid(documentType.id, dtid);
+          setAllProvisions(documentData.provisions);
+          const activeProvisionIDs = new Set(
+            documentData.provisions
+              .filter((provision) => provision.active_flag && !provision.is_deleted && provision.provision_group)
+              .map((provision) => provision.provision_group.id)
+          );
+          // mandatory provisions, will be validated against
+          const mpIds: number[] = await getMandatoryProvisionsByDocTypeId(documentType.id);
+          setMandatoryProvisionIds(mpIds);
+          // get provision groups and filter out the empty ones
+          const provisionGroupsObject: ProvisionGroup[] = await getGroupMaxByDocTypeId(documentType.id);
+          const activeProvisionGroups = provisionGroupsObject.filter((group) => activeProvisionIDs.has(group.id));
+          setProvisionGroups(activeProvisionGroups);
+        } catch (error) {
+          console.error('Failed to fetch data', error);
+          setData(null);
+        } finally {
+          setLoading(false);
+        }
+      } else {
+        // show an error
+      }
+    };
+    fetchDocData();
+  }, [documentType, dtid]);
 
   const handleGenerateReport = () => {
     if (dtid) {
@@ -144,11 +153,13 @@ const LandingPage: FC = () => {
   };
 
   const updateSelectedProvisionIds = useCallback((selectedProvisionIds: number[]) => {
-    setSelectedProvisionIds(selectedProvisionIds);
+    console.log('updating selectedProvisionIds');
+    console.log(selectedProvisionIds);
+    setSelectedProvisionIds((prevIds) => selectedProvisionIds);
   }, []);
 
   const updateVariableArray = useCallback((variableJsonData: VariableJson[]) => {
-    console.log('variableJsonData');
+    console.log('updating variableJsonData');
     console.log(variableJsonData);
     // used for saving
     setVariableArray(
@@ -208,7 +219,7 @@ const LandingPage: FC = () => {
 
   return (
     <>
-      <div className="h1">Preview - {documentType?.name} (Draft)</div>
+      <div className="h1">{documentType ? `Preview - ${documentType.name}` : 'Document Preview'}</div>
       <hr />
       <div className="mb-3 mt-3">
         <div className="font-weight-bold inlineDiv mr-1">DTID:</div>
@@ -241,7 +252,7 @@ const LandingPage: FC = () => {
         <div className="mr-3">Document Type:</div>
         <div>
           <select value={selectedDocTypeId || ''} onChange={handleDocTypeChange}>
-            <option value="">Select a document type</option>
+            <option value="-1">Select a document type</option>
             {documentTypes.map((docType) => (
               <option key={docType.id} value={docType.id}>
                 {docType.name}

@@ -122,3 +122,11 @@ export const getDocumentData = async (document_type_id: number, dtid: number): P
   console.log(response);
   return response;
 };
+
+export const getAllProvisionGroups = async (): Promise<ProvisionGroup[]> => {
+  const url = `${config.API_BASE_URL}/report/get-all-groups`;
+  const getParameters = api.generateApiParameters(url);
+  const response = await api.get<ProvisionGroup[]>(getParameters);
+  console.log(response);
+  return response;
+};

@@ -34,11 +34,6 @@ export class DocumentTypeController {
     return this.documentTypeService.findAll();
   }
 
-  @Get('get-group-max')
-  getGroupMax() {
-    return this.documentTypeService.getGroupMax();
-  }
-
   @Get('get-group-max/:document_type_id')
   getGroupMaxByDocTypeId(@Param('document_type_id') document_type_id: number) {
     return this.documentTypeService.getGroupMaxByDocTypeId(document_type_id);

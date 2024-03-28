@@ -24,10 +24,10 @@ import { FC, useCallback, useEffect, useState } from 'react';
 // import { Button } from 'react-bootstrap';
 
 export interface ReportPageProps {
-  documentType: DocType;
+  // documentType: DocType;
 }
 
-const ReportPage: FC<ReportPageProps> = ({ documentType }) => {
+const ReportPage: FC<ReportPageProps> = ({}) => {
   // const { dtid } = useParams<{ dtid: string }>();
   // const dtidNumber = dtid ? parseInt(dtid, 10) : null;
   // const [loading, setLoading] = useState<boolean>(false);

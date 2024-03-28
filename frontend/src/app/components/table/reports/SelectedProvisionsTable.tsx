@@ -30,7 +30,7 @@ const SelectedProvisionsTable: React.FC<SelectedProvisionsTableTableProps> = ({
   const [selectedProvisions, setSelectedProvisions] = useState<ProvisionDataObject[]>([]);
 
   useEffect(() => {
-    setAllProvisions(provisions);
+    if (provisions) setAllProvisions(provisions);
   }, [provisions]);
 
   // filter/sort allProvisions to find selected ones for displaying

@@ -342,7 +342,6 @@ export class DocumentDataService {
       const documentData: DocumentData = await this.documentDataRepository.findOne({
         where: { document_type: { id: document_type_id }, dtid: dtid },
       });
-      console.log(documentData);
       const documentDataProvisions: DocumentDataProvision[] = await this.getDocumentDataProvisions(
         document_type_id,
         dtid
@@ -352,8 +351,6 @@ export class DocumentDataService {
       const documentTypeProvisions: DocumentTypeProvision[] = await this.getDocumentTypeProvisions(document_type_id);
 
       const provisionIds = documentDataProvisions.map((dataProvision) => dataProvision.document_provision.id);
-      const returnObject = { provisions: documentTypeProvisions, provisionIds }; //
-      console.log(returnObject); //
       return {
         provisions: documentTypeProvisions,
         preselectedProvisionIds: provisionIds,

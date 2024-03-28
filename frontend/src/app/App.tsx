@@ -4,7 +4,7 @@ import Header from './content/display/Header';
 import Footer from './content/display/Footer';
 import { getDocumentTypes } from './common/report';
 import { DocType } from './types/types';
-import ReportPage from './content/pages/ReportPage';
+// import ReportPage from './content/pages/ReportPage';
 import SearchPage from './content/pages/SearchPage';
 import ManageTemplatesPage from './content/pages/ManageTemplatesPage';
 import AdminPage from './content/pages/AdminPage';
@@ -104,7 +104,7 @@ const App: FC = () => {
             </ContentWrapper>
           }
         />
-        {documentTypes.map((docType) => (
+        {/* {documentTypes.map((docType) => (
           <Route
             key={docType.id}
             path={`/dtid/:dtid/${docType.name}`} // may need to use hardcoded paths for certain reports, grazing lease has a weird url
@@ -114,7 +114,7 @@ const App: FC = () => {
               </ContentWrapper>
             }
           />
-        ))}
+        ))} */}
       </Routes>
       <Footer />
     </Router>

@@ -1154,11 +1154,15 @@ export class ReportService {
     return this.documentTypeService.getGroupMaxByDocTypeId(document_type_id);
   }
 
+  getAllGroups() {
+    return this.documentTypeService.getGroupMax();
+  }
+
   async getDocumentVariablesByDocumentTypeIdAndDtid(document_type_id: number, dtid: number): Promise<any> {
     // if a dtid & document_type_id are provided, get the variables with any existing user specified values
-    const variables = await this.documentDataService.getVariablesByDtidAndDocType(dtid, document_type_id);
-    if (variables) {
-      return variables;
+    const variablesObject = await this.documentDataService.getVariablesByDtidAndDocType(dtid, document_type_id);
+    if (variablesObject.variables.length > 0) {
+      return variablesObject;
     } else {
       // grab the basic variable list corresponding to the document type
       const basicVariables = await this.provisionService.getVariablesByDocumentTypeId(document_type_id);

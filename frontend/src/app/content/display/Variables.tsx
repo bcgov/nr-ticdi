@@ -1,8 +1,8 @@
 import { FC, useEffect, useState } from 'react';
 import { getDocumentVariablesByDocTypeIdDtid } from '../../common/report';
 import VariablesTable, { VariableJson } from '../../components/table/reports/VariablesTable';
-import { DocType } from '../../types/types';
-import { ProvisionData } from './Provisions';
+import { DocType, Provision } from '../../types/types';
+// import { ProvisionData } from './Provisions';
 
 interface VariablesProps {
   dtid: number;
@@ -20,12 +20,12 @@ export type VariableData = {
   update_userid: string;
   create_timestamp: string;
   update_timestamp: string;
-  provision: ProvisionData;
+  provision: Provision;
 };
 
 const Variables: FC<VariablesProps> = ({ dtid, documentType, updateHandler, selectedProvisionIds }) => {
   const [allVariables, setAllVariables] = useState<VariableData[]>([]);
-  const [variableIds, setVariableIds] = useState<number[]>([]);
+  // const [variableIds, setVariableIds] = useState<number[]>([]);
   const [filteredVariables, setFilteredVariables] = useState<VariableData[]>([]); // provisions in the currently selected group
 
   useEffect(() => {
@@ -33,12 +33,14 @@ const Variables: FC<VariablesProps> = ({ dtid, documentType, updateHandler, sele
       const variableData: { variables: VariableData[]; variableIds: number[] } =
         await getDocumentVariablesByDocTypeIdDtid(documentType.id, dtid);
       setAllVariables(variableData.variables);
-      setVariableIds(variableIds);
+      // setVariableIds(variableData.variableIds);
     };
     getData();
   }, [dtid, documentType]);
 
   useEffect(() => {
+    console.log('selectedProvisionIds changed');
+    console.log(selectedProvisionIds);
     console.log(allVariables);
     const filtered: VariableData[] | null = allVariables
       ? allVariables.filter((variable) => selectedProvisionIds.includes(variable.provision.id))

@@ -25,18 +25,21 @@ const ManageDocTypesTable: React.FC<ManageDocTypesTableProps> = ({ documentTypes
       id: 'name',
       cell: (info) => <input value={info.getValue()} className="readonlyInput" readOnly />,
       header: () => 'Name',
+      enableSorting: true,
       meta: { customCss: { width: '30%' } },
     }),
     columnHelper.accessor('created_date', {
       id: 'created_date',
       cell: (info) => <input value={info.getValue()?.substring(0, 10)} className="readonlyInput" readOnly />,
       header: () => 'Create Date',
+      enableSorting: true,
       meta: { customCss: { width: '30%' } },
     }),
     columnHelper.accessor('created_by', {
       id: 'created_by',
       cell: (info) => <input value={info.getValue()} className="readonlyInput" readOnly />,
       header: () => 'Created By',
+      enableSorting: true,
       meta: { customCss: { width: '30%' } },
     }),
     columnHelper.display({
@@ -57,6 +60,7 @@ const ManageDocTypesTable: React.FC<ManageDocTypesTableProps> = ({ documentTypes
         </button>
       ),
       header: () => null,
+      enableSorting: false,
       meta: { customCss: { width: '10%' } },
     }),
     columnHelper.display({
@@ -77,11 +81,19 @@ const ManageDocTypesTable: React.FC<ManageDocTypesTableProps> = ({ documentTypes
         </button>
       ),
       header: () => null,
+      enableSorting: false,
       meta: { customCss: { width: '10%' } },
     }),
   ];
 
-  return <DataTable columns={columns} data={documentTypes} />;
+  return (
+    <DataTable
+      columns={columns}
+      data={documentTypes}
+      enableSorting={true}
+      initialSorting={[{ id: 'name', desc: false }]}
+    />
+  );
 };
 
 export default ManageDocTypesTable;

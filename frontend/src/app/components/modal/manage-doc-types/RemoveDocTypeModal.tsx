@@ -1,29 +1,27 @@
 import { FC, useState } from 'react';
 import { Button, Form, Modal, Row, Spinner } from 'react-bootstrap';
-import { Provision } from '../../../../types/types';
+import { DocType } from '../../../types/types';
 
-interface RemoveProvisionModalProps {
-  provision: Provision | undefined;
+interface RemoveDocTypeModalProps {
+  documentType: DocType;
   show: boolean;
   onHide: () => void;
   onRemove: (id: number) => void;
 }
 
-const RemoveProvisionModal: FC<RemoveProvisionModalProps> = ({ provision, show, onHide, onRemove }) => {
+const RemoveDocTypeModal: FC<RemoveDocTypeModalProps> = ({ documentType, show, onHide, onRemove }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [showError, setShowError] = useState(false);
 
-  const removeProvisionHandler = async () => {
+  const removeDocTypeHandler = async () => {
     try {
-      if (provision) {
-        setLoading(true);
-        setShowError(false);
-        onRemove(provision.id);
-        onHide();
-      }
+      setLoading(true);
+      setShowError(false);
+      onRemove(documentType.id);
+      onHide();
     } catch (err) {
-      setError('Error removing provision');
+      setError('Error removing Document Type');
       setShowError(true);
       console.log(err);
     } finally {
@@ -38,10 +36,10 @@ const RemoveProvisionModal: FC<RemoveProvisionModalProps> = ({ provision, show, 
       </Modal.Header>
       <Modal.Body>
         <Form>
-          <p>Are you sure you want to remove this provision?</p>
+          <p>Are you sure you want to remove this document type?</p>
           <Form.Group as={Row} className="mb-3">
             <Form.Label column sm="10">
-              <b>{provision?.provision_name}</b>
+              Document Type: <b>{documentType.name}</b>
             </Form.Label>
           </Form.Group>
         </Form>
@@ -52,7 +50,7 @@ const RemoveProvisionModal: FC<RemoveProvisionModalProps> = ({ provision, show, 
           Cancel
         </Button>
 
-        <Button variant="primary" onClick={removeProvisionHandler} disabled={loading}>
+        <Button variant="primary" onClick={removeDocTypeHandler} disabled={loading}>
           {loading ? <Spinner as="span" animation="border" size="sm" role="status" aria-hidden="true" /> : 'Remove'}
         </Button>
       </Modal.Footer>
@@ -60,4 +58,4 @@ const RemoveProvisionModal: FC<RemoveProvisionModalProps> = ({ provision, show, 
   );
 };
 
-export default RemoveProvisionModal;
+export default RemoveDocTypeModal;

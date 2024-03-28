@@ -19,24 +19,33 @@ import { Provision } from './provision.entity';
 export class ProvisionVariable {
   @PrimaryGeneratedColumn()
   id: number;
+
   @Column({ nullable: true })
   variable_name: string;
+
   @Column({ nullable: true })
   variable_value: string;
+
   @Column({ nullable: true })
   help_text: string;
+
   @Column({ nullable: true })
   create_userid: string;
+
   @Column({ nullable: true })
   update_userid: string;
+
   @CreateDateColumn()
   create_timestamp: Date;
+
   @UpdateDateColumn()
   update_timestamp: Date;
+
   @ManyToOne(() => Provision, (provision) => provision.provision_variables, {
     nullable: true,
   })
   provision: Provision;
+
   @OneToMany(() => DocumentDataVariable, (documentDataVariable) => documentDataVariable.document_variable, {
     nullable: true,
     cascade: true,

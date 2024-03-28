@@ -4,72 +4,55 @@ import { Repository } from 'typeorm';
 import { CreateProvisionDto } from './dto/create-provision.dto';
 import { Provision } from './entities/provision.entity';
 import { UpdateProvisionDto } from './dto/update-provision.dto';
-import { ProvisionGroup } from './entities/provision_group.entity';
 import { ProvisionVariable } from './entities/provision_variable.entity';
 import { DocumentTypeService } from 'src/document_type/document_type.service';
 import { DocumentType } from 'src/document_type/entities/document_type.entity';
+import { DocumentTypeProvision } from './entities/document_type_provision';
+import { ProvisionGroup } from 'src/document_type/entities/provision_group.entity';
+import { ManageDocTypeProvision } from 'utils/types';
 
 @Injectable()
 export class ProvisionService {
   constructor(
     @InjectRepository(Provision)
     private provisionRepository: Repository<Provision>,
-    @InjectRepository(ProvisionGroup)
-    private provisionGroupRepository: Repository<ProvisionGroup>,
     @InjectRepository(ProvisionVariable)
     private provisionVariableRepository: Repository<ProvisionVariable>,
+    @InjectRepository(DocumentTypeProvision)
+    private documentTypeProvisionRepository: Repository<DocumentTypeProvision>,
     private documentTypeService: DocumentTypeService
   ) {}
 
   async create(provision: CreateProvisionDto): Promise<Provision> {
-    const provision_group = Math.floor(provision.provision_group);
-    const provision_group_text = provision.provision_group_text;
-    delete provision['provision_group'];
-    delete provision['provision_group_text'];
-    provision.max = Math.floor(provision.max);
-    await this.updateGroupMaximums(provision_group, provision.max, provision_group_text);
-    if ((await this.provisionGroupRepository.countBy({ provision_group })) == 0) {
-      const newProvisionGroup = this.provisionGroupRepository.create({
-        provision_group,
-        provision_group_text,
-      });
-      await this.provisionGroupRepository.save(newProvisionGroup);
-    }
-    const provisionGroup = await this.provisionGroupRepository.findOneBy({
-      provision_group,
-    });
     const newProvision: Provision = this.provisionRepository.create({
       ...provision,
-      provision_group: provisionGroup,
     });
-    return this.provisionRepository.save(newProvision);
+    const savedProvision = await this.provisionRepository.save(newProvision);
+    const documentTypes: DocumentType[] = await this.documentTypeService.findAll();
+
+    // create an array of DocumentTypeProvision entries, one for each document type, each using the newly saved provision
+    const documentTypeProvisions = documentTypes.map((documentType) => {
+      const documentTypeProvision = new DocumentTypeProvision();
+      documentTypeProvision.document_type = documentType;
+      documentTypeProvision.provision = savedProvision;
+      return documentTypeProvision;
+    });
+
+    // save the new document_type_provision entries to the db
+    await this.documentTypeProvisionRepository.save(documentTypeProvisions);
+
+    return savedProvision;
   }
 
-  async update(id: number, document_type_ids: number[], provision: UpdateProvisionDto): Promise<any> {
-    const provision_group = Math.floor(provision.provision_group);
-    const provision_group_text = provision.provision_group_text;
-    delete provision['provision_group'];
-    delete provision['provision_group_text'];
-    provision.max = Math.floor(provision.max);
-    await this.updateGroupMaximums(provision_group, provision.max, provision_group_text);
-    const provisionGroup = await this.provisionGroupRepository.findOneBy({
-      provision_group,
-    });
+  async update(id: number, provision: UpdateProvisionDto): Promise<any> {
     const existingProvision: Provision = await this.provisionRepository.findOneBy({ id });
-
-    const documentTypes: DocumentType[] = await this.documentTypeService.findByIds(document_type_ids);
-
-    existingProvision.type = provision.type;
     existingProvision.provision_name = provision.provision_name;
     existingProvision.free_text = provision.free_text;
     existingProvision.help_text = provision.help_text;
     existingProvision.category = provision.category;
-    existingProvision.order_value = provision.order_value;
     existingProvision.update_userid = provision.update_userid;
-    existingProvision.document_types = documentTypes;
     const updatedProvision = this.provisionRepository.create({
       ...existingProvision,
-      provision_group: provisionGroup,
     });
     return this.provisionRepository.save(updatedProvision);
   }
@@ -81,12 +64,13 @@ export class ProvisionService {
     provision_id: number;
     create_userid: string;
   }) {
-    const provision = await this.findById(variable.provision_id);
+    const provision: Provision = await this.findById(variable.provision_id);
     delete variable['provision_id'];
     const newVariable = this.provisionVariableRepository.create({
       ...variable,
       provision: provision,
     });
+    console.log(newVariable);
     return this.provisionVariableRepository.save(newVariable);
   }
 
@@ -120,21 +104,12 @@ export class ProvisionService {
     return this.provisionVariableRepository.delete(id);
   }
 
+  // gets global provision list
   async findAll(): Promise<any[]> {
     const provisions = await this.provisionRepository.find({
       where: { is_deleted: false },
-      relations: ['provision_group', 'document_types'],
     });
-    return provisions.map((provision) => {
-      const { provision_group, document_types, ...restOfProvision } = provision;
-      delete provision_group['id'];
-
-      return {
-        ...provision,
-        ...provision_group,
-        document_types,
-      };
-    });
+    return provisions;
   }
 
   async findAllVariables(): Promise<any[]> {
@@ -186,7 +161,6 @@ export class ProvisionService {
     try {
       return this.provisionRepository.findOne({
         where: { id: provisionId },
-        relations: ['provision_group'],
       });
     } catch (err) {
       console.log(err);
@@ -227,98 +201,135 @@ export class ProvisionService {
 
   async remove(id: number): Promise<any> {
     await this.provisionRepository.update(id, { is_deleted: true });
+    // update downstream document type provisions
+    await this.documentTypeProvisionRepository.delete({ provision: { id: id } });
     return { message: 'Provision deleted' };
   }
 
-  async getGroupMax(): Promise<any> {
-    const provisions = await this.provisionRepository.find({
-      relations: ['provision_group'],
-    });
-    let provisionGroups: ProvisionGroup[] = [];
-    provisions.forEach((provision) => {
-      provisionGroups.push(provision.provision_group);
-    });
-    provisionGroups = this.removeDuplicates(provisionGroups, 'provision_group');
-    return Array.from(provisionGroups).sort((a, b) => a.provision_group - b.provision_group);
-  }
-
-  async getGroupMaxByDocTypeId(document_type_id: number): Promise<any> {
-    const provisionGroups = await this.provisionGroupRepository.find({
-      where: { document_type: { id: document_type_id } },
-    });
-    return Array.from(provisionGroups).sort((a, b) => a.provision_group - b.provision_group);
-  }
-
-  // async getVariablesByDtid(dtid: number): Promise<any> {
-  //   // gets ALL provisions
-  //   const provisions = await this.provisionRepository.find({
-  //     relations: ['provision_variables'],
-  //   });
-
-  //   const provisionVariables: ProvisionVariable[] = [];
-  //   provisions.forEach((provision) => {
-  //     provision.provision_variables.forEach((variable) => {
-  //       variable['provisionId'] = provision.id;
-  //       provisionVariables.push(variable);
-  //     });
-  //   });
-  //   return provisionVariables;
-  // }
-
-  async getMandatoryProvisions(): Promise<number[]> {
-    const provisions = await this.provisionRepository.find({
-      where: { type: 'M' },
-    });
-    return provisions.map((provision) => provision.id);
-  }
-
+  /**
+   * Document Type Provisions
+   */
   async getMandatoryProvisionsByDocumentTypeId(document_type_id: number): Promise<number[]> {
-    const provisions = await this.provisionRepository
+    const docTypeProvisions = await this.documentTypeProvisionRepository
       .createQueryBuilder('provision')
       .innerJoinAndSelect('provision.document_types', 'documentType')
       .where('provision.type = :type', { type: 'M' })
       .andWhere('documentType.id = :documentTypeId', { documentTypeId: document_type_id })
       .getMany();
 
-    return provisions.map((provision) => provision.id);
+    return docTypeProvisions.map((provision) => provision.id);
   }
 
-  // async remove(id: number): Promise<{ deleted: boolean; message?: string }> {
-  //   try {
-  //     await this.provisionRepository.delete(id);
-  //     return { deleted: true };
-  //   } catch (err) {
-  //     return { deleted: false, message: err.message };
-  //   }
-  // }
-
-  async updateGroupMaximums(provision_group: number, max: number, provision_group_text: string) {
-    let provisionGroup: ProvisionGroup = await this.provisionGroupRepository.findOneBy({
-      provision_group: provision_group,
+  async getManageDocTypeProvisions(document_type_id: number) {
+    const provisions: Provision[] = await this.findAll();
+    console.log(provisions);
+    // get all docTypeProvisions with provision_group relation
+    const docTypeProvisions = await this.documentTypeProvisionRepository.find({
+      where: { document_type: { id: document_type_id } },
+      relations: ['provision_group', 'provision'],
     });
-    if (!provisionGroup) {
-      const newGroup = this.provisionGroupRepository.create({
-        provision_group: provision_group,
-        max: max,
-        provision_group_text: provision_group_text,
+    console.log(docTypeProvisions);
+    // get provisions which are associated with the document type
+    const associatedProvisions = await this.documentTypeProvisionRepository.find({
+      where: { document_type: { id: document_type_id } },
+    });
+    console.log(associatedProvisions);
+    // map them to a more readable format
+    const associatedProvisionIds = associatedProvisions.map((raw) => raw.id);
+    // map 'docTypeProvisions' to include a variable called 'associated' which is true or false
+    const managedProvisions: ManageDocTypeProvision[] = docTypeProvisions.map((docTypeProvision) => ({
+      id: docTypeProvision.id,
+      type: docTypeProvision.type,
+      provision_name: docTypeProvision.provision.provision_name,
+      free_text: docTypeProvision.provision.free_text,
+      help_text: docTypeProvision.provision.help_text,
+      category: docTypeProvision.provision.category,
+      active_flag: docTypeProvision.provision.active_flag,
+      sequence_value: docTypeProvision.sequence_value,
+      associated: docTypeProvision.associated,
+      provision_group: docTypeProvision?.provision_group ? docTypeProvision.provision_group.provision_group : null,
+      max: docTypeProvision?.provision_group ? docTypeProvision.provision_group.max : null,
+      provision_group_object: docTypeProvision.provision_group,
+    }));
+    return managedProvisions;
+  }
+
+  async associateDocType(provision_id: number, document_type_id: number) {
+    try {
+      console.log(`associating provision id ${provision_id} from doc type ${document_type_id}`);
+      const documentTypeProvision = await this.documentTypeProvisionRepository.findOneOrFail({
+        where: { id: provision_id },
       });
-      provisionGroup = await this.provisionGroupRepository.save(newGroup);
-    }
-    if (provisionGroup.max != max || provisionGroup.provision_group_text != provision_group_text) {
-      await this.provisionGroupRepository.update(provisionGroup.id, {
-        max: max,
-        provision_group_text: provision_group_text,
+      await this.documentTypeProvisionRepository.save({
+        ...documentTypeProvision,
+        associated: true,
       });
+    } catch (err) {
+      console.log(err);
+      throw new Error('Error associating provision.');
     }
   }
 
-  removeDuplicates<T>(array: T[], property: keyof T): T[] {
-    return array.reduce<T[]>((accumulator, currentObject) => {
-      const existingObject = accumulator.find((obj) => obj[property] === currentObject[property]);
-      if (!existingObject) {
-        accumulator.push(currentObject);
+  async disassociateDocType(provision_id: number, document_type_id: number) {
+    try {
+      console.log(`disassociating provision id ${provision_id} from doc type ${document_type_id}`);
+      const documentTypeProvision = await this.documentTypeProvisionRepository.findOneOrFail({
+        where: { id: provision_id },
+      });
+      await this.documentTypeProvisionRepository.save({
+        ...documentTypeProvision,
+        associated: false,
+      });
+    } catch (err) {
+      console.log(err);
+      throw new Error('Error disassociating provision.');
+    }
+  }
+
+  async updateManageDocTypeProvisions(document_type_id: number, docTypeProvisions: ManageDocTypeProvision[]) {
+    const existingDocTypeProvisions: DocumentTypeProvision[] = await this.documentTypeProvisionRepository.find({
+      where: {
+        document_type: { id: document_type_id },
+      },
+    });
+    const updatedProvisions = existingDocTypeProvisions.map((existingProv) => {
+      const matchingProv = docTypeProvisions.find((dtp) => dtp.id === existingProv.id);
+
+      if (matchingProv) {
+        return {
+          ...existingProv,
+          type: matchingProv.type,
+          associated: matchingProv.associated,
+          sequence_value: matchingProv.sequence_value,
+          provision_group: matchingProv.provision_group_object,
+        };
       }
-      return accumulator;
-    }, []);
+      return existingProv;
+    });
+    await this.documentTypeProvisionRepository.save(updatedProvisions);
+    console.log('Provisions updated successfully!');
+  }
+
+  /**
+   * When a new document type is created, a document type provision for each existing global provision needs to be created
+   * @param documentType
+   */
+  async generateDocTypeProvisions(documentType: DocumentType): Promise<void> {
+    const allProvisions: Provision[] = await this.findAll();
+    const documentTypeProvisions = allProvisions.map((provision) => {
+      const documentTypeProvision = new DocumentTypeProvision();
+      documentTypeProvision.document_type = documentType;
+      documentTypeProvision.provision = provision;
+      return documentTypeProvision;
+    });
+    await this.documentTypeProvisionRepository.save(documentTypeProvisions);
+  }
+
+  /**
+   * Deletes all document type provisions for a given document type which is being deleted.
+   * @param document_type_id
+   */
+  async removeDocTypeProvisions(document_type_id: number): Promise<void> {
+    await this.documentTypeProvisionRepository.delete({ document_type: { id: document_type_id } });
   }
 }

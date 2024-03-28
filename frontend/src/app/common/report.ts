@@ -29,7 +29,7 @@ export const getDocumentDataByDocTypeIdAndDtid = async (document_type_id: number
 };
 
 export const getGroupMaxByDocTypeId = async (document_type_id: number) => {
-  const url = `${config.API_BASE_URL}/report/get-group-max/${document_type_id}`;
+  const url = `${config.API_BASE_URL}/document-type/get-group-max/${document_type_id}`;
   const getParameters = api.generateApiParameters(url);
   const response: ProvisionGroup[] = await api.get<ProvisionGroup[]>(getParameters);
   return response;

@@ -59,10 +59,14 @@ const ReportPage: FC<ReportPageProps> = ({ documentType }) => {
         );
         // mandatory provisions, will be validated against
         const mpIds: number[] = await getMandatoryProvisionsByDocTypeId(documentType.id);
+        console.log('mpIds');
+        console.log(mpIds);
         setMandatoryProvisionIds(mpIds);
         // get provision groups and filter out the empty ones
         const provisionGroupsObject: ProvisionGroup[] = await getGroupMaxByDocTypeId(documentType.id);
+        console.log('provision groups');
         const activeProvisionGroups = provisionGroupsObject.filter((group) => activeProvisionIDs.has(group.id));
+        console.log(activeProvisionGroups);
         setProvisionGroups(activeProvisionGroups);
       } catch (error) {
         console.error('Failed to fetch data', error);

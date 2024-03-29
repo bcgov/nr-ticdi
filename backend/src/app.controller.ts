@@ -1,5 +1,4 @@
 import { Get, Controller, Render, Param, UseGuards, UseFilters, Session, Query, Res } from '@nestjs/common';
-import { AppService } from '../src/app.service';
 import { NFR_VARIANTS, NFR_VARIANTS_ARRAY, PAGE_TITLES, REPORT_TYPES } from 'src/constants';
 import { SessionData } from 'src/types';
 import { AuthenticationGuard } from './authentication/authentication.guard';
@@ -20,7 +19,6 @@ let requestConfig: AxiosRequestConfig;
 @Controller()
 export class AppController {
   constructor(
-    private readonly appService: AppService,
     private readonly reportService: ReportService,
     private readonly ttlsService: TTLSService
   ) {
@@ -255,15 +253,6 @@ export class AppController {
       idirUsername: session.data.activeAccount ? session.data.activeAccount.idir_username : '',
       displayAdmin: displayAdmin,
     };
-  }
-
-  @Get('getHello')
-  getHello(): string {
-    return this.appService.getHello();
-  }
-  @Get()
-  getHello2(): string {
-    return this.appService.getHello();
   }
 
   @Get('/nfr/dtid/:dtid')

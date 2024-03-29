@@ -143,7 +143,7 @@ export class ReportController {
       dtid: number;
       document_type_id: number;
       status: string;
-      provisionArray: ProvisionJSON[];
+      provisionArray: { provision_id: number; doc_type_provision_id: number }[];
       variableArray: VariableJSON[];
     }
   ) {

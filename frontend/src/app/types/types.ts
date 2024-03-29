@@ -127,6 +127,7 @@ export type ProvisionVariableObject = {
   update_userid: string;
   create_timestamp: string;
   update_timestamp: string;
+  provision: Provision;
 };
 
 export type DocumentDataProvisionObject = {
@@ -294,12 +295,19 @@ export type DocumentDataVariable = {
   document_data_id: number;
 };
 
+export type SavedVariableInfo = {
+  id: number;
+  variable_id: number;
+  saved_value: string;
+};
+
 export type DocumentDataDTO = {
   provisions: ProvisionDataObject[];
+  variables: ProvisionVariableObject[];
   preselectedProvisionIds: number[];
   preselectedVariableIds: number[];
   documentDataProvisions: DocumentDataProvision[];
-  documentDataVariables: DocumentDataVariable[];
+  savedVariableInfo: SavedVariableInfo[];
 };
 
 export type ProvisionDataObject = {
@@ -320,5 +328,23 @@ export type ProvisionDataObject = {
   update_timestamp: string;
   provision_group: ProvisionGroup;
   document_type: DocumentType;
-  document_data_provisions: DocumentDataProvision[];
+};
+
+export type ReducedProvisionDataObject = {
+  id: number;
+  associated: boolean;
+  sequence_value: number;
+  type: string;
+  provision_id: number;
+  provision_name: string;
+  category: string;
+  free_text: string;
+  help_text: string;
+  active_flag: boolean; // from global provision
+  is_deleted: boolean; // from global provision
+  create_userid: string;
+  create_timestamp: string;
+  update_userid: string;
+  update_timestamp: string;
+  provision_group: ProvisionGroup;
 };

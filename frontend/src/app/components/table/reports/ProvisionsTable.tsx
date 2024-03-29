@@ -3,7 +3,7 @@ import { DataTable } from '../common/DataTable';
 import { ColumnDef, createColumnHelper } from '@tanstack/react-table';
 // import { getDocumentProvisionsByDocTypeIdDtid } from '../../../common/report';
 // import { ProvisionData } from '../../../content/display/Provisions';
-import { DocType, ProvisionDataObject } from '../../../types/types';
+import { DocType, ReducedProvisionDataObject } from '../../../types/types';
 
 interface ProvisionsTableProps {
   dtid: number;
@@ -11,7 +11,7 @@ interface ProvisionsTableProps {
   currentGroupNumber: number | null;
   currentGroupMax: number | null;
   selectedProvisionIds: number[] | undefined;
-  provisions: ProvisionDataObject[] | undefined;
+  provisions: ReducedProvisionDataObject[] | undefined;
   selectProvision: (id: number, checked: boolean) => void;
 }
 
@@ -24,9 +24,9 @@ const ProvisionsTable: React.FC<ProvisionsTableProps> = ({
   provisions,
   selectProvision,
 }) => {
-  const [allProvisions, setAllProvisions] = useState<ProvisionDataObject[]>([]);
-  const [filteredProvisions, setFilteredProvisions] = useState<ProvisionDataObject[]>([]); // provisions in the currently selected group
-  const [currentGroupProvisions, setCurrentGroupProvisions] = useState<ProvisionDataObject[]>([]);
+  const [allProvisions, setAllProvisions] = useState<ReducedProvisionDataObject[]>([]);
+  const [filteredProvisions, setFilteredProvisions] = useState<ReducedProvisionDataObject[]>([]); // provisions in the currently selected group
+  const [currentGroupProvisions, setCurrentGroupProvisions] = useState<ReducedProvisionDataObject[]>([]);
 
   useEffect(() => {
     if (provisions) setAllProvisions(provisions);
@@ -55,11 +55,11 @@ const ProvisionsTable: React.FC<ProvisionsTableProps> = ({
       // if so, check if the other provision is already selected
       const otherName = exclusiveProvisionNames.find((name) => name !== provisionName);
       const otherProvision = allProvisions.find((provision) => provision.provision_name === otherName);
-      if (otherProvision) return selectedProvisionIds?.includes(otherProvision?.id) ?? false;
+      if (otherProvision) return selectedProvisionIds?.includes(otherProvision?.provision_id) ?? false;
     }
 
     const selectedInGroup = filteredProvisions.filter((provision) =>
-      selectedProvisionIds?.includes(provision.id)
+      selectedProvisionIds?.includes(provision.provision_id)
     ).length;
     if (
       currentGroupMax !== null &&
@@ -71,8 +71,8 @@ const ProvisionsTable: React.FC<ProvisionsTableProps> = ({
     return false;
   };
 
-  const columnHelper = createColumnHelper<ProvisionDataObject>();
-  const columns: ColumnDef<ProvisionDataObject, any>[] = [
+  const columnHelper = createColumnHelper<ReducedProvisionDataObject>();
+  const columns: ColumnDef<ReducedProvisionDataObject, any>[] = [
     columnHelper.accessor('type', {
       id: 'type',
       cell: (info) => <input value={info.getValue()} className="readonlyInput" readOnly />,
@@ -100,12 +100,12 @@ const ProvisionsTable: React.FC<ProvisionsTableProps> = ({
         <input
           type="checkbox"
           onChange={(e) => {
-            if (!isCheckboxDisabled(info.row.original.id, info.row.original.provision_name)) {
-              selectProvision(info.row.original.id, e.target.checked);
+            if (!isCheckboxDisabled(info.row.original.provision_id, info.row.original.provision_name)) {
+              selectProvision(info.row.original.provision_id, e.target.checked);
             }
           }}
-          checked={selectedProvisionIds?.includes(info.row.original.id) ?? false}
-          disabled={isCheckboxDisabled(info.row.original.id, info.row.original.provision_name)}
+          checked={selectedProvisionIds?.includes(info.row.original.provision_id) ?? false}
+          disabled={isCheckboxDisabled(info.row.original.provision_id, info.row.original.provision_name)}
           style={{ width: '100%' }}
         />
       ),

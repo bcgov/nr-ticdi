@@ -7,23 +7,6 @@ import { DocumentDataService } from './document_data.service';
 export class DocumentDataController {
   constructor(private readonly documentDataService: DocumentDataService) {}
 
-  @Post()
-  async create(
-    @Body()
-    data: {
-      body: CreateDocumentDataDto & {
-        provisionJsonArray: ProvisionJSON[];
-        variableJsonArray: VariableJSON[];
-      };
-    }
-  ) {
-    const provArr = data.body.provisionJsonArray;
-    const varArr = data.body.variableJsonArray;
-    delete data.body['provisionJsonArray'];
-    delete data.body['variableJsonArray'];
-    return this.documentDataService.createOrUpdate(data.body, provArr, varArr);
-  }
-
   @Get()
   findAll() {
     return this.documentDataService.findAll();

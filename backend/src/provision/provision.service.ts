@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { CreateProvisionDto } from './dto/create-provision.dto';
 import { Provision } from './entities/provision.entity';
 import { UpdateProvisionDto } from './dto/update-provision.dto';
@@ -124,6 +124,7 @@ export class ProvisionService {
     });
   }
 
+  // old route to be deleted
   async getProvisionsByDocumentTypeId(document_type_id: number): Promise<Provision[]> {
     const provisions: Provision[] = await this.provisionRepository
       .createQueryBuilder('provision')
@@ -136,24 +137,22 @@ export class ProvisionService {
     return provisions;
   }
 
-  // querybuilder is more efficient here
-  async getVariablesByDocumentTypeId(document_type_id: number) {
-    const provisions = await this.provisionRepository
-      .createQueryBuilder('provision')
-      .innerJoin('provision.document_types', 'documentType', 'documentType.id = :document_type_id', {
-        document_type_id,
-      })
-      .where('is_deleted = false')
-      .getMany();
+  async getVariablesByDocumentTypeId() {
+    const provisions: Provision[] = await this.provisionRepository.find({
+      where: { is_deleted: false, active_flag: true },
+      relations: ['document_type_provisions', 'provision_variables'],
+    });
+
     if (!provisions.length) {
       return [];
     }
     const provisionIds = provisions.map((provision) => provision.id);
-    const provisionVariables = await this.provisionVariableRepository
-      .createQueryBuilder('provisionVariable')
-      .where('provisionVariable.provisionId IN (:...provisionIds)', { provisionIds })
-      .leftJoinAndSelect('provisionVariable.provision', 'provision')
-      .getMany();
+    const provisionVariables = await this.provisionVariableRepository.find({
+      where: {
+        provision: { id: In(provisionIds) },
+      },
+      relations: ['provision'],
+    });
     return provisionVariables;
   }
 
@@ -209,6 +208,10 @@ export class ProvisionService {
   /**
    * Document Type Provisions
    */
+  async getDocTypeProvisionById(document_type_provision_id: number): Promise<DocumentTypeProvision> {
+    return this.documentTypeProvisionRepository.findOne({ where: { id: document_type_provision_id } });
+  }
+
   async getMandatoryProvisionsByDocumentTypeId(document_type_id: number): Promise<number[]> {
     const docTypeProvisions = await this.documentTypeProvisionRepository.find({
       where: {
@@ -292,6 +295,13 @@ export class ProvisionService {
       };
     });
     return fullDocTypeProvisions;
+  }
+
+  async getSimpleDocTypeProvisionsByDocTypeId(document_type_id: number): Promise<DocumentTypeProvision[]> {
+    return this.documentTypeProvisionRepository.find({
+      where: { document_type: { id: document_type_id } },
+      relations: ['provision'],
+    });
   }
 
   async associateDocType(provision_id: number, document_type_id: number) {

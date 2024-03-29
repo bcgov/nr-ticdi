@@ -4,8 +4,10 @@ import {
   DTRDisplayObject,
   DocType,
   DocumentDataDTO,
-  ProvisionDataObject,
   ProvisionGroup,
+  ReducedProvisionDataObject,
+  SavedVariableInfo,
+  Variable,
 } from '../../../app/types/types';
 import TenureDetails from '../display/TenureDetails';
 import DtidDetails from '../display/DtidDetails';
@@ -16,36 +18,38 @@ import {
   getMandatoryProvisionsByDocTypeId,
   getGroupMaxByDocTypeId,
   getDocumentData,
-  getAllProvisionGroups,
 } from '../../common/report';
 import InterestedParties from '../display/InterestedParties';
 import Skeleton from 'react-loading-skeleton';
 import Provisions from '../display/Provisions';
-import Variables from '../display/Variables';
 import { ProvisionJson, SaveProvisionData } from '../../components/table/reports/SelectedProvisionsTable';
-import { SaveVariableData, VariableJson } from '../../components/table/reports/VariablesTable';
+import VariablesTable, { SaveVariableData, VariableJson } from '../../components/table/reports/VariablesTable';
 import { Button, Row } from 'react-bootstrap';
 import { getDocumentTypes } from '../../common/manage-doc-types';
+import { getVariables } from '../../common/manage-provisions';
+import { useDispatch, useSelector } from 'react-redux';
+import { setProvisionDataObjects, setSelectedProvisionIds } from '../../store/reducers/provisionSlice';
+import { setSelectedVariableIds, setVariables } from '../../store/reducers/variableSlice';
+import { RootState } from '../../store/store';
+import { setSearchState } from '../../store/reducers/searchSlice';
 
 const LandingPage: FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [data, setData] = useState<DTRDisplayObject | null>(null);
-  const [allProvisions, setAllProvisions] = useState<ProvisionDataObject[]>([]);
-  // const [allVariables, setAllVariables] = useState<ProvisionVariable[]>([]);
-  const [variableArray, setVariableArray] = useState<SaveVariableData[]>([]);
-  const [provisionArray, setProvisionArray] = useState<SaveProvisionData[]>([]);
-  const [variableJsonArray, setVariableJsonArray] = useState<VariableJson[]>([]);
-  const [provisionJsonArray, setProvisionJsonArray] = useState<ProvisionJson[]>([]);
-  const [selectedProvisionIds, setSelectedProvisionIds] = useState<number[]>([]);
   const [mandatoryProvisionIds, setMandatoryProvisionIds] = useState<number[]>([]);
-
-  const [allProvisionGroups, setAllProvisionGroups] = useState<ProvisionGroup[]>([]);
   const [provisionGroups, setProvisionGroups] = useState<ProvisionGroup[]>([]);
-
-  const [dtid, setDtid] = useState<number>();
+  const [dtidInput, setDtidInput] = useState<number | null>();
+  const [dtid, setDtid] = useState<number | null>(null);
   const [selectedDocTypeId, setSelectedDocTypeId] = useState<number | null>(null);
   const [documentType, setDocumentType] = useState<DocType | null>(null);
   const [documentTypes, setDocumentTypes] = useState<DocType[]>([]);
+
+  const dispatch = useDispatch();
+  const selectedProvisionIds: number[] = useSelector((state: RootState) => state.provision.selectedProvisionIds);
+  const provisions = useSelector((state: RootState) => state.provision.provisions);
+  const selectedVariableIds: number[] = useSelector((state: RootState) => state.variable.selectedVariableIds);
+  const variables = useSelector((state: RootState) => state.variable.variables);
+  const searchState = useSelector((state: RootState) => state.search);
 
   useEffect(() => {
     const fetchBasicData = async () => {
@@ -53,10 +57,6 @@ const LandingPage: FC = () => {
         const documentTypes: DocType[] = await getDocumentTypes();
         documentTypes.sort((a, b) => a.name.localeCompare(b.name));
         setDocumentTypes(documentTypes);
-        const pgs: ProvisionGroup[] = await getAllProvisionGroups();
-        console.log(pgs);
-        // pgs.sort((a, b) => a.provision_group - b.provision_group);
-        setAllProvisionGroups(pgs);
       } catch (error) {
         console.error('Failed to fetch doc types', error);
         setData(null);
@@ -64,7 +64,6 @@ const LandingPage: FC = () => {
         setLoading(false);
       }
     };
-    console.log('fetching doc types');
     fetchBasicData();
   }, []);
 
@@ -74,20 +73,20 @@ const LandingPage: FC = () => {
     }
   }, [documentTypes, selectedDocTypeId]);
 
-  const fetchDataHandler = async () => {
-    if (dtid) {
-      try {
-        setLoading(true);
-        // Fetch any existing documentData
-        const displayData: DTRDisplayObject = await getDisplayData(dtid);
+  useEffect(() => {
+    const applySearch = async () => {
+      if (searchState.searching && searchState.dtid && searchState.document_type) {
+        dispatch(setSearchState({ searching: false }));
+        setDtid(searchState.dtid);
+        setDtidInput(searchState.dtid);
+        setDocumentType(searchState.document_type);
+        setSelectedDocTypeId(searchState.document_type.id);
+        const displayData: DTRDisplayObject = await getDisplayData(searchState.dtid);
         setData(displayData);
-      } catch (err) {
-        console.log(err);
-      } finally {
-        setLoading(false);
       }
-    }
-  };
+    };
+    applySearch();
+  }, [searchState, dispatch]);
 
   useEffect(() => {
     const fetchDocData = async () => {
@@ -96,11 +95,22 @@ const LandingPage: FC = () => {
           setLoading(true);
           // provisions, will be validated against
           const documentData: DocumentDataDTO = await getDocumentData(documentType.id, dtid);
-          console.log('documentData');
-          console.log(documentData);
-          // const fetchProvisions: { provisions: ProvisionData[]; provisionIds: number[] } =
-          //   await getDocumentProvisionsByDocTypeIdDtid(documentType.id, dtid);
-          setAllProvisions(documentData.provisions);
+          dispatch(setProvisionDataObjects(documentData?.provisions));
+          dispatch(setSelectedProvisionIds(documentData?.preselectedProvisionIds));
+          const defaultVariables: Variable[] = await getVariables();
+          const savedVariableInfo: SavedVariableInfo[] = documentData.savedVariableInfo;
+          const variables: Variable[] = defaultVariables.map((defaultVar) => {
+            const savedVar = savedVariableInfo.find((info) => info.variable_id === defaultVar.id);
+            return {
+              ...defaultVar,
+              variable_value: savedVar?.saved_value || defaultVar.variable_value,
+            };
+          });
+          dispatch(setVariables(variables));
+          const selectedVariables = variables
+            .filter((v) => documentData?.preselectedProvisionIds?.includes(v.provision_id))
+            .map((v) => v.id);
+          dispatch(setSelectedVariableIds(selectedVariables));
           const activeProvisionIDs = new Set(
             documentData.provisions
               .filter((provision) => provision.active_flag && !provision.is_deleted && provision.provision_group)
@@ -124,26 +134,42 @@ const LandingPage: FC = () => {
       }
     };
     fetchDocData();
-  }, [documentType, dtid]);
+  }, [documentType, dtid, dispatch]);
 
-  const handleGenerateReport = () => {
-    if (dtid) {
-      const errorMessage = validateProvisions();
-      if (!errorMessage) {
-        if (data && documentType && documentType.id) {
-          generateReport(dtid, data!.fileNum, documentType.id, provisionJsonArray, variableJsonArray);
-        }
-      } else {
-        alert(errorMessage);
+  const fetchDataHandler = async () => {
+    if (dtidInput) {
+      try {
+        setLoading(true);
+        setDtid(dtidInput);
+        // Fetch any existing documentData
+        const displayData: DTRDisplayObject = await getDisplayData(dtidInput);
+        setData(displayData);
+      } catch (err) {
+        console.log(err);
+      } finally {
+        setLoading(false);
       }
+    } else {
+      setData(null);
+      setDtid(null);
     }
+  };
+
+  const handleDocTypeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedId = parseInt(event.target.value);
+    setSelectedDocTypeId(selectedId || null);
+  };
+
+  const handleDtidChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setDtidInput(!isNaN(parseInt(e.target.value)) ? parseInt(e.target.value) : null);
   };
 
   const validateProvisions = (): string | null => {
     const unselectedMandatoryIds = mandatoryProvisionIds.filter(
       (mandatoryId) => !selectedProvisionIds.includes(mandatoryId)
     );
-    const matchingProvisions = allProvisions.filter((provision) => unselectedMandatoryIds.includes(provision.id));
+    const matchingProvisionIds = selectedProvisionIds.filter((id) => unselectedMandatoryIds.includes(id));
+    const matchingProvisions = provisions.filter((p) => matchingProvisionIds.includes(p.id));
     const matchingGroupNumbers = [...new Set(matchingProvisions.map((provision) => provision.provision_group))];
     if (matchingGroupNumbers.length > 0) {
       return `There are unselected mandatory provisions the following groups: ${matchingGroupNumbers.join(', ')}`;
@@ -152,49 +178,47 @@ const LandingPage: FC = () => {
     }
   };
 
-  const updateSelectedProvisionIds = useCallback((selectedProvisionIds: number[]) => {
-    console.log('updating selectedProvisionIds');
-    console.log(selectedProvisionIds);
-    setSelectedProvisionIds((prevIds) => selectedProvisionIds);
-  }, []);
+  const getSaveData = () => {
+    const selectedProvisions = provisions.filter((provision) => selectedProvisionIds.includes(provision.provision_id));
+    const provisionSaveData: SaveProvisionData[] = selectedProvisions.map((provision) => {
+      return {
+        provision_id: provision.provision_id,
+        doc_type_provision_id: provision.id,
+      };
+    });
+    const selectedVariables: Variable[] = variables.filter((variable) => selectedVariableIds.includes(variable.id));
+    const variableSaveData: SaveVariableData[] = selectedVariables.map((variable) => {
+      return { variable_id: variable.id, variable_value: variable.variable_value, provision_id: variable.provision_id };
+    });
+    return { variableSaveData, provisionSaveData };
+  };
 
-  const updateVariableArray = useCallback((variableJsonData: VariableJson[]) => {
-    console.log('updating variableJsonData');
-    console.log(variableJsonData);
-    // used for saving
-    setVariableArray(
-      variableJsonData.map((variable) => {
-        return {
-          provision_id: variable.provision_id,
-          variable_id: variable.variable_id,
-          variable_value: variable.variable_value,
-        };
-      })
-    );
-    // used to generate document
-    setVariableJsonArray(variableJsonData);
-  }, []);
-
-  const updateProvisionArray = useCallback((provisionJsonData: ProvisionJson[]) => {
-    // used for saving
-    setProvisionArray(
-      provisionJsonData.map((provision) => {
-        return { provision_id: provision.provision_id, free_text: provision.free_text };
-      })
-    );
-    // used to generate document
-    setProvisionJsonArray(provisionJsonData);
-  }, []);
+  const getReportData = () => {
+    const selectedProvisions = provisions.filter((provision) => selectedProvisionIds.includes(provision.provision_id));
+    const provisionJsonArray: ProvisionJson[] = selectedProvisions.map((provision) => {
+      return {
+        provision_id: provision.provision_id,
+        provision_group: provision.provision_group.provision_group,
+        doc_type_provision_id: provision.id,
+        provision_name: provision.provision_name,
+        free_text: provision.free_text,
+      };
+    });
+    const selectedVariables: Variable[] = variables.filter((variable) => selectedVariableIds.includes(variable.id));
+    const variableJsonArray: VariableJson[] = selectedVariables.map((variable) => {
+      return { ...variable, variable_id: variable.id };
+    });
+    return { variableJsonArray, provisionJsonArray };
+  };
 
   const handleDocumentSave = () => {
     console.log('saving...');
-    console.log('variableArray');
-    console.log(variableArray);
     const saveData = async () => {
       if (dtid && documentType) {
         try {
           setLoading(true);
-          await saveDocument(dtid, documentType.id, provisionArray, variableArray);
+          const { variableSaveData, provisionSaveData } = getSaveData();
+          await saveDocument(dtid, documentType.id, provisionSaveData, variableSaveData);
         } catch (err) {
           console.log('Error saving Document Data');
           console.log(err);
@@ -208,13 +232,18 @@ const LandingPage: FC = () => {
     saveData();
   };
 
-  const handleDocTypeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    const selectedId = parseInt(event.target.value);
-    setSelectedDocTypeId(selectedId || null);
-  };
-
-  const handleDtidChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setDtid(Number(e.target.value));
+  const handleGenerateReport = () => {
+    if (dtid) {
+      const errorMessage = validateProvisions();
+      if (!errorMessage) {
+        if (data && documentType && documentType.id) {
+          const { variableJsonArray, provisionJsonArray } = getReportData();
+          generateReport(dtid, data!.fileNum, documentType.id, provisionJsonArray, variableJsonArray);
+        }
+      } else {
+        alert(errorMessage);
+      }
+    }
   };
 
   return (
@@ -222,9 +251,9 @@ const LandingPage: FC = () => {
       <div className="h1">{documentType ? `Preview - ${documentType.name}` : 'Document Preview'}</div>
       <hr />
       <div className="mb-3 mt-3">
-        <div className="font-weight-bold inlineDiv mr-1">DTID:</div>
-        <div className="inlineDiv ml-3">
-          <input type="number" className="form-control" id="dtid" value={dtid || ''} onChange={handleDtidChange} />
+        <div className="font-weight-bold inlineDiv">DTID:</div>
+        <div className="inlineDiv ml-4 mr-4">
+          <input type="number" className="form-control" id="dtid" value={dtidInput || ''} onChange={handleDtidChange} />
         </div>
         <Button variant="success" onClick={fetchDataHandler}>
           Retrieve
@@ -245,13 +274,16 @@ const LandingPage: FC = () => {
       </Collapsible>
       <Collapsible title="Tenure Details">{data ? <TenureDetails data={data!} /> : <Skeleton />}</Collapsible>
       <Collapsible title="Interested Parties">{data ? <InterestedParties data={data!} /> : <Skeleton />}</Collapsible>
+
       <hr />
       <h3>Create Document</h3>
       <hr />
       <Row className="mb-3">
-        <div className="mr-3">Document Type:</div>
+        <div className="ml-3 mr-3">
+          <b>Document Type:</b>
+        </div>
         <div>
-          <select value={selectedDocTypeId || ''} onChange={handleDocTypeChange}>
+          <select value={selectedDocTypeId || ''} disabled={loading || !dtid || !data} onChange={handleDocTypeChange}>
             <option value="-1">Select a document type</option>
             {documentTypes.map((docType) => (
               <option key={docType.id} value={docType.id}>
@@ -261,36 +293,26 @@ const LandingPage: FC = () => {
           </select>
         </div>
       </Row>
-      {provisionGroups && dtid && documentType && (
+      {provisionGroups && dtid && documentType ? (
         <>
           <Collapsible title="Provisions">
-            <Provisions
-              dtid={dtid}
-              documentType={documentType}
-              provisionGroups={provisionGroups}
-              provisions={allProvisions}
-              updateHandler={updateProvisionArray}
-              updateSelectedProvisionIds={updateSelectedProvisionIds}
-            />
+            <Provisions dtid={dtid} documentType={documentType} provisionGroups={provisionGroups} />
           </Collapsible>
 
           <Collapsible title="Variables">
-            <Variables
-              dtid={dtid}
-              documentType={documentType}
-              updateHandler={updateVariableArray}
-              selectedProvisionIds={selectedProvisionIds}
-            />
+            <VariablesTable />
           </Collapsible>
         </>
+      ) : (
+        <></>
       )}
 
       <div style={{ display: 'flex', gap: '10px' }}>
         <>
-          <Button onClick={handleDocumentSave} variant="success" disabled={loading}>
+          <Button onClick={handleDocumentSave} variant="success" disabled={loading || !data || !dtid || !documentType}>
             Save for later
           </Button>
-          <Button onClick={handleGenerateReport} disabled={loading}>
+          <Button onClick={handleGenerateReport} disabled={loading || !data || !dtid || !documentType}>
             Create
           </Button>
         </>

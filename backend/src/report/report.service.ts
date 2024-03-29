@@ -6,7 +6,18 @@ import { ProvisionService } from 'src/provision/provision.service';
 import { TTLSService } from 'src/ttls/ttls.service';
 import { GL_REPORT_TYPE, LUR_REPORT_TYPE, SL_REPORT_TYPE, numberWords, sectionTitles } from 'utils/constants';
 import { ProvisionJSON, VariableJSON } from 'utils/types';
-import { convertToSpecialCamelCase, formatMoney, grazingLeaseVariables, nfrAddressBuilder } from 'utils/util';
+import {
+  convertToSpecialCamelCase,
+  formatMoney,
+  formatPhoneNumber,
+  formatPostalCode,
+  getContactAgent,
+  getLicenceHolder,
+  getLicenceHolderName,
+  getMailingAddress,
+  grazingLeaseVariables,
+  nfrAddressBuilder,
+} from 'utils/util';
 import { DocumentDataService } from 'src/document_data/document_data.service';
 import { DocumentDataLogService } from 'src/document_data_log/document_data_log.service';
 import { DocumentTypeService } from 'src/document_type/document_type.service';
@@ -91,15 +102,13 @@ export class ReportService {
   ) {
     // For now, hardcode this to call the different static report routes based on document type
     const documentType = await this.documentTypeService.findById(document_type_id);
-    console.log('::::::::::::::::::::::::::');
-    console.log(documentType);
     if (documentType) {
       if (documentType.name.toLowerCase().includes('notice of final review')) {
         return this.generateNFRReport(dtid, document_type_id, idirUsername, idirName, variableJson, provisionJson);
-      } else if (documentType.name.toLowerCase().includes('land use report')) {
-        return this.generateLURReport(dtid, idirUsername);
+      } else if (documentType.name.toLowerCase().includes('land use')) {
+        return this.generateLURReport(dtid, idirUsername, document_type_id);
       } else if (documentType.name.toLowerCase().includes('grazing')) {
-        return this.generateGLReport(dtid, idirUsername);
+        return this.generateGLReport(dtid, idirUsername, document_type_id);
       } else if (documentType.name.toLowerCase().includes('standard licence')) {
         return this.generateSLReport(dtid, document_type_id, idirUsername, idirName, variableJson, provisionJson);
       }
@@ -109,49 +118,118 @@ export class ReportService {
   /**
    * Generates the Land Use Report using CDOGS
    *
-   * @param prdid
+   * @param dtid
    * @param username
+   * @param document_type_id
    * @returns
    */
-  // needs a rewrite as prdid is being removed...
-  async generateLURReport(prdid: number, username: string) {
-    prdid = 1;
-    const documentType = LUR_REPORT_TYPE;
-    const url = `${hostname}:${port}/print-request-detail/view/${prdid}`;
-    const templateUrl = `${hostname}:${port}/document-template/get-active-report/${documentType}`;
-    const logUrl = `${hostname}:${port}/print-request-log/`;
-
+  async generateLURReport(dtid: number, username: string, document_type_id: number) {
     // get the view given the print request detail id
-    const data = await axios
-      .get(url, {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      })
+    await this.ttlsService.setWebadeToken();
+    const rawData: any = await firstValueFrom(this.ttlsService.callHttp(dtid))
       .then((res) => {
-        return res.data;
+        return res;
+      })
+      .catch((err) => {
+        console.log(err);
       });
+    let data;
+    if (rawData) {
+      const tenantAddr = rawData.tenantAddr[0];
+
+      const tenure = [];
+      for (let entry of rawData.interestParcel) {
+        tenure.push({
+          Area: entry.areaInHectares,
+          LegalDescription: entry.legalDescription,
+        });
+      }
+      const mappedData = {
+        dtid: rawData.dtid,
+        tenure_file_number: rawData.fileNum,
+        incorporation_number: tenantAddr ? tenantAddr.incorporationNum : '',
+        organization_unit: rawData.orgUnit,
+        purpose_name: rawData.purpose,
+        sub_purpose_name: rawData.subPurpose,
+        type_name: rawData.type,
+        sub_type_name: rawData.subType,
+        first_name: tenantAddr ? tenantAddr.firstName : '',
+        middle_name: tenantAddr ? tenantAddr.middleName : '',
+        last_name: tenantAddr ? tenantAddr.lastName : '',
+        legal_name: tenantAddr ? tenantAddr.legalName : '',
+        licence_holder_name: getLicenceHolderName(tenantAddr),
+        email_address: tenantAddr ? tenantAddr.emailAddress : '',
+        phone_number: formatPhoneNumber(
+          tenantAddr ? tenantAddr.phoneNumber : '',
+          tenantAddr ? tenantAddr.areaCode : ''
+        ),
+        licence_holder: getLicenceHolder(tenantAddr),
+        contact_agent: getContactAgent(rawData.contactFirstName, rawData.contactMiddleName, rawData.contactLastName),
+        contact_company_name: rawData.contactCompanyName,
+        contact_first_name: rawData.contactFirstName,
+        contact_middle_name: rawData.contactMiddleName,
+        contact_last_name: rawData.contactLastName,
+        contact_phone_number: formatPhoneNumber(rawData.contactPhoneNumber, null),
+        contact_email_address: rawData.contactEmail,
+        inspected_date: rawData.inspectionDate,
+        mailing_address: getMailingAddress(tenantAddr),
+        mailing_address_line_1: tenantAddr ? tenantAddr.addrLine1 : '',
+        mailing_address_line_2: tenantAddr ? tenantAddr.addrLine2 : '',
+        mailing_address_line_3: tenantAddr ? tenantAddr.addrLine3 : '',
+        mailing_city: tenantAddr ? tenantAddr.city : '',
+        mailing_province_state_code: tenantAddr ? tenantAddr.regionCd : '',
+        mailing_postal_code: tenantAddr ? formatPostalCode(tenantAddr.postalCode) : '',
+        mailing_zip: tenantAddr ? tenantAddr.zipCode : '',
+        mailing_country_code: tenantAddr ? tenantAddr.countryCd : '',
+        mailing_country: tenantAddr ? tenantAddr.country : '',
+        location_description: rawData.locLand,
+        tenure: tenure ? JSON.stringify(tenure) : '',
+      };
+      data = {
+        DTID: mappedData.dtid,
+        FileNum: mappedData.tenure_file_number,
+        OrganizationUnit: mappedData.organization_unit,
+        Purpose: mappedData.purpose_name,
+        SubPurpose: mappedData.sub_purpose_name,
+        TenureType: mappedData.type_name,
+        TenureSubType: mappedData.sub_type_name,
+        LicenceHolderName: mappedData.licence_holder_name,
+        MailingAddress: mappedData.mailing_address,
+        MailingCity: mappedData.mailing_city,
+        MailingProv: mappedData.mailing_province_state_code,
+        PostCode: mappedData.mailing_postal_code,
+        ContactAgent: mappedData.contact_agent,
+        ContactAgentEmail: mappedData.contact_email_address,
+        ContactAgentPhone: mappedData.contact_phone_number,
+        Tenure: mappedData.tenure,
+        Location: mappedData.location_description,
+        PrimaryContactEmail: mappedData.email_address,
+        PrimaryContactPhone: mappedData.phone_number,
+        InspectionDate: mappedData.inspected_date,
+        IncorporationNumber: mappedData.incorporation_number,
+      };
+    }
 
     if (data.InspectionDate) {
       data['InspectionDate'] = this.ttlsService.formatInspectedDate(data.InspectionDate);
     }
     // get the document template
-    const documentTemplateObject: { id: number; the_file: string } = await axios.get(templateUrl).then((res) => {
-      return res.data;
-    });
+    const documentTemplateObject = await this.documentTemplateService.findActiveByDocumentType(document_type_id);
 
     // log the request
     const document_template_id = documentTemplateObject.id;
-    await axios.post(logUrl, {
+    await this.documentDataLogService.create({
       document_template_id: document_template_id,
-      print_request_detail_id: prdid,
-      document_type: documentType,
+      document_data_id: null,
+      document_type_id: document_type_id,
       dtid: data.DTID,
       request_app_user: username,
       request_json: JSON.stringify(data),
+      create_userid: username,
     });
 
     const cdogsToken = await this.ttlsService.callGetToken();
+    console.log(data);
     const bufferBase64 = documentTemplateObject.the_file;
     const md = JSON.stringify({
       data,
@@ -195,12 +273,7 @@ export class ReportService {
    * @param username
    * @returns
    */
-  async generateGLReport(dtid: number, username: string) {
-    // const documentType = GL_REPORT_TYPE;
-    const documentType = SL_REPORT_TYPE;
-    const templateUrl = `${hostname}:${port}/document-template/get-active-report/${documentType}`;
-    const logUrl = `${hostname}:${port}/print-request-log/`;
-
+  async generateGLReport(dtid: number, username: string, document_type_id: number) {
     // get raw ttls data for later
     await this.ttlsService.setWebadeToken();
     const rawData: any = await firstValueFrom(this.ttlsService.callHttp(dtid))
@@ -211,9 +284,7 @@ export class ReportService {
         console.log(err);
       });
     // get the document template
-    const documentTemplateObject: { id: number; the_file: string } = await axios.get(templateUrl).then((res) => {
-      return res.data;
-    });
+    const documentTemplateObject = await this.documentTemplateService.findActiveByDocumentType(document_type_id);
     const interestParcel = rawData.interestParcel;
     const tenantAddr = rawData.tenantAddr;
     const regVars = {
@@ -237,13 +308,13 @@ export class ReportService {
     };
 
     // log the request
-    const document_template_id = documentTemplateObject.id;
-    await axios.post(logUrl, {
-      document_template_id: document_template_id,
-      print_request_detail_id: null,
-      document_type: documentType,
+    await this.documentDataLogService.create({
+      document_data_id: null, // should eventually point to document_data object
+      document_template_id: documentTemplateObject.id,
+      document_type_id: document_type_id,
       dtid: dtid,
       request_app_user: username,
+      create_userid: username,
       request_json: JSON.stringify(data),
     });
 
@@ -686,12 +757,15 @@ export class ReportService {
     // combine the formatted TTLS data, variables, and provision sections
     const data = Object.assign({}, ttlsData, variables, showProvisionSections);
 
+    const provisionSaveData = provisionJson.map((provision) => {
+      return { provision_id: provision.provision_id, doc_type_provision_id: provision.doc_type_provision_id };
+    });
     // Save the NFR Data
     const documentData = await this.saveDocument(
       dtid,
       document_type_id,
       'Complete',
-      provisionJson,
+      provisionSaveData,
       variableJson,
       idirUsername
     );
@@ -726,6 +800,7 @@ export class ReportService {
         fileType: 'docx',
       },
     };
+    console.log(cdogsData);
     const md = JSON.stringify(cdogsData);
 
     let conf = {
@@ -1076,11 +1151,14 @@ export class ReportService {
     console.log('Second log:::::::::::::::::');
     console.log(data);
     // Save the NFR Data
+    const provisionSaveData = provisionJson.map((provision) => {
+      return { provision_id: provision.provision_id, doc_type_provision_id: provision.doc_type_provision_id };
+    });
     const documentData = await this.saveDocument(
       dtid,
       document_type_id,
       'Complete',
-      provisionJson,
+      provisionSaveData,
       variableJson,
       idirUsername
     );
@@ -1165,7 +1243,7 @@ export class ReportService {
       return variablesObject;
     } else {
       // grab the basic variable list corresponding to the document type
-      const basicVariables = await this.provisionService.getVariablesByDocumentTypeId(document_type_id);
+      const basicVariables = await this.provisionService.getVariablesByDocumentTypeId();
       return { variables: basicVariables, variableIds: [] };
     }
   }
@@ -1244,20 +1322,19 @@ export class ReportService {
     dtid: number,
     document_type_id: number,
     status: string,
-    provisionJsonArray: ProvisionJSON[],
+    provisionJsonArray: { provision_id: number; doc_type_provision_id: number }[],
     variableJsonArray: VariableJSON[],
     idir_username: string
   ) {
     const documentTemplate = await this.documentTemplateService.findActiveByDocumentType(document_type_id);
     const data = {
       dtid: dtid,
-      document_type_id: document_type_id,
       template_id: documentTemplate ? documentTemplate.id : null,
       status: status,
       create_userid: idir_username,
       ttls_data: [],
     };
-    return this.documentDataService.createOrUpdate(data, provisionJsonArray, variableJsonArray);
+    return this.documentDataService.createOrUpdate(data, document_type_id, provisionJsonArray, variableJsonArray);
   }
 
   async getEnabledProvisionsByDocTypeId(document_type_id: number) {

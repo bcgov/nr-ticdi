@@ -1,7 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { FC, useEffect, useState } from 'react';
 import { DataTable } from '../common/DataTable';
 import { ColumnDef, createColumnHelper } from '@tanstack/react-table';
-import { VariableData } from '../../../content/display/Variables';
+import { Variable } from '../../../types/types';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from '../../../store/store';
+import { setVariables } from '../../../store/reducers/variableSlice';
 
 export type SaveVariableData = {
   provision_id: number;
@@ -16,64 +19,36 @@ export type VariableJson = {
   variable_value: string;
 };
 
-interface VariablesTableProps {
-  variables: VariableData[];
-  updateHandler: (variableSaveData: VariableJson[]) => void;
-}
+const VariablesTable: React.FC = React.memo(() => {
+  const [filteredVariables, setFilteredVariables] = useState<Variable[]>([]); // provisions in the currently selected group
 
-const VariablesTable: React.FC<VariablesTableProps> = React.memo(({ variables, updateHandler }) => {
-  const [initialized, setInitialized] = useState(false);
-  const [edits, setEdits] = useState<{ [variableId: number]: string }>({});
+  const dispatch = useDispatch();
+  const selectedVariableIds = useSelector((state: RootState) => state.variable.selectedVariableIds);
+  const variables: Variable[] = useSelector((state: RootState) => state.variable.variables);
+
+  useEffect(() => {
+    const filtered: Variable[] | null = variables
+      ? variables.filter((variable) => selectedVariableIds.includes(variable.id))
+      : null;
+    if (filtered) setFilteredVariables(filtered);
+  }, [variables, selectedVariableIds]);
+
+  useEffect(() => {
+    const filtered: Variable[] | null = variables
+      ? variables.filter((variable) => selectedVariableIds.includes(variable.id))
+      : null;
+    if (filtered) setFilteredVariables(filtered);
+  }, [variables, selectedVariableIds]);
 
   const handleEdit = (variableId: number, newValue: string) => {
-    setEdits((currentEdits) => ({ ...currentEdits, [variableId]: newValue }));
-  };
-
-  useEffect(() => {
-    return () => {
-      const updatedVariables = variables.map((variable) => ({
-        ...variable,
-        variable_value: edits[variable.id] ?? variable.variable_value,
-      }));
-      const variableJson = updatedVariables.map((variable) => ({
-        provision_id: variable.provision.id,
-        variable_id: variable.id,
-        variable_name: variable.variable_name,
-        variable_value: variable.variable_value,
-      }));
-      updateHandler(variableJson);
-    };
-  }, [edits]);
-
-  const saveChanges = (variableId: number, newValue: string) => {
-    const updatedVariables = variables.map((variable) =>
+    const newVariables = variables.map((variable) =>
       variable.id === variableId ? { ...variable, variable_value: newValue } : variable
     );
-    const variableJson = updatedVariables.map((variable) => ({
-      provision_id: variable.provision.id,
-      variable_id: variable.id,
-      variable_name: variable.variable_name,
-      variable_value: variable.variable_value,
-    }));
-    updateHandler(variableJson);
+    dispatch(setVariables(newVariables));
   };
 
-  useEffect(() => {
-    if (variables.length > 0 && !initialized) {
-      setInitialized(true);
-      updateHandler(
-        variables.map((variable) => ({
-          provision_id: variable.provision.id,
-          variable_id: variable.id,
-          variable_name: variable.variable_name,
-          variable_value: variable.variable_value,
-        }))
-      );
-    }
-  }, [initialized, variables, updateHandler]);
-
-  const columnHelper = createColumnHelper<VariableData>();
-  const columns: ColumnDef<VariableData, any>[] = [
+  const columnHelper = createColumnHelper<Variable>();
+  const columns: ColumnDef<Variable, any>[] = [
     columnHelper.accessor('variable_name', {
       id: 'variable_name',
       cell: (info) => <input value={info.getValue()} className="readonlyInput" title={info.getValue()} readOnly />,
@@ -83,8 +58,12 @@ const VariablesTable: React.FC<VariablesTableProps> = React.memo(({ variables, u
     }),
     columnHelper.accessor('variable_value', {
       id: 'variable_value',
-      cell: (info) => (
-        <VariableValueCell value={info.getValue()} updateValue={handleEdit} variableId={info.row.original.id} />
+      cell: ({ row }) => (
+        <TableCell
+          getValue={() => row.original.variable_value}
+          variableId={row.original.id}
+          onCellUpdate={handleEdit}
+        />
       ),
       header: () => 'Enter Text',
       enableSorting: false,
@@ -109,33 +88,35 @@ const VariablesTable: React.FC<VariablesTableProps> = React.memo(({ variables, u
   return (
     <DataTable
       columns={columns}
-      data={variables}
+      data={filteredVariables}
       enableSorting={true}
       initialSorting={[{ id: 'variable_name', desc: false }]}
     />
   );
 });
 
-interface VariableValueCellProps {
-  value: string;
-  updateValue: (v: number, i: string) => void;
+interface TableCellProps {
+  getValue: () => any;
   variableId: number;
+  onCellUpdate: (variableId: number, newValue: any) => void;
 }
-
-const VariableValueCell: React.FC<VariableValueCellProps> = ({ value, updateValue, variableId }) => {
-  const [inputValue, setInputValue] = useState(value);
+const TableCell: FC<TableCellProps> = ({ getValue, variableId, onCellUpdate }) => {
+  let initialValue = getValue() ? getValue() : '';
+  const [value, setValue] = useState(initialValue);
 
   useEffect(() => {
-    setInputValue(value);
-  }, [value]);
+    setValue(initialValue);
+  }, [initialValue]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newValue = e.target.value;
-    setInputValue(newValue);
-    updateValue(variableId, newValue);
+  const handleBlur = () => {
+    onCellUpdate(variableId, value);
   };
 
-  return <input value={inputValue} onChange={handleChange} style={{ width: '100%' }} />;
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    setValue(e.target.value);
+  };
+
+  return <input type="text" value={value} onChange={handleChange} onBlur={handleBlur} style={{ width: '100%' }} />;
 };
 
 export default VariablesTable;

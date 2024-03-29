@@ -46,7 +46,7 @@ const TemplateInfoTable: React.FC<TemplateInfoTableProps> = ({ documentType, ref
   const handleDownloadTemplate = async (id: number, fileName: string) => {
     try {
       setLoading(true);
-      await downloadTemplate(id, fileName);
+      await downloadTemplate(id, fileName + '.docx');
     } catch (error) {
       console.log('Error downloading template');
       console.log(error);

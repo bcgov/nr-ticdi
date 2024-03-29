@@ -1,5 +1,5 @@
 import config from '../../config';
-import { ProvisionJson } from '../components/table/reports/SelectedProvisionsTable';
+import { ProvisionJson, SaveProvisionData } from '../components/table/reports/SelectedProvisionsTable';
 import { VariableJson } from '../components/table/reports/VariablesTable';
 // import { ProvisionData } from '../content/display/Provisions';
 import { VariableData } from '../content/display/Variables';
@@ -71,7 +71,7 @@ export const getDocumentVariablesByDocTypeIdDtid = async (
 export const saveDocument = async (
   dtid: number,
   document_type_id: number,
-  provisionArray: { provision_id: number; free_text: string }[],
+  provisionArray: SaveProvisionData[],
   variableArray: { provision_id: number; variable_id: number; variable_value: string }[]
 ): Promise<void> => {
   const url = `${config.API_BASE_URL}/report/save-document`;
@@ -82,6 +82,7 @@ export const saveDocument = async (
     provisionArray: provisionArray,
     variableArray: variableArray,
   };
+  console.log(data);
   const postParameters = api.generateApiParameters(url, data);
   await api.post<void>(postParameters);
 };

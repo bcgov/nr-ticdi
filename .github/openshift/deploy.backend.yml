@@ -99,7 +99,7 @@ objects:
                   valueFrom:
                     secretKeyRef:
                       name: ticdi-sessions
-                      key: session-secret
+                      key: session_secret
               ports:
                 - containerPort: 3000
                   protocol: TCP

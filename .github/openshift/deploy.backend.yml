@@ -46,6 +46,28 @@ objects:
           referencePolicy:
             type: Local
   - apiVersion: v1
+    kind: Secret
+    metadata:
+      name: ticdi-sessions
+      labels:
+        app: ${NAME}
+    stringData:
+      cookie_secret: ${cookie_secret}
+      session_secret: ${session_secret}  
+  - kind: PersistentVolumeClaim
+    apiVersion: v1
+    metadata:
+      name: ticdi-sessions
+      labels:
+        app: ${NAME}-${ZONE}
+    spec:
+      accessModes:
+        - ReadWriteMany
+      resources:
+        requests:
+          storage: "256Mi"
+      storageClassName: netapp-file-standard
+  - apiVersion: v1
     kind: DeploymentConfig
     metadata:
       labels:
@@ -95,11 +117,86 @@ objects:
                     secretKeyRef:
                       name: ${NAME}-${ZONE}-database
                       key: database-user
-                - name: session_secret
+                - name: cookie_secret
                   valueFrom:
                     secretKeyRef:
                       name: ticdi-sessions
+                      key: cookie_secret
+                - name: session_secret
+                  valueFrom:
+                    secretKeyRef: 
+                      name: ticdi-sessions
                       key: session_secret
+                - name: keycloak_base_url
+                  valueFrom:
+                    secretKeyRef: 
+                      name: keycloak
+                      key: keycloak_base_url
+                - name: keycloak_realm
+                  valueFrom:
+                    secretKeyRef: 
+                      name: keycloak
+                      key: keycloak_realm
+                - name: keycloak_client_id
+                  valueFrom:
+                    secretKeyRef: 
+                      name: keycloak
+                      key: keycloak_client_id
+                - name: keycloak_secret
+                  valueFrom:
+                    secretKeyRef: 
+                      name: keycloak
+                      key: keycloak_secret
+                - name: cdogs_service_client_id
+                  valueFrom:
+                    secretKeyRef: 
+                      name: cdogs
+                      key: cdogs_service_client_id
+                - name: cdogs_service_client_secret
+                  valueFrom:
+                    secretKeyRef: 
+                      name: cdogs
+                      key: cdogs_service_client_secret
+                - name: cdogs_url
+                  valueFrom:
+                    secretKeyRef: 
+                      name: cdogs
+                      key: cdogs_url
+                - name: cdogs_token_endpoint
+                  valueFrom:
+                    secretKeyRef: 
+                      name: cdogs
+                      key: cdogs_token_endpoint
+                - name: users_api_base_url
+                  valueFrom:
+                    secretKeyRef: 
+                      name: css-users-api
+                      key: users_api_base_url
+                - name: css_environment
+                  valueFrom:
+                    secretKeyRef: 
+                      name: css-users-api
+                      key: css_environment
+                - name: integration_id
+                  valueFrom:
+                    secretKeyRef: 
+                      name: css-users-api
+                      key: integration_id
+                - name: users_api_token_url
+                  valueFrom:
+                    secretKeyRef: 
+                      name: css-users-api
+                      key: users_api_token_url
+                - name: users_api_client_id
+                  valueFrom:
+                    secretKeyRef: 
+                      name: css-users-api
+                      key: users_api_client_id
+                - name: users_api_client_secret
+                  valueFrom:
+                    secretKeyRef: 
+                      name: css-users-api
+                      key: users_api_client_secret
               ports:
                 - containerPort: 3000
                   protocol: TCP
@@ -127,6 +224,9 @@ objects:
                 timeoutSeconds: 5
               securityContext:
                 allowPrivilegeEscalation: true
+              volumeMounts:
+                - mountPath: /mnt/sessions
+                  name: ticdi-sessions
   - apiVersion: v1
     kind: Service
     metadata:

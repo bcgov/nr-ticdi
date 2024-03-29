@@ -4,10 +4,12 @@
  * their respective report pages
  */
 
-import { FC, useState } from 'react';
+import { FC, useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import SearchDataTable from '../../components/table/search/SearchDataTable';
 import { DocType } from '../../types/types';
+import { setSearchState } from '../../store/reducers/searchSlice';
+import { useDispatch } from 'react-redux';
 
 // TODO - redo page to include all document types, replace variant with document type
 
@@ -15,10 +17,18 @@ const SearchPage: FC = () => {
   const [selectedDocument, setSelectedDocument] = useState<{ dtid: number; documentType: DocType } | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const handleOpenDocument = async () => {
     if (selectedDocument) {
-      navigate(`/dtid/${selectedDocument.dtid}/${selectedDocument.documentType.name}`);
+      dispatch(
+        setSearchState({
+          dtid: selectedDocument.dtid,
+          document_type: selectedDocument.documentType,
+          searching: true,
+        })
+      );
+      navigate('/');
     }
   };
 
@@ -26,9 +36,9 @@ const SearchPage: FC = () => {
     setSearchTerm(e.target.value);
   };
 
-  const handleSelectedDocumentChange = (dtid: number, documentType: DocType) => {
+  const handleSelectedDocumentChange = useCallback((dtid: number, documentType: DocType) => {
     setSelectedDocument({ dtid, documentType });
-  };
+  }, []);
 
   return (
     <>

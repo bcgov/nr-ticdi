@@ -7,23 +7,6 @@ import { DocumentDataService } from './document_data.service';
 export class DocumentDataController {
   constructor(private readonly documentDataService: DocumentDataService) {}
 
-  @Post()
-  async create(
-    @Body()
-    data: {
-      body: CreateDocumentDataDto & {
-        provisionJsonArray: ProvisionJSON[];
-        variableJsonArray: VariableJSON[];
-      };
-    }
-  ) {
-    const provArr = data.body.provisionJsonArray;
-    const varArr = data.body.variableJsonArray;
-    delete data.body['provisionJsonArray'];
-    delete data.body['variableJsonArray'];
-    return this.documentDataService.createOrUpdate(data.body, provArr, varArr);
-  }
-
   @Get()
   findAll() {
     return this.documentDataService.findAll();
@@ -55,6 +38,11 @@ export class DocumentDataController {
 
   @Get('provisions/:document_type_id/:dtid')
   getProvisionsByDocTypeIdAndDtid(@Param('document_type_id') document_type_id: number, @Param('dtid') dtid: number) {
+    return this.documentDataService.getProvisionsByDocTypeIdAndDtid(document_type_id, dtid);
+  }
+
+  @Get('get/:document_type_id/:dtid')
+  getDocData(@Param('document_type_id') document_type_id: number, @Param('dtid') dtid: number) {
     return this.documentDataService.getProvisionsByDocTypeIdAndDtid(document_type_id, dtid);
   }
 

@@ -52,6 +52,11 @@ const Header: FC<HeaderProps> = ({ isAdmin, idirUsername }) => {
                   Search
                 </a>
               </div>
+              <div id="createDocumentLinkDiv" style={{ width: 'auto' }}>
+                <a className="nav-item nav-link" id="createDocumentLink" href="/">
+                  Create Document
+                </a>
+              </div>
             </div>
           </div>
           <div style={{ float: 'right', color: 'white' }}>{idirUsername}</div>

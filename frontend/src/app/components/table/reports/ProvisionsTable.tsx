@@ -1,49 +1,35 @@
 import React, { useEffect, useState } from 'react';
 import { DataTable } from '../common/DataTable';
 import { ColumnDef, createColumnHelper } from '@tanstack/react-table';
-import { getDocumentProvisionsByDocTypeIdDtid } from '../../../common/report';
-import { ProvisionData } from '../../../content/display/Provisions';
-import { DocType } from '../../../types/types';
+import { ReducedProvisionDataObject } from '../../../types/types';
 
 interface ProvisionsTableProps {
-  dtid: number;
-  docType: DocType;
   currentGroupNumber: number | null;
   currentGroupMax: number | null;
   selectedProvisionIds: number[] | undefined;
+  provisions: ReducedProvisionDataObject[] | undefined;
   selectProvision: (id: number, checked: boolean) => void;
 }
 
 const ProvisionsTable: React.FC<ProvisionsTableProps> = ({
-  dtid,
-  docType,
   currentGroupNumber,
   currentGroupMax,
   selectedProvisionIds,
+  provisions,
   selectProvision,
 }) => {
-  const [allProvisions, setAllProvisions] = useState<ProvisionData[]>([]);
-  const [filteredProvisions, setFilteredProvisions] = useState<ProvisionData[]>([]); // provisions in the currently selected group
-  const [currentGroupProvisions, setCurrentGroupProvisions] = useState<ProvisionData[]>([]);
+  const [allProvisions, setAllProvisions] = useState<ReducedProvisionDataObject[]>([]);
+  const [filteredProvisions, setFilteredProvisions] = useState<ReducedProvisionDataObject[]>([]); // provisions in the currently selected group
 
-  // get data
   useEffect(() => {
-    const fetchData = async () => {
-      const fetchedProvisions: { provisions: ProvisionData[]; provisionIds: number[] } =
-        await getDocumentProvisionsByDocTypeIdDtid(docType.id, dtid);
-      setAllProvisions(fetchedProvisions.provisions);
-    };
-
-    fetchData();
-  }, [dtid, docType, currentGroupNumber]);
+    if (provisions) setAllProvisions(provisions);
+  }, [provisions]);
 
   // filter based on current group
   useEffect(() => {
-    if (allProvisions) {
-      console.log('allProvisions');
-      console.log(allProvisions);
+    if (allProvisions && currentGroupNumber) {
       const filtered = allProvisions.filter(
-        (provision) => provision.provision_group.provision_group === currentGroupNumber
+        (provision) => provision.provision_group && provision.provision_group.provision_group === currentGroupNumber
       );
       setFilteredProvisions(filtered);
     }
@@ -60,11 +46,11 @@ const ProvisionsTable: React.FC<ProvisionsTableProps> = ({
       // if so, check if the other provision is already selected
       const otherName = exclusiveProvisionNames.find((name) => name !== provisionName);
       const otherProvision = allProvisions.find((provision) => provision.provision_name === otherName);
-      if (otherProvision) return selectedProvisionIds?.includes(otherProvision?.id) ?? false;
+      if (otherProvision) return selectedProvisionIds?.includes(otherProvision?.provision_id) ?? false;
     }
 
     const selectedInGroup = filteredProvisions.filter((provision) =>
-      selectedProvisionIds?.includes(provision.id)
+      selectedProvisionIds?.includes(provision.provision_id)
     ).length;
     if (
       currentGroupMax !== null &&
@@ -76,8 +62,8 @@ const ProvisionsTable: React.FC<ProvisionsTableProps> = ({
     return false;
   };
 
-  const columnHelper = createColumnHelper<ProvisionData>();
-  const columns: ColumnDef<ProvisionData, any>[] = [
+  const columnHelper = createColumnHelper<ReducedProvisionDataObject>();
+  const columns: ColumnDef<ReducedProvisionDataObject, any>[] = [
     columnHelper.accessor('type', {
       id: 'type',
       cell: (info) => <input value={info.getValue()} className="readonlyInput" readOnly />,
@@ -99,31 +85,24 @@ const ProvisionsTable: React.FC<ProvisionsTableProps> = ({
       enableSorting: false,
       meta: { customCss: { width: '45%' } },
     }),
-    columnHelper.accessor('select', {
+    columnHelper.display({
       id: 'select',
       cell: (info) => (
         <input
           type="checkbox"
           onChange={(e) => {
-            if (!isCheckboxDisabled(info.row.original.id, info.row.original.provision_name)) {
-              selectProvision(info.row.original.id, e.target.checked);
+            if (!isCheckboxDisabled(info.row.original.provision_id, info.row.original.provision_name)) {
+              selectProvision(info.row.original.provision_id, e.target.checked);
             }
           }}
-          checked={selectedProvisionIds?.includes(info.row.original.id) ?? false}
-          disabled={isCheckboxDisabled(info.row.original.id, info.row.original.provision_name)}
+          checked={selectedProvisionIds?.includes(info.row.original.provision_id) ?? false}
+          disabled={isCheckboxDisabled(info.row.original.provision_id, info.row.original.provision_name)}
           style={{ width: '100%' }}
         />
       ),
       header: () => null,
       enableSorting: false,
       meta: { customCss: { width: '5%' } },
-    }),
-    columnHelper.accessor('id', {
-      id: 'id',
-      cell: () => null,
-      header: () => null,
-      enableSorting: false,
-      meta: { customCss: { display: 'none' } },
     }),
   ];
 

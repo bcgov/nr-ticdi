@@ -42,7 +42,7 @@ export class DocumentTemplateService {
       .getMany();
 
     if (!existingTemplates || existingTemplates.length === 0) {
-      return 0;
+      return 1;
     } else {
       let currentVersion = existingTemplates.reduce((max, item) => Math.max(max, item.template_version), 0);
       return currentVersion + 1;

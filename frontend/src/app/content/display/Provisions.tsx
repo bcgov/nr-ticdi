@@ -1,58 +1,28 @@
-import { FC, useEffect, useState } from 'react';
-import { DocType, DocumentDataObject, ProvisionGroup } from '../../types/types';
-import { getDocumentDataByDocTypeIdAndDtid } from '../../common/report';
+import { FC, useState } from 'react';
+import { DocType, ProvisionGroup, Variable } from '../../types/types';
 import ProvisionsTable from '../../components/table/reports/ProvisionsTable';
-import SelectedProvisionsTable, { ProvisionJson } from '../../components/table/reports/SelectedProvisionsTable';
+import SelectedProvisionsTable from '../../components/table/reports/SelectedProvisionsTable';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from '../../store/store';
+import { deselectProvision, selectProvision } from '../../store/reducers/provisionSlice';
+import { setSelectedVariableIds } from '../../store/reducers/variableSlice';
 
 interface ProvisionsProps {
   dtid: number;
   documentType: DocType;
   provisionGroups: ProvisionGroup[] | undefined;
-  updateHandler: (provisionJson: ProvisionJson[]) => void;
-  updateSelectedProvisionIds: (selectedProvisionIds: number[]) => void;
 }
 
-export type ProvisionData = {
-  id: number;
-  type: string;
-  provision_name: string;
-  free_text: string;
-  category: string;
-  active_flag: boolean;
-  create_userid: string;
-  update_userid: string;
-  help_text: string;
-  create_timestamp: string;
-  update_timestamp: string;
-  select: boolean;
-  max: number;
-  provision_group: ProvisionGroup;
-  is_deleted: boolean;
-};
-
-const Provisions: FC<ProvisionsProps> = ({
-  dtid,
-  documentType,
-  provisionGroups,
-  updateHandler,
-  updateSelectedProvisionIds,
-}) => {
-  const [selectedProvisionIds, setSelectedProvisionIds] = useState<number[]>([]);
+const Provisions: FC<ProvisionsProps> = ({ dtid, documentType, provisionGroups }) => {
   const [selectedProvisionGroup, setSelectedProvisionGroup] = useState<number | null>(null);
   const [selectedProvisionGroupMax, setSelectedProvisionGroupMax] = useState<number | null>(null);
   const [viewedProvisionGroups, setViewedProvisionGroups] = useState<Set<number>>(new Set());
 
-  useEffect(() => {
-    const fetchData = async () => {
-      if (dtid && documentType && documentType.id) {
-        const documentData: DocumentDataObject = await getDocumentDataByDocTypeIdAndDtid(documentType.id, dtid);
-        if (documentData) {
-          setSelectedProvisionIds(documentData.provisionIds);
-        }
-      }
-    };
-    fetchData();
-  }, [dtid, documentType.id]);
+  const dispatch = useDispatch();
+  const selectedProvisionIds = useSelector((state: RootState) => state.provision.selectedProvisionIds);
+  const provisions = useSelector((state: RootState) => state.provision.provisions);
+  const selectedVariableIds = useSelector((state: RootState) => state.variable.selectedVariableIds);
+  const variables: Variable[] = useSelector((state: RootState) => state.variable.variables);
 
   const handleProvisionGroupChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const value = parseInt(event.target.value);
@@ -71,24 +41,26 @@ const Provisions: FC<ProvisionsProps> = ({
   };
 
   const selectProvisionHandler = (id: number, selected: boolean) => {
-    setSelectedProvisionIds((prevIds) => {
-      const updatedIds = new Set(prevIds);
-      if (selected) {
-        updatedIds.add(id);
-      } else {
-        updatedIds.delete(id);
+    if (selected) {
+      dispatch(selectProvision(id));
+      // we have access to an array of selectedVariableIds
+      const variableIdsToUpdate = variables?.filter((v) => v.provision_id === id)?.map((v) => v.id);
+      // combine variableIdsToUpdate with selectedVariableIds on the next line
+      const newSelectedVariableIds = [...new Set([...selectedVariableIds, ...variableIdsToUpdate])]; // set ensures no duplicates
+      dispatch(setSelectedVariableIds(newSelectedVariableIds));
+    } else {
+      dispatch(deselectProvision(id));
+      const variableIdsToRemove = variables?.filter((v) => v.provision_id === id)?.map((v) => v.id);
+      if (variableIdsToRemove) {
+        const newSelectedVariableIds = selectedVariableIds.filter((id) => !variableIdsToRemove.includes(id));
+        dispatch(setSelectedVariableIds(newSelectedVariableIds));
       }
-      return Array.from(updatedIds);
-    });
+    }
   };
-
-  useEffect(() => {
-    updateSelectedProvisionIds(selectedProvisionIds);
-  }, [selectedProvisionIds]);
 
   return (
     <>
-      {/* <div>
+      <div>
         <label htmlFor="provisionGroupSelect" style={{ marginRight: '10px' }}>
           Select A Group
         </label>
@@ -109,10 +81,9 @@ const Provisions: FC<ProvisionsProps> = ({
             </option>
           ))}
         </select>
-      </div> */}
+      </div>
       <ProvisionsTable
-        dtid={dtid}
-        docType={documentType}
+        provisions={provisions}
         currentGroupNumber={selectedProvisionGroup}
         currentGroupMax={selectedProvisionGroupMax}
         selectedProvisionIds={selectedProvisionIds}
@@ -121,10 +92,9 @@ const Provisions: FC<ProvisionsProps> = ({
       <hr style={{ marginLeft: '0', backgroundColor: 'rgba(0, 0, 0, 0.3)' }} />
       <div style={{ fontWeight: 'bold' }}>Selected Provisions</div>
       <SelectedProvisionsTable
-        dtid={dtid}
         docType={documentType}
         selectedProvisionIds={selectedProvisionIds}
-        updateHandler={updateHandler}
+        provisions={provisions}
       />
     </>
   );

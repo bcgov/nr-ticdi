@@ -75,7 +75,8 @@ export class DocumentTypeService {
     const provisionGroups = await this.provisionGroupRepository.find({
       relations: ['document_type'],
     });
-    return Array.from(provisionGroups).sort((a, b) => a.provision_group - b.provision_group);
+    console.log('pgs');
+    return provisionGroups.sort((a, b) => a.provision_group - b.provision_group);
   }
 
   async getGroupMaxByDocTypeId(document_type_id: number): Promise<any> {

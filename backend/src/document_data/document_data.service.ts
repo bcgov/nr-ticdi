@@ -12,6 +12,7 @@ import { ProvisionService } from 'src/provision/provision.service';
 import { DocumentTemplateService } from 'src/document_template/document_template.service';
 import { DocumentType } from 'src/document_type/entities/document_type.entity';
 import { DocumentTypeService } from 'src/document_type/document_type.service';
+import { DocumentTypeProvision } from 'src/provision/entities/document_type_provision';
 
 @Injectable()
 export class DocumentDataService {
@@ -34,11 +35,12 @@ export class DocumentDataService {
 
   async createOrUpdate(
     documentDataDto: CreateDocumentDataDto,
-    provisionArray: { provision_id: number; free_text: string }[],
+    document_type_id: number,
+    provisionArray: { provision_id: number; doc_type_provision_id: number }[],
     variableArray: { variable_id: number; variable_value: string }[]
   ): Promise<DocumentData> {
     console.log(variableArray);
-    const { dtid, document_type_id } = documentDataDto;
+    const { dtid } = documentDataDto;
     const documentData: DocumentData = await this.documentDataRepository.findOne({
       where: { dtid: dtid, document_type: { id: document_type_id } },
       relations: [
@@ -71,19 +73,23 @@ export class DocumentDataService {
       );
     }
     // else create new documentData
-    const documentTemplate = await this.documentTemplateService.findActiveByDocumentType(
-      documentDataDto.document_type_id
-    );
+    const documentTemplate = await this.documentTemplateService.findActiveByDocumentType(document_type_id);
     documentDataDto['template_id'] = documentTemplate ? documentTemplate.id : null;
-    documentDataDto['document_type'] = await this.documentTypeService.findById(document_type_id);
-    delete documentDataDto['document_type_id'];
+    const documentType = await this.documentTypeService.findById(document_type_id);
     const newDocumentData: DocumentData = this.documentDataRepository.create(documentDataDto);
+    newDocumentData.document_type = documentType;
     const updatedDocumentData = await this.documentDataRepository.save(newDocumentData);
 
-    const documentDataProvisions = provisionArray.map(({ provision_id, free_text }) => {
+    const documentTypeProvisions: DocumentTypeProvision[] =
+      await this.provisionService.getSimpleDocTypeProvisionsByDocTypeId(document_type_id);
+
+    const documentDataProvisions = provisionArray.map(({ provision_id }) => {
       const documentProvision = documentProvisions.find((provision) => provision.id === provision_id);
       const documentDataProvision = new DocumentDataProvision();
       documentDataProvision.document_data = updatedDocumentData;
+      documentDataProvision.document_type_provision = documentTypeProvisions.find(
+        (dtp) => dtp.provision.id === provision_id
+      );
       documentDataProvision.document_provision = documentProvision;
       return documentDataProvision;
     });
@@ -108,7 +114,7 @@ export class DocumentDataService {
   async updateDocumentData(
     documentDataDto: CreateDocumentDataDto,
     documentData: DocumentData,
-    provisionArray: { provision_id: number; free_text: string }[],
+    provisionArray: { provision_id: number; doc_type_provision_id: number }[],
     variableArray: { variable_id: number; variable_value: string }[],
     documentProvisions: Provision[],
     documentVariables: ProvisionVariable[]
@@ -126,10 +132,13 @@ export class DocumentDataService {
         (p) => p.document_provision.id === provision.provision_id
       );
       const documentProvision = documentProvisions.find((p) => p.id === provision.provision_id);
+      const documentTypeProvision = await this.provisionService.getDocTypeProvisionById(
+        provision.doc_type_provision_id
+      );
 
       if (documentDataProvision) {
         // Update an existing DocumentDataProvision entry
-        await this.documentDataProvisionRepository.save(documentDataProvision);
+        // await this.documentDataProvisionRepository.save(documentDataProvision);
       } else if (!documentDataProvision) {
         // No data found for this specific provision so create a new entry in DocumentDataProvision
         const documentProvisionToAdd = await this.documentProvisionRepository.findOneBy({
@@ -137,6 +146,7 @@ export class DocumentDataService {
         });
         const newDocumentDataProvision: DocumentDataProvision = this.documentDataProvisionRepository.create({
           document_provision: documentProvisionToAdd,
+          document_type_provision: documentTypeProvision,
           document_data: updatedDocumentData,
         });
         await this.documentDataProvisionRepository.save(newDocumentDataProvision);
@@ -173,7 +183,7 @@ export class DocumentDataService {
 
   async deleteDataVarsAndProvs(
     documentData: DocumentData,
-    provisionArray: { provision_id: number; free_text: string }[],
+    provisionArray: { provision_id: number; doc_type_provision_id: number }[],
     variableArray: { variable_id: number; variable_value: string }[]
   ) {
     // Delete data provisions that have been removed by the user
@@ -205,12 +215,8 @@ export class DocumentDataService {
   }
 
   // Used by the search page.
-  // Variant data is persisted so only return the active variant foreach dtid.
   async findAll(): Promise<DocumentData[]> {
     return await this.documentDataRepository.find({
-      where: {
-        active: true,
-      },
       relations: ['document_type'],
     });
   }
@@ -287,6 +293,7 @@ export class DocumentDataService {
     });
   }
 
+  // delete
   async getVariablesByDtidAndDocType(dtid: number, document_type_id: number) {
     try {
       const documentData: DocumentData = await this.documentDataRepository.findOne({
@@ -301,12 +308,12 @@ export class DocumentDataService {
       });
       // if the documentData doesn't exist yet, return null. This null value is caught elsewhere.
       if (!documentData) {
-        return null;
+        return { variables: [], variableIds: [] };
       }
       // saved variables attached to the documentData entry
       const existingDataVariables: DocumentDataVariable[] = documentData.document_data_variables;
       // all variables associated with the variant
-      const variables: ProvisionVariable[] = await this.provisionService.getVariablesByDocumentTypeId(document_type_id);
+      const variables: ProvisionVariable[] = await this.provisionService.getVariablesByDocumentTypeId();
       // inserting the existing variable_values to the set of all variables
       for (const variable of variables) {
         const existingDataVariable = existingDataVariables.find(
@@ -321,31 +328,89 @@ export class DocumentDataService {
     } catch (err) {
       console.log('Error in getVariablesByDtidAndDocType');
       console.log(err);
-      return null;
+      return { variables: [], variableIds: [] };
     }
   }
 
+  /**
+   * Gets all document type provisions (combined with global provision info), a list of preselected
+   * provision ids, and any document_data_provisions and document_data_variables
+   * that have been saved for this combination of DTID and document_type_id.
+   *
+   * Returns
+   * @param document_type_id
+   * @param dtid
+   * @returns
+   */
   async getProvisionsByDocTypeIdAndDtid(document_type_id: number, dtid: number) {
     try {
-      const documentData = await this.documentDataRepository
-        .createQueryBuilder('document_data')
-        .leftJoinAndSelect('document_data.document_data_provisions', 'document_data_provisions')
-        .leftJoinAndSelect('document_data_provisions.document_provision', 'provision')
-        .where('document_data.dtid = :dtid', { dtid })
-        .andWhere('document_data."documentTypeId"  = :document_type_id', { document_type_id })
-        .getOne();
+      const documentData: DocumentData = await this.documentDataRepository.findOne({
+        where: { document_type: { id: document_type_id }, dtid: dtid },
+      });
+      const documentDataProvisions: DocumentDataProvision[] = await this.getDocumentDataProvisions(
+        document_type_id,
+        dtid
+      );
+      const documentDataVariables: DocumentDataVariable[] = await this.getDocumentDataVariables(document_type_id, dtid);
+      const mappedVariables = documentDataVariables.map((ddv) => {
+        return { id: ddv.id, variable_id: ddv.document_variable.id, saved_value: ddv.data_variable_value };
+      });
+      const variableIds: number[] = documentDataVariables.map((dataVariable) => dataVariable.document_variable.id);
+      const documentTypeProvisions: DocumentTypeProvision[] = await this.getDocumentTypeProvisions(document_type_id);
 
-      // saved provisions attached to the dtid
-      const existingDataProvisions: DocumentDataProvision[] = [];
-      if (documentData) existingDataProvisions.push(...documentData.document_data_provisions);
-      // all provisions with the specified document_type_id
-      const provisions: Provision[] = await this.provisionService.getAllProvisionsByDocTypeId(document_type_id);
-      const provisionIds = existingDataProvisions.map((dataProvision) => dataProvision.document_provision.id);
-      return { provisions, provisionIds };
+      const provisionIds = documentDataProvisions.map((dataProvision) => dataProvision.document_provision.id);
+      return {
+        provisions: documentTypeProvisions,
+        preselectedProvisionIds: provisionIds,
+        preselectedVariableIds: variableIds,
+        documentDataProvisions: documentDataProvisions,
+        savedVariableInfo: mappedVariables,
+      };
     } catch (err) {
       console.log('Error in getProvisionsByDocTypeIdAndDtid');
       console.log(err);
       return null;
+    }
+  }
+
+  // helper function for getProvisionsByDocTypeIdAndDtid
+  async getDocumentTypeProvisions(document_type_id: number): Promise<DocumentTypeProvision[]> {
+    const documentTypeProvisions: DocumentTypeProvision[] =
+      await this.provisionService.getDocumentTypeProvisionsByDocumentTypeId(document_type_id);
+    return documentTypeProvisions;
+  }
+
+  // helper function for getProvisionsByDocTypeIdAndDtid
+  async getDocumentDataProvisions(document_type_id: number, dtid: number): Promise<DocumentDataProvision[]> {
+    const documentData: DocumentData = await this.documentDataRepository.findOne({
+      where: { dtid: dtid, document_type: { id: document_type_id } },
+      relations: ['document_data_provisions'],
+    });
+    if (documentData && documentData.id) {
+      const documentDataProvisions: DocumentDataProvision[] = await this.documentDataProvisionRepository.find({
+        where: { document_data: { id: documentData.id } },
+        relations: ['document_type_provision', 'document_provision', 'document_data'],
+      });
+      return documentDataProvisions;
+    } else {
+      return [];
+    }
+  }
+
+  // helper function for getProvisionsByDocTypeIdAndDtid
+  async getDocumentDataVariables(document_type_id, dtid: number): Promise<DocumentDataVariable[]> {
+    const documentData: DocumentData = await this.documentDataRepository.findOne({
+      where: { dtid: dtid, document_type: { id: document_type_id } },
+      relations: ['document_data_provisions'],
+    });
+    if (documentData && documentData.id) {
+      const documentDataVariables: DocumentDataVariable[] = await this.documentDataVariableRepository.find({
+        where: { document_data: { id: documentData.id } },
+        relations: ['document_data', 'document_variable'],
+      });
+      return documentDataVariables;
+    } else {
+      return [];
     }
   }
 

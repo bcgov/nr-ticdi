@@ -1,5 +1,4 @@
-**/node_modules
-.*
-*.md
-Dockerfile
-.git*/
+build/
+cypress/
+node_modules/
+.env

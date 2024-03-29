@@ -1,13 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { DataTable } from '../common/DataTable';
 import { ColumnDef, createColumnHelper } from '@tanstack/react-table';
-// import { getDocumentProvisionsByDocTypeIdDtid } from '../../../common/report';
-// import { ProvisionData } from '../../../content/display/Provisions';
-import { DocType, ReducedProvisionDataObject } from '../../../types/types';
+import { ReducedProvisionDataObject } from '../../../types/types';
 
 interface ProvisionsTableProps {
-  dtid: number;
-  docType: DocType;
   currentGroupNumber: number | null;
   currentGroupMax: number | null;
   selectedProvisionIds: number[] | undefined;
@@ -16,8 +12,6 @@ interface ProvisionsTableProps {
 }
 
 const ProvisionsTable: React.FC<ProvisionsTableProps> = ({
-  dtid,
-  docType,
   currentGroupNumber,
   currentGroupMax,
   selectedProvisionIds,
@@ -26,7 +20,6 @@ const ProvisionsTable: React.FC<ProvisionsTableProps> = ({
 }) => {
   const [allProvisions, setAllProvisions] = useState<ReducedProvisionDataObject[]>([]);
   const [filteredProvisions, setFilteredProvisions] = useState<ReducedProvisionDataObject[]>([]); // provisions in the currently selected group
-  const [currentGroupProvisions, setCurrentGroupProvisions] = useState<ReducedProvisionDataObject[]>([]);
 
   useEffect(() => {
     if (provisions) setAllProvisions(provisions);
@@ -35,8 +28,6 @@ const ProvisionsTable: React.FC<ProvisionsTableProps> = ({
   // filter based on current group
   useEffect(() => {
     if (allProvisions && currentGroupNumber) {
-      console.log('allProvisions');
-      console.log(allProvisions);
       const filtered = allProvisions.filter(
         (provision) => provision.provision_group && provision.provision_group.provision_group === currentGroupNumber
       );

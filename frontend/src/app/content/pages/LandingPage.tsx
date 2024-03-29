@@ -1,11 +1,10 @@
-import { FC, useCallback, useEffect, useState } from 'react';
+import { FC, useEffect, useState } from 'react';
 import Collapsible from '../../../app/components/common/Collapsible';
 import {
   DTRDisplayObject,
   DocType,
   DocumentDataDTO,
   ProvisionGroup,
-  ReducedProvisionDataObject,
   SavedVariableInfo,
   Variable,
 } from '../../../app/types/types';
@@ -233,16 +232,24 @@ const LandingPage: FC = () => {
   };
 
   const handleGenerateReport = () => {
-    if (dtid) {
-      const errorMessage = validateProvisions();
-      if (!errorMessage) {
-        if (data && documentType && documentType.id) {
-          const { variableJsonArray, provisionJsonArray } = getReportData();
-          generateReport(dtid, data!.fileNum, documentType.id, provisionJsonArray, variableJsonArray);
+    try {
+      setLoading(true);
+      if (dtid) {
+        const errorMessage = validateProvisions();
+        if (!errorMessage) {
+          if (data && documentType && documentType.id) {
+            const { variableJsonArray, provisionJsonArray } = getReportData();
+            generateReport(dtid, data!.fileNum, documentType.id, provisionJsonArray, variableJsonArray);
+          }
+        } else {
+          alert(errorMessage);
         }
-      } else {
-        alert(errorMessage);
       }
+    } catch (err) {
+      console.log(err);
+      // set error state
+    } finally {
+      setLoading(false);
     }
   };
 

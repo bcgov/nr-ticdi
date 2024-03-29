@@ -83,8 +83,6 @@ const Provisions: FC<ProvisionsProps> = ({ dtid, documentType, provisionGroups }
         </select>
       </div>
       <ProvisionsTable
-        dtid={dtid}
-        docType={documentType}
         provisions={provisions}
         currentGroupNumber={selectedProvisionGroup}
         currentGroupMax={selectedProvisionGroupMax}

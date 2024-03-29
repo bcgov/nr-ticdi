@@ -130,7 +130,7 @@ objects:
                       name: ttls
                       key: ttls_api_endpoint
                 - name: BACKEND_URL
-                  value: http://${NAME}-${ZONE}-backend
+                  alue: https://${NAME}-${ZONE}-backend.${DOMAIN}
                 - name: session_path
                   value: '/mnt/sessions'
                 - name: LOG_LEVEL

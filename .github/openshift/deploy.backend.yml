@@ -95,6 +95,11 @@ objects:
                     secretKeyRef:
                       name: ${NAME}-${ZONE}-database
                       key: database-user
+                - name: session_secret
+                  valueFrom:
+                    secretKeyRef:
+                      name: ticdi-sessions
+                      key: session_secret
               ports:
                 - containerPort: 3000
                   protocol: TCP

@@ -155,7 +155,7 @@ objects:
                     secretKeyRef:
                       name: ttls
                       key: ttls_api_endpoint
-                - name: backend_url
+                - name: BACKEND_URL
                   value: http://${NAME}-${ZONE}-backend
                 - name: session_path
                   value: '/mnt/sessions'

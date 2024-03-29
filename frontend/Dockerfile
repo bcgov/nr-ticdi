@@ -1,4 +1,4 @@
-# RedHat UBI 8 with an updated version of Node.js
+# RedHat UBI 8 with nodejs 16
 FROM registry.access.redhat.com/ubi8/ubi as builder
 
 RUN dnf module enable -y nodejs:16 && dnf install -y nodejs
@@ -12,7 +12,7 @@ RUN npm ci --only=prod && \
 # Deployment container
 FROM registry.access.redhat.com/ubi8/ubi-micro
 
-# Set node to production
+# Set node to production 
 ENV NODE_ENV production
 
 # Node packages and dependencies
@@ -29,7 +29,7 @@ COPY --from=builder /usr/lib64/libbrotlicommon.so.1 /usr/lib64/
 # Copy over app
 WORKDIR /app
 COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/build ./dist
 
 # Expose port - mostly a convention, for readability
 EXPOSE 3000

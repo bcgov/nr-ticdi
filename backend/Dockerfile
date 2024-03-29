@@ -39,4 +39,4 @@ HEALTHCHECK --interval=30s --timeout=3s CMD curl -f http://localhost/:3000
 USER app
 
 # Start up command
-ENTRYPOINT ["node", "dist/main"]
+ENTRYPOINT ["node", "dist/src/main"]

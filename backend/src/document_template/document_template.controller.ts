@@ -6,7 +6,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { Express } from 'express';
 import { Param } from '@nestjs/common/decorators';
 import { DocumentTemplate } from './entities/document_template.entity';
-import { TrimmedDocumentTemplate } from '../../utils/types';
+import { TrimmedDocumentTemplate } from '../types';
 
 @Controller('document-template')
 export class DocumentTemplateController {

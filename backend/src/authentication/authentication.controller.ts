@@ -1,5 +1,5 @@
 import { Body, Controller, Post, Session, UseFilters, UseGuards } from '@nestjs/common';
-import { SessionData } from 'utils/types';
+import { SessionData } from 'src/types';
 import { AuthenticationFilter } from './authentication.filter';
 import { AuthenticationGuard } from './authentication.guard';
 

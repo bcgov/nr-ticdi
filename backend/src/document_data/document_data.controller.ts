@@ -1,5 +1,5 @@
 import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
-import { ProvisionJSON, VariableJSON } from 'utils/types';
+import { ProvisionJSON, VariableJSON } from 'src/types';
 import { CreateDocumentDataDto } from './dto/create-document_data.dto';
 import { DocumentDataService } from './document_data.service';
 

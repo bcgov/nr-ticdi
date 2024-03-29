@@ -9,7 +9,7 @@ import { DocumentTypeService } from 'src/document_type/document_type.service';
 import { DocumentType } from 'src/document_type/entities/document_type.entity';
 import { DocumentTypeProvision } from './entities/document_type_provision';
 import { ProvisionGroup } from 'src/document_type/entities/provision_group.entity';
-import { ManageDocTypeProvision } from 'utils/types';
+import { ManageDocTypeProvision } from 'src/types';
 
 @Injectable()
 export class ProvisionService {

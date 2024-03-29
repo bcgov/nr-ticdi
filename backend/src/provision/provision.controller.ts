@@ -1,7 +1,7 @@
 import { Body, Controller, Get, Param, Post, Session } from '@nestjs/common';
 import { CreateProvisionDto } from './dto/create-provision.dto';
 import { ProvisionService } from './provision.service';
-import { ManageDocTypeProvision, SessionData } from 'utils/types';
+import { ManageDocTypeProvision, SessionData } from 'src/types';
 
 @Controller('provision')
 export class ProvisionController {

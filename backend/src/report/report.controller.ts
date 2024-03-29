@@ -10,7 +10,7 @@ import {
   UseGuards,
   UseFilters,
 } from '@nestjs/common';
-import { ProvisionJSON, SessionData, VariableJSON } from 'utils/types';
+import { ProvisionJSON, SessionData, VariableJSON } from 'src/types';
 import { TTLSService } from '../ttls/ttls.service';
 import { AxiosRequestConfig } from 'axios';
 import { AuthenticationFilter } from 'src/authentication/authentication.filter';

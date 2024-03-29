@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import * as base64 from 'base-64';
 import { URLSearchParams } from 'url';
 import jwt_decode from 'jwt-decode';
-import { AccountObject, TokenObject } from 'utils/types';
+import { AccountObject, TokenObject } from 'src/types';
 const axios = require('axios');
 
 export class AuthenticationError extends Error {}

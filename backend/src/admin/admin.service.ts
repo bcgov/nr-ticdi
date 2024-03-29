@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import * as dotenv from 'dotenv';
 import { HttpService } from '@nestjs/axios';
-import { SearchResultsItem, UserObject } from 'utils/types';
+import { SearchResultsItem, UserObject } from 'src/types';
 import { DocumentTemplateService } from 'src/document_template/document_template.service';
 import { ProvisionService } from 'src/provision/provision.service';
 import { DocumentTypeService } from 'src/document_type/document_type.service';

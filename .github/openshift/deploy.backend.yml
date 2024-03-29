@@ -95,6 +95,10 @@ objects:
             app: ${NAME}-${ZONE}
             deploymentconfig: ${NAME}-${ZONE}-${COMPONENT}
         spec:
+          volumes:
+            - name: ticdi-sessions
+              persistentVolumeClaim:
+                claimName: ticdi-sessions
           containers:
             - image: ${NAME}-${ZONE}-${COMPONENT}:${IMAGE_TAG}
               imagePullPolicy: Always

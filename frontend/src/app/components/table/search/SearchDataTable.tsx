@@ -51,6 +51,7 @@ const SearchDataTable: React.FC<SearchDataTableProps> = ({ searchTerm, setSelect
   }, [searchTerm, searchData]);
 
   const activeRadioHandler = (dtid: number, document_type: DocType) => {
+    console.log('changed');
     setSelectedDocument({ dtid, document_type });
     setSelectedDocumentChange(dtid, document_type);
   };
@@ -70,35 +71,36 @@ const SearchDataTable: React.FC<SearchDataTableProps> = ({ searchTerm, setSelect
       cell: (info) => <input value={info.getValue()} className="readonlyInput" readOnly />,
       header: () => 'Version',
       enableSorting: false,
-      meta: { customCss: { width: '6%' } },
+      meta: { customCss: { width: '8%' } },
+    }),
+
+    columnHelper.accessor('file_name', {
+      id: 'file_name',
+      cell: (info) => <input value={info.getValue()} className="readonlyInput" readOnly />,
+      header: () => 'Template Name',
+      enableSorting: false,
+      meta: { customCss: { width: '35%' } },
     }),
     columnHelper.accessor((row) => row.document_type.name, {
       id: 'doc_type',
       cell: (info) => <input value={info.getValue()} className="readonlyInput" readOnly />,
       header: () => 'Document Type',
       enableSorting: false,
-      meta: { customCss: { width: '24%' } },
-    }),
-    columnHelper.accessor('file_name', {
-      id: 'file_name',
-      cell: (info) => <input value={info.getValue()} className="readonlyInput" readOnly />,
-      header: () => 'Template Name',
-      enableSorting: false,
-      meta: { customCss: { width: '36%' } },
+      meta: { customCss: { width: '23%' } },
     }),
     columnHelper.accessor('updated_date', {
       id: 'updated_date',
       cell: (info) => <input value={info.getValue()} className="readonlyInput" readOnly />,
       header: () => 'Uploaded Date',
       enableSorting: true,
-      meta: { customCss: { width: '12%' } },
+      meta: { customCss: { width: '11%' } },
     }),
     columnHelper.accessor('status', {
       id: 'status',
       cell: (info) => <input value={info.getValue()} className="readonlyInput" readOnly />,
       header: () => 'Status',
       enableSorting: true,
-      meta: { customCss: { width: '12%' } },
+      meta: { customCss: { width: '11%' } },
     }),
     columnHelper.accessor('active', {
       id: 'active',
@@ -106,7 +108,10 @@ const SearchDataTable: React.FC<SearchDataTableProps> = ({ searchTerm, setSelect
         <input
           type="radio"
           name="activeSelection"
-          checked={info.row.original.dtid === selectedDocument?.dtid}
+          checked={
+            info.row.original.dtid === selectedDocument?.dtid &&
+            info.row.original.document_type === selectedDocument?.document_type
+          }
           onChange={() => activeRadioHandler(info.row.original.dtid, info.row.original.document_type)}
           style={{ width: '100%' }}
         />

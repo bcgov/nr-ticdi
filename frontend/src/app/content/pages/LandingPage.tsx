@@ -234,6 +234,7 @@ const LandingPage: FC = () => {
   const handleGenerateReport = () => {
     try {
       setLoading(true);
+      handleDocumentSave();
       if (dtid) {
         const errorMessage = validateProvisions();
         if (!errorMessage) {

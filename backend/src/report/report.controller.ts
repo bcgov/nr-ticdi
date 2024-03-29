@@ -180,4 +180,9 @@ export class ReportController {
   getMandatoryProvisionsByDocumentTypeId(@Param('document_type_id') document_type_id: number) {
     return this.reportService.getMandatoryProvisionsByDocumentTypeId(document_type_id);
   }
+
+  @Get()
+  getHealthCheck() {
+    return "";
+  }
 }

@@ -19,10 +19,12 @@ export type VariableJson = {
   variable_value: string;
 };
 
-const VariablesTable: React.FC = React.memo(() => {
+const VariablesTable: React.FC<{ onVariableEdit: (variableId: number, newValue: string) => void }> = ({
+  onVariableEdit,
+}) => {
   const [filteredVariables, setFilteredVariables] = useState<Variable[]>([]); // provisions in the currently selected group
 
-  const dispatch = useDispatch();
+  // const dispatch = useDispatch();
   const selectedVariableIds = useSelector((state: RootState) => state.variable.selectedVariableIds);
   const variables: Variable[] = useSelector((state: RootState) => state.variable.variables);
 
@@ -40,12 +42,16 @@ const VariablesTable: React.FC = React.memo(() => {
     if (filtered) setFilteredVariables(filtered);
   }, [variables, selectedVariableIds]);
 
+  // const handleEdit = (variableId: number, newValue: string) => {
+  //   const newVariables = variables.map((variable) =>
+  //     variable.id === variableId ? { ...variable, variable_value: newValue } : variable
+  //   );
+  //   dispatch(setVariables(newVariables));
+  // };
   const handleEdit = (variableId: number, newValue: string) => {
-    const newVariables = variables.map((variable) =>
-      variable.id === variableId ? { ...variable, variable_value: newValue } : variable
-    );
-    dispatch(setVariables(newVariables));
+    onVariableEdit(variableId, newValue);
   };
+  console.log('re-render');
 
   const columnHelper = createColumnHelper<Variable>();
   const columns: ColumnDef<Variable, any>[] = [
@@ -93,7 +99,7 @@ const VariablesTable: React.FC = React.memo(() => {
       initialSorting={[{ id: 'variable_name', desc: false }]}
     />
   );
-});
+};
 
 interface TableCellProps {
   getValue: () => any;
@@ -119,4 +125,4 @@ const TableCell: FC<TableCellProps> = ({ getValue, variableId, onCellUpdate }) =
   return <input type="text" value={value} onChange={handleChange} onBlur={handleBlur} style={{ width: '100%' }} />;
 };
 
-export default VariablesTable;
+export default React.memo(VariablesTable);

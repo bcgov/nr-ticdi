@@ -26,11 +26,7 @@ export type VariableData = {
 const Variables: FC<VariablesProps> = ({ dtid, documentType, updateHandler }) => {
   // const [allVariables, setAllVariables] = useState<VariableData[]>([]);
 
-  return (
-    <>
-      <VariablesTable />
-    </>
-  );
+  return <>{/* <VariablesTable /> */}</>;
 };
 
 export default Variables;

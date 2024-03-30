@@ -2,9 +2,8 @@ import React, { FC, useEffect, useState } from 'react';
 import { DataTable } from '../common/DataTable';
 import { ColumnDef, createColumnHelper } from '@tanstack/react-table';
 import { Variable } from '../../../types/types';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { RootState } from '../../../store/store';
-import { setVariables } from '../../../store/reducers/variableSlice';
 
 export type SaveVariableData = {
   provision_id: number;
@@ -24,7 +23,6 @@ const VariablesTable: React.FC<{ onVariableEdit: (variableId: number, newValue: 
 }) => {
   const [filteredVariables, setFilteredVariables] = useState<Variable[]>([]); // provisions in the currently selected group
 
-  // const dispatch = useDispatch();
   const selectedVariableIds = useSelector((state: RootState) => state.variable.selectedVariableIds);
   const variables: Variable[] = useSelector((state: RootState) => state.variable.variables);
 
@@ -42,12 +40,6 @@ const VariablesTable: React.FC<{ onVariableEdit: (variableId: number, newValue: 
     if (filtered) setFilteredVariables(filtered);
   }, [variables, selectedVariableIds]);
 
-  // const handleEdit = (variableId: number, newValue: string) => {
-  //   const newVariables = variables.map((variable) =>
-  //     variable.id === variableId ? { ...variable, variable_value: newValue } : variable
-  //   );
-  //   dispatch(setVariables(newVariables));
-  // };
   const handleEdit = (variableId: number, newValue: string) => {
     onVariableEdit(variableId, newValue);
   };

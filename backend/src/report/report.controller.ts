@@ -112,6 +112,11 @@ export class ReportController {
     return this.reportService.getGroupMaxByDocTypeId(document_type_id);
   }
 
+  @Get('get-all-groups')
+  getAllGroups() {
+    return this.reportService.getAllGroups();
+  }
+
   @Get('provisions/:document_type_id/:dtid')
   getDocumentProvisionsByDocumentTypeId(
     @Param('document_type_id') document_type_id: number,
@@ -126,6 +131,7 @@ export class ReportController {
     @Param('dtid') dtid: number
   ) {
     const variables = await this.reportService.getDocumentVariablesByDocumentTypeIdAndDtid(document_type_id, dtid);
+    console.log(variables);
     return variables;
   }
 
@@ -137,7 +143,7 @@ export class ReportController {
       dtid: number;
       document_type_id: number;
       status: string;
-      provisionArray: ProvisionJSON[];
+      provisionArray: { provision_id: number; doc_type_provision_id: number }[];
       variableArray: VariableJSON[];
     }
   ) {

@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { DataTable } from '../common/DataTable';
 import { ColumnDef, createColumnHelper } from '@tanstack/react-table';
-import { activateTemplate, downloadTemplate, getTemplatesInfo } from '../../../common/manage-templates';
+import { activateTemplate, downloadTemplate, getTemplatesInfo, previewTemplate } from '../../../common/manage-templates';
 import { DocType, TemplateInfo } from '../../../types/types';
 import { Button } from 'react-bootstrap';
+import PreviewTemplateModal from '../../modal/admin/manage-templates/PreviewTemplateModal';
 
 interface TemplateInfoTableProps {
   documentType: DocType;
@@ -15,6 +16,8 @@ const TemplateInfoTable: React.FC<TemplateInfoTableProps> = ({ documentType, ref
   const [templateData, setTemplateData] = useState<TemplateInfo[]>([]);
   const [currentlyActive, setCurrentlyActive] = useState<number>();
   const [loading, setLoading] = useState<boolean>(false);
+  const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [iframeSrcBlob, setIframeSrcBlob] = useState<Blob | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -46,7 +49,28 @@ const TemplateInfoTable: React.FC<TemplateInfoTableProps> = ({ documentType, ref
   const handleDownloadTemplate = async (id: number, fileName: string) => {
     try {
       setLoading(true);
-      await downloadTemplate(id, fileName);
+      await downloadTemplate(id, fileName + '.docx');
+    } catch (error) {
+      console.log('Error downloading template');
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const toggleModal = () => {
+    setIsOpen(!isOpen);
+  };
+
+  const handlePreviewTemplate = async (id: number, fileName: string) => {
+    try {
+      setLoading(true);
+      const responce = await previewTemplate(id, fileName);
+      if (responce) {
+        setIframeSrcBlob(responce);
+        setIsOpen(true);
+        setLoading(false);
+      }
     } catch (error) {
       console.log('Error downloading template');
       console.log(error);
@@ -103,7 +127,7 @@ const TemplateInfoTable: React.FC<TemplateInfoTableProps> = ({ documentType, ref
     columnHelper.accessor('preview', {
       id: 'preview',
       cell: (info) => (
-        <Button variant="success" onClick={() => console.log('')}>
+        <Button variant="success" onClick={() => handlePreviewTemplate(info.row.original.id, info.row.original.file_name)}>
           Preview
         </Button>
       ),
@@ -145,14 +169,19 @@ const TemplateInfoTable: React.FC<TemplateInfoTableProps> = ({ documentType, ref
     }),
   ];
 
-  return (
+
+
+
+  return <>
+    {isOpen && <PreviewTemplateModal isOpen={isOpen} toggleModal={toggleModal} iframeSrcBlob={iframeSrcBlob} />}
     <DataTable
       columns={columns}
       data={templateData}
       enableSorting={true}
       initialSorting={[{ id: 'template_version', desc: false }]}
     />
-  );
+  </>;
+
 };
 
 export default TemplateInfoTable;

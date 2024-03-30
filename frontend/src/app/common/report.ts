@@ -1,9 +1,9 @@
 import config from '../../config';
-import { ProvisionJson } from '../components/table/reports/SelectedProvisionsTable';
+import { ProvisionJson, SaveProvisionData } from '../components/table/reports/SelectedProvisionsTable';
 import { VariableJson } from '../components/table/reports/VariablesTable';
-import { ProvisionData } from '../content/display/Provisions';
+// import { ProvisionData } from '../content/display/Provisions';
 import { VariableData } from '../content/display/Variables';
-import { DTR, DTRDisplayObject, DocType, DocumentDataObject, ProvisionGroup } from '../types/types';
+import { DTR, DTRDisplayObject, DocType, DocumentDataDTO, DocumentDataObject, ProvisionGroup } from '../types/types';
 import { buildDTRDisplayData } from '../util/util';
 import * as api from './api';
 
@@ -42,18 +42,18 @@ export const getMandatoryProvisionsByDocTypeId = async (document_type_id: number
   return response;
 };
 
-export const getDocumentProvisionsByDocTypeIdDtid = async (
-  document_type_id: number,
-  dtid: number
-): Promise<{ provisions: ProvisionData[]; provisionIds: number[] }> => {
-  const url = `${config.API_BASE_URL}/report/provisions/${document_type_id}/${dtid}`;
-  const getParameters = api.generateApiParameters(url);
-  const response: { provisions: ProvisionData[]; provisionIds: number[] } = await api.get<{
-    provisions: ProvisionData[];
-    provisionIds: number[];
-  }>(getParameters);
-  return response;
-};
+// export const getDocumentProvisionsByDocTypeIdDtid = async (
+//   document_type_id: number,
+//   dtid: number
+// ): Promise<{ provisions: ProvisionData[]; provisionIds: number[] }> => {
+//   const url = `${config.API_BASE_URL}/report/provisions/${document_type_id}/${dtid}`;
+//   const getParameters = api.generateApiParameters(url);
+//   const response: { provisions: ProvisionData[]; provisionIds: number[] } = await api.get<{
+//     provisions: ProvisionData[];
+//     provisionIds: number[];
+//   }>(getParameters);
+//   return response;
+// };
 
 export const getDocumentVariablesByDocTypeIdDtid = async (
   document_type_id: number,
@@ -71,7 +71,7 @@ export const getDocumentVariablesByDocTypeIdDtid = async (
 export const saveDocument = async (
   dtid: number,
   document_type_id: number,
-  provisionArray: { provision_id: number; free_text: string }[],
+  provisionArray: SaveProvisionData[],
   variableArray: { provision_id: number; variable_id: number; variable_value: string }[]
 ): Promise<void> => {
   const url = `${config.API_BASE_URL}/report/save-document`;
@@ -82,6 +82,7 @@ export const saveDocument = async (
     provisionArray: provisionArray,
     variableArray: variableArray,
   };
+  console.log(data);
   const postParameters = api.generateApiParameters(url, data);
   await api.post<void>(postParameters);
 };
@@ -111,7 +112,22 @@ export const generateReport = async (
 
 export const getDocumentTypes = () => {
   const url = `${config.API_BASE_URL}/document-type`;
-  console.log(url);
   const getParameters = api.generateApiParameters(url);
   return api.get<DocType[]>(getParameters);
+};
+
+export const getDocumentData = async (document_type_id: number, dtid: number): Promise<DocumentDataDTO> => {
+  const url = `${config.API_BASE_URL}/document-data/get/${document_type_id}/${dtid}`;
+  const getParameters = api.generateApiParameters(url);
+  const response = await api.get<DocumentDataDTO>(getParameters);
+  console.log(response);
+  return response;
+};
+
+export const getAllProvisionGroups = async (): Promise<ProvisionGroup[]> => {
+  const url = `${config.API_BASE_URL}/report/get-all-groups`;
+  const getParameters = api.generateApiParameters(url);
+  const response = await api.get<ProvisionGroup[]>(getParameters);
+  console.log(response);
+  return response;
 };

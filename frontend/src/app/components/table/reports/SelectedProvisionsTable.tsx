@@ -1,20 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import { DataTable } from '../common/DataTable';
 import { ColumnDef, createColumnHelper } from '@tanstack/react-table';
-import { getDocumentProvisionsByDocTypeIdDtid } from '../../../common/report';
-import { ProvisionData } from '../../../content/display/Provisions';
-import { DocType } from '../../../types/types';
+import { DocType, ReducedProvisionDataObject } from '../../../types/types';
 
 interface SelectedProvisionsTableTableProps {
   docType: DocType;
-  dtid: number;
   selectedProvisionIds: number[] | undefined;
-  updateHandler: (provisionJson: ProvisionJson[]) => void;
+  provisions: ReducedProvisionDataObject[] | undefined;
 }
 
-export type SaveProvisionData = { provision_id: number; free_text: string };
+export type SaveProvisionData = { provision_id: number; doc_type_provision_id: number };
 export type ProvisionJson = {
   provision_id: number;
+  doc_type_provision_id: number;
   provision_group: number;
   provision_name: string;
   free_text: string;
@@ -22,28 +20,23 @@ export type ProvisionJson = {
 
 const SelectedProvisionsTable: React.FC<SelectedProvisionsTableTableProps> = ({
   docType,
-  dtid,
   selectedProvisionIds,
-  updateHandler,
+  provisions,
 }) => {
-  const [allProvisions, setAllProvisions] = useState<ProvisionData[]>([]);
-  const [selectedProvisions, setSelectedProvisions] = useState<ProvisionData[]>([]);
+  const [allProvisions, setAllProvisions] = useState<ReducedProvisionDataObject[]>([]);
+  const [selectedProvisions, setSelectedProvisions] = useState<ReducedProvisionDataObject[]>([]);
 
-  // grab all provisions
   useEffect(() => {
-    const fetchData = async () => {
-      const provisionData: { provisions: ProvisionData[]; provisionIds: number[] } =
-        await getDocumentProvisionsByDocTypeIdDtid(docType.id, dtid);
-      setAllProvisions(provisionData.provisions);
-    };
-    fetchData();
-  }, [docType, dtid]);
+    if (provisions) setAllProvisions(provisions);
+  }, [provisions]);
 
   // filter/sort allProvisions to find selected ones for displaying
   useEffect(() => {
     if (allProvisions) {
-      const filtered = allProvisions.filter((provision) => selectedProvisionIds?.includes(provision.id));
-      const filteredAndSorted: ProvisionData[] = [...filtered].sort((a, b) => {
+      console.log('selectedids');
+      console.log(selectedProvisionIds);
+      const filtered = allProvisions.filter((provision) => selectedProvisionIds?.includes(provision.provision_id));
+      const filteredAndSorted: ReducedProvisionDataObject[] = [...filtered].sort((a, b) => {
         if (a.provision_group < b.provision_group) return -1;
         if (a.provision_group > b.provision_group) return 1;
         return a.provision_name.localeCompare(b.provision_name);
@@ -52,23 +45,8 @@ const SelectedProvisionsTable: React.FC<SelectedProvisionsTableTableProps> = ({
     }
   }, [allProvisions, selectedProvisionIds, docType]);
 
-  // update provision save data array in ReportPage when selectedProvisions changes
-  useEffect(() => {
-    const collectProvisionData = () => {
-      const provisionJson: ProvisionJson[] = selectedProvisions.map((provision) => ({
-        provision_id: provision.id,
-        provision_group: provision.provision_group.provision_group,
-        provision_name: provision.provision_name,
-        free_text: provision.free_text,
-      }));
-
-      updateHandler(provisionJson);
-    };
-    collectProvisionData();
-  }, [selectedProvisions]);
-
-  const columnHelper = createColumnHelper<ProvisionData>();
-  const columns: ColumnDef<ProvisionData, any>[] = [
+  const columnHelper = createColumnHelper<ReducedProvisionDataObject>();
+  const columns: ColumnDef<ReducedProvisionDataObject, any>[] = [
     columnHelper.accessor('type', {
       id: 'type',
       cell: (info) => <input value={info.getValue()} className="readonlyInput" readOnly />,
@@ -76,9 +54,9 @@ const SelectedProvisionsTable: React.FC<SelectedProvisionsTableTableProps> = ({
       enableSorting: true,
       meta: { customCss: { width: '5%' } },
     }),
-    columnHelper.accessor('provision_group', {
+    columnHelper.accessor((row) => row.provision_group.provision_group, {
       id: 'provision_group',
-      cell: (info) => <input value={info.getValue().provision_group} className="readonlyInput" readOnly />,
+      cell: (info) => <input value={info.getValue()} className="readonlyInput" readOnly />,
       header: () => 'Group',
       enableSorting: true,
       meta: { customCss: { width: '5%' } },
@@ -105,8 +83,8 @@ const SelectedProvisionsTable: React.FC<SelectedProvisionsTableTableProps> = ({
       data={selectedProvisions}
       enableSorting={true}
       initialSorting={[
-        { id: 'provision_group', desc: false }, // unsure if this will be seen as an object, may need to map the data beforehand
-        { id: 'provision_name', desc: false },
+        { id: 'provision_group', desc: false },
+        // { id: 'provision_name', desc: false },
       ]}
     />
   );

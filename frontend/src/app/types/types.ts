@@ -127,6 +127,7 @@ export type ProvisionVariableObject = {
   update_userid: string;
   create_timestamp: string;
   update_timestamp: string;
+  provision: Provision;
 };
 
 export type DocumentDataProvisionObject = {
@@ -220,16 +221,10 @@ export type Variable = {
 
 // used on Manage Provisions page
 export type ProvisionUpload = {
-  // type: string;
-  // provision_group: number;
-  // provision_group_text: string;
-  // max: number;
   provision_name: string;
   free_text: string;
   help_text: string;
   category: string;
-  // sequence_value: number;
-  // document_type_ids: number[]; //
 };
 
 export type VariableUpload = {
@@ -259,4 +254,97 @@ export type DocType = {
   update_userid: string;
   create_timestamp: string;
   update_timestamp: string;
+};
+
+export type DocumentData = {
+  dtid: number;
+  template_id: number;
+  status: string;
+  active: boolean;
+  create_userid: string;
+  update_userid: string;
+  create_timestamp: Date;
+  update_timestamp: Date;
+  document_data_provisions?: DocumentDataProvision[];
+  document_data_variables?: DocumentDataVariable[];
+  document_type?: DocumentType;
+};
+
+export type DocTypeProvision = {
+  id: number;
+  associated: boolean;
+  sequence_value: number;
+  type: string;
+  document_type?: DocumentType;
+  provision?: Provision;
+  provision_group?: ProvisionGroup;
+  document_data_provisions?: DocumentDataProvision[];
+};
+
+export type DocumentDataProvision = {
+  id: number;
+  document_type_provision?: DocTypeProvision;
+  document_provision?: Provision;
+  document_data?: DocumentData;
+};
+
+export type DocumentDataVariable = {
+  id: number;
+  data_variable_value: string;
+  document_variable_id: number;
+  document_data_id: number;
+};
+
+export type SavedVariableInfo = {
+  id: number;
+  variable_id: number;
+  saved_value: string;
+};
+
+export type DocumentDataDTO = {
+  provisions: ProvisionDataObject[];
+  variables: ProvisionVariableObject[];
+  preselectedProvisionIds: number[];
+  preselectedVariableIds: number[];
+  documentDataProvisions: DocumentDataProvision[];
+  savedVariableInfo: SavedVariableInfo[];
+};
+
+export type ProvisionDataObject = {
+  id: number;
+  associated: boolean;
+  sequence_value: number;
+  type: string;
+  provision_id: number;
+  provision_name: string;
+  category: string;
+  free_text: string;
+  help_text: string;
+  active_flag: boolean; // from global provision
+  is_deleted: boolean; // from global provision
+  create_userid: string;
+  create_timestamp: string;
+  update_userid: string;
+  update_timestamp: string;
+  provision_group: ProvisionGroup;
+  document_type: DocumentType;
+};
+
+export type ReducedProvisionDataObject = {
+  id: number;
+  associated: boolean;
+  sequence_value: number;
+  type: string;
+  provision_id: number;
+  provision_name: string;
+  category: string;
+  free_text: string;
+  help_text: string;
+  active_flag: boolean; // from global provision
+  is_deleted: boolean; // from global provision
+  create_userid: string;
+  create_timestamp: string;
+  update_userid: string;
+  update_timestamp: string;
+  provision_group: ProvisionGroup;
 };

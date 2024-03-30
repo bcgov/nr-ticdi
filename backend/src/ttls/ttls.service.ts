@@ -6,7 +6,7 @@ import { map } from 'rxjs/operators';
 import { URLSearchParams } from 'url';
 import * as dotenv from 'dotenv';
 import * as base64 from 'base-64';
-import { formatPostalCode, getNFRMailingAddress } from 'utils/util';
+import { formatPostalCode, getNFRMailingAddress } from 'src/util';
 declare const Buffer;
 const axios = require('axios');
 

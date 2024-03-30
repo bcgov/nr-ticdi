@@ -32,17 +32,13 @@
     "@types/react-datepicker": "^6.2.0"
   },
   "devDependencies": {
-    "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
-    "@types/react-datepicker": "^6.2.0",
     "sass": "^1.71.1"
   },
   "scripts": {
-    "prebuild": "rimraf dist",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject",
-    "start:prod": "node dist/main"
+    "eject": "react-scripts eject"
   },
   "eslintConfig": {
     "extends": [

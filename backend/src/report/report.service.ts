@@ -4,8 +4,8 @@ import { firstValueFrom } from 'rxjs';
 import { DocumentTemplateService } from 'src/document_template/document_template.service';
 import { ProvisionService } from 'src/provision/provision.service';
 import { TTLSService } from 'src/ttls/ttls.service';
-import { GL_REPORT_TYPE, LUR_REPORT_TYPE, SL_REPORT_TYPE, numberWords, sectionTitles } from 'utils/constants';
-import { ProvisionJSON, VariableJSON } from 'utils/types';
+import { GL_REPORT_TYPE, LUR_REPORT_TYPE, SL_REPORT_TYPE, numberWords, sectionTitles } from '../constants';
+import { ProvisionJSON, VariableJSON } from '../types';
 import {
   convertToSpecialCamelCase,
   formatMoney,
@@ -17,7 +17,7 @@ import {
   getMailingAddress,
   grazingLeaseVariables,
   nfrAddressBuilder,
-} from 'utils/util';
+} from '../util';
 import { DocumentDataService } from 'src/document_data/document_data.service';
 import { DocumentDataLogService } from 'src/document_data_log/document_data_log.service';
 import { DocumentTypeService } from 'src/document_type/document_type.service';

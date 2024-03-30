@@ -36,6 +36,9 @@ parameters:
   - name: PROMOTE
     description: Image (namespace/name:tag) to promote/import
     value: bcgov/nr-ticdi:prod-frontend
+  - name: LOG_LEVEL
+    description: Caddy logging level DEBUG, INFO, WARN, ERROR, PANIC, and FATAL (https://github.com/caddyserver/caddy/blob/master/logging.go)
+    value: "info"
 objects:
   - apiVersion: v1
     kind: ImageStream
@@ -53,28 +56,6 @@ objects:
             name: ${REGISTRY}/${PROMOTE}
           referencePolicy:
             type: Local
-  - apiVersion: v1
-    kind: Secret
-    metadata:
-      name: ticdi-sessions
-      labels:
-        app: ${NAME}
-    stringData:
-      cookie_secret: ${cookie_secret}
-      session_secret: ${session_secret}  
-  - kind: PersistentVolumeClaim
-    apiVersion: v1
-    metadata:
-      name: ticdi-sessions
-      labels:
-        app: ${NAME}-${ZONE}
-    spec:
-      accessModes:
-        - ReadWriteMany
-      resources:
-        requests:
-          storage: "256Mi"
-      storageClassName: netapp-file-standard
   - apiVersion: v1
     kind: DeploymentConfig
     metadata:
@@ -103,12 +84,11 @@ objects:
             app: ${NAME}-${ZONE}
             deploymentconfig: ${NAME}-${ZONE}-${COMPONENT}
         spec:
-          volumes:
-            - name: ticdi-sessions
-              persistentVolumeClaim:
-                claimName: ticdi-sessions
           containers:
             - image: ${NAME}-${ZONE}-${COMPONENT}:${IMAGE_TAG}
+              securityContext:
+                capabilities:
+                  add: ["NET_BIND_SERVICE"]
               imagePullPolicy: Always
               name: ${NAME}
               env:
@@ -149,90 +129,12 @@ objects:
                     secretKeyRef:
                       name: ttls
                       key: ttls_api_endpoint
-                - name: backend_url
-                  value: http://${NAME}-${ZONE}-backend
+                - name: BACKEND_URL
+                  value: https://${NAME}-${ZONE}-backend.${DOMAIN}
                 - name: session_path
                   value: '/mnt/sessions'
-                - name: cookie_secret
-                  valueFrom:
-                    secretKeyRef:
-                      name: ticdi-sessions
-                      key: cookie_secret
-                - name: session_secret
-                  valueFrom:
-                    secretKeyRef: 
-                      name: ticdi-sessions
-                      key: session_secret
-                - name: keycloak_base_url
-                  valueFrom:
-                    secretKeyRef: 
-                      name: keycloak
-                      key: keycloak_base_url
-                - name: keycloak_realm
-                  valueFrom:
-                    secretKeyRef: 
-                      name: keycloak
-                      key: keycloak_realm
-                - name: keycloak_client_id
-                  valueFrom:
-                    secretKeyRef: 
-                      name: keycloak
-                      key: keycloak_client_id
-                - name: keycloak_secret
-                  valueFrom:
-                    secretKeyRef: 
-                      name: keycloak
-                      key: keycloak_secret
-                - name: cdogs_service_client_id
-                  valueFrom:
-                    secretKeyRef: 
-                      name: cdogs
-                      key: cdogs_service_client_id
-                - name: cdogs_service_client_secret
-                  valueFrom:
-                    secretKeyRef: 
-                      name: cdogs
-                      key: cdogs_service_client_secret
-                - name: cdogs_url
-                  valueFrom:
-                    secretKeyRef: 
-                      name: cdogs
-                      key: cdogs_url
-                - name: cdogs_token_endpoint
-                  valueFrom:
-                    secretKeyRef: 
-                      name: cdogs
-                      key: cdogs_token_endpoint
-                - name: users_api_base_url
-                  valueFrom:
-                    secretKeyRef: 
-                      name: css-users-api
-                      key: users_api_base_url
-                - name: css_environment
-                  valueFrom:
-                    secretKeyRef: 
-                      name: css-users-api
-                      key: css_environment
-                - name: integration_id
-                  valueFrom:
-                    secretKeyRef: 
-                      name: css-users-api
-                      key: integration_id
-                - name: users_api_token_url
-                  valueFrom:
-                    secretKeyRef: 
-                      name: css-users-api
-                      key: users_api_token_url
-                - name: users_api_client_id
-                  valueFrom:
-                    secretKeyRef: 
-                      name: css-users-api
-                      key: users_api_client_id
-                - name: users_api_client_secret
-                  valueFrom:
-                    secretKeyRef: 
-                      name: css-users-api
-                      key: users_api_client_secret
+                - name: LOG_LEVEL
+                  value: ${LOG_LEVEL}
               ports:
                 - containerPort: 3000
                   protocol: TCP
@@ -258,9 +160,6 @@ objects:
                 initialDelaySeconds: 15
                 periodSeconds: 30
                 timeoutSeconds: 5
-              volumeMounts:
-                - mountPath: /mnt/sessions
-                  name: ticdi-sessions
   - apiVersion: v1
     kind: Service
     metadata:

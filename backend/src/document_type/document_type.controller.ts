@@ -3,7 +3,7 @@ import { AuthenticationFilter } from 'src/authentication/authentication.filter';
 import { AuthenticationGuard } from 'src/authentication/authentication.guard';
 import { GenerateReportGuard } from 'src/authentication/generate-report.guard';
 import { DocumentTypeService } from './document_type.service';
-import { SessionData } from 'utils/types';
+import { SessionData } from 'src/types';
 import { ProvisionGroup } from './entities/provision_group.entity';
 
 // @UseFilters(AuthenticationFilter)

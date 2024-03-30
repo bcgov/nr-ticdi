@@ -10,7 +10,7 @@ import {
   UseGuards,
   UseFilters,
 } from '@nestjs/common';
-import { ProvisionJSON, SessionData, VariableJSON } from 'utils/types';
+import { ProvisionJSON, SessionData, VariableJSON } from 'src/types';
 import { TTLSService } from '../ttls/ttls.service';
 import { AxiosRequestConfig } from 'axios';
 import { AuthenticationFilter } from 'src/authentication/authentication.filter';
@@ -185,5 +185,10 @@ export class ReportController {
   @Get('get-mandatory-provisions-by-document-type-id/:document_type_id')
   getMandatoryProvisionsByDocumentTypeId(@Param('document_type_id') document_type_id: number) {
     return this.reportService.getMandatoryProvisionsByDocumentTypeId(document_type_id);
+  }
+
+  @Get()
+  getHealthCheck() {
+    return "";
   }
 }

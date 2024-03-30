@@ -14,7 +14,7 @@ import {
   Param,
   Res,
 } from '@nestjs/common';
-import { ExportDataObject, SessionData, UserObject } from 'utils/types';
+import { ExportDataObject, SessionData, UserObject } from 'src/types';
 import { AxiosRequestConfig } from 'axios';
 import { AdminService } from './admin.service';
 import { AuthenticationFilter } from 'src/authentication/authentication.filter';

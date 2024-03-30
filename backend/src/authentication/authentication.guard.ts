@@ -3,7 +3,7 @@ import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from
 import { AuthenticationService } from './authentication.service';
 import { Request } from 'express';
 import { URL } from 'url';
-import { AccountObject, TokenObject } from 'utils/types';
+import { AccountObject, TokenObject } from 'src/types';
 
 @Injectable()
 export class AuthenticationGuard implements CanActivate {

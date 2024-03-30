@@ -5,11 +5,7 @@ import { AppService } from './app.service';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  app.enableCors({
-    origin: 'http://localhost:3000',
-    methods: 'GET,POST,PUT,DELETE,OPTIONS',
-    allowedHeaders: 'Content-Type,Authorization',
-  });
+  app.enableCors();
   const config = new DocumentBuilder()
     .setTitle('Users example')
     .setDescription('The user API description')

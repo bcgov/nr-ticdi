@@ -470,3 +470,73 @@ export function convertToSpecialCamelCase(str) {
     return str;
   }
 }
+
+// LUR util functions carried over
+export function getLicenceHolderName(tenantAddr: {
+  firstName: string;
+  middleName: string;
+  lastName: string;
+  legalName: string;
+}): string {
+  return tenantAddr.legalName
+    ? tenantAddr.legalName
+    : [tenantAddr.firstName, tenantAddr.middleName, tenantAddr.lastName].filter(Boolean).join(' ');
+}
+
+// returns the individual name
+export function getLicenceHolder(tenantAddr: { firstName: string; middleName: string; lastName: string }): string {
+  if (tenantAddr && (tenantAddr.firstName || tenantAddr.middleName || tenantAddr.lastName)) {
+    let name = tenantAddr.firstName ? tenantAddr.firstName : '';
+    name = tenantAddr.middleName ? name.concat(' ' + tenantAddr.middleName) : name;
+    name = tenantAddr.lastName ? name.concat(' ' + tenantAddr.lastName) : name;
+    return name;
+  }
+  return '';
+}
+
+// returns the individual name
+export function getContactAgent(firstName: string, middleName: string, lastName: string): string {
+  if (firstName || middleName || lastName) {
+    let name = firstName ? firstName : '';
+    name = middleName ? name.concat(' ' + middleName) : name;
+    name = lastName ? name.concat(' ' + lastName) : name;
+    return name;
+  }
+  return '';
+}
+
+export function concatCityProvPostal(tenantAddr: { city: string; provAbbr: string; postalCode: string }): string {
+  const addressParts = [];
+  if (tenantAddr) {
+    if (tenantAddr.city) {
+      addressParts.push(tenantAddr.city);
+    }
+
+    if (tenantAddr.provAbbr) {
+      addressParts.push(tenantAddr.provAbbr);
+    }
+
+    if (tenantAddr.postalCode) {
+      addressParts.push(formatPostalCode(tenantAddr.postalCode));
+    }
+  }
+
+  return addressParts.join(' ');
+}
+
+export function formatInspectedDate(inspected_date: string): string {
+  if (inspected_date && inspected_date.length == 8) {
+    return inspected_date.substring(0, 4) + '-' + inspected_date.substring(4, 6) + '-' + inspected_date.substring(6, 8);
+  }
+  return inspected_date;
+}
+
+export function formatPhoneNumber(phone_number: string, area_code: string): string {
+  if (phone_number && phone_number.length == 10) {
+    return phone_number.replace(/(\d{3})(\d{3})(\d{4})/, '($1)$2-$3');
+  } else if (phone_number && area_code && (phone_number + area_code).length == 10) {
+    return (area_code + phone_number).replace(/(\d{3})(\d{3})(\d{4})/, '($1) $2-$3');
+  } else {
+    return '';
+  }
+}

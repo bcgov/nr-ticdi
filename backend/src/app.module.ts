@@ -19,6 +19,7 @@ import { HttpExceptionFilter } from './authentication/http-exception.filter';
 import { APP_FILTER } from '@nestjs/core';
 
 import config from './ormconfig';
+import { JWTAuthModule } from './auth/jwtauth.module';
 
 console.log('Var check - POSTGRESQL_HOST', process.env.POSTGRESQL_HOST);
 console.log('Var check - POSTGRESQL_DATABASE', process.env.POSTGRESQL_DATABASE);
@@ -39,7 +40,8 @@ if (process.env.POSTGRESQL_PASSWORD != null) {
     DocumentDataLogModule,
     ProvisionModule,
     HttpModule,
-    AuthenticationModule,
+    // AuthenticationModule,
+    JWTAuthModule,
     AdminModule,
     ReportModule,
     SessionModule.forRoot({

@@ -8,11 +8,11 @@ export const AUTH_TOKEN = "__auth_token";
  * @param onAuthenticatedCallback
  */
 const initKeycloak = (onAuthenticatedCallback: () => void) => {
-  console.log("initKeycloak");
   _kc
     .init({
       onLoad: "login-required",
       pkceMethod: "S256",
+      checkLoginIframe: false,
     })
     .then((authenticated) => {
       if (!authenticated) {
@@ -20,6 +20,8 @@ const initKeycloak = (onAuthenticatedCallback: () => void) => {
       } else {
         localStorage.setItem(AUTH_TOKEN, `${_kc.token}`);
       }
+      console.log('WHAT?')
+
       onAuthenticatedCallback();
     })
     .catch(console.error);
@@ -45,7 +47,7 @@ const updateToken = (
   successCallback:
     | ((value: boolean) => boolean | PromiseLike<boolean>)
     | null
-    | undefined
+    | undefined,
 ) => _kc.updateToken(5).then(successCallback).catch(doLogin);
 
 const getUsername = () => _kc.tokenParsed?.display_name;

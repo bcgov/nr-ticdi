@@ -2,9 +2,8 @@ import React, { FC, useEffect, useState } from 'react';
 import { DataTable } from '../common/DataTable';
 import { ColumnDef, createColumnHelper } from '@tanstack/react-table';
 import { Variable } from '../../../types/types';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { RootState } from '../../../store/store';
-import { setVariables } from '../../../store/reducers/variableSlice';
 
 export type SaveVariableData = {
   provision_id: number;
@@ -19,10 +18,11 @@ export type VariableJson = {
   variable_value: string;
 };
 
-const VariablesTable: React.FC = React.memo(() => {
+const VariablesTable: React.FC<{ onVariableEdit: (variableId: number, newValue: string) => void }> = ({
+  onVariableEdit,
+}) => {
   const [filteredVariables, setFilteredVariables] = useState<Variable[]>([]); // provisions in the currently selected group
 
-  const dispatch = useDispatch();
   const selectedVariableIds = useSelector((state: RootState) => state.variable.selectedVariableIds);
   const variables: Variable[] = useSelector((state: RootState) => state.variable.variables);
 
@@ -41,11 +41,9 @@ const VariablesTable: React.FC = React.memo(() => {
   }, [variables, selectedVariableIds]);
 
   const handleEdit = (variableId: number, newValue: string) => {
-    const newVariables = variables.map((variable) =>
-      variable.id === variableId ? { ...variable, variable_value: newValue } : variable
-    );
-    dispatch(setVariables(newVariables));
+    onVariableEdit(variableId, newValue);
   };
+  console.log('re-render');
 
   const columnHelper = createColumnHelper<Variable>();
   const columns: ColumnDef<Variable, any>[] = [
@@ -93,7 +91,7 @@ const VariablesTable: React.FC = React.memo(() => {
       initialSorting={[{ id: 'variable_name', desc: false }]}
     />
   );
-});
+};
 
 interface TableCellProps {
   getValue: () => any;
@@ -119,4 +117,4 @@ const TableCell: FC<TableCellProps> = ({ getValue, variableId, onCellUpdate }) =
   return <input type="text" value={value} onChange={handleChange} onBlur={handleBlur} style={{ width: '100%' }} />;
 };
 
-export default VariablesTable;
+export default React.memo(VariablesTable);

@@ -348,3 +348,15 @@ export type ReducedProvisionDataObject = {
   update_timestamp: string;
   provision_group: ProvisionGroup;
 };
+
+export type VariableData = {
+  id: number;
+  variable_name: string;
+  variable_value: string;
+  help_text: string;
+  create_userid: string;
+  update_userid: string;
+  create_timestamp: string;
+  update_timestamp: string;
+  provision: Provision;
+};

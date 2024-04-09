@@ -1,4 +1,4 @@
-import { FC, useEffect, useState } from 'react';
+import { FC, useCallback, useEffect, useState } from 'react';
 import Collapsible from '../../../app/components/common/Collapsible';
 import {
   DTRDisplayObject,
@@ -42,6 +42,8 @@ const LandingPage: FC = () => {
   const [selectedDocTypeId, setSelectedDocTypeId] = useState<number | null>(null);
   const [documentType, setDocumentType] = useState<DocType | null>(null);
   const [documentTypes, setDocumentTypes] = useState<DocType[]>([]);
+
+  const [variableEdits, setVariableEdits] = useState<{ [variableId: number]: string }>({});
 
   const dispatch = useDispatch();
   const selectedProvisionIds: number[] = useSelector((state: RootState) => state.provision.selectedProvisionIds);
@@ -177,6 +179,13 @@ const LandingPage: FC = () => {
     }
   };
 
+  const handleVariableEdit = useCallback((variableId: number, newValue: string) => {
+    setVariableEdits((prevEdits) => ({
+      ...prevEdits,
+      [variableId]: newValue,
+    }));
+  }, []);
+
   const getSaveData = () => {
     const selectedProvisions = provisions.filter((provision) => selectedProvisionIds.includes(provision.provision_id));
     const provisionSaveData: SaveProvisionData[] = selectedProvisions.map((provision) => {
@@ -185,10 +194,20 @@ const LandingPage: FC = () => {
         doc_type_provision_id: provision.id,
       };
     });
+
     const selectedVariables: Variable[] = variables.filter((variable) => selectedVariableIds.includes(variable.id));
-    const variableSaveData: SaveVariableData[] = selectedVariables.map((variable) => {
+    const updatedVariables = selectedVariables.map((variable) => {
+      if (variableEdits[variable.id] !== undefined) {
+        return { ...variable, variable_value: variableEdits[variable.id] };
+      }
+      return variable;
+    });
+    dispatch(setVariables(updatedVariables));
+    setVariableEdits({});
+    const variableSaveData: SaveVariableData[] = updatedVariables.map((variable) => {
       return { variable_id: variable.id, variable_value: variable.variable_value, provision_id: variable.provision_id };
     });
+
     return { variableSaveData, provisionSaveData };
   };
 
@@ -308,7 +327,7 @@ const LandingPage: FC = () => {
           </Collapsible>
 
           <Collapsible title="Variables">
-            <VariablesTable />
+            <VariablesTable onVariableEdit={handleVariableEdit} />
           </Collapsible>
         </>
       ) : (

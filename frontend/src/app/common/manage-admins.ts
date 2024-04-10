@@ -20,7 +20,8 @@ function getDateTimeForFileName(): string {
 
 export async function getAdminData(): Promise<AdminData[]> {
   const adminDataUrl: string = `${config.API_BASE_URL}/admin/get-admins`;
-  const adminData: AdminData[] = await api.get({ url: adminDataUrl });
+  const getParameters = api.generateApiParameters(adminDataUrl);
+  const adminData: AdminData[] = await api.get(getParameters);
   return adminData;
 }
 
@@ -32,8 +33,11 @@ export async function getAdminData(): Promise<AdminData[]> {
  * @param documentDescription
  */
 export async function exportUsers(): Promise<void> {
+  console.log(1)
   const reportUrl: string = `${config.API_BASE_URL}/admin/get-export-data`;
+  console.log(2, reportUrl)
   const reportName: string = `user_list-${getDateTimeForFileName()}.csv`;
+  console.log(3, reportName)
   api.handleFileDownloadGet(reportUrl, reportName);
 }
 

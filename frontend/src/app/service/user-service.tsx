@@ -20,8 +20,6 @@ const initKeycloak = (onAuthenticatedCallback: () => void) => {
       } else {
         localStorage.setItem(AUTH_TOKEN, `${_kc.token}`);
       }
-      console.log('WHAT?')
-
       onAuthenticatedCallback();
     })
     .catch(console.error);
@@ -60,6 +58,7 @@ const getUsername = () => _kc.tokenParsed?.display_name;
 const hasRole = (roles: any) => {
   const jwt = _kc.tokenParsed;
   const userroles = jwt?.client_roles;
+
   const includesRoles =
     typeof roles === "string"
       ? userroles?.includes(roles)

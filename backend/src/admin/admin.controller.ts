@@ -163,6 +163,7 @@ export class AdminController {
 
   @Get('get-export-data')
   getExportData(): Promise<string> {
+    console.log('here')
     return this.adminService.getExportData();
   }
 

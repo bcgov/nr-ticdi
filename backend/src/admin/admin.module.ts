@@ -8,10 +8,12 @@ import { AuthenticationModule } from 'src/authentication/authentication.module';
 import { DocumentTemplateModule } from 'src/document_template/document_template.module';
 import { ProvisionModule } from 'src/provision/provision.module';
 import { DocumentTypeModule } from 'src/document_type/document_type.module';
+import { JWTAuthModule } from 'src/auth/jwtauth.module';
+import { JwtAuthGuard } from 'src/auth/jwtauth.guard';
 
 @Module({
-  imports: [HttpModule, AuthenticationModule, DocumentTemplateModule, ProvisionModule, DocumentTypeModule],
-  providers: [AdminGuard, AdminService],
+  imports: [HttpModule, JWTAuthModule, DocumentTemplateModule, ProvisionModule, DocumentTypeModule],
+  providers: [AdminGuard, AdminService, JwtAuthGuard],
   exports: [AdminService],
   controllers: [AdminController],
 })

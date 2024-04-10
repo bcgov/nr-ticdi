@@ -61,26 +61,24 @@ export class AdminController {
     });
   }
 
-  
-
-  @Get('preview-template/:id')
-  async previewTemplate(@Param('id') id: number, @Res() res) {
-    try {
-      const dtObject = await this.adminService.downloadTemplate(id);
-      const base64Data = dtObject.the_file;
-      const pdfBuffer = await this.adminService.convertDocxToPdfBuffer(base64Data);
-      const streamableFile = new stream.PassThrough();
-    streamableFile.end(pdfBuffer);
-    res.set({
-      'Content-Type': 'application/pdf',
-      'Content-Disposition': 'attachment; filename=file.pdf',
-    });
-    streamableFile.pipe(res);
-    } catch (error) {
-      console.error('Error:', error);
-      res.status(500).send('Internal Server Error');
-    }
-  }
+  // @Get('preview-template/:id')
+  // async previewTemplate(@Param('id') id: number, @Res() res) {
+  //   try {
+  //     const dtObject = await this.adminService.downloadTemplate(id);
+  //     const base64Data = dtObject.the_file;
+  //     const pdfBuffer = await this.adminService.convertDocxToPdfBuffer(base64Data);
+  //     const streamableFile = new stream.PassThrough();
+  //   streamableFile.end(pdfBuffer);
+  //   res.set({
+  //     'Content-Type': 'application/pdf',
+  //     'Content-Disposition': 'attachment; filename=file.pdf',
+  //   });
+  //   streamableFile.pipe(res);
+  //   } catch (error) {
+  //     console.error('Error:', error);
+  //     res.status(500).send('Internal Server Error');
+  //   }
+  // }
 
   @Get('download-template/:id')
   async downloadTemplate(@Param('id') id: number, @Res() res) {

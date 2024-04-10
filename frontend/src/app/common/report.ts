@@ -1,3 +1,4 @@
+import { AxiosError } from 'axios';
 import config from '../../config';
 import { ProvisionJson, SaveProvisionData } from '../components/table/reports/SelectedProvisionsTable';
 import { VariableJson } from '../components/table/reports/VariablesTable';
@@ -19,12 +20,20 @@ import * as api from './api';
  * @param dtid
  * @returns
  */
-export async function getDisplayData(dtid: number): Promise<DTRDisplayObject> {
+export async function getDisplayData(dtid: number): Promise<{ dtr: DTRDisplayObject | null; error: string | null }> {
   const url = `${config.API_BASE_URL}/report/get-data/${dtid}`;
   const getParameters = api.generateApiParameters(url);
-  const data: DTR = await api.get<DTR>(getParameters);
-  const displayData = buildDTRDisplayData(data);
-  return displayData;
+  try {
+    const data: DTR = await api.get<DTR>(getParameters);
+    const displayData = buildDTRDisplayData(data);
+    return { dtr: displayData, error: null };
+  } catch (err: any) {
+    if (err && err.isAxiosError) {
+      const axiosError = err as AxiosError<any>;
+      return { dtr: null, error: axiosError.response?.data.message || 'An error occurred while fetching the data' };
+    }
+    return { dtr: null, error: 'An error occurred while fetching the data' };
+  }
 }
 
 export const getDocumentDataByDocTypeIdAndDtid = async (document_type_id: number, dtid: number) => {
@@ -75,7 +84,6 @@ export const saveDocument = async (
     provisionArray: provisionArray,
     variableArray: variableArray,
   };
-  console.log(data);
   const postParameters = api.generateApiParameters(url, data);
   await api.post<void>(postParameters);
 };
@@ -99,7 +107,6 @@ export const generateReport = async (
     provisionJson: provisionJson,
     variableJson: variableJson,
   };
-
   api.handleFileDownloadPost(url, data, reportName);
 };
 
@@ -113,7 +120,6 @@ export const getDocumentData = async (document_type_id: number, dtid: number): P
   const url = `${config.API_BASE_URL}/document-data/get/${document_type_id}/${dtid}`;
   const getParameters = api.generateApiParameters(url);
   const response = await api.get<DocumentDataDTO>(getParameters);
-  console.log(response);
   return response;
 };
 
@@ -121,6 +127,5 @@ export const getAllProvisionGroups = async (): Promise<ProvisionGroup[]> => {
   const url = `${config.API_BASE_URL}/report/get-all-groups`;
   const getParameters = api.generateApiParameters(url);
   const response = await api.get<ProvisionGroup[]>(getParameters);
-  console.log(response);
   return response;
 };

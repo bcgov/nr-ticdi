@@ -1,6 +1,6 @@
 export interface DTR {
-  dtid: number;
-  fileNum: string;
+  dtid: number | null;
+  fileNum: string | null;
   orgUnit: string | null;
   complexLevel: string | null;
   purpose: string | null;
@@ -75,8 +75,8 @@ export interface TenantAddressResource {
  */
 export interface DTRDisplayObject {
   // Basic Info
-  dtid: number;
-  fileNum: string;
+  dtid: number | null;
+  fileNum: string | null;
   primaryContactName: string; // from tenantAddr
   // DTID Details
   contactName: string;

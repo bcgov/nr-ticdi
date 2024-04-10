@@ -149,10 +149,6 @@ export class ProvisionController {
 
   @Post('update-manage-doc-type-provisions')
   updateManageDocTypeProvisions(@Body() data: { document_type_id: number; provisions: ManageDocTypeProvision[] }) {
-    console.log('~~~~~~');
-    console.log(data.document_type_id);
-    console.log(data.provisions);
-    console.log('~~~~~~');
     return this.provisionService.updateManageDocTypeProvisions(data.document_type_id, data.provisions);
   }
 }

@@ -9,6 +9,8 @@ import {
   Param,
   UseGuards,
   UseFilters,
+  HttpException,
+  HttpStatus,
 } from '@nestjs/common';
 import { ProvisionJSON, SessionData, VariableJSON } from 'src/types';
 import { TTLSService } from '../ttls/ttls.service';
@@ -50,6 +52,8 @@ export class ReportController {
         console.log('callHttp failed');
         console.log(err);
         console.log(err.response.data);
+        const errorMessage = `Disposition Transaction not found with id ${dtid}`;
+        throw new HttpException(errorMessage, HttpStatus.INTERNAL_SERVER_ERROR);
       });
     return response;
   }
@@ -189,6 +193,6 @@ export class ReportController {
 
   @Get()
   getHealthCheck() {
-    return "";
+    return '';
   }
 }

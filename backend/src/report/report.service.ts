@@ -1272,14 +1272,12 @@ export class ReportService {
         dtid: document.dtid,
         version: templatesLookup[document.template_id].template_version,
         file_name: templatesLookup[document.template_id].file_name,
-        updated_date: document.update_timestamp.toISOString().slice(0, 10),
+        updated_date: document && document.update_timestamp ? document.update_timestamp.toISOString().slice(0, 10) : '',
         status: document.status,
         active: templatesLookup[document.template_id].active_flag,
         document_data_id: document.id,
         document_type: document.document_type,
       }));
-    console.log(combinedArray[0].updated_date);
-    // returns this: 2024-03-29T22:06:09.151Z
 
     return combinedArray;
   }

@@ -120,6 +120,11 @@ export const getDocumentData = async (document_type_id: number, dtid: number): P
   const url = `${config.API_BASE_URL}/document-data/get/${document_type_id}/${dtid}`;
   const getParameters = api.generateApiParameters(url);
   const response = await api.get<DocumentDataDTO>(getParameters);
+  console.log('~~~~~~~~~~~~~~~~~~~~~~~');
+  console.log('~~~ getDocumentData ~~~');
+  console.log(response);
+  console.log('~~~~~~~~~~~~~~~~~~~~~~~');
+  console.log('~~~~~~~~~~~~~~~~~~~~~~~');
   return response;
 };
 

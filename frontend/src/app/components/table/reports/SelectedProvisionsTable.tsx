@@ -33,8 +33,6 @@ const SelectedProvisionsTable: React.FC<SelectedProvisionsTableTableProps> = ({
   // filter/sort allProvisions to find selected ones for displaying
   useEffect(() => {
     if (allProvisions) {
-      console.log('selectedids');
-      console.log(selectedProvisionIds);
       const filtered = allProvisions.filter((provision) => selectedProvisionIds?.includes(provision.provision_id));
       const filteredAndSorted: ReducedProvisionDataObject[] = [...filtered].sort((a, b) => {
         if (a.provision_group < b.provision_group) return -1;

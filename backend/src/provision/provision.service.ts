@@ -279,7 +279,7 @@ export class ProvisionService {
       update_timestamp: string;
     };
     const docTypeProvisions = await this.documentTypeProvisionRepository.find({
-      where: { document_type: { id: document_type_id } },
+      where: { document_type: { id: document_type_id }, associated: true },
       relations: ['document_type', 'provision', 'provision_group', 'document_data_provisions'],
     });
     const provisions = await this.provisionRepository.find({ relations: ['provision_variables'] });

@@ -140,9 +140,9 @@ const SearchDataTable: React.FC<SearchDataTableProps> = ({ searchTerm, setSelect
     <DataTable
       columns={columns}
       data={filteredSearchData}
-      // paginationSetup={{ enabled: true, pageSize: 10 }}
+      paginationSetup={{ enabled: true, pageSize: 10 }}
       enableSorting={true}
-      initialSorting={[{ id: 'dtid', desc: false }]}
+      initialSorting={[{ id: 'updated_date', desc: true }]}
     />
   );
 };

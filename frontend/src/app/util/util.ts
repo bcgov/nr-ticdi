@@ -1,4 +1,11 @@
-import { AreaItem, DTR, InterestParcel, InterestedParties, TenantAddressResource } from '../types/types';
+import {
+  AreaItem,
+  DTR,
+  DTRDisplayObject,
+  InterestParcel,
+  InterestedParties,
+  TenantAddressResource,
+} from '../types/types';
 
 /**
  * Formats and returns a full mailing address
@@ -80,86 +87,118 @@ const formatInspectedDate = (inspected_date: string | null): string => {
  * @param tenantAddr
  * @returns an array of interested parties
  */
-const getInterestedParties = (tenantAddr: TenantAddressResource[]): InterestedParties[] => {
-  const result: { clientName: string; address: string }[] = [];
-  const seenCombinations = new Set<string>();
+const getInterestedParties = (tenantAddr: TenantAddressResource[] | null): InterestedParties[] => {
+  if (tenantAddr) {
+    const result: { clientName: string; address: string }[] = [];
+    const seenCombinations = new Set<string>();
 
-  for (const client of tenantAddr) {
-    let clientName: string;
-    if (client.legalName) {
-      clientName = client.legalName;
-    } else {
-      clientName = [client.firstName, client.middleName, client.lastName].filter(Boolean).join(' ');
+    for (const client of tenantAddr) {
+      let clientName: string;
+      if (client.legalName) {
+        clientName = client.legalName;
+      } else {
+        clientName = [client.firstName, client.middleName, client.lastName].filter(Boolean).join(' ');
+      }
+
+      const address = getFullMailingAddress(client);
+      const combination = `${clientName}-${address}`;
+
+      if (!seenCombinations.has(combination)) {
+        result.push({
+          clientName,
+          address,
+        });
+        seenCombinations.add(combination);
+      }
     }
 
-    const address = getFullMailingAddress(client);
-    const combination = `${clientName}-${address}`;
-
-    if (!seenCombinations.has(combination)) {
-      result.push({
-        clientName,
-        address,
-      });
-      seenCombinations.add(combination);
-    }
+    return result;
+  } else {
+    return [];
   }
-
-  return result;
 };
 
 const getAreaList = (interestParcel: InterestParcel[]): AreaItem[] => {
+  console.log(interestParcel);
   return interestParcel.map((parcel) => ({
     areaInHectares: parcel.areaInHectares,
     legalDescription: parcel.legalDescription,
   }));
 };
 
-export const buildDTRDisplayData = (data: DTR) => {
-  const tenantAddr: TenantAddressResource[] = (data && data.tenantAddr) ?? data.tenantAddr;
-  const firstTenant: TenantAddressResource = tenantAddr[0];
+export const buildDTRDisplayData = (data: DTR): DTRDisplayObject => {
+  if (data) {
+    const tenantAddr: TenantAddressResource[] | null = (data && data.tenantAddr) ?? data.tenantAddr;
+    const firstTenant: TenantAddressResource | null = tenantAddr ? tenantAddr[0] : null;
 
-  let primaryContactName: string = '';
-  let primaryContactEmail: string = '';
-  let primaryContactPhone: string = '';
-  let incorporationNum: string = '';
-  let address: string = '';
-  let cityProvPostal: string = '';
-  let country: string = '';
+    let primaryContactName: string = '';
+    let primaryContactEmail: string = '';
+    let primaryContactPhone: string = '';
+    let incorporationNum: string = '';
+    let address: string = '';
+    let cityProvPostal: string = '';
+    let country: string = '';
 
-  if (firstTenant) {
-    primaryContactName = getFullName(firstTenant.firstName, firstTenant.middleName, firstTenant.lastName);
-    primaryContactEmail = firstTenant.emailAddress ? firstTenant.emailAddress : '';
-    primaryContactPhone = formatPhoneNumber(
-      firstTenant.phoneNumber ? firstTenant.phoneNumber : '',
-      firstTenant.areaCode ? firstTenant.areaCode : ''
-    );
-    incorporationNum = firstTenant.incorporationNum ? firstTenant.incorporationNum.toString() : '';
-    address = getSimpleMailingAddress(firstTenant);
-    cityProvPostal = getCityProvPostal(firstTenant);
-    country = firstTenant.country ? firstTenant.country : '';
+    if (firstTenant) {
+      primaryContactName = getFullName(firstTenant.firstName, firstTenant.middleName, firstTenant.lastName);
+      primaryContactEmail = firstTenant.emailAddress ? firstTenant.emailAddress : '';
+      primaryContactPhone = formatPhoneNumber(
+        firstTenant.phoneNumber ? firstTenant.phoneNumber : '',
+        firstTenant.areaCode ? firstTenant.areaCode : ''
+      );
+      incorporationNum = firstTenant.incorporationNum ? firstTenant.incorporationNum.toString() : '';
+      address = getSimpleMailingAddress(firstTenant);
+      cityProvPostal = getCityProvPostal(firstTenant);
+      country = firstTenant.country ? firstTenant.country : '';
+    }
+
+    return {
+      dtid: data.dtid,
+      fileNum: data.fileNum,
+      primaryContactName: primaryContactName, // from tenantAddr
+      contactName: getFullName(data.contactFirstName, data.contactMiddleName, data.contactLastName),
+      orgUnit: data.orgUnit ? data.orgUnit : '',
+      primaryContactEmail: primaryContactEmail, // from tenantAddr
+      primaryContactPhone: primaryContactPhone, // from tenantAddr
+      contactEmail: data.contactEmail ? data.contactEmail : '',
+      contactPhoneNumber: data.contactPhoneNumber ? data.contactPhoneNumber : '',
+      incorporationNum: incorporationNum, // from tenantAddr
+      inspectionDate: formatInspectedDate(data.inspectionDate),
+      type: data.type ? data.type : '',
+      subType: data.subType ? data.subType : '',
+      purpose: data.purpose ? data.purpose : '',
+      subPurpose: data.subPurpose ? data.subPurpose : '',
+      mailingAddress1: address, // address line // from tenantAddr
+      mailingAddress2: cityProvPostal, // city prov postal line // from tenantAddr
+      mailingAddress3: country, // country line // from tenantAddr
+      locLand: data.locLand ? data.locLand : '',
+      areaList: data.interestParcel ? getAreaList(data.interestParcel) : [],
+      interestedParties: data.tenantAddr ? getInterestedParties(data.tenantAddr) : [],
+    };
+  } else {
+    // no data, return an empty object
+    return {
+      dtid: null,
+      fileNum: '',
+      primaryContactName: '',
+      contactName: '',
+      orgUnit: '',
+      primaryContactEmail: '',
+      primaryContactPhone: '',
+      contactEmail: '',
+      contactPhoneNumber: '',
+      incorporationNum: '',
+      inspectionDate: '',
+      type: '',
+      subType: '',
+      purpose: '',
+      subPurpose: '',
+      mailingAddress1: '',
+      mailingAddress2: '',
+      mailingAddress3: '',
+      locLand: '',
+      areaList: [],
+      interestedParties: [],
+    };
   }
-
-  return {
-    dtid: data.dtid,
-    fileNum: data.fileNum,
-    primaryContactName: primaryContactName, // from tenantAddr
-    contactName: getFullName(data.contactFirstName, data.contactMiddleName, data.contactLastName),
-    orgUnit: data.orgUnit ? data.orgUnit : '',
-    primaryContactEmail: primaryContactEmail, // from tenantAddr
-    primaryContactPhone: primaryContactPhone, // from tenantAddr
-    contactEmail: data.contactEmail ? data.contactEmail : '',
-    contactPhoneNumber: data.contactPhoneNumber ? data.contactPhoneNumber : '',
-    incorporationNum: incorporationNum, // from tenantAddr
-    inspectionDate: formatInspectedDate(data.inspectionDate),
-    type: data.type ? data.type : '',
-    subType: data.subType ? data.subType : '',
-    purpose: data.purpose ? data.purpose : '',
-    subPurpose: data.subPurpose ? data.subPurpose : '',
-    mailingAddress1: address, // address line // from tenantAddr
-    mailingAddress2: cityProvPostal, // city prov postal line // from tenantAddr
-    mailingAddress3: country, // country line // from tenantAddr
-    locLand: data.locLand ? data.locLand : '',
-    areaList: getAreaList(data.interestParcel),
-    interestedParties: getInterestedParties(data.tenantAddr),
-  };
 };

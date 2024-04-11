@@ -11,7 +11,6 @@ import * as mammoth from 'mammoth';
 import * as PDFDocument from 'pdfkit';
 import * as pdf from 'html-pdf';
 
-
 const axios = require('axios');
 const FormData = require('form-data');
 
@@ -364,35 +363,35 @@ export class AdminService {
     return header + csvRows.join('\n');
   }
 
-async convertDocxToPdfBuffer(base64Data: string): Promise<Buffer> {
-   // Decode base64 string
-   const buffer = Buffer.from(base64Data, 'base64');
+  async convertDocxToPdfBuffer(base64Data: string): Promise<Buffer> {
+    // Decode base64 string
+    const buffer = Buffer.from(base64Data, 'base64');
 
-   // Write buffer to temporary file
-   const tempFilePath = './temp.docx';
-   fs.writeFileSync(tempFilePath, buffer);
+    // Write buffer to temporary file
+    const tempFilePath = './temp.docx';
+    fs.writeFileSync(tempFilePath, buffer);
 
-   // Convert DOCX to HTML
-   const { value } = await mammoth.convertToHtml({ path: tempFilePath });
-   const htmlContent = value;
+    // Convert DOCX to HTML
+    const { value } = await mammoth.convertToHtml({ path: tempFilePath });
+    const htmlContent = value;
 
-   // Set options for html-pdf
-   const options: pdf.CreateOptions = {
-       format: 'Letter', // Set the PDF format (e.g., 'A4', 'Letter', etc.)
-       base: `file://${__dirname}/`, // Set the base path for local file references
-   };
+    // Set options for html-pdf
+    const options: pdf.CreateOptions = {
+      format: 'Letter', // Set the PDF format (e.g., 'A4', 'Letter', etc.)
+      base: `file://${__dirname}/`, // Set the base path for local file references
+    };
 
-   return new Promise<Buffer>((resolve, reject) => {
-       // Convert HTML to PDF
-       pdf.create(htmlContent, options).toBuffer((err, buffer) => {
-           if (err) {
-               reject(err);
-           } else {
-               // Remove temporary file
-               fs.unlinkSync(tempFilePath);
-               resolve(buffer);
-           }
-       });
-   });
-}
+    return new Promise<Buffer>((resolve, reject) => {
+      // Convert HTML to PDF
+      pdf.create(htmlContent, options).toBuffer((err, buffer) => {
+        if (err) {
+          reject(err);
+        } else {
+          // Remove temporary file
+          fs.unlinkSync(tempFilePath);
+          resolve(buffer);
+        }
+      });
+    });
+  }
 }

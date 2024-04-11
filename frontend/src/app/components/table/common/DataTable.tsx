@@ -137,7 +137,7 @@ export function DataTable<TData>({
             className="border rounded p-1"
             onClick={(e) => {
               e.preventDefault();
-              table.previousPage();
+              table.setPageIndex(table.getPageCount() - 1);
             }}
             disabled={!table.getCanNextPage()}
           >

@@ -61,12 +61,29 @@ export class AdminController {
     });
   }
 
+  // @Get('preview-template/:id')
+  // async previewTemplate(@Param('id') id: number, @Res() res) {
+  //   try {
+  //     const dtObject = await this.adminService.downloadTemplate(id);
+  //     const base64Data = dtObject.the_file;
+  //     const pdfBuffer = await this.adminService.convertDocxToPdfBuffer(base64Data);
+  //     const streamableFile = new stream.PassThrough();
+  //     streamableFile.end(pdfBuffer);
+  //     res.set({
+  //       'Content-Type': 'application/pdf',
+  //       'Content-Disposition': 'attachment; filename=file.pdf',
+  //     });
+  //     streamableFile.pipe(res);
+  //   } catch (error) {
+  //     console.error('Error:', error);
+  //     res.status(500).send('Internal Server Error');
+  //   }
+  // }
+
   @Get('preview-template/:id')
   async previewTemplate(@Param('id') id: number, @Res() res) {
     try {
-      const dtObject = await this.adminService.downloadTemplate(id);
-      const base64Data = dtObject.the_file;
-      const pdfBuffer = await this.adminService.convertDocxToPdfBuffer(base64Data);
+      const pdfBuffer = await this.adminService.getPreviewPdf(id);
       const streamableFile = new stream.PassThrough();
       streamableFile.end(pdfBuffer);
       res.set({
@@ -142,14 +159,6 @@ export class AdminController {
     return { message: 'Template uploaded successfully' };
   }
 
-  // @Post('upload-template')
-  // @UseInterceptors(FileInterceptor('file'))
-  // async uploadTemplate(@UploadedFile() file: Express.Multer.File, @Body() body: any) {
-  //   console.log(file); // Check if the file is received correctly
-  //   console.log(body); // Log the body to see if other data is as expected
-  //   return { message: 'Debugging' };
-  // }
-
   /**
    * Used for an AJAX route to render all admins in a datatable
    * @returns altered admin object array
@@ -196,11 +205,6 @@ export class AdminController {
   removeAdmin(@Body() input: { idirUsername: string }): Promise<{ message: string }> {
     return this.adminService.removeAdmin(input.idirUsername);
   }
-
-  // @Get('templates/:reportId')
-  // getTemplates(@Param('reportId') reportId: number): Promise<any> {
-  //   return this.adminService.getTemplates(reportId);
-  // }
 
   @Get('open-document/:document_id')
   setSessionDocument(@Session() session: { data?: SessionData }, @Param('document_id') documentId: number): void {

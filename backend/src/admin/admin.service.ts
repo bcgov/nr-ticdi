@@ -6,13 +6,14 @@ import { DocumentTemplateService } from 'src/document_template/document_template
 import { ProvisionService } from 'src/provision/provision.service';
 import { DocumentTypeService } from 'src/document_type/document_type.service';
 import { DocumentType } from 'src/document_type/entities/document_type.entity';
-import * as fs from 'fs';
-import * as mammoth from 'mammoth';
-import * as PDFDocument from 'pdfkit';
-import * as pdf from 'html-pdf';
+// import * as fs from 'fs';
+// import * as mammoth from 'mammoth';
+// import * as PDFDocument from 'pdfkit';
+// import * as pdf from 'html-pdf';
+import { TTLSService } from 'src/ttls/ttls.service';
 
 const axios = require('axios');
-const FormData = require('form-data');
+// const FormData = require('form-data');
 
 dotenv.config();
 let hostname: string;
@@ -22,6 +23,7 @@ let port: number;
 export class AdminService {
   constructor(
     private readonly httpService: HttpService,
+    private readonly ttlsService: TTLSService,
     private readonly documentTemplateService: DocumentTemplateService,
     private readonly provisionService: ProvisionService,
     private readonly documentTypeService: DocumentTypeService
@@ -363,35 +365,76 @@ export class AdminService {
     return header + csvRows.join('\n');
   }
 
-  async convertDocxToPdfBuffer(base64Data: string): Promise<Buffer> {
-    // Decode base64 string
-    const buffer = Buffer.from(base64Data, 'base64');
+  // async convertDocxToPdfBuffer(base64Data: string): Promise<Buffer> {
+  //   // Decode base64 string
+  //   const buffer = Buffer.from(base64Data, 'base64');
 
-    // Write buffer to temporary file
-    const tempFilePath = './temp.docx';
-    fs.writeFileSync(tempFilePath, buffer);
+  //   // Write buffer to temporary file
+  //   const tempFilePath = './temp.docx';
+  //   fs.writeFileSync(tempFilePath, buffer);
 
-    // Convert DOCX to HTML
-    const { value } = await mammoth.convertToHtml({ path: tempFilePath });
-    const htmlContent = value;
+  //   // Convert DOCX to HTML
+  //   const { value } = await mammoth.convertToHtml({ path: tempFilePath });
+  //   const htmlContent = value;
 
-    // Set options for html-pdf
-    const options: pdf.CreateOptions = {
-      format: 'Letter', // Set the PDF format (e.g., 'A4', 'Letter', etc.)
-      base: `file://${__dirname}/`, // Set the base path for local file references
-    };
+  //   // Set options for html-pdf
+  //   const options: pdf.CreateOptions = {
+  //     format: 'Letter', // Set the PDF format (e.g., 'A4', 'Letter', etc.)
+  //     base: `file://${__dirname}/`, // Set the base path for local file references
+  //   };
 
-    return new Promise<Buffer>((resolve, reject) => {
-      // Convert HTML to PDF
-      pdf.create(htmlContent, options).toBuffer((err, buffer) => {
-        if (err) {
-          reject(err);
-        } else {
-          // Remove temporary file
-          fs.unlinkSync(tempFilePath);
-          resolve(buffer);
-        }
-      });
+  //   return new Promise<Buffer>((resolve, reject) => {
+  //     // Convert HTML to PDF
+  //     pdf.create(htmlContent, options).toBuffer((err, buffer) => {
+  //       if (err) {
+  //         reject(err);
+  //       } else {
+  //         // Remove temporary file
+  //         fs.unlinkSync(tempFilePath);
+  //         resolve(buffer);
+  //       }
+  //     });
+  //   });
+  // }
+
+  async getPreviewPdf(id: number): Promise<Buffer> {
+    const cdogsToken = await this.ttlsService.callGetToken();
+    const documentTemplateObject = await this.documentTemplateService.findOne(id);
+
+    const bufferBase64 = documentTemplateObject.the_file;
+    const data = {};
+    const md = JSON.stringify({
+      data,
+      formatters:
+        '{"myFormatter":"_function_myFormatter|function(data) { return data.slice(1); }","myOtherFormatter":"_function_myOtherFormatter|function(data) {return data.slice(2);}"}',
+      options: {
+        cacheReport: false,
+        convertTo: 'pdf',
+        overwrite: true,
+        reportName: 'ticdi-report',
+      },
+      template: {
+        content: `${bufferBase64}`,
+        encodingType: 'base64',
+        fileType: 'docx',
+      },
     });
+
+    const conf = {
+      method: 'post',
+      url: process.env.cdogs_url,
+      headers: {
+        Authorization: `Bearer ${cdogsToken}`,
+        'Content-Type': 'application/json',
+      },
+      responseType: 'arraybuffer',
+      data: md,
+    };
+    const ax = require('axios');
+    const response = await ax(conf).catch((error) => {
+      console.log(error.response);
+    });
+    console.log('time - ' + Date.now());
+    return response.data;
   }
 }

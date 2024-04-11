@@ -25,6 +25,11 @@ export class ProvisionController {
     return this.provisionService.findAllVariables();
   }
 
+  @Get('variables-by-doc-type/:document_type_id')
+  findVariablesByDocType(@Param('document_type_id') document_type_id: number) {
+    return this.provisionService.findVariablesByDocType(+document_type_id);
+  }
+
   @Post('add')
   addProvision(
     @Body()

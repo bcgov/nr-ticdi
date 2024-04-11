@@ -124,6 +124,28 @@ export class ProvisionService {
     });
   }
 
+  async findVariablesByDocType(document_type_id: number): Promise<any[]> {
+    console.log('document_type_id: ' + document_type_id);
+    const variables = await this.provisionVariableRepository.find({
+      relations: ['provision'],
+    });
+    const documentTypeProvisions = await this.documentTypeProvisionRepository.find({
+      where: { associated: true },
+      relations: ['provision', 'document_type'],
+    });
+    const filteredDtps = documentTypeProvisions.filter((dtp) => dtp.document_type.id === document_type_id);
+    const docTypeProvisionIds = filteredDtps.map((dtp) => dtp.provision.id);
+    const associatedVariables = variables
+      .filter((variable) => docTypeProvisionIds.includes(variable.provision.id))
+      .map((variable) => {
+        return {
+          ...variable,
+          provision_id: variable.provision.id,
+        };
+      });
+    return associatedVariables;
+  }
+
   // old route to be deleted
   async getProvisionsByDocumentTypeId(document_type_id: number): Promise<Provision[]> {
     const provisions: Provision[] = await this.provisionRepository

@@ -15,7 +15,14 @@ export const getVariables = async (): Promise<Variable[]> => {
   const url = `${config.API_BASE_URL}/provision/variables`;
   const getParameters = api.generateApiParameters(url);
   const response: Variable[] = await api.get<Variable[]>(getParameters);
-  console.log('getVariables response');
+  return response;
+};
+
+export const getVariablesByDocType = async (document_type_id: number): Promise<Variable[]> => {
+  const url = `${config.API_BASE_URL}/provision/variables-by-doc-type/${document_type_id}`;
+  const getParameters = api.generateApiParameters(url);
+  const response: Variable[] = await api.get<Variable[]>(getParameters);
+  console.log('getVariablesByDocType response');
   console.log(response);
   return response;
 };

@@ -130,6 +130,18 @@ export type ProvisionVariableObject = {
   provision: Provision;
 };
 
+export type SimpleVariableObject = {
+  id: number;
+  variable_name: string;
+  variable_value: string;
+  help_text: string;
+  create_userid: string;
+  update_userid: string;
+  create_timestamp: string;
+  update_timestamp: string;
+  provision_id: number;
+};
+
 export type DocumentDataProvisionObject = {
   provision_free_text: string;
   id: number;

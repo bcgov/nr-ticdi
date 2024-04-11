@@ -398,7 +398,7 @@ export class DocumentDataService {
   }
 
   // helper function for getProvisionsByDocTypeIdAndDtid
-  async getDocumentDataVariables(document_type_id, dtid: number): Promise<DocumentDataVariable[]> {
+  async getDocumentDataVariables(document_type_id: number, dtid: number): Promise<DocumentDataVariable[]> {
     const documentData: DocumentData = await this.documentDataRepository.findOne({
       where: { dtid: dtid, document_type: { id: document_type_id } },
       relations: ['document_data_provisions'],

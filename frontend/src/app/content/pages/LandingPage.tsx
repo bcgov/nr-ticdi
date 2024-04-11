@@ -25,7 +25,7 @@ import { ProvisionJson, SaveProvisionData } from '../../components/table/reports
 import VariablesTable, { SaveVariableData, VariableJson } from '../../components/table/reports/VariablesTable';
 import { Alert, Button, Row } from 'react-bootstrap';
 import { getDocumentTypes } from '../../common/manage-doc-types';
-import { getVariables } from '../../common/manage-provisions';
+import { getVariables, getVariablesByDocType } from '../../common/manage-provisions';
 import { useDispatch, useSelector } from 'react-redux';
 import { setProvisionDataObjects, setSelectedProvisionIds } from '../../store/reducers/provisionSlice';
 import { setSelectedVariableIds, setVariables } from '../../store/reducers/variableSlice';
@@ -107,7 +107,7 @@ const LandingPage: FC = () => {
           const documentData: DocumentDataDTO = await getDocumentData(documentType.id, dtid);
           dispatch(setProvisionDataObjects(documentData?.provisions));
           dispatch(setSelectedProvisionIds(documentData?.preselectedProvisionIds));
-          const defaultVariables: Variable[] = await getVariables();
+          const defaultVariables: Variable[] = await getVariablesByDocType(documentType.id);
           const savedVariableInfo: SavedVariableInfo[] = documentData.savedVariableInfo;
           const variables: Variable[] = defaultVariables.map((defaultVar) => {
             const savedVar = savedVariableInfo.find((info) => info.variable_id === defaultVar.id);

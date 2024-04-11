@@ -282,7 +282,7 @@ const ManageDocumentProvisionsTable: React.FC<ManageDocumentProvisionsTableProps
     <DataTable
       columns={columns}
       data={filteredProvisions}
-      // paginationSetup={{ enabled: true, pageSize: 10 }}
+      paginationSetup={{ enabled: true, pageSize: 20 }}
       enableSorting={true}
       initialSorting={[
         { id: 'associated', desc: true },

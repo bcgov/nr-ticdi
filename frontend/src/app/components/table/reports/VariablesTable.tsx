@@ -49,7 +49,9 @@ const VariablesTable: React.FC<{ onVariableEdit: (variableId: number, newValue: 
   const columns: ColumnDef<Variable, any>[] = [
     columnHelper.accessor('variable_name', {
       id: 'variable_name',
-      cell: (info) => <input value={info.getValue()} className="readonlyInput" title={info.getValue()} readOnly />,
+      cell: (info) => (
+        <input value={info.getValue()} className="readonlyInput" title={info.getValue()} readOnly tabIndex={-1} />
+      ),
       header: () => 'Variable',
       enableSorting: true,
       meta: { customCss: { width: '28%' } },
@@ -69,7 +71,9 @@ const VariablesTable: React.FC<{ onVariableEdit: (variableId: number, newValue: 
     }),
     columnHelper.accessor('help_text', {
       id: 'help_text',
-      cell: (info) => <input value={info.getValue()} className="readonlyInput" title={info.getValue()} readOnly />,
+      cell: (info) => (
+        <input value={info.getValue()} className="readonlyInput" title={info.getValue()} readOnly tabIndex={-1} />
+      ),
       header: () => 'Help',
       enableSorting: false,
       meta: { customCss: { width: '36%' } },

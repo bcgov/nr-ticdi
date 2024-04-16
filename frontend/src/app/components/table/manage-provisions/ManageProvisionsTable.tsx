@@ -157,7 +157,7 @@ const ManageProvisionsTable: React.FC<ManageProvisionsTableProps> = ({
       <DataTable
         columns={columns}
         data={allProvisions}
-        // paginationSetup={{ enabled: true, pageSize: 10 }}
+        paginationSetup={{ enabled: true, pageSize: 20 }}
         enableSorting={true}
         initialSorting={[
           // { id: 'provision_group', desc: false },

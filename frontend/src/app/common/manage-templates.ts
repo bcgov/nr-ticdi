@@ -54,7 +54,7 @@ export const disableProvision = async (provisionId: number): Promise<void> => {
   console.log(response);
 };
 
-export const previewTemplate = async (id: number, fileName: string): Promise<Blob | null>=> {
+export const previewTemplate = async (id: number, fileName: string): Promise<Blob | null> => {
   const url = `${config.API_BASE_URL}/admin/preview-template/${id}`;
   const response = await api.handleFilePreviewGet(url, fileName);
   if (response) {

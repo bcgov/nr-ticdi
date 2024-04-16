@@ -1,6 +1,6 @@
 export interface DTR {
-  dtid: number;
-  fileNum: string;
+  dtid: number | null;
+  fileNum: string | null;
   orgUnit: string | null;
   complexLevel: string | null;
   purpose: string | null;
@@ -75,8 +75,8 @@ export interface TenantAddressResource {
  */
 export interface DTRDisplayObject {
   // Basic Info
-  dtid: number;
-  fileNum: string;
+  dtid: number | null;
+  fileNum: string | null;
   primaryContactName: string; // from tenantAddr
   // DTID Details
   contactName: string;
@@ -128,6 +128,18 @@ export type ProvisionVariableObject = {
   create_timestamp: string;
   update_timestamp: string;
   provision: Provision;
+};
+
+export type SimpleVariableObject = {
+  id: number;
+  variable_name: string;
+  variable_value: string;
+  help_text: string;
+  create_userid: string;
+  update_userid: string;
+  create_timestamp: string;
+  update_timestamp: string;
+  provision_id: number;
 };
 
 export type DocumentDataProvisionObject = {
@@ -347,4 +359,16 @@ export type ReducedProvisionDataObject = {
   update_userid: string;
   update_timestamp: string;
   provision_group: ProvisionGroup;
+};
+
+export type VariableData = {
+  id: number;
+  variable_name: string;
+  variable_value: string;
+  help_text: string;
+  create_userid: string;
+  update_userid: string;
+  create_timestamp: string;
+  update_timestamp: string;
+  provision: Provision;
 };

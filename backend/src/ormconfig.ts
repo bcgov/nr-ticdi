@@ -11,7 +11,7 @@ import { ProvisionVariable } from './provision/entities/provision_variable.entit
 import { DocumentTypeProvision } from './provision/entities/document_type_provision';
 
 const config: TypeOrmModuleOptions = {
-  logging: true,
+  logging: ['error'],
   type: 'postgres',
   host: process.env.POSTGRESQL_HOST || 'localhost',
   port: 5432,
@@ -30,7 +30,7 @@ const config: TypeOrmModuleOptions = {
     DocumentType,
     DocumentTypeProvision,
   ],
-  synchronize: true,
+  synchronize: false,
 };
 
 export default config;

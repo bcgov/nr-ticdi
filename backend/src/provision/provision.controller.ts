@@ -25,6 +25,11 @@ export class ProvisionController {
     return this.provisionService.findAllVariables();
   }
 
+  @Get('variables-by-doc-type/:document_type_id')
+  findVariablesByDocType(@Param('document_type_id') document_type_id: number) {
+    return this.provisionService.findVariablesByDocType(+document_type_id);
+  }
+
   @Post('add')
   addProvision(
     @Body()
@@ -149,10 +154,6 @@ export class ProvisionController {
 
   @Post('update-manage-doc-type-provisions')
   updateManageDocTypeProvisions(@Body() data: { document_type_id: number; provisions: ManageDocTypeProvision[] }) {
-    console.log('~~~~~~');
-    console.log(data.document_type_id);
-    console.log(data.provisions);
-    console.log('~~~~~~');
     return this.provisionService.updateManageDocTypeProvisions(data.document_type_id, data.provisions);
   }
 }

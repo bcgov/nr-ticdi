@@ -14,7 +14,7 @@ import {
   Param,
   Res,
 } from '@nestjs/common';
-import { ExportDataObject, SessionData, UserObject } from 'src/types';
+import { ExportDataObject, IdirObject, SessionData, UserObject } from 'src/types';
 import { AxiosRequestConfig } from 'axios';
 import { AdminService } from './admin.service';
 import { AuthenticationFilter } from 'src/authentication/authentication.filter';
@@ -23,6 +23,7 @@ import { AdminGuard } from './admin.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Express } from 'express';
 import * as stream from 'stream';
+import { User } from 'src/auth/decorators/user.decorator';
 
 let requestUrl: string;
 let requestConfig: AxiosRequestConfig;
@@ -45,18 +46,13 @@ export class AdminController {
 
   @Get('activate-template/:id/:document_type_id')
   async activateTemplate(
-    @Session() session: { data?: SessionData },
+    @User() user: IdirObject,
     @Param('id') id: number,
     @Param('document_type_id') document_type_id: number
   ) {
-    const update_userid = session?.data?.activeAccount
-      ? session.data.activeAccount.idir_username
-        ? session.data.activeAccount.idir_username
-        : ''
-      : '';
     return this.adminService.activateTemplate({
       id: id,
-      update_userid: update_userid,
+      update_userid: user.idir_username,
       document_type_id: document_type_id,
     });
   }
@@ -100,7 +96,7 @@ export class AdminController {
   @Post('upload-template')
   @UseInterceptors(FileInterceptor('file'))
   async uploadTemplate2(
-    @Session() session: { data?: SessionData },
+    @User() user: IdirObject,
     @UploadedFile(
       new ParseFilePipe({
         validators: [
@@ -118,16 +114,9 @@ export class AdminController {
       template_name: string;
     }
   ) {
-    const create_userid = session?.data?.activeAccount
-      ? session.data.activeAccount.idir_username
-        ? session.data.activeAccount.idir_username
-        : ''
-      : '';
-    const template_author = session?.data?.activeAccount
-      ? session.data.activeAccount.name
-        ? session.data.activeAccount.name
-        : ''
-      : '';
+    const create_userid = user && user.idir_username ? user.idir_username : '';
+    const template_author =
+      user && user.given_name && user.family_name ? `${user.family_name}, ${user.given_name}` : '';
     const uploadData = {
       document_type_id: params.document_type_id,
       active_flag: false,
@@ -151,7 +140,6 @@ export class AdminController {
 
   @Get('get-export-data')
   getExportData(): Promise<string> {
-    console.log('here')
     return this.adminService.getExportData();
   }
 
@@ -188,11 +176,6 @@ export class AdminController {
     return this.adminService.removeAdmin(input.idirUsername);
   }
 
-  @Get('open-document/:document_id')
-  setSessionDocument(@Session() session: { data?: SessionData }, @Param('document_id') documentId: number): void {
-    session.data.selected_document = { document_id: documentId };
-  }
-
   @Get('get-templates/:document_type_id')
   getDocumentTemplates(@Param('document_type_id') document_type_id: number): any {
     return this.adminService.getDocumentTemplates(document_type_id);
@@ -219,16 +202,8 @@ export class AdminController {
   }
 
   @Post('add-document-type')
-  addDocumentType(
-    @Session() session: { data?: SessionData },
-    @Body() data: { name: string; created_by: string; created_date: string }
-  ) {
-    const create_userid = session?.data?.activeAccount
-      ? session.data.activeAccount.idir_username
-        ? session.data.activeAccount.idir_username
-        : ''
-      : '';
-    return this.adminService.addDocumentType(data.name, data.created_by, data.created_date, create_userid);
+  addDocumentType(@User() user: IdirObject, @Body() data: { name: string; created_by: string; created_date: string }) {
+    return this.adminService.addDocumentType(data.name, data.created_by, data.created_date, user.idir_username);
   }
 
   @Get('remove-document-type/:id')

@@ -13,16 +13,13 @@ import { ReportService } from './report/report.service';
 import { nfrInterestedParties } from 'src/util';
 import { JwtAuthGuard } from './auth/jwtauth.guard';
 
-//
+// unused, to be cleaned up
 let requestUrl: string;
 let requestConfig: AxiosRequestConfig;
 
 @Controller()
 export class AppController {
-  constructor(
-    private readonly reportService: ReportService,
-    private readonly ttlsService: TTLSService
-  ) {
+  constructor(private readonly reportService: ReportService, private readonly ttlsService: TTLSService) {
     const hostname = process.env.backend_url ? process.env.backend_url : `http://localhost`;
     const port = process.env.backend_url ? 3000 : 3001;
     requestUrl = `${hostname}:${port}/document-template/`;
@@ -35,8 +32,8 @@ export class AppController {
 
   @Get()
   @Render('index')
-//  @UseFilters(AuthenticationFilter)
-//  @UseGuards(AuthenticationGuard)
+  //  @UseFilters(AuthenticationFilter)
+  //  @UseGuards(AuthenticationGuard)
   @UseGuards(JwtAuthGuard)
   async root(@Session() session: { data?: SessionData }) {
     let isAdmin = false;
@@ -67,8 +64,8 @@ export class AppController {
    * @returns
    */
   @Get('dtid/:dtid/:documentType')
-//  @UseFilters(AuthenticationFilter)
-//  @UseGuards(AuthenticationGuard)
+  //  @UseFilters(AuthenticationFilter)
+  //  @UseGuards(AuthenticationGuard)
   @UseGuards(JwtAuthGuard)
   async reportPage(
     @Session() session: { data?: SessionData },
@@ -98,8 +95,8 @@ export class AppController {
    * @returns
    */
   @Get('dtid/:dtid')
-//  @UseFilters(AuthenticationFilter)
-//  @UseGuards(AuthenticationGuard)
+  //  @UseFilters(AuthenticationFilter)
+  //  @UseGuards(AuthenticationGuard)
   @UseGuards(JwtAuthGuard)
   async landUserReportRedirect(
     @Session() session: { data?: SessionData },
@@ -110,8 +107,8 @@ export class AppController {
     return this.landUseReportPage(session, dtid, req, res);
   }
 
-//  @UseFilters(AuthenticationFilter)
-//  @UseGuards(AuthenticationGuard)
+  //  @UseFilters(AuthenticationFilter)
+  //  @UseGuards(AuthenticationGuard)
   @UseGuards(JwtAuthGuard)
   async landUseReportPage(
     @Session() session: { data?: SessionData },
@@ -177,8 +174,8 @@ export class AppController {
 
   @Get('system-admin')
   @Render('system-admin')
-//  @UseFilters(AuthenticationFilter)
-//  @UseGuards(AuthenticationGuard)
+  //  @UseFilters(AuthenticationFilter)
+  //  @UseGuards(AuthenticationGuard)
   @UseGuards(JwtAuthGuard)
   @UseGuards(AdminGuard)
   async systemAdminPage(@Session() session: { data?: SessionData }) {
@@ -207,8 +204,8 @@ export class AppController {
 
   @Get('manage-templates')
   @Render('manage-templates')
-//  @UseFilters(AuthenticationFilter)
-//  @UseGuards(AuthenticationGuard)
+  //  @UseFilters(AuthenticationFilter)
+  //  @UseGuards(AuthenticationGuard)
   @UseGuards(AdminGuard)
   @UseGuards(JwtAuthGuard)
   async adminPage(@Session() session: { data?: SessionData }, @Query('report') reportIndex) {
@@ -241,8 +238,8 @@ export class AppController {
 
   @Get('search')
   @Render('search')
-//  @UseFilters(AuthenticationFilter)
-//  @UseGuards(AuthenticationGuard)
+  //  @UseFilters(AuthenticationFilter)
+  //  @UseGuards(AuthenticationGuard)
   @UseGuards(JwtAuthGuard)
   async searchPage(@Session() session: { data?: SessionData }) {
     let isAdmin = false;
@@ -265,8 +262,8 @@ export class AppController {
 
   @Get('/nfr/dtid/:dtid')
   @Render('nfr')
-//  @UseFilters(AuthenticationFilter)
-//  @UseGuards(AuthenticationGuard)
+  //  @UseFilters(AuthenticationFilter)
+  //  @UseGuards(AuthenticationGuard)
   @UseGuards(JwtAuthGuard)
   redirectNFR(@Res() res: Response, @Param('dtid') dtid: number) {
     res.redirect(`/nfr/dtid/${dtid}/${encodeURI(NFR_VARIANTS.default)}`);
@@ -275,8 +272,8 @@ export class AppController {
 
   @Get('/404')
   @Render('404')
-//  @UseFilters(AuthenticationFilter)
-//  @UseGuards(AuthenticationGuard)
+  //  @UseFilters(AuthenticationFilter)
+  //  @UseGuards(AuthenticationGuard)
   @UseGuards(JwtAuthGuard)
   notFound(@Session() session: { data?: SessionData }) {
     let isAdmin = false;

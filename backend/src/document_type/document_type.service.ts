@@ -75,7 +75,6 @@ export class DocumentTypeService {
     const provisionGroups = await this.provisionGroupRepository.find({
       relations: ['document_type'],
     });
-    console.log('pgs');
     return provisionGroups.sort((a, b) => a.provision_group - b.provision_group);
   }
 

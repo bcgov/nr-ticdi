@@ -3,7 +3,6 @@ import {
   Controller,
   StreamableFile,
   Header,
-  Session,
   Body,
   Post,
   Param,
@@ -12,7 +11,7 @@ import {
   HttpException,
   HttpStatus,
 } from '@nestjs/common';
-import { ProvisionJSON, SessionData, VariableJSON } from 'src/types';
+import { IdirObject, ProvisionJSON, VariableJSON } from 'src/types';
 import { TTLSService } from '../ttls/ttls.service';
 import { AxiosRequestConfig } from 'axios';
 import { AuthenticationFilter } from 'src/authentication/authentication.filter';
@@ -20,6 +19,7 @@ import { AuthenticationGuard } from 'src/authentication/authentication.guard';
 import { GenerateReportGuard } from 'src/authentication/generate-report.guard';
 import { ReportService } from './report.service';
 import { firstValueFrom } from 'rxjs';
+import { User } from 'src/auth/decorators/user.decorator';
 
 let requestUrl: string;
 let requestConfig: AxiosRequestConfig;
@@ -42,7 +42,7 @@ export class ReportController {
 
   // Gets data from ttls route for displaying on report page
   @Get('get-data/:dtid')
-  async getData(@Session() session: { data?: SessionData }, @Param('dtid') dtid: number) {
+  async getData(@Param('dtid') dtid: number) {
     await this.ttlsService.setWebadeToken();
     const response: any = await firstValueFrom(this.ttlsService.callHttp(dtid))
       .then((res) => {
@@ -59,11 +59,7 @@ export class ReportController {
   }
 
   @Get('get-document-data/:document_type_id/:dtid')
-  getDocumentDataByDocTypeIdAndDtid(
-    @Session() session: { data?: SessionData },
-    @Param('document_type_id') document_type_id: number,
-    @Param('dtid') dtid: number
-  ) {
+  getDocumentDataByDocTypeIdAndDtid(@Param('document_type_id') document_type_id: number, @Param('dtid') dtid: number) {
     return this.reportService.getDocumentDataByDocTypeIdAndDtid(document_type_id, dtid);
   }
 
@@ -81,7 +77,7 @@ export class ReportController {
   @Header('Content-Type', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document')
   @Header('Content-Disposition', 'attachment; filename=report.docx')
   async generateReport(
-    @Session() session: { data: SessionData },
+    @User() user: IdirObject,
     @Body()
     data: {
       dtid: number;
@@ -90,15 +86,8 @@ export class ReportController {
       provisionJson: ProvisionJSON[];
     }
   ) {
-    let idir_username = '';
-    let idir_full_name = '';
-    if (session?.data?.activeAccount) {
-      idir_username = session?.data?.activeAccount.idir_username;
-      idir_full_name = session?.data?.activeAccount.full_name;
-      console.log('active account found');
-    } else {
-      console.log('no active account found');
-    }
+    const idir_username = user && user.idir_username ? user.idir_username : '';
+    const idir_full_name = user && user.given_name && user.family_name ? `${user.family_name}, ${user.given_name}` : '';
     return new StreamableFile(
       await this.reportService.generateReport(
         data.dtid,
@@ -135,13 +124,12 @@ export class ReportController {
     @Param('dtid') dtid: number
   ) {
     const variables = await this.reportService.getDocumentVariablesByDocumentTypeIdAndDtid(document_type_id, dtid);
-    console.log(variables);
     return variables;
   }
 
   @Post('save-document')
   saveDocument(
-    @Session() session: { data: SessionData },
+    @User() user: IdirObject,
     @Body()
     data: {
       dtid: number;
@@ -151,13 +139,7 @@ export class ReportController {
       variableArray: VariableJSON[];
     }
   ) {
-    let idir_username = '';
-    if (session?.data?.activeAccount) {
-      idir_username = session?.data?.activeAccount.idir_username;
-      console.log('active account found');
-    } else {
-      console.log('no active account found');
-    }
+    let idir_username = user && user.idir_username ? user.idir_username : '';
     return this.reportService.saveDocument(
       data.dtid,
       data.document_type_id,

@@ -39,7 +39,6 @@ export class DocumentDataService {
     provisionArray: { provision_id: number; doc_type_provision_id: number }[],
     variableArray: { variable_id: number; variable_value: string }[]
   ): Promise<DocumentData> {
-    console.log(variableArray);
     const { dtid } = documentDataDto;
     const documentData: DocumentData = await this.documentDataRepository.findOne({
       where: { dtid: dtid, document_type: { id: document_type_id } },

@@ -800,7 +800,6 @@ export class ReportService {
         fileType: 'docx',
       },
     };
-    console.log(cdogsData);
     const md = JSON.stringify(cdogsData);
 
     let conf = {
@@ -1143,13 +1142,8 @@ export class ReportService {
         },
       ]),
     }; // parse out the rawData, variableJson, and provisionJson into something useable
-    // Shiv Satya
-    console.log('first log:::::::::::::::::');
-    console.log(ttlsData);
     // combine the formatted TTLS data, variables, and provision sections
     const data = Object.assign({}, ttlsData, variables, showProvisionSections);
-    console.log('Second log:::::::::::::::::');
-    console.log(data);
     // Save the NFR Data
     const provisionSaveData = provisionJson.map((provision) => {
       return { provision_id: provision.provision_id, doc_type_provision_id: provision.doc_type_provision_id };

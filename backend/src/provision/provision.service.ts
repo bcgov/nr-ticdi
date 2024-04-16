@@ -70,7 +70,6 @@ export class ProvisionService {
       ...variable,
       provision: provision,
     });
-    console.log(newVariable);
     return this.provisionVariableRepository.save(newVariable);
   }
 
@@ -125,7 +124,6 @@ export class ProvisionService {
   }
 
   async findVariablesByDocType(document_type_id: number): Promise<any[]> {
-    console.log('document_type_id: ' + document_type_id);
     const variables = await this.provisionVariableRepository.find({
       relations: ['provision'],
     });
@@ -249,20 +247,17 @@ export class ProvisionService {
 
   async getManageDocTypeProvisions(document_type_id: number) {
     const provisions: Provision[] = await this.findAll();
-    console.log(provisions);
     // get all docTypeProvisions with provision_group relation
     const docTypeProvisions = await this.documentTypeProvisionRepository.find({
       where: { document_type: { id: document_type_id } },
       relations: ['provision_group', 'provision'],
     });
-    console.log(docTypeProvisions);
     // get provisions which are associated with the document type
     const associatedProvisions = await this.documentTypeProvisionRepository.find({
       where: { document_type: { id: document_type_id } },
     });
-    console.log(associatedProvisions);
     // map them to a more readable format
-    const associatedProvisionIds = associatedProvisions.map((raw) => raw.id);
+    const associatedProvisionIds = associatedProvisions.map((raw) => raw.id); // ?
     // map 'docTypeProvisions' to include a variable called 'associated' which is true or false
     const managedProvisions: ManageDocTypeProvision[] = docTypeProvisions.map((docTypeProvision) => ({
       id: docTypeProvision.id,

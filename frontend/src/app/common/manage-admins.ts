@@ -33,11 +33,8 @@ export async function getAdminData(): Promise<AdminData[]> {
  * @param documentDescription
  */
 export async function exportUsers(): Promise<void> {
-  console.log(1)
   const reportUrl: string = `${config.API_BASE_URL}/admin/get-export-data`;
-  console.log(2, reportUrl)
   const reportName: string = `user_list-${getDateTimeForFileName()}.csv`;
-  console.log(3, reportName)
   api.handleFileDownloadGet(reportUrl, reportName);
 }
 

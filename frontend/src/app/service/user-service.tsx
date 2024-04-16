@@ -8,11 +8,11 @@ export const AUTH_TOKEN = "__auth_token";
  * @param onAuthenticatedCallback
  */
 const initKeycloak = (onAuthenticatedCallback: () => void) => {
-  console.log("initKeycloak");
   _kc
     .init({
       onLoad: "login-required",
       pkceMethod: "S256",
+      checkLoginIframe: false,
     })
     .then((authenticated) => {
       if (!authenticated) {
@@ -45,7 +45,7 @@ const updateToken = (
   successCallback:
     | ((value: boolean) => boolean | PromiseLike<boolean>)
     | null
-    | undefined
+    | undefined,
 ) => _kc.updateToken(5).then(successCallback).catch(doLogin);
 
 const getUsername = () => _kc.tokenParsed?.display_name;
@@ -58,6 +58,7 @@ const getUsername = () => _kc.tokenParsed?.display_name;
 const hasRole = (roles: any) => {
   const jwt = _kc.tokenParsed;
   const userroles = jwt?.client_roles;
+
   const includesRoles =
     typeof roles === "string"
       ? userroles?.includes(roles)

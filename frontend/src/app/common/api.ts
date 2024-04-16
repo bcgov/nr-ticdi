@@ -83,7 +83,7 @@ const fileDownloadGet = <T, M = {}>(parameters: ApiRequestParameters<M>): Promis
     const { url, requiresAuthentication } = parameters;
 
     if (requiresAuthentication) {
-      axios.defaults.headers.common['Authorization'] = `Bearer ${localStorage.getItem('AUTH_TOKEN')}`;
+      axios.defaults.headers.common['Authorization'] = `Bearer ${localStorage.getItem(AUTH_TOKEN)}`;
     }
 
     axios
@@ -152,6 +152,8 @@ export const handleFilePreviewGet = async (url: string, filename: string): Promi
  */
 export const handleFileDownloadGet = async (url: string, filename: string) => {
   const getParameters = generateApiParameters(url);
+
+  console.log(getParameters)
 
   await fileDownloadGet<Blob>(getParameters)
     .then(async (blob) => {
@@ -270,7 +272,7 @@ export const putFile = <T, M = {}>(parameters: ApiRequestParameters<M>, headers:
 export const generateApiParameters = <T = {}>(
   url: string,
   params?: T,
-  requiresAuthentication: boolean = false
+  requiresAuthentication: boolean = true
 ): ApiRequestParameters<T> => {
   let result = {
     url,

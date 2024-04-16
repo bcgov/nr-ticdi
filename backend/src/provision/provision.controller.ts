@@ -1,7 +1,8 @@
-import { Body, Controller, Get, Param, Post, Session } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { CreateProvisionDto } from './dto/create-provision.dto';
 import { ProvisionService } from './provision.service';
-import { ManageDocTypeProvision, SessionData } from 'src/types';
+import { IdirObject, ManageDocTypeProvision } from 'src/types';
+import { User } from 'src/auth/decorators/user.decorator';
 
 @Controller('provision')
 export class ProvisionController {
@@ -39,9 +40,9 @@ export class ProvisionController {
       help_text: string;
       category: string;
     },
-    @Session() session: { data?: SessionData }
+    @User() user: IdirObject
   ) {
-    const create_userid = session?.data?.activeAccount.idir_username;
+    const create_userid = user.idir_username;
     return this.provisionService.create({ ...provisionParams, create_userid });
   }
 
@@ -55,9 +56,9 @@ export class ProvisionController {
       help_text: string;
       category: string;
     },
-    @Session() session: { data?: SessionData }
+    @User() user: IdirObject
   ) {
-    const update_userid = session?.data?.activeAccount.idir_username;
+    const update_userid = user.idir_username;
     const { id, ...paramsMinusId } = provisionParams;
     return this.provisionService.update(id, {
       ...paramsMinusId,
@@ -79,9 +80,9 @@ export class ProvisionController {
       help_text: string;
       provision_id: number;
     },
-    @Session() session: { data?: SessionData }
+    @User() user: IdirObject
   ) {
-    const create_userid = session?.data?.activeAccount.idir_username;
+    const create_userid = user.idir_username;
     return this.provisionService.addVariable({ ...variable, create_userid });
   }
 
@@ -95,9 +96,9 @@ export class ProvisionController {
       provision_id: number;
       id: number;
     },
-    @Session() session: { data?: SessionData }
+    @User() user: IdirObject
   ) {
-    const update_userid = session?.data?.activeAccount.idir_username;
+    const update_userid = user.idir_username;
     return this.provisionService.updateVariable({ ...variable, update_userid });
   }
 
@@ -135,7 +136,6 @@ export class ProvisionController {
 
   @Get('get-manage-doc-type-provisions/:id')
   getManageDocTypeProvisions(@Param('id') document_type_id: number) {
-    console.log('getManageDocTypeProvisions');
     return this.provisionService.getManageDocTypeProvisions(document_type_id);
   }
 

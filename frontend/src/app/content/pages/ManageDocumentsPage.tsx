@@ -19,31 +19,14 @@ import EditDocTypeTable from '../../components/table/manage-doc-types/EditDocTyp
 import DocumentProvisionSearch, {
   DocumentProvisionSearchState,
 } from '../../components/common/manage-doc-types/DocumentProvisionSearch';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from '../../store/store';
+import { setDocType } from '../../store/reducers/docTypeSlice';
 
 const ManageDocumentsPage: FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [showMain, setShowMain] = useState<boolean>(true);
   const [showEdit, setShowEdit] = useState<boolean>(false);
-  const [currentDocType, setCurrentDocType] = useState<DocType>({
-    id: -1,
-    name: '',
-    created_by: '',
-    created_date: '',
-    create_userid: '',
-    create_timestamp: '',
-    update_timestamp: '',
-    update_userid: '',
-  });
-  const [updatedDocType, setUpdatedDocType] = useState<DocType>({
-    id: -1,
-    name: '',
-    created_by: '',
-    created_date: '',
-    create_userid: '',
-    create_timestamp: '',
-    update_timestamp: '',
-    update_userid: '',
-  });
   const [allDocTypes, setAllDocTypes] = useState<DocType[]>([]);
   const [provisionGroups, setProvisionGroups] = useState<ProvisionGroup[]>([]);
   const [provisions, setProvisions] = useState<ManageDocTypeProvision[]>([]);
@@ -67,20 +50,30 @@ const ManageDocumentsPage: FC = () => {
     isAdvancedSearch: false,
   });
 
+  const dispatch = useDispatch();
+  const { selectedDocType, updatedDocType } = useSelector((state: RootState) => state.docType);
+
   useEffect(() => {
     const getData = async () => {
-      const docTypeData = await getDocumentTypes();
-      setAllDocTypes(docTypeData);
+      setLoading(true);
+      try {
+        const docTypeData = await getDocumentTypes();
+        setAllDocTypes(docTypeData);
+      } catch (error) {
+        console.log('Failed to fetch document types');
+      } finally {
+        setLoading(false);
+      }
     };
     getData();
   }, [refreshDocTypesTrigger]);
 
   useEffect(() => {
     const getData = async () => {
-      if (currentDocType.id !== -1) {
-        const groupData = await getGroupMaxByDocTypeId(currentDocType.id);
+      if (selectedDocType.id !== -1) {
+        const groupData = await getGroupMaxByDocTypeId(selectedDocType.id);
         setProvisionGroups(groupData);
-        const provisionData = await getManageDocumentTypeProvisions(currentDocType.id);
+        const provisionData = await getManageDocumentTypeProvisions(selectedDocType.id);
         setProvisions(provisionData);
       } else {
         setProvisionGroups([]);
@@ -88,11 +81,11 @@ const ManageDocumentsPage: FC = () => {
       }
     };
     getData();
-  }, [refreshTrigger, currentDocType]);
+  }, [refreshTrigger, selectedDocType]);
 
-  useEffect(() => {
-    setUpdatedDocType(currentDocType);
-  }, [currentDocType]);
+  // useEffect(() => {
+  //   setUpdatedDocType(selectedDocType);
+  // }, [selectedDocType]);
 
   useEffect(() => {
     setUpdatedProvisions(provisions);
@@ -107,9 +100,11 @@ const ManageDocumentsPage: FC = () => {
   };
 
   const showEditPage = (id: number) => {
-    const selectedDocType = allDocTypes.find((docType) => docType.id === id);
-    if (selectedDocType) {
-      setCurrentDocType(selectedDocType);
+    // const selectedDocType = allDocTypes.find((docType) => docType.id === id);
+    const newSelectedDocType = allDocTypes.find((docType) => docType.id === id);
+    if (newSelectedDocType) {
+      dispatch(setDocType(newSelectedDocType));
+      // setselectedDocType(selectedDocType);
       setShowMain(false);
       setShowEdit(true);
     }
@@ -126,34 +121,36 @@ const ManageDocumentsPage: FC = () => {
 
   const addDocTypeHandler = async (name: string, created_by: string, created_date: string) => {
     try {
+      setLoading(true);
       await addDocType(name, created_by, created_date);
       refreshDocTypes();
     } catch (err) {
       console.log('Error adding doc type');
       console.log(err);
+    } finally {
+      setLoading(false);
     }
   };
 
   const openRemoveDocTypeModal = (id: number) => {
-    const selectedDocType = allDocTypes.find((docType) => docType.id === id);
-    if (selectedDocType) {
-      setCurrentDocType(selectedDocType);
+    const newSelectedDocType = allDocTypes.find((docType) => docType.id === id);
+    if (newSelectedDocType) {
+      dispatch(setDocType(newSelectedDocType));
       setShowRemoveDocTypeModal(true);
     }
   };
 
   const removeDocTypeHandler = async (id: number) => {
     try {
+      setLoading(true);
       await removeDocType(id);
       refreshDocTypes();
     } catch (err) {
       console.log('Error removing doc type');
       console.log(err);
+    } finally {
+      setLoading(false);
     }
-  };
-
-  const handleUpdateDocTypeState = (updatedDocType: DocType) => {
-    setUpdatedDocType(updatedDocType);
   };
 
   const updateProvisionsState = (newProvisionsState: ManageDocTypeProvision[]) => {
@@ -161,17 +158,21 @@ const ManageDocumentsPage: FC = () => {
   };
 
   const saveButtonHandler = async () => {
-    await saveDocType();
-    await saveProvisions();
+    try {
+      await saveDocType();
+      await saveProvisions();
+    } catch (err) {
+      console.log('Error when saving');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const saveDocType = async () => {
     try {
       setLoading(true);
-      console.log('Saving Doc Type...');
-      // console.log(updatedDocType);
       await updateDocType(
-        currentDocType.id,
+        selectedDocType.id,
         updatedDocType.name,
         updatedDocType.created_by,
         updatedDocType.created_date
@@ -180,6 +181,8 @@ const ManageDocumentsPage: FC = () => {
     } catch (err) {
       console.log('Error saving doc type');
       console.log(err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -187,7 +190,7 @@ const ManageDocumentsPage: FC = () => {
     try {
       setLoading(true);
       console.log('Saving Provisions...');
-      await updateManageDocTypeProvisions(currentDocType.id, updatedProvisions);
+      await updateManageDocTypeProvisions(selectedDocType.id, updatedProvisions);
     } catch (err) {
       console.log('Error updating provisions');
       console.log(err);
@@ -199,6 +202,7 @@ const ManageDocumentsPage: FC = () => {
   const setSearchStateHandler = (searchState: DocumentProvisionSearchState) => {
     setSearchState(searchState);
   };
+  console.log('re-render');
 
   return (
     <>
@@ -221,9 +225,9 @@ const ManageDocumentsPage: FC = () => {
             onAdd={addDocTypeHandler}
           />
 
-          {currentDocType && (
+          {selectedDocType && (
             <RemoveDocTypeModal
-              documentType={currentDocType}
+              documentType={selectedDocType}
               show={showRemoveDocTypeModal}
               onHide={() => setShowRemoveDocTypeModal(false)}
               onRemove={removeDocTypeHandler}
@@ -233,13 +237,13 @@ const ManageDocumentsPage: FC = () => {
       )}
       {showEdit && (
         <>
-          <h1>Edit Document Type - {currentDocType.name}</h1>
+          <h1>Edit Document Type - {selectedDocType.name}</h1>
           <hr />
           {/** Doc Type info / edit single row table */}
           {/** Document Type Name - Date Created - Created By - Last Updated Date - Last Updated By */}
-          <EditDocTypeTable documentType={[currentDocType]} onUpdate={handleUpdateDocTypeState} />
+          <EditDocTypeTable documentType={[]} onUpdate={() => {}} />
           <hr />
-          <h1>Associate Provisions to {currentDocType.name}</h1>
+          <h1>Associate Provisions to {selectedDocType.name}</h1>
           <hr />
           {/** Search implementation */}
           {/** Advanced Search: different inputs - id, type, group, free text, category */}
@@ -255,7 +259,7 @@ const ManageDocumentsPage: FC = () => {
 
           {/** Global Provisions table */}
           <ManageDocumentProvisionsTable
-            documentTypeId={currentDocType.id}
+            documentTypeId={selectedDocType.id}
             provisions={provisions}
             provisionGroups={provisionGroups}
             searchState={searchState}
@@ -265,7 +269,7 @@ const ManageDocumentsPage: FC = () => {
           {/** ID - Type - Group - Seq - Max - Provision Name - Free Text - Category - Associated */}
           <EditProvisionGroupsModal
             provisionGroups={provisionGroups}
-            documentTypeId={currentDocType.id}
+            documentTypeId={selectedDocType.id}
             show={showEditProvisionGroupsModal}
             refreshTables={refreshTables}
             onHide={() => setShowEditProvisionGroupsModal(false)}

@@ -3,59 +3,39 @@ import { DataTable } from '../common/DataTable';
 import { DocType } from '../../../types/types';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-import { format } from 'date-fns';
-import { ColumnDef, Row, createColumnHelper } from '@tanstack/react-table';
+import { toZonedTime, format as tzFormat } from 'date-fns-tz';
+import { ColumnDef, createColumnHelper } from '@tanstack/react-table';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from '../../../store/store';
+import { setUpdatedDocType } from '../../../store/reducers/docTypeSlice';
 
 interface EditDocTypeTableProps {
   documentType: DocType[];
   onUpdate: (documentType: DocType) => void;
 }
 
-const EditDocTypeTable: FC<EditDocTypeTableProps> = ({ documentType, onUpdate }) => {
-  const [updatedDocType, setUpdatedDocType] = useState(documentType[0]);
-
-  useEffect(() => {
-    onUpdate(updatedDocType);
-  }, [updatedDocType, onUpdate]);
-
-  const handleCellUpdate = (columnId: string, newValue: any) => {
-    setUpdatedDocType((prev) => ({
-      ...prev,
-      [columnId]: newValue,
-    }));
-  };
+const EditDocTypeTable: FC<EditDocTypeTableProps> = ({}) => {
+  const { updatedDocType } = useSelector((state: RootState) => state.docType);
 
   const columnHelper = createColumnHelper<DocType>();
-
   const columns: ColumnDef<DocType, any>[] = [
     columnHelper.accessor('name', {
       id: 'name',
-      cell: (info) => (
-        <TableCell getValue={info.getValue} row={info.row} columnId={info.column.id} onCellUpdate={handleCellUpdate} />
-      ),
+      cell: (info) => <TableCell getValue={info.getValue} columnId={info.column.id} />,
       header: () => 'Document Type Name',
       enableSorting: false,
       meta: { customCss: { width: '20%' }, type: 'text' },
     }),
     columnHelper.accessor('created_date', {
       id: 'created_date',
-      cell: (info) => (
-        <DateTableCell
-          getValue={info.getValue}
-          row={info.row}
-          columnId={info.column.id}
-          onCellUpdate={handleCellUpdate}
-        />
-      ),
+      cell: (info) => <DateTableCell getValue={info.getValue} columnId={info.column.id} />,
       header: () => 'Date Created',
       enableSorting: false,
       meta: { customCss: { width: '20%', margin: '0px' }, type: 'text' },
     }),
     columnHelper.accessor('created_by', {
       id: 'created_by',
-      cell: (info) => (
-        <TableCell getValue={info.getValue} row={info.row} columnId={info.column.id} onCellUpdate={handleCellUpdate} />
-      ),
+      cell: (info) => <TableCell getValue={info.getValue} columnId={info.column.id} />,
       header: () => 'Created By',
       enableSorting: false,
       meta: { customCss: { width: '20%' }, type: 'text' },
@@ -83,12 +63,12 @@ export default EditDocTypeTable;
 
 interface TableCellProps<T> {
   getValue: () => any;
-  row: Row<T>;
   columnId: string;
-  onCellUpdate: (columnId: string, newValue: any) => void;
 }
 
-const TableCell: FC<TableCellProps<DocType>> = ({ getValue, row, columnId, onCellUpdate }) => {
+const TableCell: FC<TableCellProps<DocType>> = ({ getValue, columnId }) => {
+  const dispatch = useDispatch();
+  const updatedDocType = useSelector((state: RootState) => state.docType.updatedDocType);
   const initialValue = getValue() ? (columnId === 'created_date' ? getValue().substring(0, 10) : getValue()) : '';
   const [value, setValue] = useState(initialValue);
 
@@ -96,12 +76,12 @@ const TableCell: FC<TableCellProps<DocType>> = ({ getValue, row, columnId, onCel
     setValue(initialValue);
   }, [initialValue]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setValue(e.target.value);
+  const onBlur = () => {
+    dispatch(setUpdatedDocType({ ...updatedDocType, [columnId]: value }));
   };
 
-  const onBlur = () => {
-    onCellUpdate(columnId, value);
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setValue(e.target.value);
   };
 
   return (
@@ -116,11 +96,17 @@ const TableCell: FC<TableCellProps<DocType>> = ({ getValue, row, columnId, onCel
   );
 };
 
-const DateTableCell: FC<TableCellProps<DocType>> = ({ getValue, columnId, onCellUpdate }) => {
+const DateTableCell: FC<TableCellProps<DocType>> = ({ getValue, columnId }) => {
+  const dispatch = useDispatch();
+  const updatedDocType = useSelector((state: RootState) => state.docType.updatedDocType);
+
+  const timeZone = 'UTC';
+
   const initialValue = useMemo(() => {
     const dateValue = getValue();
-    return dateValue ? new Date(dateValue) : null;
+    return dateValue ? toZonedTime(new Date(dateValue), timeZone) : null;
   }, [getValue]);
+
   const [value, setValue] = useState(initialValue);
 
   useEffect(() => {
@@ -130,9 +116,13 @@ const DateTableCell: FC<TableCellProps<DocType>> = ({ getValue, columnId, onCell
   const handleDateChange = (date: Date | null) => {
     setValue(date);
     if (date) {
-      const formattedDate = format(date, 'yyyy-MM-dd');
-      console.log(formattedDate);
-      onCellUpdate(columnId, formattedDate);
+      const formattedDate = tzFormat(date, 'yyyy-MM-dd', { timeZone });
+      dispatch(
+        setUpdatedDocType({
+          ...updatedDocType,
+          [columnId]: formattedDate,
+        })
+      );
     }
   };
 

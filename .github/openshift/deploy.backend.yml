@@ -216,6 +216,41 @@ objects:
                     secretKeyRef:
                       name: ticdi-backend-oicd
                       key: jwt-issuer
+                - name: ticdi_environment
+                  valueFrom:
+                    secretKeyRef:
+                      name: ticdi-environment
+                      key: ticdi_environment
+                - name: ttls_url
+                  valueFrom:
+                    secretKeyRef:
+                      name: ttls
+                      key: ttls_url
+                - name: ttls_api_key
+                  valueFrom:
+                    secretKeyRef:
+                      name: ttls
+                      key: ttls_api_key
+                - name: WEBADE_AUTH_ENDPOINT
+                  valueFrom:
+                    secretKeyRef:
+                      name: ttls
+                      key: webade_auth_endpoint
+                - name: WEBADE_USERNAME
+                  valueFrom:
+                    secretKeyRef:
+                      name: ttls
+                      key: webade_username
+                - name: WEBADE_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: ttls
+                      key: webade_password
+                - name: TTLS_API_ENDPOINT
+                  valueFrom:
+                    secretKeyRef:
+                      name: ttls
+                      key: ttls_api_endpoint
               ports:
                 - containerPort: 3000
                   protocol: TCP

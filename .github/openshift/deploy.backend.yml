@@ -201,6 +201,21 @@ objects:
                     secretKeyRef: 
                       name: css-users-api
                       key: users_api_client_secret
+                - name: KEYCLOCK_CLIENT_ID
+                  valueFrom:
+                    secretKeyRef:
+                      name: ticdi-backend-oicd
+                      key: keycloak-client-id
+                - name: JWKS_URI
+                  valueFrom:
+                    secretKeyRef:
+                      name: ticdi-backend-oicd
+                      key: jwks-uri
+                - name: JWT_ISSUER
+                  valueFrom:
+                    secretKeyRef:
+                      name: ticdi-backend-oicd
+                      key: jwt-issuer
               ports:
                 - containerPort: 3000
                   protocol: TCP

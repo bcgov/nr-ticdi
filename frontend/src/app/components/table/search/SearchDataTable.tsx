@@ -6,10 +6,11 @@ import { DocType, SearchData } from '../../../types/types';
 
 interface SearchDataTableProps {
   searchTerm: string;
+  searchDocType: string;
   setSelectedDocumentChange: (dtid: number, documentType: DocType) => void;
 }
 
-const SearchDataTable: React.FC<SearchDataTableProps> = ({ searchTerm, setSelectedDocumentChange }) => {
+const SearchDataTable: React.FC<SearchDataTableProps> = ({ searchTerm, searchDocType, setSelectedDocumentChange }) => {
   const [searchData, setSearchData] = useState<SearchData[]>([]);
   const [filteredSearchData, setFilteredSearchData] = useState<SearchData[]>([]);
   const [selectedDocument, setSelectedDocument] = useState<{ dtid: number; document_type: DocType } | null>(null);
@@ -32,23 +33,26 @@ const SearchDataTable: React.FC<SearchDataTableProps> = ({ searchTerm, setSelect
 
   useEffect(() => {
     const filterData = () => {
-      if (!searchTerm || searchTerm === '') {
-        setFilteredSearchData(searchData);
-        return;
-      }
-      const lowerCaseSearchTerm = searchTerm.toLowerCase();
+      let filteredData = searchData;
 
-      const filteredData = searchData.filter((item) =>
-        (Object.keys(item) as (keyof SearchData)[]).some((key) =>
-          String(item[key]).toLowerCase().includes(lowerCaseSearchTerm)
-        )
-      );
+      if (searchTerm) {
+        const lowerCaseSearchTerm = searchTerm.toLowerCase();
+        filteredData = filteredData.filter((item) =>
+          (Object.keys(item) as (keyof SearchData)[]).some((key) =>
+            String(item[key]).toLowerCase().includes(lowerCaseSearchTerm)
+          )
+        );
+      }
+
+      if (searchDocType) {
+        filteredData = filteredData.filter((item) => item.document_type.name === searchDocType);
+      }
 
       setFilteredSearchData(filteredData);
     };
 
     filterData();
-  }, [searchTerm, searchData]);
+  }, [searchTerm, searchDocType, searchData]);
 
   const activeRadioHandler = (dtid: number, document_type: DocType) => {
     console.log('changed');

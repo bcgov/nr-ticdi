@@ -1,11 +1,11 @@
 import { FC } from 'react';
+import Roles from '../../../app/roles';
+import UserService from '../../service/user-service';
 
-interface HeaderProps {
-  isAdmin: Boolean;
-  idirUsername: String;
-}
+const Header: FC = () => {
+  const username = UserService.getUsername();
+  const isAdmin = UserService.hasRole([Roles.TICDI_ADMIN]);
 
-const Header: FC<HeaderProps> = ({ isAdmin, idirUsername }) => {
   return (
     <header className="header">
       <nav className="navbar navbar-expand-lg navbar-dark">
@@ -59,7 +59,7 @@ const Header: FC<HeaderProps> = ({ isAdmin, idirUsername }) => {
               </div>
             </div>
           </div>
-          <div style={{ float: 'right', color: 'white' }}>{idirUsername}</div>
+          <div style={{ float: 'right', color: 'white' }}>{username}</div>
         </div>
       </nav>
     </header>

@@ -1,6 +1,7 @@
-import _kc from "../keycloak";
+import config from '../../config';
+import _kc from '../keycloak';
 
-export const AUTH_TOKEN = "__auth_token";
+export const AUTH_TOKEN = '__auth_token';
 
 /**
  * Initializes Keycloak instance and calls the provided callback function if successfully authenticated.
@@ -10,13 +11,13 @@ export const AUTH_TOKEN = "__auth_token";
 const initKeycloak = (onAuthenticatedCallback: () => void) => {
   _kc
     .init({
-      onLoad: "login-required",
-      pkceMethod: "S256",
+      onLoad: 'login-required',
+      pkceMethod: 'S256',
       checkLoginIframe: false,
     })
     .then((authenticated) => {
       if (!authenticated) {
-        console.log("User is not authenticated.");
+        console.log('User is not authenticated.');
       } else {
         localStorage.setItem(AUTH_TOKEN, `${_kc.token}`);
       }
@@ -41,14 +42,11 @@ const getToken = () => _kc.token;
 
 const isLoggedIn = () => !!_kc.token;
 
-const updateToken = (
-  successCallback:
-    | ((value: boolean) => boolean | PromiseLike<boolean>)
-    | null
-    | undefined,
-) => _kc.updateToken(5).then(successCallback).catch(doLogin);
+const updateToken = (successCallback: ((value: boolean) => boolean | PromiseLike<boolean>) | null | undefined) =>
+  _kc.updateToken(5).then(successCallback).catch(doLogin);
 
-const getUsername = () => _kc.tokenParsed?.display_name;
+const getDisplayName = () => _kc.tokenParsed?.display_name;
+const getUsername = () => _kc.tokenParsed?.idir_username;
 
 /**
  * Determines if a user's role(s) overlap with the role on the private route.  The user's role is determined via jwt.client_roles
@@ -60,9 +58,7 @@ const hasRole = (roles: any) => {
   const userroles = jwt?.client_roles;
 
   const includesRoles =
-    typeof roles === "string"
-      ? userroles?.includes(roles)
-      : roles.some((r: any) => userroles?.includes(r));
+    typeof roles === 'string' ? userroles?.includes(roles) : roles.some((r: any) => userroles?.includes(r));
   return includesRoles;
 };
 
@@ -74,6 +70,7 @@ const UserService = {
   getToken,
   updateToken,
   getUsername,
+  getDisplayName,
   hasRole,
 };
 

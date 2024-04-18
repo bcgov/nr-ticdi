@@ -10,8 +10,8 @@ const App: FC = () => {
   return (
     <Provider store={store}>
       <Router>
-        <Header idirUsername="Michael" isAdmin={true} />
-        <AppRoutes/>
+        <Header />
+        <AppRoutes />
         <Footer />
       </Router>
     </Provider>

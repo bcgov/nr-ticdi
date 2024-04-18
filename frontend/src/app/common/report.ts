@@ -117,7 +117,7 @@ export const getDocumentTypes = () => {
 };
 
 export const getDocumentData = async (document_type_id: number, dtid: number): Promise<DocumentDataDTO> => {
-  const url = `${config.API_BASE_URL}/document-data/get/${document_type_id}/${dtid}`;
+  const url = `${config.API_BASE_URL}/document-data/provisions/${document_type_id}/${dtid}`;
   const getParameters = api.generateApiParameters(url);
   const response = await api.get<DocumentDataDTO>(getParameters);
   return response;

@@ -41,11 +41,6 @@ export class DocumentDataController {
     return this.documentDataService.getProvisionsByDocTypeIdAndDtid(document_type_id, dtid);
   }
 
-  @Get('get/:document_type_id/:dtid')
-  getDocData(@Param('document_type_id') document_type_id: number, @Param('dtid') dtid: number) {
-    return this.documentDataService.getProvisionsByDocTypeIdAndDtid(document_type_id, dtid);
-  }
-
   @Get('get-enabled-provisions/:document_type_id/:dtid')
   getEnabledProvisionsByDocTypeIdAndDtid(
     @Param('document_type_id') document_type_id: number,

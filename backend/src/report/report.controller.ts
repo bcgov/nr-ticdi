@@ -174,7 +174,7 @@ export class ReportController {
     return this.reportService.getMandatoryProvisionsByDocumentTypeId(document_type_id);
   }
 
-  @Get()
+  @Get('healthcheck')
   @Public()
   getHealthCheck() {
     return '';

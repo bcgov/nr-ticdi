@@ -20,6 +20,7 @@ import { GenerateReportGuard } from 'src/authentication/generate-report.guard';
 import { ReportService } from './report.service';
 import { firstValueFrom } from 'rxjs';
 import { User } from 'src/auth/decorators/user.decorator';
+import { Public } from 'src/auth/decorators/public.decorator';
 
 let requestUrl: string;
 let requestConfig: AxiosRequestConfig;
@@ -174,6 +175,7 @@ export class ReportController {
   }
 
   @Get()
+  @Public()
   getHealthCheck() {
     return '';
   }

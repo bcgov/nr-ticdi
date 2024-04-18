@@ -58,21 +58,21 @@ const AdminDataTable: React.FC<AdminDataTableProps> = ({ searchTerm, removeAdmin
   const columns: ColumnDef<AdminData, any>[] = [
     columnHelper.accessor('name', {
       id: 'name',
-      cell: (info) => <input value={info.getValue()} className="readonlyInput" readOnly />,
+      cell: (info) => <input value={info.getValue()} className="form-control readonlyInput" readOnly />,
       header: () => 'Name',
       enableSorting: true,
       meta: { customCss: { width: '30%' } },
     }),
     columnHelper.accessor('username', {
       id: 'username',
-      cell: (info) => <input value={info.getValue()} className="readonlyInput" readOnly />,
+      cell: (info) => <input value={info.getValue()} className="form-control readonlyInput" readOnly />,
       header: () => 'User Name',
       enableSorting: true,
       meta: { customCss: { width: '30%' } },
     }),
     columnHelper.accessor('email', {
       id: 'email',
-      cell: (info) => <input value={info.getValue()} className="readonlyInput" readOnly />,
+      cell: (info) => <input value={info.getValue()} className="form-control readonlyInput" readOnly />,
       header: () => 'Email',
       enableSorting: true,
       meta: { customCss: { width: '30%' } },

@@ -47,28 +47,28 @@ const SelectedProvisionsTable: React.FC<SelectedProvisionsTableTableProps> = ({
   const columns: ColumnDef<ReducedProvisionDataObject, any>[] = [
     columnHelper.accessor('type', {
       id: 'type',
-      cell: (info) => <input value={info.getValue()} className="readonlyInput" readOnly />,
+      cell: (info) => <input value={info.getValue()} className="form-control readonlyInput" readOnly />,
       header: () => 'Type',
       enableSorting: true,
       meta: { customCss: { width: '5%' } },
     }),
     columnHelper.accessor((row) => row.provision_group.provision_group, {
       id: 'provision_group',
-      cell: (info) => <input value={info.getValue()} className="readonlyInput" readOnly />,
+      cell: (info) => <input value={info.getValue()} className="form-control readonlyInput" readOnly />,
       header: () => 'Group',
       enableSorting: true,
       meta: { customCss: { width: '5%' } },
     }),
     columnHelper.accessor('provision_name', {
       id: 'provision_name',
-      cell: (info) => <input value={info.getValue()} className="readonlyInput" readOnly />,
+      cell: (info) => <input value={info.getValue()} className="form-control readonlyInput" readOnly />,
       header: () => 'Provision',
       enableSorting: true,
       meta: { customCss: { width: '50%' } },
     }),
     columnHelper.accessor('category', {
       id: 'category',
-      cell: (info) => <input value={info.getValue()} className="readonlyInput" readOnly />,
+      cell: (info) => <input value={info.getValue()} className="form-control readonlyInput" readOnly />,
       header: () => 'Category',
       enableSorting: true,
       meta: { customCss: { width: '30%' } },

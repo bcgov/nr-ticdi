@@ -42,14 +42,16 @@ const EditDocTypeTable: FC<EditDocTypeTableProps> = ({}) => {
     }),
     columnHelper.accessor('update_timestamp', {
       id: 'update_timestamp',
-      cell: (info) => <input value={info.getValue().substring(0, 10)} className="form-control" readOnly />,
+      cell: (info) => (
+        <input value={info.getValue().substring(0, 10)} className="form-control readonlyInput" readOnly />
+      ),
       header: () => 'Last Updated Date',
       enableSorting: false,
       meta: { customCss: { width: '20%' }, type: 'text' },
     }),
     columnHelper.accessor('update_userid', {
       id: 'update_userid',
-      cell: (info) => <input value={info.getValue()} className="form-control" readOnly />,
+      cell: (info) => <input value={info.getValue()} className="form-control readonlyInput" readOnly />,
       header: () => 'Last Updated By',
       enableSorting: false,
       meta: { customCss: { width: '20%' }, type: 'text' },

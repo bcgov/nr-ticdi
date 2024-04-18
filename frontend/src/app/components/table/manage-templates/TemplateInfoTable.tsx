@@ -1,7 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { DataTable } from '../common/DataTable';
 import { ColumnDef, createColumnHelper } from '@tanstack/react-table';
-import { activateTemplate, downloadTemplate, getTemplatesInfo, previewTemplate } from '../../../common/manage-templates';
+import {
+  activateTemplate,
+  downloadTemplate,
+  getTemplatesInfo,
+  previewTemplate,
+} from '../../../common/manage-templates';
 import { DocType, TemplateInfo } from '../../../types/types';
 import { Button } from 'react-bootstrap';
 import PreviewTemplateModal from '../../modal/admin/manage-templates/PreviewTemplateModal';
@@ -89,21 +94,21 @@ const TemplateInfoTable: React.FC<TemplateInfoTableProps> = ({ documentType, ref
   const columns: ColumnDef<TemplateInfo, any>[] = [
     columnHelper.accessor('template_version', {
       id: 'template_version',
-      cell: (info) => <input value={info.getValue()} className="readonlyInput" readOnly />,
+      cell: (info) => <input value={info.getValue()} className="form-control readonlyInput" readOnly />,
       header: () => 'Doc No.',
       enableSorting: true,
       meta: { customCss: { width: '5%' } },
     }),
     columnHelper.accessor('file_name', {
       id: 'file_name',
-      cell: (info) => <input value={info.getValue()} className="readonlyInput" readOnly />,
+      cell: (info) => <input value={info.getValue()} className="form-control readonlyInput" readOnly />,
       header: () => 'Template Name',
       enableSorting: true,
       meta: { customCss: { width: '50%' } },
     }),
     columnHelper.accessor('update_timestamp', {
       id: 'update_timestamp',
-      cell: (info) => <input value={info.getValue()} className="readonlyInput" readOnly />,
+      cell: (info) => <input value={info.getValue()} className="form-control readonlyInput" readOnly />,
       header: () => 'Uploaded Date',
       enableSorting: true,
       meta: { customCss: { width: '15%' } },
@@ -127,7 +132,10 @@ const TemplateInfoTable: React.FC<TemplateInfoTableProps> = ({ documentType, ref
     columnHelper.accessor('preview', {
       id: 'preview',
       cell: (info) => (
-        <Button variant="success" onClick={() => handlePreviewTemplate(info.row.original.id, info.row.original.file_name)}>
+        <Button
+          variant="success"
+          onClick={() => handlePreviewTemplate(info.row.original.id, info.row.original.file_name)}
+        >
           Preview
         </Button>
       ),
@@ -169,19 +177,17 @@ const TemplateInfoTable: React.FC<TemplateInfoTableProps> = ({ documentType, ref
     }),
   ];
 
-
-
-
-  return <>
-    {isOpen && <PreviewTemplateModal isOpen={isOpen} toggleModal={toggleModal} iframeSrcBlob={iframeSrcBlob} />}
-    <DataTable
-      columns={columns}
-      data={templateData}
-      enableSorting={true}
-      initialSorting={[{ id: 'template_version', desc: false }]}
-    />
-  </>;
-
+  return (
+    <>
+      {isOpen && <PreviewTemplateModal isOpen={isOpen} toggleModal={toggleModal} iframeSrcBlob={iframeSrcBlob} />}
+      <DataTable
+        columns={columns}
+        data={templateData}
+        enableSorting={true}
+        initialSorting={[{ id: 'template_version', desc: false }]}
+      />
+    </>
+  );
 };
 
 export default TemplateInfoTable;

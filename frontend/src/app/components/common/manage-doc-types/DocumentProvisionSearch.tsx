@@ -71,7 +71,7 @@ const DocumentProvisionSearch: FC<DocumentProvisionSearchProps> = ({ onSearch })
               </Col>
               <Col sm={7}>
                 <input
-                  className="mb-1"
+                  className="form-control mb-1"
                   type="text"
                   name="provisionName"
                   value={searchState.provisionName}
@@ -87,7 +87,7 @@ const DocumentProvisionSearch: FC<DocumentProvisionSearchProps> = ({ onSearch })
               </Col>
               <Col sm={7}>
                 <input
-                  className="mb-1"
+                  className="form-control mb-1"
                   type="number"
                   name="id"
                   value={searchState.id}
@@ -103,7 +103,7 @@ const DocumentProvisionSearch: FC<DocumentProvisionSearchProps> = ({ onSearch })
               </Col>
               <Col sm={7}>
                 <select
-                  className="mb-1"
+                  className="form-control mb-1"
                   value={searchState.type}
                   name="type"
                   onChange={handleSelectChange}
@@ -125,7 +125,7 @@ const DocumentProvisionSearch: FC<DocumentProvisionSearchProps> = ({ onSearch })
               </Col>
               <Col sm={7}>
                 <input
-                  className="mb-1"
+                  className="form-control mb-1"
                   type="text"
                   name="group"
                   value={searchState.group}
@@ -141,7 +141,7 @@ const DocumentProvisionSearch: FC<DocumentProvisionSearchProps> = ({ onSearch })
               </Col>
               <Col sm={7}>
                 <input
-                  className="mb-1"
+                  className="form-control mb-1"
                   type="text"
                   name="freeText"
                   value={searchState.freeText}
@@ -157,7 +157,7 @@ const DocumentProvisionSearch: FC<DocumentProvisionSearchProps> = ({ onSearch })
               </Col>
               <Col sm={7}>
                 <input
-                  className="mb-1"
+                  className="form-control mb-1"
                   type="text"
                   name="category"
                   value={searchState.category}
@@ -193,7 +193,7 @@ const DocumentProvisionSearch: FC<DocumentProvisionSearchProps> = ({ onSearch })
           {/* Basic Search Inputs */}
           <Col sm={1}>
             <input
-              className=""
+              className="form-control"
               type="number"
               name="id"
               placeholder="ID"
@@ -204,7 +204,7 @@ const DocumentProvisionSearch: FC<DocumentProvisionSearchProps> = ({ onSearch })
           </Col>
           <Col sm={3}>
             <input
-              className="ml-2"
+              className="form-control ml-2"
               type="text"
               name="provisionName"
               placeholder="Provision Name"

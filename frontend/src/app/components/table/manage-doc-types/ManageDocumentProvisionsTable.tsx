@@ -170,7 +170,7 @@ const ManageDocumentProvisionsTable: React.FC<ManageDocumentProvisionsTableProps
   const columns: ColumnDef<ManageDocTypeProvision, any>[] = [
     columnHelper.accessor('id', {
       id: 'id',
-      cell: (info) => <input value={info.getValue()} className="readonlyInput" readOnly />,
+      cell: (info) => <input value={info.getValue()} className="form-control readonlyInput" readOnly />,
       header: () => 'ID',
       enableSorting: true,
       meta: { customCss: { width: '5%' } },
@@ -232,7 +232,7 @@ const ManageDocumentProvisionsTable: React.FC<ManageDocumentProvisionsTableProps
       cell: (info) => (
         <input
           value={info.row.original.max ? info.row.original.max : ''}
-          className="readonlyInput"
+          className="form-control readonlyInput"
           readOnly
           onChange={() => {}}
         />
@@ -243,21 +243,27 @@ const ManageDocumentProvisionsTable: React.FC<ManageDocumentProvisionsTableProps
     }),
     columnHelper.accessor('provision_name', {
       id: 'provision_name',
-      cell: (info) => <input value={info.getValue()} className="readonlyInput" title={info.getValue()} readOnly />,
+      cell: (info) => (
+        <input value={info.getValue()} className="form-control readonlyInput" title={info.getValue()} readOnly />
+      ),
       header: () => 'Provision',
       enableSorting: false,
       meta: { customCss: { width: '30%' } },
     }),
     columnHelper.accessor('free_text', {
       id: 'free_text',
-      cell: (info) => <input value={info.getValue()} className="readonlyInput" title={info.getValue()} readOnly />,
+      cell: (info) => (
+        <input value={info.getValue()} className="form-control readonlyInput" title={info.getValue()} readOnly />
+      ),
       header: () => 'Free Text',
       enableSorting: true,
       meta: { customCss: { width: '10%' } },
     }),
     columnHelper.accessor('category', {
       id: 'category',
-      cell: (info) => <input value={info.getValue()} className="readonlyInput" title={info.getValue()} readOnly />,
+      cell: (info) => (
+        <input value={info.getValue()} className="form-control readonlyInput" title={info.getValue()} readOnly />
+      ),
       header: () => 'Category',
       enableSorting: true,
       meta: { customCss: { width: '15%' } },
@@ -348,7 +354,16 @@ const ProvisionGroupCell: React.FC<ProvisionGroupCellProps> = ({ row, provisionG
     onUpdate(row.original.id, matchedProvisionGroup);
   };
 
-  return <input type="number" value={inputValue} onBlur={handleBlur} onChange={handleChange} style={inputStyle} />;
+  return (
+    <input
+      type="number"
+      className="form-control"
+      value={inputValue}
+      onBlur={handleBlur}
+      onChange={handleChange}
+      style={inputStyle}
+    />
+  );
 };
 
 // custom cell for type and sequence columns
@@ -390,7 +405,7 @@ const TableCell: FC<TableCellProps<ManageDocTypeProvision>> = ({
   };
 
   return inputType === 'select' ? (
-    <select value={value} onChange={handleSelectChange} style={{ width: '100%' }}>
+    <select className="form-control" value={value} onChange={handleSelectChange} style={{ width: '100%' }}>
       {selectOptions.map((option) => (
         <option key={option.value} value={option.value}>
           {option.label}
@@ -398,7 +413,14 @@ const TableCell: FC<TableCellProps<ManageDocTypeProvision>> = ({
       ))}
     </select>
   ) : (
-    <input type="text" value={value} onChange={handleChange} onBlur={handleBlur} style={{ width: '100%' }} />
+    <input
+      type="text"
+      className="form-control"
+      value={value}
+      onChange={handleChange}
+      onBlur={handleBlur}
+      style={{ width: '100%' }}
+    />
   );
 };
 

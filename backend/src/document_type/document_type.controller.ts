@@ -6,10 +6,12 @@ import { DocumentTypeService } from './document_type.service';
 import { IdirObject } from 'src/types';
 import { ProvisionGroup } from './entities/provision_group.entity';
 import { User } from 'src/auth/decorators/user.decorator';
+import { JwtAuthGuard } from 'src/auth/jwtauth.guard';
 
 // @UseFilters(AuthenticationFilter)
 // @UseGuards(AuthenticationGuard)
 // @UseGuards(GenerateReportGuard)
+@UseGuards(JwtAuthGuard)
 @Controller('document-type')
 export class DocumentTypeController {
   constructor(private documentTypeService: DocumentTypeService) {}

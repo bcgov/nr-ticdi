@@ -65,14 +65,14 @@ const SearchDataTable: React.FC<SearchDataTableProps> = ({ searchTerm, searchDoc
   const columns: ColumnDef<SearchData, any>[] = [
     columnHelper.accessor('dtid', {
       id: 'dtid',
-      cell: (info) => <input value={info.getValue()} className="readonlyInput" readOnly />,
+      cell: (info) => <input value={info.getValue()} className="form-control readonlyInput" readOnly />,
       header: () => 'DTID',
       enableSorting: true,
       meta: { customCss: { width: '10%' } },
     }),
     columnHelper.accessor('version', {
       id: 'version',
-      cell: (info) => <input value={info.getValue()} className="readonlyInput" readOnly />,
+      cell: (info) => <input value={info.getValue()} className="form-control readonlyInput" readOnly />,
       header: () => 'Version',
       enableSorting: false,
       meta: { customCss: { width: '8%' } },
@@ -80,28 +80,28 @@ const SearchDataTable: React.FC<SearchDataTableProps> = ({ searchTerm, searchDoc
 
     columnHelper.accessor('file_name', {
       id: 'file_name',
-      cell: (info) => <input value={info.getValue()} className="readonlyInput" readOnly />,
+      cell: (info) => <input value={info.getValue()} className="form-control readonlyInput" readOnly />,
       header: () => 'Template Name',
       enableSorting: false,
       meta: { customCss: { width: '35%' } },
     }),
     columnHelper.accessor((row) => row.document_type.name, {
       id: 'doc_type',
-      cell: (info) => <input value={info.getValue()} className="readonlyInput" readOnly />,
+      cell: (info) => <input value={info.getValue()} className="form-control readonlyInput" readOnly />,
       header: () => 'Document Type',
       enableSorting: false,
       meta: { customCss: { width: '23%' } },
     }),
     columnHelper.accessor('updated_date', {
       id: 'updated_date',
-      cell: (info) => <input value={info.getValue()} className="readonlyInput" readOnly />,
+      cell: (info) => <input value={info.getValue()} className="form-control readonlyInput" readOnly />,
       header: () => 'Uploaded Date',
       enableSorting: true,
       meta: { customCss: { width: '11%' } },
     }),
     columnHelper.accessor('status', {
       id: 'status',
-      cell: (info) => <input value={info.getValue()} className="readonlyInput" readOnly />,
+      cell: (info) => <input value={info.getValue()} className="form-control readonlyInput" readOnly />,
       header: () => 'Status',
       enableSorting: true,
       meta: { customCss: { width: '11%' } },

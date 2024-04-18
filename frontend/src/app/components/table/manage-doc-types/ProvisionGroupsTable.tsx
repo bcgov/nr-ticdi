@@ -119,6 +119,7 @@ const TableCell: FC<TableCellProps<ProvisionGroup>> = ({ getValue, row, column, 
   return (
     <input
       value={value}
+      className="form-control"
       onChange={(e) => setValue(e.target.value)}
       onBlur={onBlur}
       type={'text'}

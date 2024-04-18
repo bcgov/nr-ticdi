@@ -364,12 +364,21 @@ const LandingPage: FC = () => {
         <></>
       )}
 
-      <div style={{ display: 'flex', gap: '10px' }}>
+      <div style={{ display: 'flex', gap: '10px', minHeight: '55px' }}>
         <>
-          <Button onClick={handleDocumentSave} variant="success" disabled={loading || !data || !dtid || !documentType}>
+          <Button
+            onClick={handleDocumentSave}
+            style={{ margin: '5px' }}
+            variant="success"
+            disabled={loading || !data || !dtid || !documentType}
+          >
             Save for later
           </Button>
-          <Button onClick={handleGenerateReport} disabled={loading || !data || !dtid || !documentType}>
+          <Button
+            onClick={handleGenerateReport}
+            style={{ margin: '5px' }}
+            disabled={loading || !data || !dtid || !documentType}
+          >
             Create
           </Button>
         </>

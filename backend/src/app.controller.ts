@@ -12,6 +12,7 @@ import { Request, Response } from 'express';
 import { ReportService } from './report/report.service';
 import { nfrInterestedParties } from 'src/util';
 import { JwtAuthGuard } from './auth/jwtauth.guard';
+import { Public } from './auth/decorators/public.decorator';
 
 // unused, to be cleaned up
 let requestUrl: string;
@@ -28,6 +29,12 @@ export class AppController {
         'Content-Type': 'application/json',
       },
     };
+  }
+
+  @Get('healthcheck')
+  @Public()
+  getHello(): string {
+    return "hello";
   }
 
   @Get()

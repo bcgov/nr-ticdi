@@ -39,6 +39,9 @@ parameters:
   - name: LOG_LEVEL
     description: Caddy logging level DEBUG, INFO, WARN, ERROR, PANIC, and FATAL (https://github.com/caddyserver/caddy/blob/master/logging.go)
     value: "info"
+  - name: KEYCLOAK_URL
+    description: Keycloak auth url
+    value: https://dev.loginproxy.gov.bc.ca/auth
 objects:
   - apiVersion: v1
     kind: ImageStream
@@ -94,43 +97,10 @@ objects:
               env:
                 - name: NODE_TLS_REJECT_UNAUTHORIZED 
                   value: '0'
-                - name: ticdi_environment
-                  valueFrom:
-                    secretKeyRef:
-                      name: ticdi-environment
-                      key: ticdi_environment
-                - name: ttls_url
-                  valueFrom:
-                    secretKeyRef:
-                      name: ttls
-                      key: ttls_url
-                - name: ttls_api_key
-                  valueFrom:
-                    secretKeyRef:
-                      name: ttls
-                      key: ttls_api_key
-                - name: WEBADE_AUTH_ENDPOINT
-                  valueFrom:
-                    secretKeyRef:
-                      name: ttls
-                      key: webade_auth_endpoint
-                - name: WEBADE_USERNAME
-                  valueFrom:
-                    secretKeyRef:
-                      name: ttls
-                      key: webade_username
-                - name: WEBADE_PASSWORD
-                  valueFrom:
-                    secretKeyRef:
-                      name: ttls
-                      key: webade_password
-                - name: TTLS_API_ENDPOINT
-                  valueFrom:
-                    secretKeyRef:
-                      name: ttls
-                      key: ttls_api_endpoint
                 - name: BACKEND_URL
                   value: https://${NAME}-${ZONE}-backend.${DOMAIN}
+                - name: KEYCLOAK_URL
+                  value: ${KEYCLOAK_URL}
                 - name: session_path
                   value: '/mnt/sessions'
                 - name: LOG_LEVEL

@@ -47,7 +47,7 @@ const ManageDocumentProvisionsTable: React.FC<ManageDocumentProvisionsTableProps
       // Advanced search checks (only apply if isAdvancedSearch is true)
       const matchesType = searchState.isAdvancedSearch
         ? searchState.type
-          ? provision.type.toLowerCase().includes(searchState.type.toLowerCase())
+          ? provision.type && provision.type.includes(searchState.type)
           : true
         : true;
       const matchesGroup = searchState.isAdvancedSearch
@@ -57,12 +57,12 @@ const ManageDocumentProvisionsTable: React.FC<ManageDocumentProvisionsTableProps
         : true;
       const matchesFreeText = searchState.isAdvancedSearch
         ? searchState.freeText
-          ? provision.free_text.toLowerCase().includes(searchState.freeText.toLowerCase())
+          ? provision.free_text && provision.free_text.toLowerCase().includes(searchState.freeText.toLowerCase())
           : true
         : true;
       const matchesCategory = searchState.isAdvancedSearch
         ? searchState.category
-          ? provision.category.toLowerCase().includes(searchState.category.toLowerCase())
+          ? provision.category && provision.category.toLowerCase().includes(searchState.category.toLowerCase())
           : true
         : true;
       const matchesAssociated = searchState.isAdvancedSearch

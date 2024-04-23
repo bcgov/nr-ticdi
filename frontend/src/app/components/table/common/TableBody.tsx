@@ -4,6 +4,6 @@ interface TableBodyProps {
   children: React.ReactNode;
 }
 
-export const TableBody: FC<TableBodyProps> = ({ children }) => {
+export const TableBody: FC<TableBodyProps> = React.memo(({ children }) => {
   return <tbody className="">{children}</tbody>;
-};
+});

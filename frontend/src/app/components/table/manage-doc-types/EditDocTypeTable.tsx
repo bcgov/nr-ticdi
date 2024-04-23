@@ -1,4 +1,4 @@
-import { FC, useEffect, useMemo, useState } from 'react';
+import React, { FC, useEffect, useMemo, useState } from 'react';
 import { DataTable } from '../common/DataTable';
 import { DocType } from '../../../types/types';
 import DatePicker from 'react-datepicker';
@@ -7,38 +7,96 @@ import { toZonedTime, format as tzFormat } from 'date-fns-tz';
 import { ColumnDef, createColumnHelper } from '@tanstack/react-table';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../../store/store';
-import { setUpdatedDocType } from '../../../store/reducers/docTypeSlice';
+import { setDocType, setUpdatedDocType } from '../../../store/reducers/docTypeSlice';
+import { updateDocType } from '../../../common/manage-doc-types';
+import { Button } from 'react-bootstrap';
 
 interface EditDocTypeTableProps {
-  documentType: DocType[];
-  onUpdate: (documentType: DocType) => void;
+  onUpdate: (documentType: Partial<DocType>) => void;
+  refreshDocTypes: () => void;
 }
 
-const EditDocTypeTable: FC<EditDocTypeTableProps> = ({}) => {
-  const { updatedDocType } = useSelector((state: RootState) => state.docType);
+const EditDocTypeTable: FC<EditDocTypeTableProps> = ({ onUpdate, refreshDocTypes }) => {
+  const [isEditing, setIsEditing] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const dispatch = useDispatch();
+  const { selectedDocType } = useSelector((state: RootState) => state.docType);
+  const [currentDocType, setCurrentDocType] = useState<DocType>(selectedDocType);
+
+  useEffect(() => {
+    setCurrentDocType(selectedDocType);
+  }, [selectedDocType]);
+
+  const handleEditButton = () => {
+    setIsEditing(true);
+  };
+
+  const handleSaveButton = async () => {
+    try {
+      setIsLoading(true);
+      await updateDocType(
+        selectedDocType.id,
+        currentDocType.name,
+        currentDocType.created_by,
+        currentDocType.created_date
+      );
+      dispatch(setDocType({ ...currentDocType }));
+      refreshDocTypes();
+    } catch (err) {
+      console.log(err);
+    } finally {
+      setIsEditing(false);
+      setIsLoading(false);
+    }
+  };
+
+  const handleCancelButton = () => {
+    setIsEditing(false);
+  };
+
+  const updateHandler = (newValue: any) => {
+    setCurrentDocType({ ...currentDocType, ...newValue });
+    console.log('updateHandler');
+  };
 
   const columnHelper = createColumnHelper<DocType>();
   const columns: ColumnDef<DocType, any>[] = [
     columnHelper.accessor('name', {
       id: 'name',
-      cell: (info) => <TableCell getValue={info.getValue} columnId={info.column.id} />,
+      cell: ({ row }) => (
+        <TableCell getValue={() => row.original.name} columnId="name" onUpdate={updateHandler} isEditing={isEditing} />
+      ),
       header: () => 'Document Type Name',
       enableSorting: false,
-      meta: { customCss: { width: '20%' }, type: 'text' },
+      meta: { customCss: { width: '17%' }, type: 'text' },
     }),
     columnHelper.accessor('created_date', {
       id: 'created_date',
-      cell: (info) => <DateTableCell getValue={info.getValue} columnId={info.column.id} />,
+      cell: ({ row }) => (
+        <DateTableCell
+          getValue={() => row.original.created_date}
+          columnId="created_date"
+          onUpdate={updateHandler}
+          isEditing={isEditing}
+        />
+      ),
       header: () => 'Date Created',
       enableSorting: false,
-      meta: { customCss: { width: '20%', margin: '0px' }, type: 'text' },
+      meta: { customCss: { width: '17%', margin: '0px' }, type: 'text' },
     }),
     columnHelper.accessor('created_by', {
       id: 'created_by',
-      cell: (info) => <TableCell getValue={info.getValue} columnId={info.column.id} />,
+      cell: ({ row }) => (
+        <TableCell
+          getValue={() => row.original.created_by}
+          columnId="created_by"
+          onUpdate={updateHandler}
+          isEditing={isEditing}
+        />
+      ),
       header: () => 'Created By',
       enableSorting: false,
-      meta: { customCss: { width: '20%' }, type: 'text' },
+      meta: { customCss: { width: '17%' }, type: 'text' },
     }),
     columnHelper.accessor('update_timestamp', {
       id: 'update_timestamp',
@@ -47,58 +105,100 @@ const EditDocTypeTable: FC<EditDocTypeTableProps> = ({}) => {
       ),
       header: () => 'Last Updated Date',
       enableSorting: false,
-      meta: { customCss: { width: '20%' }, type: 'text' },
+      meta: { customCss: { width: '17%' }, type: 'text' },
     }),
     columnHelper.accessor('update_userid', {
       id: 'update_userid',
       cell: (info) => <input value={info.getValue()} className="form-control readonlyInput" readOnly />,
       header: () => 'Last Updated By',
       enableSorting: false,
-      meta: { customCss: { width: '20%' }, type: 'text' },
+      meta: { customCss: { width: '17%' }, type: 'text' },
+    }),
+    columnHelper.display({
+      id: 'edit_and_save',
+      cell: () =>
+        isEditing ? (
+          <Button variant="success" onClick={handleSaveButton} style={{ width: '100%' }} disabled={isLoading}>
+            Save
+          </Button>
+        ) : (
+          <Button variant="primary" onClick={handleEditButton} style={{ width: '100%' }} disabled={isLoading}>
+            Edit
+          </Button>
+        ),
+      header: () => '',
+      enableSorting: false,
+      meta: { customCss: { width: '8%' } },
+    }),
+    columnHelper.display({
+      id: 'cancel',
+      cell: () =>
+        isEditing && (
+          <Button variant="secondary" onClick={handleCancelButton} style={{ width: '100%' }} disabled={isLoading}>
+            Cancel
+          </Button>
+        ),
+      header: () => '',
+      enableSorting: false,
+      meta: { customCss: { width: '8%' } },
     }),
   ];
 
-  return <DataTable columns={columns} data={[updatedDocType]} />;
+  return <DataTable columns={columns} data={[currentDocType]} />;
 };
 
-export default EditDocTypeTable;
+export default React.memo(EditDocTypeTable);
 
 interface TableCellProps<T> {
   getValue: () => any;
   columnId: string;
+  onUpdate: (newValue: any) => void;
+  isEditing: boolean;
 }
 
-const TableCell: FC<TableCellProps<DocType>> = ({ getValue, columnId }) => {
-  const dispatch = useDispatch();
-  const updatedDocType = useSelector((state: RootState) => state.docType.updatedDocType);
-  const initialValue = getValue() ? (columnId === 'created_date' ? getValue().substring(0, 10) : getValue()) : '';
+const TableCell: FC<TableCellProps<DocType>> = ({ getValue, columnId, onUpdate, isEditing }) => {
+  // const dispatch = useDispatch();
+  // const updatedDocType = useSelector((state: RootState) => state.docType.updatedDocType);
+  // const initialValue = getValue() ? (columnId === 'created_date' ? getValue().substring(0, 10) : getValue()) : '';
+  let initialValue = getValue() ? getValue() : '';
   const [value, setValue] = useState(initialValue);
 
   useEffect(() => {
     setValue(initialValue);
   }, [initialValue]);
 
-  const onBlur = () => {
-    dispatch(setUpdatedDocType({ ...updatedDocType, [columnId]: value }));
+  const handleBlur = () => {
+    // dispatch(setUpdatedDocType({ ...updatedDocType, [columnId]: value }));
+    onUpdate({ [columnId]: value });
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setValue(e.target.value);
   };
 
-  return (
+  return isEditing ? (
     <input
       type="text"
+      className="form-control"
       value={value}
       onChange={handleChange}
-      onBlur={onBlur}
+      onBlur={handleBlur}
       style={{ width: '100%' }}
-      className="form-control"
+    />
+  ) : (
+    <input
+      type="text"
+      className="form-control readonlyInput"
+      value={value}
+      onChange={handleChange}
+      onBlur={handleBlur}
+      style={{ width: '100%' }}
+      readOnly
     />
   );
 };
 
-const DateTableCell: FC<TableCellProps<DocType>> = ({ getValue, columnId }) => {
+const DateTableCell: FC<TableCellProps<DocType>> = ({ getValue, columnId, onUpdate, isEditing }) => {
   const dispatch = useDispatch();
   const updatedDocType = useSelector((state: RootState) => state.docType.updatedDocType);
 
@@ -128,5 +228,15 @@ const DateTableCell: FC<TableCellProps<DocType>> = ({ getValue, columnId }) => {
     }
   };
 
-  return <DatePicker selected={value} onChange={handleDateChange} dateFormat="yyyy-MM-dd" className="form-control" />;
+  return isEditing ? (
+    <DatePicker selected={value} onChange={handleDateChange} dateFormat="yyyy-MM-dd" className="form-control" />
+  ) : (
+    <DatePicker
+      selected={value}
+      onChange={handleDateChange}
+      dateFormat="yyyy-MM-dd"
+      className="form-control readonlyInput"
+      readOnly
+    />
+  );
 };

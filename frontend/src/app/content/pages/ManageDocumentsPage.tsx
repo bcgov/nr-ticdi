@@ -1,4 +1,4 @@
-import { FC, useEffect, useState } from 'react';
+import React, { FC, useCallback, useEffect, useState } from 'react';
 import { Button, Col, Row } from 'react-bootstrap';
 import { DocType, ProvisionGroup } from '../../types/types';
 import { getDocumentTypes, getGroupMaxByDocTypeId } from '../../common/report';
@@ -52,6 +52,11 @@ const ManageDocumentsPage: FC = () => {
 
   const dispatch = useDispatch();
   const { selectedDocType, updatedDocType } = useSelector((state: RootState) => state.docType);
+  const [docTypeEdits, setDocTypeEdits] = useState<DocType>(selectedDocType);
+
+  useEffect(() => {
+    setDocTypeEdits(selectedDocType);
+  }, [selectedDocType]);
 
   useEffect(() => {
     const getData = async () => {
@@ -83,28 +88,24 @@ const ManageDocumentsPage: FC = () => {
     getData();
   }, [refreshTrigger, selectedDocType]);
 
-  // useEffect(() => {
-  //   setUpdatedDocType(selectedDocType);
-  // }, [selectedDocType]);
-
   useEffect(() => {
     setUpdatedProvisions(provisions);
   }, [provisions]);
 
   const refreshDocTypes = () => {
+    console.log('refreshDocTypes');
     setRefreshDocTypesTrigger((prev) => prev + 1);
   };
 
   const refreshTables = () => {
+    console.log('refreshTables');
     setRefreshTrigger((prev) => prev + 1);
   };
 
   const showEditPage = (id: number) => {
-    // const selectedDocType = allDocTypes.find((docType) => docType.id === id);
     const newSelectedDocType = allDocTypes.find((docType) => docType.id === id);
     if (newSelectedDocType) {
       dispatch(setDocType(newSelectedDocType));
-      // setselectedDocType(selectedDocType);
       setShowMain(false);
       setShowEdit(true);
     }
@@ -167,6 +168,12 @@ const ManageDocumentsPage: FC = () => {
       setLoading(false);
     }
   };
+
+  const handleDocTypeEdit = useCallback((newValues: Partial<DocType>) => {
+    setDocTypeEdits((prev) => ({ ...prev, ...newValues }));
+    console.log('updated:');
+    console.log(newValues);
+  }, []);
 
   const saveDocType = async () => {
     try {
@@ -241,7 +248,7 @@ const ManageDocumentsPage: FC = () => {
           <hr />
           {/** Doc Type info / edit single row table */}
           {/** Document Type Name - Date Created - Created By - Last Updated Date - Last Updated By */}
-          <EditDocTypeTable documentType={[]} onUpdate={() => {}} />
+          <EditDocTypeTable refreshDocTypes={refreshDocTypes} onUpdate={handleDocTypeEdit} />
           <hr />
           <h1>Associate Provisions to {selectedDocType.name}</h1>
           <hr />

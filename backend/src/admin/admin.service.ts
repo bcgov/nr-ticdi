@@ -40,6 +40,10 @@ export class AdminService {
     return this.documentTemplateService.remove(document_type_id, id);
   }
 
+  updateTemplate(data: { id: number; documentNo: number; documentName: string; document_type_id: number }): Promise<any> {
+    return this.documentTemplateService.updateTemplate(data);
+  }
+
   async uploadTemplate(
     data: {
       document_type_id: number;

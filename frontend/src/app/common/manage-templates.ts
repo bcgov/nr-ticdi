@@ -93,3 +93,9 @@ export const uploadTemplate = async (formData: FormData): Promise<void> => {
   const postParameters = api.generateApiParameters(url, formData);
   await api.post<{ message: string }>(postParameters);
 };
+
+export const editTemplate = async (id: number, documentTypeId: number, documentNo: number, documentName: string): Promise<void> => {
+  const url = `${config.API_BASE_URL}/admin/update-template/${id}/${documentTypeId}/${documentNo}/${documentName}`;
+  const getParameters = api.generateApiParameters(url);
+  await api.get<void>(getParameters);
+}

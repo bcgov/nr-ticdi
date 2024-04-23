@@ -65,6 +65,12 @@ export class DocumentTemplateService {
     return activatedTemplate;
   }
 
+  async updateTemplate(data:{id: number; documentNo: number; documentName: string; document_type_id: number }): Promise<any>{
+    const updatedTemplate = await this.documentTemplateRepository.update({ id: data.id }, { file_name: data.documentName, template_version: data.documentNo});
+    await this.updateTemplates(data.document_type_id);
+    return updatedTemplate
+  }
+
   async checkForActiveTemplates(data: { id: number; update_userid: string; document_type_id: number }): Promise<any> {
     const allTemplates = await this.documentTemplateRepository
       .createQueryBuilder('documentTemplate')

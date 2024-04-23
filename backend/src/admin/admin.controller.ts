@@ -72,7 +72,8 @@ export class AdminController {
       streamableFile.end(pdfBuffer);
       res.set({
         'Content-Type': 'application/pdf',
-        'Content-Disposition': 'attachment; filename=file.pdf',
+        'Content-Disposition': 'inline; filename=preview.pdf',
+        'Content-Security-Policy': "default-src 'self'; frame-src 'self' blob:;",
       });
       streamableFile.pipe(res);
     } catch (error) {

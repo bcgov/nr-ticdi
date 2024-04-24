@@ -31,8 +31,14 @@ import { setProvisionDataObjects, setSelectedProvisionIds } from '../../store/re
 import { setSelectedVariableIds, setVariables } from '../../store/reducers/variableSlice';
 import { RootState } from '../../store/store';
 import { setSearchState } from '../../store/reducers/searchSlice';
+import { useParams } from 'react-router-dom';
 
 const LandingPage: FC = () => {
+  const {dtidNumber, docTypeFromUrl} = useParams();
+  const dtidFromUrl = dtidNumber ? parseInt(dtidNumber) : null;
+  const [initializeDtid, setInitializeDtid] = useState<boolean>(true);
+  const [initializeDocType, setInitializeDocType] = useState<boolean>(true);
+
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [showError, setShowError] = useState<boolean>(false);
@@ -54,6 +60,36 @@ const LandingPage: FC = () => {
   const selectedVariableIds: number[] = useSelector((state: RootState) => state.variable.selectedVariableIds);
   const variables = useSelector((state: RootState) => state.variable.variables);
   const searchState = useSelector((state: RootState) => state.search);
+
+  // Old route compatibility, set dtid from url, set doc type to lur if none given
+  useEffect(() => {
+    if (dtidFromUrl && initializeDtid) {
+      setDtidInput(dtidFromUrl);
+      setDtid(dtidFromUrl);
+      fetchData(dtidFromUrl);
+      setInitializeDtid(false);
+    }
+  }, [dtidFromUrl]);
+
+  // Old route compatibility, set doc type from url
+  useEffect(() => {
+    if (docTypeFromUrl && initializeDocType && documentTypes.length > 0) {
+      for (let dt of documentTypes) {
+        if (dt.name.toLowerCase() === docTypeFromUrl.toLowerCase()) {
+          setDocumentType(dt);
+          setSelectedDocTypeId(dt.id)
+          setInitializeDocType(false);
+        }
+      }
+    } else if (!docTypeFromUrl && dtidFromUrl && initializeDocType && documentTypes.length > 0) {
+        const lurDocType = documentTypes.find((dt) => dt.name === 'Land Use Report');
+        if (lurDocType) {
+          setDocumentType(lurDocType);
+          setSelectedDocTypeId(lurDocType.id)
+        }
+        setInitializeDocType(false);
+    }
+  }, [documentTypes, docTypeFromUrl])
 
   useEffect(() => {
     const fetchBasicData = async () => {
@@ -146,26 +182,30 @@ const LandingPage: FC = () => {
     fetchDocData();
   }, [documentType, dtid, dispatch]);
 
+  const fetchData = async (dtidValue: number) => {
+    try {
+      setLoading(true);
+      setDtid(dtidValue);
+      // Fetch any existing documentData
+      const displayData: { dtr: DTRDisplayObject | null; error: string | null } = await getDisplayData(dtidValue);
+      if (!displayData.error) setData(displayData.dtr);
+      else {
+        setError(displayData.error);
+        setShowError(true);
+      }
+    } catch (err: any) {
+      setError(err);
+      setShowError(true);
+    } finally {
+      setLoading(false);
+    }
+  }
+
   const fetchDataHandler = async () => {
     setError(null);
     setShowError(false);
     if (dtidInput) {
-      try {
-        setLoading(true);
-        setDtid(dtidInput);
-        // Fetch any existing documentData
-        const displayData: { dtr: DTRDisplayObject | null; error: string | null } = await getDisplayData(dtidInput);
-        if (!displayData.error) setData(displayData.dtr);
-        else {
-          setError(displayData.error);
-          setShowError(true);
-        }
-      } catch (err: any) {
-        setError(err);
-        setShowError(true);
-      } finally {
-        setLoading(false);
-      }
+      fetchData(dtidInput);
     } else {
       setData(null);
       setDtid(null);

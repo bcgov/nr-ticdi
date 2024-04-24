@@ -5,6 +5,7 @@ import { activateTemplate, downloadTemplate, getTemplatesInfo, previewTemplate }
 import { DocType, TemplateInfo } from '../../../types/types';
 import { Button } from 'react-bootstrap';
 import PreviewTemplateModal from '../../modal/admin/manage-templates/PreviewTemplateModal';
+import EditTemplateModal from '../../modal/manage-templates/EditTemplateModal';
 
 interface TemplateInfoTableProps {
   documentType: DocType;
@@ -18,7 +19,13 @@ const TemplateInfoTable: React.FC<TemplateInfoTableProps> = ({ documentType, ref
   const [loading, setLoading] = useState<boolean>(false);
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [iframeSrcBlob, setIframeSrcBlob] = useState<Blob | null>(null);
-
+  const [isEditModalOpen, setisEditModalOpen] = useState<boolean>(false);
+  const [documentId, setDocumentId] = useState<number>(10);
+  const [documentName, setDocumentName] = useState<string>('');
+  const [documentVersion, setDocumentVersion] = useState<number>(10);
+  const [isTemplateUpdated, setTemplateUpdated] = useState<boolean>(false);
+  //]
+  //
   useEffect(() => {
     const fetchData = async () => {
       const data = await getTemplatesInfo(documentType.id);
@@ -31,7 +38,7 @@ const TemplateInfoTable: React.FC<TemplateInfoTableProps> = ({ documentType, ref
     };
 
     fetchData();
-  }, [documentType, refreshVersion]);
+  }, [documentType, refreshVersion, isTemplateUpdated]);
 
   const activeRadioHandler = async (id: number) => {
     try {
@@ -79,10 +86,23 @@ const TemplateInfoTable: React.FC<TemplateInfoTableProps> = ({ documentType, ref
     }
   };
 
+  const handleEditTemplate = async (id: number, fileName: string, version: number) => {
+    setLoading(true);
+    setDocumentId(id);
+    setDocumentName(fileName);
+    setDocumentVersion(version);
+    setisEditModalOpen(true);
+  };
+
   // this opens a modal which is handled on the ManageTemplatesPage
   const handleRemoveButton = (id: number) => {
     handleRemove(id);
   };
+
+  const onTemplateUpdated = () => {
+    setTemplateUpdated(!isTemplateUpdated);
+    setisEditModalOpen(false);
+  }
 
   const columnHelper = createColumnHelper<TemplateInfo>();
 
@@ -149,6 +169,17 @@ const TemplateInfoTable: React.FC<TemplateInfoTableProps> = ({ documentType, ref
       enableSorting: false,
       meta: { customCss: { width: '12%' } },
     }),
+    columnHelper.accessor('edit', {
+      id: 'edit',
+      cell: (info) => (
+        <Button variant="primary" onClick={() => handleEditTemplate(info.row.original.id, info.row.original.file_name, info.row.original.template_version)}>
+          Edit Doc
+        </Button>
+      ),
+      header: () => null,
+      enableSorting: false,
+      meta: { customCss: { width: '11%' } },
+    }),
     columnHelper.accessor('remove', {
       id: 'remove',
       cell: (info) => (
@@ -173,6 +204,7 @@ const TemplateInfoTable: React.FC<TemplateInfoTableProps> = ({ documentType, ref
 
 
   return <>
+    {isEditModalOpen && <EditTemplateModal show={isEditModalOpen} documentTypeId={documentType.id} documentName={documentName} documentId={documentId} documentVersion={documentVersion} onHide={() => setisEditModalOpen(false)} onUpload={onTemplateUpdated} />}
     {isOpen && <PreviewTemplateModal isOpen={isOpen} toggleModal={toggleModal} iframeSrcBlob={iframeSrcBlob} />}
     <DataTable
       columns={columns}

@@ -18,6 +18,10 @@ const ManageTemplatesPage: FC = () => {
     const getData = async () => {
       const docTypeData = await getDocumentTypes();
       setAllDocTypes(docTypeData);
+      if (docTypeData.length > 0) {
+        setSelectedDocType(docTypeData[0]);
+        refreshTables();
+      }
     };
     getData();
   }, []);
@@ -57,9 +61,7 @@ const ManageTemplatesPage: FC = () => {
             id="reportTypes"
             style={{ minWidth: '200px' }}
             className="border border-1 rounded pl-2 ml-4"
-            onChange={selectedDocTypeHandler}
-          >
-            <option key="none" value={-1}></option>
+            onChange={selectedDocTypeHandler}>
             {allDocTypes.map((docType) => (
               <option key={docType.id} value={docType.id}>
                 {docType.name}

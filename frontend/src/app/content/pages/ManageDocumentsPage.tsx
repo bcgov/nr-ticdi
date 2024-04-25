@@ -22,7 +22,7 @@ import DocumentProvisionSearch, {
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../store/store';
 import { setDocType } from '../../store/reducers/docTypeSlice';
-import TestProvisionTable from '../../components/table/manage-doc-types/TestProvisionTable';
+// import TestProvisionTable from '../../components/table/manage-doc-types/TestProvisionTable';
 
 const ManageDocumentsPage: FC = () => {
   const [loading, setLoading] = useState<boolean>(false);

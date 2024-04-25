@@ -14,7 +14,6 @@ interface ManageDocumentProvisionsTableProps {
   provisions: ManageDocTypeProvision[] | undefined;
   provisionGroups: ProvisionGroup[] | undefined;
   searchState: DocumentProvisionSearchState;
-  refreshTables: () => void;
   onUpdate: (manageDocTypeProvisions: ManageDocTypeProvision[]) => void;
 }
 
@@ -23,7 +22,6 @@ const ManageDocumentProvisionsTable: React.FC<ManageDocumentProvisionsTableProps
   provisions,
   provisionGroups,
   searchState,
-  refreshTables,
   onUpdate,
 }) => {
   const [allProvisions, setAllProvisions] = useState<ManageDocTypeProvision[]>([]);
@@ -84,22 +82,36 @@ const ManageDocumentProvisionsTable: React.FC<ManageDocumentProvisionsTableProps
     setFilteredProvisions(searchFilteredProvisions);
   }, [allProvisions, searchState]);
 
+  useEffect(() => {
+    onUpdate(allProvisions);
+  }, [allProvisions, onUpdate]);
+
   const associateCheckboxHandler = async (provisionId: number, newValue: boolean) => {
     try {
       setLoading(true);
-      if (newValue) {
-        await associateProvisionToDocType(provisionId, documentTypeId);
-      } else {
-        await disassociateProvisionFromDocType(provisionId, documentTypeId);
-      }
+      let updatedAllProvisions: ManageDocTypeProvision[] = [];
+      let updatedFilteredProvisions: ManageDocTypeProvision[] = [];
+
+      // Update all provisions and store the updated list in a variable
       setAllProvisions((prevProvisions) => {
-        let newProvisions = prevProvisions.map((provision) => {
+        updatedAllProvisions = prevProvisions.map((provision) => {
           if (provision.id === provisionId) {
             return { ...provision, associated: newValue };
           }
           return provision;
         });
-        return newProvisions;
+        return updatedAllProvisions;
+      });
+
+      // Update filtered provisions and store the updated list in a variable
+      setFilteredProvisions((prevProvisions) => {
+        updatedFilteredProvisions = prevProvisions.map((provision) => {
+          if (provision.id === provisionId) {
+            return { ...provision, associated: newValue };
+          }
+          return provision;
+        });
+        return updatedFilteredProvisions;
       });
     } catch (error) {
       console.log('Error enabling/disabling provision');

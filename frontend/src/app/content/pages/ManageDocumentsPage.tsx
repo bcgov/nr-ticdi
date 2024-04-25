@@ -22,6 +22,7 @@ import DocumentProvisionSearch, {
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../store/store';
 import { setDocType } from '../../store/reducers/docTypeSlice';
+import TestProvisionTable from '../../components/table/manage-doc-types/TestProvisionTable';
 
 const ManageDocumentsPage: FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
@@ -155,12 +156,13 @@ const ManageDocumentsPage: FC = () => {
   };
 
   const updateProvisionsState = (newProvisionsState: ManageDocTypeProvision[]) => {
+    console.log('updating provisions');
     setUpdatedProvisions(newProvisionsState);
   };
 
   const saveButtonHandler = async () => {
     try {
-      await saveDocType();
+      // await saveDocType();
       await saveProvisions();
     } catch (err) {
       console.log('Error when saving');
@@ -175,28 +177,33 @@ const ManageDocumentsPage: FC = () => {
     console.log(newValues);
   }, []);
 
-  const saveDocType = async () => {
-    try {
-      setLoading(true);
-      await updateDocType(
-        selectedDocType.id,
-        updatedDocType.name,
-        updatedDocType.created_by,
-        updatedDocType.created_date
-      );
-      refreshDocTypes();
-    } catch (err) {
-      console.log('Error saving doc type');
-      console.log(err);
-    } finally {
-      setLoading(false);
-    }
-  };
+  // const saveDocType = async () => {
+  //   try {
+  //     setLoading(true);
+  //     await updateDocType(
+  //       selectedDocType.id,
+  //       updatedDocType.name,
+  //       updatedDocType.created_by,
+  //       updatedDocType.created_date
+  //     );
+  //     refreshDocTypes();
+  //   } catch (err) {
+  //     console.log('Error saving doc type');
+  //     console.log(err);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
   const saveProvisions = async () => {
     try {
       setLoading(true);
       console.log('Saving Provisions...');
+      for (let prov of updatedProvisions) {
+        if (prov.associated) {
+          console.log(prov);
+        }
+      }
       await updateManageDocTypeProvisions(selectedDocType.id, updatedProvisions);
     } catch (err) {
       console.log('Error updating provisions');
@@ -270,9 +277,13 @@ const ManageDocumentsPage: FC = () => {
             provisions={provisions}
             provisionGroups={provisionGroups}
             searchState={searchState}
-            refreshTables={refreshTables}
             onUpdate={updateProvisionsState}
           />
+          {/* <TestProvisionTable
+            provisions={provisions}
+            provisionGroups={provisionGroups}
+            onUpdate={updateProvisionsState}
+          /> */}
           {/** ID - Type - Group - Seq - Max - Provision Name - Free Text - Category - Associated */}
           <EditProvisionGroupsModal
             provisionGroups={provisionGroups}

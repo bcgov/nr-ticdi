@@ -51,6 +51,7 @@ const EditDocTypeTable: FC<EditDocTypeTableProps> = ({ onUpdate, refreshDocTypes
   };
 
   const handleCancelButton = () => {
+    setCurrentDocType(selectedDocType);
     setIsEditing(false);
   };
 

@@ -1,19 +1,18 @@
-// import { Get, Controller, Render, Param, UseGuards, UseFilters, Session, Query, Res } from '@nestjs/common';
-// import { NFR_VARIANTS, NFR_VARIANTS_ARRAY, PAGE_TITLES, REPORT_TYPES } from 'src/constants';
-// import { SessionData } from 'src/types';
-// import { AuthenticationGuard } from './authentication/authentication.guard';
-// import { AuthenticationFilter } from './authentication/authentication.filter';
-// import { TTLSService } from './ttls/ttls.service';
-// import { AdminGuard } from './admin/admin.guard';
-// import { AxiosRequestConfig } from 'axios';
-// import { firstValueFrom } from 'rxjs';
-// import { Req } from '@nestjs/common/decorators/http/route-params.decorator';
-// import { Request, Response } from 'express';
-// import { ReportService } from './report/report.service';
-// import { nfrInterestedParties } from 'src/util';
-// import { JwtAuthGuard } from './auth/jwtauth.guard';
-
-import { Controller, Get } from '@nestjs/common';
+import { Get, Controller, Render, Param, UseGuards, UseFilters, Session, Query, Res } from '@nestjs/common';
+import { NFR_VARIANTS, NFR_VARIANTS_ARRAY, PAGE_TITLES, REPORT_TYPES } from 'src/constants';
+import { SessionData } from 'src/types';
+import { AuthenticationGuard } from './authentication/authentication.guard';
+import { AuthenticationFilter } from './authentication/authentication.filter';
+import { TTLSService } from './ttls/ttls.service';
+import { AdminGuard } from './admin/admin.guard';
+import { AxiosRequestConfig } from 'axios';
+import { firstValueFrom } from 'rxjs';
+import { Req } from '@nestjs/common/decorators/http/route-params.decorator';
+import { Request, Response } from 'express';
+import { ReportService } from './report/report.service';
+import { nfrInterestedParties } from 'src/util';
+import { JwtAuthGuard } from './auth/jwtauth.guard';
+import { Public } from './auth/decorators/public.decorator';
 
 // // unused, to be cleaned up
 // let requestUrl: string;
@@ -21,10 +20,27 @@ import { Controller, Get } from '@nestjs/common';
 
 @Controller()
 export class AppController {
-  @Get()
-  getHello() {
-    return 'Hello Backend!';
+  // constructor(private readonly reportService: ReportService, private readonly ttlsService: TTLSService) {
+  //   const hostname = process.env.backend_url ? process.env.backend_url : `http://localhost`;
+  //   const port = process.env.backend_url ? 3000 : 3001;
+  //   requestUrl = `${hostname}:${port}/document-template/`;
+  //   requestConfig = {
+  //     headers: {
+  //       'Content-Type': 'application/json',
+  //     },
+  //   };
+  // }
+
+  @Get('healthcheck')
+  @Public()
+  getHello(): string {
+    return 'hello';
   }
+
+  // @Get()
+  // getHello() {
+  //   return 'Hello Backend!';
+  // }
   // constructor(private readonly reportService: ReportService, private readonly ttlsService: TTLSService) {
   //   const hostname = process.env.backend_url ? process.env.backend_url : `http://localhost`;
   //   const port = process.env.backend_url ? 3000 : 3001;

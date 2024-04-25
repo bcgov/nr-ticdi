@@ -199,6 +199,7 @@ export type TemplateInfo = {
   view: any; // remove from route
   remove: any; // remove from route
   preview: any; // remove from route
+  edit: any;
   id: number;
 };
 

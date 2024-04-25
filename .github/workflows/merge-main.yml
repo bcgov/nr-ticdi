@@ -122,6 +122,7 @@ jobs:
           oc process -f .github/openshift/deploy.backend.yml -p ZONE=${{ env.ZONE }} \
             -p PROMOTE=${{ github.repository }}:${{ env.ZONE }}-backend | oc apply -f -
           oc process -f .github/openshift/deploy.frontend.yml -p ZONE=${{ env.ZONE }} \
+            -p KEYCLOAK_URL=${{ vars.KEYCLOAK_URL_TEST}}  \
             -p PROMOTE=${{ github.repository }}:${{ env.ZONE }}-frontend | oc apply -f -
 
           # Follow any active rollouts (see deploymentconfigs)

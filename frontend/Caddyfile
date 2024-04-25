@@ -17,7 +17,7 @@
           }
           respond `window.REACT_APP_KEYCLOAK_URL="{$KEYCLOAK_URL}";
                    window.REACT_APP_KEYCLOAK_REALM="standard";
-                   window.REACT_APP_KEYCLOAK_CLIENT_ID="ticdi-4133";
+                   window.REACT_APP_KEYCLOAK_CLIENT_ID="ticdi-2-5398";
                    window.REACT_APP_API_URL="{$BACKEND_URL}";`
   }
 

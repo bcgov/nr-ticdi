@@ -64,6 +64,22 @@ export class AdminController {
     });
   }
 
+  @Get('update-template/:id/:documentTypeId/:documentNo/:documentName')
+  async upddateTemplate(
+    @User() user: IdirObject,
+    @Param('id') id: number,
+    @Param('document_type_id') document_type_id: number,
+    @Param('documentNo') documentNo: number,
+    @Param('documentName') documentName: string
+  ){
+   return this.adminService.updateTemplate({
+    id: id,
+    documentNo: documentNo,
+    documentName: documentName,
+    document_type_id: document_type_id,
+   });
+  }
+
   @Get('preview-template/:id')
   async previewTemplate(@Param('id') id: number, @Res() res) {
     try {

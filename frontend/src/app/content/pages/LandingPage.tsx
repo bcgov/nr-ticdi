@@ -32,9 +32,10 @@ import { setSelectedVariableIds, setVariables } from '../../store/reducers/varia
 import { RootState } from '../../store/store';
 import { setSearchState } from '../../store/reducers/searchSlice';
 import { useParams } from 'react-router-dom';
+import CustomCollapsible from './documentpreview/CustomCollapsible';
 
 const LandingPage: FC = () => {
-  const {dtidNumber, docTypeFromUrl} = useParams();
+  const { dtidNumber, docTypeFromUrl } = useParams();
   const dtidFromUrl = dtidNumber ? parseInt(dtidNumber) : null;
   const [initializeDtid, setInitializeDtid] = useState<boolean>(true);
   const [initializeDocType, setInitializeDocType] = useState<boolean>(true);
@@ -60,6 +61,7 @@ const LandingPage: FC = () => {
   const selectedVariableIds: number[] = useSelector((state: RootState) => state.variable.selectedVariableIds);
   const variables = useSelector((state: RootState) => state.variable.variables);
   const searchState = useSelector((state: RootState) => state.search);
+  const [isOpen, setIsOpen] = useState(false);
 
   // Old route compatibility, set dtid from url, set doc type to lur if none given
   useEffect(() => {
@@ -77,19 +79,19 @@ const LandingPage: FC = () => {
       for (let dt of documentTypes) {
         if (dt.name.toLowerCase() === docTypeFromUrl.toLowerCase()) {
           setDocumentType(dt);
-          setSelectedDocTypeId(dt.id)
+          setSelectedDocTypeId(dt.id);
           setInitializeDocType(false);
         }
       }
     } else if (!docTypeFromUrl && dtidFromUrl && initializeDocType && documentTypes.length > 0) {
-        const lurDocType = documentTypes.find((dt) => dt.name === 'Land Use Report');
-        if (lurDocType) {
-          setDocumentType(lurDocType);
-          setSelectedDocTypeId(lurDocType.id)
-        }
-        setInitializeDocType(false);
+      const lurDocType = documentTypes.find((dt) => dt.name === 'Land Use Report');
+      if (lurDocType) {
+        setDocumentType(lurDocType);
+        setSelectedDocTypeId(lurDocType.id);
+      }
+      setInitializeDocType(false);
     }
-  }, [documentTypes, docTypeFromUrl])
+  }, [documentTypes, docTypeFromUrl]);
 
   useEffect(() => {
     const fetchBasicData = async () => {
@@ -171,7 +173,7 @@ const LandingPage: FC = () => {
           setProvisionGroups(activeProvisionGroups);
         } catch (error) {
           console.error('Failed to fetch data', error);
-          setData(null);
+          //setData(null);
         } finally {
           setLoading(false);
         }
@@ -199,7 +201,7 @@ const LandingPage: FC = () => {
     } finally {
       setLoading(false);
     }
-  }
+  };
 
   const fetchDataHandler = async () => {
     setError(null);
@@ -266,6 +268,14 @@ const LandingPage: FC = () => {
 
     return { variableSaveData, provisionSaveData };
   };
+
+  const handleClear = () => {
+    setDtidInput(null);
+    setData(null);
+    setIsOpen(false);
+    setSelectedDocTypeId(null);
+  };
+  const toggleCollapsible = () => setIsOpen(!isOpen);
 
   const getReportData = () => {
     const selectedProvisions = provisions.filter((provision) => selectedProvisionIds.includes(provision.provision_id));
@@ -343,10 +353,19 @@ const LandingPage: FC = () => {
         <div className="inlineDiv ml-4 mr-4">
           <input type="number" className="form-control" id="dtid" value={dtidInput || ''} onChange={handleDtidChange} />
         </div>
-        <Button variant="success" onClick={fetchDataHandler}>
+        <Button variant="success" onClick={fetchDataHandler} style={{ marginRight: '10px', width: '150px' }}>
           Retrieve
         </Button>
+
+        <Button
+          variant="outline-primary"
+          style={{ backgroundColor: 'transparent', color: 'black', width: '150px' }}
+          onClick={handleClear}
+        >
+          Clear
+        </Button>
       </div>
+
       {showError && (
         <Alert variant="danger" className="mb-3 d-inline-block" style={{ width: 'auto', maxWidth: '100%' }}>
           {error}
@@ -362,11 +381,30 @@ const LandingPage: FC = () => {
         <div className="font-weight-bold inlineDiv mr-1">Primary Contact Name:</div>
         <div className="inlineDiv">{data?.primaryContactName}</div>
       </div>
-      <Collapsible title="Disposition Transaction ID Details">
+      <CustomCollapsible
+        title="Disposition Transaction ID Details"
+        isOpen={isOpen}
+        toggleCollapsible={toggleCollapsible}
+        isSpanRequired={false}
+      >
         {data ? <DtidDetails data={data!} /> : <Skeleton />}
-      </Collapsible>
-      <Collapsible title="Tenure Details">{data ? <TenureDetails data={data!} /> : <Skeleton />}</Collapsible>
-      <Collapsible title="Interested Parties">{data ? <InterestedParties data={data!} /> : <Skeleton />}</Collapsible>
+      </CustomCollapsible>
+      <CustomCollapsible
+        title="Tenure Details"
+        isOpen={isOpen}
+        toggleCollapsible={toggleCollapsible}
+        isSpanRequired={false}
+      >
+        {data ? <TenureDetails data={data!} /> : <Skeleton />}
+      </CustomCollapsible>
+      <CustomCollapsible
+        title="Interested Parties"
+        isOpen={isOpen}
+        toggleCollapsible={toggleCollapsible}
+        isSpanRequired={false}
+      >
+        {data ? <InterestedParties data={data!} /> : <Skeleton />}
+      </CustomCollapsible>
 
       <hr />
       <h3>Create Document</h3>

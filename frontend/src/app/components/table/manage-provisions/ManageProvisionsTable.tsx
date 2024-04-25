@@ -97,7 +97,7 @@ const ManageProvisionsTable: React.FC<ManageProvisionsTableProps> = ({
   const columns: ColumnDef<Provision, any>[] = [
     columnHelper.accessor('id', {
       id: 'id',
-      cell: (info) => <input value={info.getValue()} className="readonlyInput" readOnly />,
+      cell: (info) => <input value={info.getValue()} className="form-control readonlyInput" readOnly />,
       header: () => 'ID',
       meta: { customCss: { width: '5%' } },
     }),
@@ -110,14 +110,14 @@ const ManageProvisionsTable: React.FC<ManageProvisionsTableProps> = ({
     // }),
     columnHelper.accessor('provision_name', {
       id: 'provision_name',
-      cell: (info) => <input value={info.getValue()} className="readonlyInput" readOnly />,
+      cell: (info) => <input value={info.getValue()} className="form-control readonlyInput" readOnly />,
       header: () => 'Provision',
       enableSorting: true,
       meta: { customCss: { width: '35%' } },
     }),
     columnHelper.accessor('category', {
       id: 'category',
-      cell: (info) => <input value={info.getValue()} className="readonlyInput" readOnly />,
+      cell: (info) => <input value={info.getValue()} className="form-control readonlyInput" readOnly />,
       header: () => 'Category',
       enableSorting: true,
       meta: { customCss: { width: '20%' } },

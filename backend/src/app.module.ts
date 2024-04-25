@@ -9,14 +9,11 @@ import { ProvisionModule } from './provision/provision.module';
 import { DocumentDataModule } from './document_data/document_data.module';
 import { HttpModule } from '@nestjs/axios';
 import { TTLSService } from './ttls/ttls.service';
-import { AuthenticationModule } from './authentication/authentication.module';
 import { SessionModule } from 'nestjs-session';
 import { AdminController } from './admin/admin.controller';
 import { AdminModule } from './admin/admin.module';
 import { ReportModule } from './report/report.module';
 import { DocumentTypeModule } from './document_type/document_type.module';
-import { HttpExceptionFilter } from './authentication/http-exception.filter';
-import { APP_FILTER } from '@nestjs/core';
 
 import config from './ormconfig';
 import { JWTAuthModule } from './auth/jwtauth.module';
@@ -40,7 +37,6 @@ if (process.env.POSTGRESQL_PASSWORD != null) {
     DocumentDataLogModule,
     ProvisionModule,
     HttpModule,
-    // AuthenticationModule,
     JWTAuthModule,
     AdminModule,
     ReportModule,
@@ -49,13 +45,6 @@ if (process.env.POSTGRESQL_PASSWORD != null) {
     }),
   ],
   controllers: [AdminController],
-  providers: [
-    AppService,
-    TTLSService,
-    // {
-    //   provide: APP_FILTER,
-    //   useClass: HttpExceptionFilter,
-    // },
-  ],
+  providers: [AppService, TTLSService],
 })
 export class AppModule {}

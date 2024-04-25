@@ -1,10 +1,12 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
 import { CreateProvisionDto } from './dto/create-provision.dto';
 import { ProvisionService } from './provision.service';
 import { IdirObject, ManageDocTypeProvision } from 'src/types';
 import { User } from 'src/auth/decorators/user.decorator';
+import { JwtAuthGuard } from 'src/auth/jwtauth.guard';
 
 @Controller('provision')
+@UseGuards(JwtAuthGuard)
 export class ProvisionController {
   constructor(private readonly provisionService: ProvisionService) {}
 

@@ -71,7 +71,7 @@ const DocumentProvisionSearch: FC<DocumentProvisionSearchProps> = ({ onSearch })
               </Col>
               <Col sm={7}>
                 <input
-                  className="mb-1"
+                  className="form-control mb-1"
                   type="text"
                   name="provisionName"
                   value={searchState.provisionName}
@@ -87,7 +87,7 @@ const DocumentProvisionSearch: FC<DocumentProvisionSearchProps> = ({ onSearch })
               </Col>
               <Col sm={7}>
                 <input
-                  className="mb-1"
+                  className="form-control mb-1"
                   type="number"
                   name="id"
                   value={searchState.id}
@@ -103,7 +103,7 @@ const DocumentProvisionSearch: FC<DocumentProvisionSearchProps> = ({ onSearch })
               </Col>
               <Col sm={7}>
                 <select
-                  className="mb-1"
+                  className="form-control mb-1"
                   value={searchState.type}
                   name="type"
                   onChange={handleSelectChange}
@@ -125,7 +125,7 @@ const DocumentProvisionSearch: FC<DocumentProvisionSearchProps> = ({ onSearch })
               </Col>
               <Col sm={7}>
                 <input
-                  className="mb-1"
+                  className="form-control mb-1"
                   type="text"
                   name="group"
                   value={searchState.group}
@@ -141,7 +141,7 @@ const DocumentProvisionSearch: FC<DocumentProvisionSearchProps> = ({ onSearch })
               </Col>
               <Col sm={7}>
                 <input
-                  className="mb-1"
+                  className="form-control mb-1"
                   type="text"
                   name="freeText"
                   value={searchState.freeText}
@@ -157,7 +157,7 @@ const DocumentProvisionSearch: FC<DocumentProvisionSearchProps> = ({ onSearch })
               </Col>
               <Col sm={7}>
                 <input
-                  className="mb-1"
+                  className="form-control mb-1"
                   type="text"
                   name="category"
                   value={searchState.category}
@@ -193,7 +193,7 @@ const DocumentProvisionSearch: FC<DocumentProvisionSearchProps> = ({ onSearch })
           {/* Basic Search Inputs */}
           <Col sm={1}>
             <input
-              className=""
+              className="form-control"
               type="number"
               name="id"
               placeholder="ID"
@@ -204,7 +204,7 @@ const DocumentProvisionSearch: FC<DocumentProvisionSearchProps> = ({ onSearch })
           </Col>
           <Col sm={3}>
             <input
-              className="ml-2"
+              className="form-control ml-2"
               type="text"
               name="provisionName"
               placeholder="Provision Name"
@@ -220,148 +220,6 @@ const DocumentProvisionSearch: FC<DocumentProvisionSearchProps> = ({ onSearch })
           </Col>
         </>
       )}
-      {/* {!searchState.isAdvancedSearch ? (
-        <Col sm={8}>
-          <Col sm={6} style={{ display: 'flex', alignItems: 'center', gap: '10px' }} className="mt-3">
-            <input
-              type="number"
-              name="id"
-              placeholder="ID"
-              value={searchState.id}
-              onChange={handleChange}
-              style={{ width: '60px' }}
-              className="ml-2"
-            />
-            <input
-              type="text"
-              name="provisionName"
-              placeholder="Provision Name"
-              value={searchState.provisionName}
-              onChange={handleChange}
-              style={{ width: '300px' }}
-            />
-            <Col sm={4}>
-              <Button variant="primary" onClick={toggleAdvancedSearch}>
-                Advanced <FontAwesomeIcon icon={faCaretDown} />
-              </Button>
-            </Col>
-          </Col>
-        </Col>
-      ) : (
-        <>
-          <Col sm={6}>
-            <Row>
-              <Col sm={3} className="search-label">
-                Provision Name:
-              </Col>
-              <Col sm={3}>
-                <input
-                  className="search-input"
-                  type="text"
-                  name="provisionName"
-                  value={searchState.provisionName}
-                  onChange={handleChange}
-                />
-              </Col>
-            </Row>
-
-            <Row>
-              <Col sm={3} className="search-label">
-                ID:
-              </Col>
-              <Col sm={3}>
-                <input
-                  className="search-input"
-                  type="number"
-                  name="id"
-                  value={searchState.id}
-                  onChange={handleChange}
-                />
-              </Col>
-            </Row>
-
-            <Row>
-              <Col sm={3} className="search-label">
-                Type:
-              </Col>
-              <Col sm={3}>
-                <input
-                  className="search-input"
-                  type="text"
-                  name="type"
-                  value={searchState.type}
-                  onChange={handleChange}
-                />
-              </Col>
-            </Row>
-
-            <Row>
-              <Col sm={3} className="search-label">
-                Group:
-              </Col>
-              <Col sm={3}>
-                <input
-                  className="search-input"
-                  type="text"
-                  name="group"
-                  value={searchState.group}
-                  onChange={handleChange}
-                />
-              </Col>
-            </Row>
-
-            <Row>
-              <Col sm={3} className="search-label">
-                Free Text:
-              </Col>
-              <Col sm={3}>
-                <input
-                  className="search-input"
-                  type="text"
-                  name="freeText"
-                  value={searchState.freeText}
-                  onChange={handleChange}
-                />
-              </Col>
-            </Row>
-
-            <Row>
-              <Col sm={3} className="search-label">
-                Category:
-              </Col>
-              <Col sm={3}>
-                <input
-                  className="search-input"
-                  type="text"
-                  name="category"
-                  value={searchState.category}
-                  onChange={handleChange}
-                />
-              </Col>
-            </Row>
-
-            <Row>
-              <Col sm={3} className="search-label">
-                Associated:
-              </Col>
-              <Col sm={3}>
-                <input
-                  className="search-input"
-                  type="checkbox"
-                  name="associated"
-                  checked={searchState.associated}
-                  onChange={handleChange}
-                />
-              </Col>
-            </Row>
-          </Col>
-          <Col sm={2}>
-            <Button variant="primary" onClick={toggleAdvancedSearch} className="mt-3">
-              Advanced <FontAwesomeIcon icon={faCaretUp} />
-            </Button>
-          </Col>
-        </>
-      )} */}
     </>
   );
 };

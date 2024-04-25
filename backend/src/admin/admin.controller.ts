@@ -24,6 +24,10 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { Express } from 'express';
 import * as stream from 'stream';
 import { User } from 'src/auth/decorators/user.decorator';
+import { JwtRoleGuard } from 'src/auth/jwtrole.guard';
+import { JwtAuthGuard } from 'src/auth/jwtauth.guard';
+import { Roles } from 'src/auth/decorators/roles.decorator';
+import { Role } from 'src/enum/role.enum';
 
 let requestUrl: string;
 let requestConfig: AxiosRequestConfig;
@@ -32,6 +36,9 @@ let requestConfig: AxiosRequestConfig;
 // @UseFilters(AuthenticationFilter)
 // @UseGuards(AuthenticationGuard)
 // @UseGuards(AdminGuard)
+@UseGuards(JwtAuthGuard)
+@UseGuards(JwtRoleGuard)
+@Roles(Role.TICDI_ADMIN)
 export class AdminController {
   constructor(private readonly adminService: AdminService) {
     const hostname = process.env.backend_url ? process.env.backend_url : `http://localhost`;
@@ -81,7 +88,8 @@ export class AdminController {
       streamableFile.end(pdfBuffer);
       res.set({
         'Content-Type': 'application/pdf',
-        'Content-Disposition': 'attachment; filename=file.pdf',
+        'Content-Disposition': 'inline; filename=preview.pdf',
+        'Content-Security-Policy': "default-src 'self'; frame-src 'self' blob:;",
       });
       streamableFile.pipe(res);
     } catch (error) {

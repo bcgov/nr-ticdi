@@ -4,7 +4,7 @@ import { createRoot } from 'react-dom/client';
 import App from './app/App';
 import './app/App.css';
 import reportWebVitals from './reportWebVitals';
-import UserService from "./app/service/user-service";
+import UserService from './app/service/user-service';
 
 const container = document.getElementById('root')!;
 const root = createRoot(container);
@@ -17,12 +17,6 @@ const onAuthenticatedCallback = () =>
   );
 
 UserService.initKeycloak(onAuthenticatedCallback);
-
-// root.render(
-//   <StrictMode>
-//     <App />
-//   </StrictMode>
-// );
 
 // If you want to start measuring performance in your app, pass a function
 // to log results (for example: reportWebVitals(console.log))

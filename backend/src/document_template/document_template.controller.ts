@@ -4,11 +4,13 @@ import { CreateDocumentTemplateDto } from './dto/create-document_template.dto';
 import { UpdateDocumentTemplateDto } from './dto/update-document_template.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Express } from 'express';
-import { Param } from '@nestjs/common/decorators';
+import { Param, UseGuards } from '@nestjs/common/decorators';
 import { DocumentTemplate } from './entities/document_template.entity';
 import { TrimmedDocumentTemplate } from '../types';
+import { JwtAuthGuard } from 'src/auth/jwtauth.guard';
 
 @Controller('document-template')
+@UseGuards(JwtAuthGuard)
 export class DocumentTemplateController {
   constructor(private readonly templateService: DocumentTemplateService) {}
 

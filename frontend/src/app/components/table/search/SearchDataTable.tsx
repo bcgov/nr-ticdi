@@ -6,10 +6,11 @@ import { DocType, SearchData } from '../../../types/types';
 
 interface SearchDataTableProps {
   searchTerm: string;
+  searchDocType: string;
   setSelectedDocumentChange: (dtid: number, documentType: DocType) => void;
 }
 
-const SearchDataTable: React.FC<SearchDataTableProps> = ({ searchTerm, setSelectedDocumentChange }) => {
+const SearchDataTable: React.FC<SearchDataTableProps> = ({ searchTerm, searchDocType, setSelectedDocumentChange }) => {
   const [searchData, setSearchData] = useState<SearchData[]>([]);
   const [filteredSearchData, setFilteredSearchData] = useState<SearchData[]>([]);
   const [selectedDocument, setSelectedDocument] = useState<{ dtid: number; document_type: DocType } | null>(null);
@@ -32,23 +33,26 @@ const SearchDataTable: React.FC<SearchDataTableProps> = ({ searchTerm, setSelect
 
   useEffect(() => {
     const filterData = () => {
-      if (!searchTerm || searchTerm === '') {
-        setFilteredSearchData(searchData);
-        return;
-      }
-      const lowerCaseSearchTerm = searchTerm.toLowerCase();
+      let filteredData = searchData;
 
-      const filteredData = searchData.filter((item) =>
-        (Object.keys(item) as (keyof SearchData)[]).some((key) =>
-          String(item[key]).toLowerCase().includes(lowerCaseSearchTerm)
-        )
-      );
+      if (searchTerm) {
+        const lowerCaseSearchTerm = searchTerm.toLowerCase();
+        filteredData = filteredData.filter((item) =>
+          (Object.keys(item) as (keyof SearchData)[]).some((key) =>
+            String(item[key]).toLowerCase().includes(lowerCaseSearchTerm)
+          )
+        );
+      }
+
+      if (searchDocType) {
+        filteredData = filteredData.filter((item) => item.document_type.name === searchDocType);
+      }
 
       setFilteredSearchData(filteredData);
     };
 
     filterData();
-  }, [searchTerm, searchData]);
+  }, [searchTerm, searchDocType, searchData]);
 
   const activeRadioHandler = (dtid: number, document_type: DocType) => {
     console.log('changed');
@@ -61,14 +65,14 @@ const SearchDataTable: React.FC<SearchDataTableProps> = ({ searchTerm, setSelect
   const columns: ColumnDef<SearchData, any>[] = [
     columnHelper.accessor('dtid', {
       id: 'dtid',
-      cell: (info) => <input value={info.getValue()} className="readonlyInput" readOnly />,
+      cell: (info) => <input value={info.getValue()} className="form-control readonlyInput" readOnly />,
       header: () => 'DTID',
       enableSorting: true,
       meta: { customCss: { width: '10%' } },
     }),
     columnHelper.accessor('version', {
       id: 'version',
-      cell: (info) => <input value={info.getValue()} className="readonlyInput" readOnly />,
+      cell: (info) => <input value={info.getValue()} className="form-control readonlyInput" readOnly />,
       header: () => 'Version',
       enableSorting: false,
       meta: { customCss: { width: '8%' } },
@@ -76,28 +80,28 @@ const SearchDataTable: React.FC<SearchDataTableProps> = ({ searchTerm, setSelect
 
     columnHelper.accessor('file_name', {
       id: 'file_name',
-      cell: (info) => <input value={info.getValue()} className="readonlyInput" readOnly />,
+      cell: (info) => <input value={info.getValue()} className="form-control readonlyInput" readOnly />,
       header: () => 'Template Name',
       enableSorting: false,
       meta: { customCss: { width: '35%' } },
     }),
     columnHelper.accessor((row) => row.document_type.name, {
       id: 'doc_type',
-      cell: (info) => <input value={info.getValue()} className="readonlyInput" readOnly />,
+      cell: (info) => <input value={info.getValue()} className="form-control readonlyInput" readOnly />,
       header: () => 'Document Type',
       enableSorting: false,
       meta: { customCss: { width: '23%' } },
     }),
     columnHelper.accessor('updated_date', {
       id: 'updated_date',
-      cell: (info) => <input value={info.getValue()} className="readonlyInput" readOnly />,
+      cell: (info) => <input value={info.getValue()} className="form-control readonlyInput" readOnly />,
       header: () => 'Uploaded Date',
       enableSorting: true,
       meta: { customCss: { width: '11%' } },
     }),
     columnHelper.accessor('status', {
       id: 'status',
-      cell: (info) => <input value={info.getValue()} className="readonlyInput" readOnly />,
+      cell: (info) => <input value={info.getValue()} className="form-control readonlyInput" readOnly />,
       header: () => 'Status',
       enableSorting: true,
       meta: { customCss: { width: '11%' } },

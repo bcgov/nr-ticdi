@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import React, { FC } from 'react';
 
 interface TableCellProps {
   children: any;
@@ -6,7 +6,7 @@ interface TableCellProps {
   className?: string;
   style?: React.CSSProperties;
 }
-export const TableCell: FC<TableCellProps> = ({ children, colSpan, className, style }) => {
+export const TableCell: FC<TableCellProps> = React.memo(({ children, colSpan, className, style }) => {
   const defaultStyle: React.CSSProperties = {
     paddingTop: '10px',
     paddingRight: '10px',
@@ -17,4 +17,4 @@ export const TableCell: FC<TableCellProps> = ({ children, colSpan, className, st
       {children}
     </td>
   );
-};
+});

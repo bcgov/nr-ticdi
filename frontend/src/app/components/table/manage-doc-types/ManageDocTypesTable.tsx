@@ -23,21 +23,23 @@ const ManageDocTypesTable: React.FC<ManageDocTypesTableProps> = ({ documentTypes
   const columns: ColumnDef<DocType, any>[] = [
     columnHelper.accessor('name', {
       id: 'name',
-      cell: (info) => <input value={info.getValue()} className="readonlyInput" readOnly />,
+      cell: (info) => <input value={info.getValue()} className="form-control readonlyInput" readOnly />,
       header: () => 'Name',
       enableSorting: true,
       meta: { customCss: { width: '30%' } },
     }),
     columnHelper.accessor('created_date', {
       id: 'created_date',
-      cell: (info) => <input value={info.getValue()?.substring(0, 10)} className="readonlyInput" readOnly />,
+      cell: (info) => (
+        <input value={info.getValue()?.substring(0, 10)} className="form-control readonlyInput" readOnly />
+      ),
       header: () => 'Create Date',
       enableSorting: true,
       meta: { customCss: { width: '30%' } },
     }),
     columnHelper.accessor('created_by', {
       id: 'created_by',
-      cell: (info) => <input value={info.getValue()} className="readonlyInput" readOnly />,
+      cell: (info) => <input value={info.getValue()} className="form-control readonlyInput" readOnly />,
       header: () => 'Created By',
       enableSorting: true,
       meta: { customCss: { width: '30%' } },

@@ -14,12 +14,16 @@ import {
 import { IdirObject, ProvisionJSON, VariableJSON } from 'src/types';
 import { TTLSService } from '../ttls/ttls.service';
 import { AxiosRequestConfig } from 'axios';
-import { AuthenticationFilter } from 'src/authentication/authentication.filter';
-import { AuthenticationGuard } from 'src/authentication/authentication.guard';
-import { GenerateReportGuard } from 'src/authentication/generate-report.guard';
+// import { AuthenticationFilter } from 'src/authentication/authentication.filter';
+// import { AuthenticationGuard } from 'src/authentication/authentication.guard';
+// import { GenerateReportGuard } from 'src/authentication/generate-report.guard';
 import { ReportService } from './report.service';
 import { firstValueFrom } from 'rxjs';
 import { User } from 'src/auth/decorators/user.decorator';
+import { JwtAuthGuard } from 'src/auth/jwtauth.guard';
+import { JwtRoleGuard } from 'src/auth/jwtrole.guard';
+import { Role } from 'src/enum/role.enum';
+import { Roles } from 'src/auth/decorators/roles.decorator';
 import { Public } from 'src/auth/decorators/public.decorator';
 
 let requestUrl: string;
@@ -28,6 +32,7 @@ let requestConfig: AxiosRequestConfig;
 // @UseFilters(AuthenticationFilter)
 // @UseGuards(AuthenticationGuard)
 // @UseGuards(GenerateReportGuard)
+@UseGuards(JwtAuthGuard)
 @Controller('report')
 export class ReportController {
   constructor(private readonly ttlsService: TTLSService, private readonly reportService: ReportService) {
@@ -75,6 +80,8 @@ export class ReportController {
 
   // remember to update
   @Post('generate-report')
+  @UseGuards(JwtRoleGuard)
+  @Roles(Role.GENERATE_DOCUMENTS)
   @Header('Content-Type', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document')
   @Header('Content-Disposition', 'attachment; filename=report.docx')
   async generateReport(

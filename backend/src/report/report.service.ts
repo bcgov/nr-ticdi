@@ -354,95 +354,104 @@ export class ReportService {
     return response.data;
   }
 
-  // /**
-  //  *
-  //  * @param dtid
-  //  * @param idir_username
-  //  * @param reportType - id of the report type used to get report type & active template
-  //  */
-  // async generateReportNew(
-  //   dtid: number,
-  //   idir_username: string,
-  //   reportId: number
-  // ) {
-  //   const documentTemplateObject: { id: number; the_file: string; document_type: string } = await this.documentTemplateService.getReportTemplate(reportId);
+  /**
+   *
+   * @param dtid
+   * @param idir_username
+   * @param reportType - id of the report type used to get report type & active template
+   */
+  async generateReportNew(
+    dtid: number,
+    username: string,
+    document_type_id: number,
+    variableJson: VariableJSON[],
+    provisionJson: ProvisionJSON[]
+  ) {
+    // get raw ttls data for later
+    await this.ttlsService.setWebadeToken();
+    const rawData: any = await firstValueFrom(this.ttlsService.callHttp(dtid))
+      .then((res) => {
+        return res;
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+    // get the document template
+    const documentTemplateObject = await this.documentTemplateService.findActiveByDocumentType(document_type_id);
+    const data = {};
 
-  //   const data = {};
+    await this.documentDataLogService.create({
+      document_data_id: null, // should eventually point to document_data object
+      document_template_id: documentTemplateObject.id,
+      document_type_id: document_type_id,
+      dtid: dtid,
+      request_app_user: username,
+      create_userid: username,
+      request_json: JSON.stringify(data),
+    });
 
-  //   // log the request
-  //   const logData = {
-  //     document_template_id: documentTemplateObject.id,
-  //     print_request_detail_id: null,
-  //     document_type: documentTemplateObject.document_type,
-  //     dtid: dtid,
-  //     request_app_user: idir_username,
-  //     request_json: JSON.stringify(data),
-  //     create_userid: idir_username,
-  //   };
-  //   await this.printRequestLogService.create(logData);
+    const bufferBase64 = documentTemplateObject.the_file;
+    return await this.callCdogs(bufferBase64, data);
+  }
 
-  //   const bufferBase64 = documentTemplateObject.the_file;
-  //   return await this.callCdogs(bufferBase64, data)
-  // }
+  async callCdogs(base64Template: string, data: any) {
+    const cdogsToken = await this.ttlsService.callGetToken();
+    const md = JSON.stringify({
+      data,
+      formatters:
+        '{"myFormatter":"_function_myFormatter|function(data) { return data.slice(1); }","myOtherFormatter":"_function_myOtherFormatter|function(data) {return data.slice(2);}"}',
+      options: {
+        cacheReport: false,
+        convertTo: 'docx',
+        overwrite: true,
+        reportName: 'ticdi-report',
+      },
+      template: {
+        content: `${base64Template}`,
+        encodingType: 'base64',
+        fileType: 'docx',
+      },
+    });
 
-  // async callCdogs(base64Template: string, data: any) {
-  //   const cdogsToken = await this.ttlsService.callGetToken();
-  //   const md = JSON.stringify({
-  //     data,
-  //     formatters:
-  //       '{"myFormatter":"_function_myFormatter|function(data) { return data.slice(1); }","myOtherFormatter":"_function_myOtherFormatter|function(data) {return data.slice(2);}"}',
-  //     options: {
-  //       cacheReport: false,
-  //       convertTo: "docx",
-  //       overwrite: true,
-  //       reportName: "ticdi-report",
-  //     },
-  //     template: {
-  //       content: `${base64Template}`,
-  //       encodingType: "base64",
-  //       fileType: "docx",
-  //     },
-  //   });
+    const conf = {
+      method: 'post',
+      url: process.env.cdogs_url,
+      headers: {
+        Authorization: `Bearer ${cdogsToken}`,
+        'Content-Type': 'application/json',
+      },
+      responseType: 'arraybuffer',
+      data: md,
+    };
+    const ax = require('axios');
+    const response = await ax(conf).catch((error) => {
+      console.log(error.response);
+    });
+    return response.data;
+  }
 
-  //   const conf = {
-  //     method: "post",
-  //     url: process.env.cdogs_url,
-  //     headers: {
-  //       Authorization: `Bearer ${cdogsToken}`,
-  //       "Content-Type": "application/json",
-  //     },
-  //     responseType: "arraybuffer",
-  //     data: md,
-  //   };
-  //   const ax = require("axios");
-  //   const response = await ax(conf).catch((error) => {
-  //     console.log(error.response);
-  //   });
-  //   return response.data;
-  // }
-
-  // /**
-  //  * Generates an NFR report name using tenure file number
-  //  * and a version number. The version number is incremented
-  //  * each time someone generates a NFR report.
-  //  *
-  //  * @param tenureFileNumber
-  //  * @returns
-  //  */
-  // async generateNFRReportName(dtid: number, tenureFileNumber: string) {
-  //   const url = `${hostname}:${port}/document-data-log/version/` + dtid;
-  //   // grab the next version string for the dtid
-  //   const version = await axios
-  //     .get(url, {
-  //       headers: {
-  //         'Content-Type': 'application/json',
-  //       },
-  //     })
-  //     .then((res) => {
-  //       return res.data;
-  //     });
-  //   return { reportName: 'NFR_' + tenureFileNumber + '_' + version + '.docx' };
-  // }
+  /**
+   * Generates an NFR report name using tenure file number
+   * and a version number. The version number is incremented
+   * each time someone generates a NFR report.
+   *
+   * @param tenureFileNumber
+   * @returns
+   */
+  async generateNFRReportName(dtid: number, tenureFileNumber: string) {
+    const url = `${hostname}:${port}/document-data-log/version/` + dtid;
+    // grab the next version string for the dtid
+    const version = await axios
+      .get(url, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+      .then((res) => {
+        return res.data;
+      });
+    return { reportName: 'NFR_' + tenureFileNumber + '_' + version + '.docx' };
+  }
 
   async generateNFRReport(
     dtid: number,

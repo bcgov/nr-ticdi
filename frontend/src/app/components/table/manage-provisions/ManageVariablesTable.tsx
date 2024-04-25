@@ -44,14 +44,16 @@ const ManageVariablesTable: React.FC<ManageVariablesTableProps> = ({ variables, 
   const columns: ColumnDef<Variable, any>[] = [
     columnHelper.accessor('variable_name', {
       id: 'variable_name',
-      cell: (info) => <input value={info.getValue()} className="readonlyInput" readOnly />,
+      cell: (info) => <input value={info.getValue()} className="form-control readonlyInput" readOnly />,
       header: () => 'Name',
       enableSorting: true,
       meta: { customCss: { width: '40%' } },
     }),
     columnHelper.accessor('variable_value', {
       id: 'variable_value',
-      cell: (info) => <input value={info.getValue()} className="readonlyInput" title={info.getValue()} readOnly />,
+      cell: (info) => (
+        <input value={info.getValue()} className="form-control readonlyInput" title={info.getValue()} readOnly />
+      ),
       header: () => 'Value',
       enableSorting: false,
       meta: { customCss: { width: '40%' } },

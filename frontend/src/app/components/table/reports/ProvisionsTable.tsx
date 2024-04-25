@@ -66,21 +66,23 @@ const ProvisionsTable: React.FC<ProvisionsTableProps> = ({
   const columns: ColumnDef<ReducedProvisionDataObject, any>[] = [
     columnHelper.accessor('type', {
       id: 'type',
-      cell: (info) => <input value={info.getValue()} className="readonlyInput" readOnly />,
+      cell: (info) => <input value={info.getValue()} className="form-control readonlyInput" readOnly />,
       header: () => 'Type',
       enableSorting: true,
       meta: { customCss: { width: '5%' } },
     }),
     columnHelper.accessor('provision_name', {
       id: 'provision_name',
-      cell: (info) => <input value={info.getValue()} className="readonlyInput" readOnly />,
+      cell: (info) => <input value={info.getValue()} className="form-control readonlyInput" readOnly />,
       header: () => 'Provision',
       enableSorting: true,
       meta: { customCss: { width: '45%' } },
     }),
     columnHelper.accessor('help_text', {
       id: 'help_text',
-      cell: (info) => <input value={info.getValue()} className="readonlyInput" title={info.getValue()} readOnly />,
+      cell: (info) => (
+        <input value={info.getValue()} className="form-control readonlyInput" title={info.getValue()} readOnly />
+      ),
       header: () => 'Help',
       enableSorting: false,
       meta: { customCss: { width: '45%' } },

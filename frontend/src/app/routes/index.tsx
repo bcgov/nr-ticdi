@@ -73,6 +73,18 @@ export default function AppRoutes(){
                 </ContentWrapper>
                 }
             />
-        </Routes>
+
+            <Route path={`/dtid/:dtidNumber`} element={
+                <ContentWrapper>
+                    <LandingPage />
+                </ContentWrapper>
+            }/>
+
+            <Route path={`/dtid/:dtidNumber/:docTypeFromUrl`} element={
+                <ContentWrapper>
+                    <LandingPage />
+                </ContentWrapper>
+                }/>
+            </Routes>
     )
 }

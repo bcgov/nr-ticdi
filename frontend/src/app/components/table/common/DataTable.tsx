@@ -102,9 +102,9 @@ export function DataTable<TData>({
       </Table>
       {/* simple pagination controls */}
       {paginationSetup.enabled && (
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 mt-3">
           <button
-            className="border rounded p-1"
+            className="border rounded m-1 p-2"
             onClick={(e) => {
               e.preventDefault();
               table.setPageIndex(0);
@@ -114,7 +114,7 @@ export function DataTable<TData>({
             {'<<'}
           </button>
           <button
-            className="border rounded p-1"
+            className="border rounded m-1 p-2"
             onClick={(e) => {
               e.preventDefault();
               table.previousPage();
@@ -124,7 +124,7 @@ export function DataTable<TData>({
             {'<'}
           </button>
           <button
-            className="border rounded p-1"
+            className="border rounded m-1 p-2"
             onClick={(e) => {
               e.preventDefault();
               table.nextPage();
@@ -134,7 +134,7 @@ export function DataTable<TData>({
             {'>'}
           </button>
           <button
-            className="border rounded p-1"
+            className="border rounded m-1 p-2"
             onClick={(e) => {
               e.preventDefault();
               table.setPageIndex(table.getPageCount() - 1);

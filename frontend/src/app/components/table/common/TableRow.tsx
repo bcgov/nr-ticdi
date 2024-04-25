@@ -5,6 +5,6 @@ interface TableRowProps {
   key?: React.Key;
 }
 
-export const TableRow: FC<TableRowProps> = ({ children, ...rest }) => {
+export const TableRow: FC<TableRowProps> = React.memo(({ children, ...rest }) => {
   return <tr {...rest}>{children}</tr>;
-};
+});

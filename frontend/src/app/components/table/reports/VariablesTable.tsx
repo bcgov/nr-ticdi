@@ -50,7 +50,13 @@ const VariablesTable: React.FC<{ onVariableEdit: (variableId: number, newValue: 
     columnHelper.accessor('variable_name', {
       id: 'variable_name',
       cell: (info) => (
-        <input value={info.getValue()} className="readonlyInput" title={info.getValue()} readOnly tabIndex={-1} />
+        <input
+          value={info.getValue()}
+          className="form-control readonlyInput"
+          title={info.getValue()}
+          readOnly
+          tabIndex={-1}
+        />
       ),
       header: () => 'Variable',
       enableSorting: true,
@@ -72,7 +78,13 @@ const VariablesTable: React.FC<{ onVariableEdit: (variableId: number, newValue: 
     columnHelper.accessor('help_text', {
       id: 'help_text',
       cell: (info) => (
-        <input value={info.getValue()} className="readonlyInput" title={info.getValue()} readOnly tabIndex={-1} />
+        <input
+          value={info.getValue()}
+          className="form-control readonlyInput"
+          title={info.getValue()}
+          readOnly
+          tabIndex={-1}
+        />
       ),
       header: () => 'Help',
       enableSorting: false,
@@ -118,7 +130,16 @@ const TableCell: FC<TableCellProps> = ({ getValue, variableId, onCellUpdate }) =
     setValue(e.target.value);
   };
 
-  return <input type="text" value={value} onChange={handleChange} onBlur={handleBlur} style={{ width: '100%' }} />;
+  return (
+    <input
+      type="text"
+      className="form-control"
+      value={value}
+      onChange={handleChange}
+      onBlur={handleBlur}
+      style={{ width: '100%' }}
+    />
+  );
 };
 
 export default React.memo(VariablesTable);

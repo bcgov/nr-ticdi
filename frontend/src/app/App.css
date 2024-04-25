@@ -13,6 +13,7 @@
 .readonlyInput {
   width: 100%;
   color: gray;
+  background-color: white !important;
 }
 
 .linkButton {
@@ -58,4 +59,8 @@
 .btn-close:focus {
   outline: none;
   box-shadow: none;
+}
+
+readonly {
+  background-color: lightgray !important;
 }

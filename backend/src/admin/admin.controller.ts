@@ -38,7 +38,7 @@ let requestConfig: AxiosRequestConfig;
 // @UseGuards(AdminGuard)
 @UseGuards(JwtAuthGuard)
 @UseGuards(JwtRoleGuard)
-@Roles(Role.TICDI_ADMIN)
+// @Roles(Role.TICDI_ADMIN)
 export class AdminController {
   constructor(private readonly adminService: AdminService) {
     const hostname = process.env.backend_url ? process.env.backend_url : `http://localhost`;
@@ -71,13 +71,13 @@ export class AdminController {
     @Param('document_type_id') document_type_id: number,
     @Param('documentNo') documentNo: number,
     @Param('documentName') documentName: string
-  ){
-   return this.adminService.updateTemplate({
-    id: id,
-    documentNo: documentNo,
-    documentName: documentName,
-    document_type_id: document_type_id,
-   });
+  ) {
+    return this.adminService.updateTemplate({
+      id: id,
+      documentNo: documentNo,
+      documentName: documentName,
+      document_type_id: document_type_id,
+    });
   }
 
   @Get('preview-template/:id')

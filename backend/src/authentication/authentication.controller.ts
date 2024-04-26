@@ -3,6 +3,7 @@ import { SessionData } from 'src/types';
 import { AuthenticationFilter } from './authentication.filter';
 import { AuthenticationGuard } from './authentication.guard';
 
+// old auth, to be removed
 @Controller('authentication')
 @UseFilters(AuthenticationFilter)
 @UseGuards(AuthenticationGuard)

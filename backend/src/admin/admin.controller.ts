@@ -28,16 +28,14 @@ import { JwtRoleGuard } from 'src/auth/jwtrole.guard';
 import { JwtAuthGuard } from 'src/auth/jwtauth.guard';
 import { Roles } from 'src/auth/decorators/roles.decorator';
 import { Role } from 'src/enum/role.enum';
+import { Public } from 'src/auth/decorators/public.decorator';
 
 let requestUrl: string;
 let requestConfig: AxiosRequestConfig;
 
 @Controller('admin')
-// @UseFilters(AuthenticationFilter)
-// @UseGuards(AuthenticationGuard)
-// @UseGuards(AdminGuard)
 @UseGuards(JwtAuthGuard)
-@UseGuards(JwtRoleGuard)
+// @UseGuards(JwtRoleGuard)
 // @Roles(Role.TICDI_ADMIN)
 export class AdminController {
   constructor(private readonly adminService: AdminService) {

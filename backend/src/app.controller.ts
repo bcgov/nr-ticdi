@@ -34,7 +34,7 @@ export class AppController {
   @Get('healthcheck')
   @Public()
   getHello(): string {
-    return 'hello';
+    return 'Hello Backend!';
   }
 
   // @Get()

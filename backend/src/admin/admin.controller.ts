@@ -35,8 +35,8 @@ let requestConfig: AxiosRequestConfig;
 
 @Controller('admin')
 @UseGuards(JwtAuthGuard)
-// @UseGuards(JwtRoleGuard)
-// @Roles(Role.TICDI_ADMIN)
+@UseGuards(JwtRoleGuard)
+@Roles(Role.TICDI_ADMIN)
 export class AdminController {
   constructor(private readonly adminService: AdminService) {
     const hostname = process.env.backend_url ? process.env.backend_url : `http://localhost`;

@@ -87,7 +87,7 @@ export class AdminController {
       res.set({
         'Content-Type': 'application/pdf',
         'Content-Disposition': 'inline; filename=preview.pdf',
-        'Content-Security-Policy': "default-src 'self'; frame-src 'self' blob:;",
+        'Content-Security-Policy': "default-src 'self' https://*.gov.bc.ca data:; frame-src 'self' blob:;",
       });
       streamableFile.pipe(res);
     } catch (error) {

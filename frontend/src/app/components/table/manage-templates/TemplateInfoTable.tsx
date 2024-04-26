@@ -29,8 +29,7 @@ const TemplateInfoTable: React.FC<TemplateInfoTableProps> = ({ documentType, ref
   const [documentName, setDocumentName] = useState<string>('');
   const [documentVersion, setDocumentVersion] = useState<number>(10);
   const [isTemplateUpdated, setTemplateUpdated] = useState<boolean>(false);
-  //]
-  //
+
   useEffect(() => {
     const fetchData = async () => {
       const data = await getTemplatesInfo(documentType.id);
@@ -77,9 +76,9 @@ const TemplateInfoTable: React.FC<TemplateInfoTableProps> = ({ documentType, ref
   const handlePreviewTemplate = async (id: number, fileName: string) => {
     try {
       setLoading(true);
-      const responce = await previewTemplate(id, fileName);
-      if (responce) {
-        setIframeSrcBlob(responce);
+      const response = await previewTemplate(id, fileName);
+      if (response) {
+        setIframeSrcBlob(response);
         setIsOpen(true);
         setLoading(false);
       }

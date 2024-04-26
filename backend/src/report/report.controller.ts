@@ -80,7 +80,7 @@ export class ReportController {
 
   // remember to update
   @Post('generate-report')
-  @UseGuards(JwtRoleGuard)
+  // @UseGuards(JwtRoleGuard)
   // @Roles(Role.GENERATE_DOCUMENTS)
   @Header('Content-Type', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document')
   @Header('Content-Disposition', 'attachment; filename=report.docx')

@@ -130,10 +130,10 @@ export const handleFilePreviewGet = async (url: string, filename: string): Promi
     const getParameters = generateApiParameters(url);
     return new Promise<Blob>((resolve, reject) => {
       fileDownloadGet<Blob>(getParameters)
-        .then(blob => {
+        .then((blob) => {
           resolve(blob);
         })
-        .catch(error => {
+        .catch((error) => {
           console.error('Preview error:', error);
           reject(error);
         });
@@ -153,7 +153,7 @@ export const handleFilePreviewGet = async (url: string, filename: string): Promi
 export const handleFileDownloadGet = async (url: string, filename: string) => {
   const getParameters = generateApiParameters(url);
 
-  console.log(getParameters)
+  console.log(getParameters);
 
   await fileDownloadGet<Blob>(getParameters)
     .then(async (blob) => {

@@ -56,16 +56,35 @@ export const disableProvision = async (provisionId: number): Promise<void> => {
 
 export const previewTemplate = async (id: number, fileName: string): Promise<Blob | null> => {
   const url = `${config.API_BASE_URL}/admin/preview-template/${id}`;
-  const response = await api.handleFilePreviewGet(url, fileName);
-  if (response) {
-    console.log('Preview response:');
-    console.log(response);
-    return response;
-  } else {
-    console.log('Preview response was null or there was an error.');
+  try {
+    const getParameters = api.generateApiParameters(url);
+    const response = await api.get<any>(getParameters);
+    const base64Data = response.data;
+    const blob = base64ToBlob(base64Data, 'application/pdf');
+    return blob;
+  } catch (error) {
+    console.error('Error retrieving preview:', error);
     return null;
   }
 };
+
+// util for previewTemplate
+function base64ToBlob(base64: string, mime: string): Blob {
+  const byteCharacters = atob(base64);
+  const byteArrays = [];
+
+  for (let offset = 0; offset < byteCharacters.length; offset += 512) {
+    const slice = byteCharacters.slice(offset, offset + 512);
+    const byteNumbers = new Array(slice.length);
+    for (let i = 0; i < slice.length; i++) {
+      byteNumbers[i] = slice.charCodeAt(i);
+    }
+    const byteArray = new Uint8Array(byteNumbers);
+    byteArrays.push(byteArray);
+  }
+
+  return new Blob(byteArrays, { type: mime });
+}
 
 export const downloadTemplate = async (id: number, fileName: string): Promise<void> => {
   const url = `${config.API_BASE_URL}/admin/download-template/${id}`;
@@ -94,8 +113,13 @@ export const uploadTemplate = async (formData: FormData): Promise<void> => {
   await api.post<{ message: string }>(postParameters);
 };
 
-export const editTemplate = async (id: number, documentTypeId: number, documentNo: number, documentName: string): Promise<void> => {
+export const editTemplate = async (
+  id: number,
+  documentTypeId: number,
+  documentNo: number,
+  documentName: string
+): Promise<void> => {
   const url = `${config.API_BASE_URL}/admin/update-template/${id}/${documentTypeId}/${documentNo}/${documentName}`;
   const getParameters = api.generateApiParameters(url);
   await api.get<void>(getParameters);
-}
+};

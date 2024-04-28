@@ -1,0 +1,252 @@
+{{- if .Values.backend.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "backend.fullname" . }}
+  labels:
+    {{- include "backend.labels" . | nindent 4 }}
+spec:
+  strategy:
+    type: {{ .Values.backend.deploymentStrategy }}
+  {{- if not .Values.backend.autoscaling.enabled }}
+  replicas: {{ .Values.backend.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "backend.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        rollme: {{ randAlphaNum 5 | quote }}
+        prometheus.io/scrape: 'true'
+        prometheus.io/port: '3000'
+        prometheus.io/path: '/api/metrics'
+      labels:
+        {{- include "backend.labels" . | nindent 8 }}
+    spec:
+      {{- if .Values.backend.podSecurityContext }}
+      securityContext:
+        {{- toYaml .Values.backend.podSecurityContext | nindent 12 }}
+      {{- end }}
+      initContainers:
+        - name: {{ include "backend.fullname" . }}-init
+          image: "{{.Values.global.registry}}/{{.Values.global.repository}}/migrations:{{ .Values.global.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ default "Always" .Values.backend.imagePullPolicy }}
+          envFrom:
+            - secretRef:
+                name: {{.Release.Name}}
+          env:
+            - name: FLYWAY_BASELINE_ON_MIGRATE
+              value: "true"
+            - name: FLYWAY_DEFAULT_SCHEMA
+              value: "USERS"
+            - name: FLYWAY_CONNECT_RETRIES
+              value: "10"
+          resources:
+            limits:
+              cpu: 400m
+              memory: 200Mi
+            requests:
+              cpu: 20m
+              memory: 200Mi
+      containers:
+        - name: {{ include "backend.fullname" . }}
+          {{- if .Values.backend.securityContext }}
+          securityContext:
+            {{- toYaml .Values.backend.securityContext | nindent 12 }}
+          {{- end }}
+          image: "{{.Values.global.registry}}/{{.Values.global.repository}}/backend:{{ .Values.global.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ default "Always" .Values.backend.imagePullPolicy }}
+          envFrom:
+            - secretRef:
+                name: {{.Release.Name}}
+          env:
+            - name: NODE_TLS_REJECT_UNAUTHORIZED 
+              value: '0'
+            - name: LOG_LEVEL
+              value: info
+            - name: cookie_secret
+              valueFrom:
+                secretKeyRef:
+                  name: ticdi-sessions
+                  key: cookie_secret
+            - name: session_secret
+              valueFrom:
+                secretKeyRef: 
+                  name: ticdi-sessions
+                  key: session_secret
+            - name: keycloak_base_url
+              valueFrom:
+                secretKeyRef: 
+                  name: keycloak
+                  key: keycloak_base_url
+            - name: keycloak_realm
+              valueFrom:
+                secretKeyRef: 
+                  name: keycloak
+                  key: keycloak_realm
+            - name: keycloak_client_id
+              valueFrom:
+                secretKeyRef: 
+                  name: keycloak
+                  key: keycloak_client_id
+            - name: keycloak_secret
+              valueFrom:
+                secretKeyRef: 
+                  name: keycloak
+                  key: keycloak_secret
+            - name: cdogs_service_client_id
+              valueFrom:
+                secretKeyRef: 
+                  name: cdogs
+                  key: cdogs_service_client_id
+            - name: cdogs_service_client_secret
+              valueFrom:
+                secretKeyRef: 
+                  name: cdogs
+                  key: cdogs_service_client_secret
+            - name: cdogs_url
+              valueFrom:
+                secretKeyRef: 
+                  name: cdogs
+                  key: cdogs_url
+            - name: cdogs_token_endpoint
+              valueFrom:
+                secretKeyRef: 
+                  name: cdogs
+                  key: cdogs_token_endpoint
+            - name: users_api_base_url
+              valueFrom:
+                secretKeyRef: 
+                  name: css-users-api
+                  key: users_api_base_url
+            - name: css_environment
+              valueFrom:
+                secretKeyRef: 
+                  name: css-users-api
+                  key: css_environment
+            - name: integration_id
+              valueFrom:
+                secretKeyRef: 
+                  name: css-users-api
+                  key: integration_id
+            - name: users_api_token_url
+              valueFrom:
+                secretKeyRef: 
+                  name: css-users-api
+                  key: users_api_token_url
+            - name: users_api_client_id
+              valueFrom:
+                secretKeyRef: 
+                  name: css-users-api
+                  key: users_api_client_id
+            - name: users_api_client_secret
+              valueFrom:
+                secretKeyRef: 
+                  name: css-users-api
+                  key: users_api_client_secret
+            - name: KEYCLOCK_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: ticdi-backend-oicd
+                  key: keycloak-client-id
+            - name: JWKS_URI
+              valueFrom:
+                secretKeyRef:
+                  name: ticdi-backend-oicd
+                  key: jwks-uri
+            - name: JWT_ISSUER
+              valueFrom:
+                secretKeyRef:
+                  name: ticdi-backend-oicd
+                  key: jwt-issuer
+            - name: ticdi_environment
+              valueFrom:
+                secretKeyRef:
+                  name: ticdi-environment
+                  key: ticdi_environment
+            - name: ttls_url
+              valueFrom:
+                secretKeyRef:
+                  name: ttls
+                  key: ttls_url
+            - name: ttls_api_key
+              valueFrom:
+                secretKeyRef:
+                  name: ttls
+                  key: ttls_api_key
+            - name: WEBADE_AUTH_ENDPOINT
+              valueFrom:
+                secretKeyRef:
+                  name: ttls
+                  key: webade_auth_endpoint
+            - name: WEBADE_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: ttls
+                  key: webade_username
+            - name: WEBADE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: ttls
+                  key: webade_password
+            - name: TTLS_API_ENDPOINT
+              valueFrom:
+                secretKeyRef:
+                  name: ttls
+                  key: ttls_api_endpoint
+          ports:
+            - name: http
+              containerPort: {{ .Values.backend.service.targetPort }}
+              protocol: TCP
+          readinessProbe:
+            httpGet:
+              path: /report/healthcheck
+              port: http
+              scheme: HTTP
+            initialDelaySeconds: 5
+            periodSeconds: 2
+            timeoutSeconds: 2
+            successThreshold: 1
+            failureThreshold: 30
+          livenessProbe:
+            successThreshold: 1
+            failureThreshold: 3
+            httpGet:
+              path: /report/healthcheck
+              port: 3000
+              scheme: HTTP
+            initialDelaySeconds: 15
+            periodSeconds: 30
+            timeoutSeconds: 5
+          resources: # this is optional
+            limits:
+              cpu: 150m
+              memory: 150Mi
+            requests:
+              cpu: 50m
+              memory: 75Mi
+      {{- with .Values.backend.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.backend.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: app.kubernetes.io/name
+                    operator: In
+                    values:
+                      - {{ include "backend.fullname" . }}
+                  - key: app.kubernetes.io/instance
+                    operator: In
+                    values:
+                      - {{ .Release.Name }}
+              topologyKey: "kubernetes.io/hostname"
+
+{{- end }}

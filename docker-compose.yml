@@ -24,10 +24,10 @@ services:
       - 'npm i && npm run start'
     environment:
       NODE_ENV: development
-      POSTGRESQL_HOST: database
-      POSTGRESQL_USER: default
-      POSTGRESQL_PASSWORD: default
-      POSTGRESQL_DATABASE: default
+      POSTGRES_HOST: database
+      POSTGRES_USER: default
+      POSTGRES_PASSWORD: default
+      POSTGRES_DATABASE: default
       session_secret: asdfasdh
     healthcheck:
       test: ['CMD', 'curl', '-f', 'http://localhost:3000/report']

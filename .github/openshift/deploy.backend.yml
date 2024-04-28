@@ -53,7 +53,7 @@ objects:
         app: ${NAME}
     stringData:
       cookie_secret: ${cookie_secret}
-      session_secret: ${session_secret}  
+      session_secret: ${session_secret}
   - kind: PersistentVolumeClaim
     apiVersion: v1
     metadata:
@@ -65,7 +65,7 @@ objects:
         - ReadWriteMany
       resources:
         requests:
-          storage: "256Mi"
+          storage: '256Mi'
       storageClassName: netapp-file-standard
   - apiVersion: v1
     kind: DeploymentConfig
@@ -104,19 +104,19 @@ objects:
               imagePullPolicy: Always
               name: ${NAME}
               env:
-                - name: POSTGRESQL_HOST
+                - name: POSTGRES_HOST
                   value: ${NAME}-${ZONE}-database
-                - name: POSTGRESQL_DATABASE
+                - name: POSTGRES_DATABASE
                   valueFrom:
                     secretKeyRef:
                       name: ${NAME}-${ZONE}-database
                       key: database-name
-                - name: POSTGRESQL_PASSWORD
+                - name: POSTGRES_PASSWORD
                   valueFrom:
                     secretKeyRef:
                       name: ${NAME}-${ZONE}-database
                       key: database-password
-                - name: POSTGRESQL_USER
+                - name: POSTGRES_USER
                   valueFrom:
                     secretKeyRef:
                       name: ${NAME}-${ZONE}-database
@@ -128,77 +128,77 @@ objects:
                       key: cookie_secret
                 - name: session_secret
                   valueFrom:
-                    secretKeyRef: 
+                    secretKeyRef:
                       name: ticdi-sessions
                       key: session_secret
                 - name: keycloak_base_url
                   valueFrom:
-                    secretKeyRef: 
+                    secretKeyRef:
                       name: keycloak
                       key: keycloak_base_url
                 - name: keycloak_realm
                   valueFrom:
-                    secretKeyRef: 
+                    secretKeyRef:
                       name: keycloak
                       key: keycloak_realm
                 - name: keycloak_client_id
                   valueFrom:
-                    secretKeyRef: 
+                    secretKeyRef:
                       name: keycloak
                       key: keycloak_client_id
                 - name: keycloak_secret
                   valueFrom:
-                    secretKeyRef: 
+                    secretKeyRef:
                       name: keycloak
                       key: keycloak_secret
                 - name: cdogs_service_client_id
                   valueFrom:
-                    secretKeyRef: 
+                    secretKeyRef:
                       name: cdogs
                       key: cdogs_service_client_id
                 - name: cdogs_service_client_secret
                   valueFrom:
-                    secretKeyRef: 
+                    secretKeyRef:
                       name: cdogs
                       key: cdogs_service_client_secret
                 - name: cdogs_url
                   valueFrom:
-                    secretKeyRef: 
+                    secretKeyRef:
                       name: cdogs
                       key: cdogs_url
                 - name: cdogs_token_endpoint
                   valueFrom:
-                    secretKeyRef: 
+                    secretKeyRef:
                       name: cdogs
                       key: cdogs_token_endpoint
                 - name: users_api_base_url
                   valueFrom:
-                    secretKeyRef: 
+                    secretKeyRef:
                       name: css-users-api
                       key: users_api_base_url
                 - name: css_environment
                   valueFrom:
-                    secretKeyRef: 
+                    secretKeyRef:
                       name: css-users-api
                       key: css_environment
                 - name: integration_id
                   valueFrom:
-                    secretKeyRef: 
+                    secretKeyRef:
                       name: css-users-api
                       key: integration_id
                 - name: users_api_token_url
                   valueFrom:
-                    secretKeyRef: 
+                    secretKeyRef:
                       name: css-users-api
                       key: users_api_token_url
                 - name: users_api_client_id
                   valueFrom:
-                    secretKeyRef: 
+                    secretKeyRef:
                       name: css-users-api
                       key: users_api_client_id
                 - name: users_api_client_secret
                   valueFrom:
-                    secretKeyRef: 
+                    secretKeyRef:
                       name: css-users-api
                       key: users_api_client_secret
                 - name: KEYCLOCK_CLIENT_ID

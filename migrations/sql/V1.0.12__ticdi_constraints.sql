@@ -25,3 +25,9 @@ ALTER TABLE public.provision_group ADD CONSTRAINT "FK_provision_group_document_t
 -- public.provision_variable foreign keys
 
 ALTER TABLE public.provision_variable ADD CONSTRAINT "FK_provision_variable_provision" FOREIGN KEY ("provisionId") REFERENCES public.provision(id);
+
+-- public.document_type_provision foreign keys
+
+ALTER TABLE public.document_type_provision ADD CONSTRAINT "FK_document_type_provision_provision" FOREIGN KEY ("provisionId") REFERENCES public.provision(id);
+ALTER TABLE public.document_type_provision ADD CONSTRAINT "FK_document_type_provision_provision_group" FOREIGN KEY ("provisionGroupId") REFERENCES public.provision_group(id);
+ALTER TABLE public.document_type_provision ADD CONSTRAINT "FK_document_type_provision_document_type" FOREIGN KEY ("documentTypeId") REFERENCES public.document_type(id);

@@ -131,13 +131,6 @@ CREATE TABLE public.document_type_provision (
 	CONSTRAINT "PK_document_type_provision" PRIMARY KEY (id)
 );
 
-
--- public.document_type_provision foreign keys
-
-ALTER TABLE public.document_type_provision ADD CONSTRAINT "FK_document_type_provision_provision" FOREIGN KEY ("provisionId") REFERENCES public.provision(id);
-ALTER TABLE public.document_type_provision ADD CONSTRAINT "FK_document_type_provision_provision_group" FOREIGN KEY ("provisionGroupId") REFERENCES public.provision_group(id);
-ALTER TABLE public.document_type_provision ADD CONSTRAINT "FK_document_type_provision_document_type" FOREIGN KEY ("documentTypeId") REFERENCES public.document_type(id);
-
 -- public.provision definition
 
 -- Drop table

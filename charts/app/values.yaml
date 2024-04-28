@@ -133,7 +133,7 @@ crunchy: # enable it for TEST and PROD, for PR based pipelines simply use single
       cpu: 25m
       memory: 256Mi
     limits:
-      cpu: 100m
+      cpu: 200m
       memory: 512Mi
     replicaCertCopy:
       requests:
@@ -225,14 +225,14 @@ bitnami-pg:
       podSecurityContext:
         enabled: false
       storage:
-        size: 200Mi
+        size: 400Mi
   primary:
     persistence:
       enabled: true
       storageClass: netapp-block-standard
       accessModes:
         - ReadWriteOnce
-      size: 100Mi
+      size: 2000Mi
     containerSecurityContext:
       enabled: false
     podSecurityContext:
@@ -244,11 +244,11 @@ bitnami-pg:
           PGPASSWORD=$POSTGRES_PASSWORD psql -U postgres -d postgres -c "CREATE EXTENSION postgis;"
     resources:
       requests:
-        cpu: 50m
+        cpu: 100m
         memory: 150Mi
       limits:
-        cpu: 150m
-        memory: 250Mi
+        cpu: 300m
+        memory: 450Mi
 
 backup:
   enabled: true

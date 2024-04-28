@@ -21,10 +21,10 @@ import { JWTAuthModule } from './auth/jwtauth.module';
 console.log('Var check - POSTGRES_HOST', process.env.POSTGRES_HOST);
 console.log('Var check - POSTGRES_DATABASE', process.env.POSTGRES_DATABASE);
 console.log('Var check - POSTGRES_USER', process.env.POSTGRES_USER);
-if (process.env.POSTGRESQL_PASSWORD != null) {
-  console.log('Var check - POSTGRESQL_PASSWORD present');
+if (process.env.POSTGRES_PASSWORD != null) {
+  console.log('Var check - POSTGRES_PASSWORD present');
 } else {
-  console.log('Var check - POSTGRESQL_PASSWORD not present');
+  console.log('Var check - POSTGRES_PASSWORD not present');
 }
 
 @Module({

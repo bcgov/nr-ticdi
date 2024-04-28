@@ -173,7 +173,7 @@ CREATE TABLE public.provision_variable (
 
 -- DROP SEQUENCE public.document_data_id_seq;
 
-CREATE OR REPLACE SEQUENCE public.document_data_id_seq
+CREATE SEQUENCE public.document_data_id_seq
 	INCREMENT BY 1
 	MINVALUE 1
 	MAXVALUE 2147483647
@@ -186,7 +186,7 @@ CREATE OR REPLACE SEQUENCE public.document_data_id_seq
 
 -- DROP SEQUENCE public.document_data_log_id_seq;
 
-CREATE OR REPLACE  SEQUENCE public.document_data_log_id_seq
+CREATE SEQUENCE public.document_data_log_id_seq
 	INCREMENT BY 1
 	MINVALUE 1
 	MAXVALUE 2147483647
@@ -199,7 +199,7 @@ CREATE OR REPLACE  SEQUENCE public.document_data_log_id_seq
 
 -- DROP SEQUENCE public.document_data_provision_id_seq;
 
-CREATE OR REPLACE  SEQUENCE public.document_data_provision_id_seq
+CREATE SEQUENCE public.document_data_provision_id_seq
 	INCREMENT BY 1
 	MINVALUE 1
 	MAXVALUE 2147483647
@@ -212,7 +212,7 @@ CREATE OR REPLACE  SEQUENCE public.document_data_provision_id_seq
 
 -- DROP SEQUENCE public.document_data_variable_id_seq;
 
-CREATE OR REPLACE  SEQUENCE public.document_data_variable_id_seq
+CREATE SEQUENCE public.document_data_variable_id_seq
 	INCREMENT BY 1
 	MINVALUE 1
 	MAXVALUE 2147483647
@@ -225,7 +225,7 @@ CREATE OR REPLACE  SEQUENCE public.document_data_variable_id_seq
 
 -- DROP SEQUENCE public.document_template_id_seq;
 
-CREATE OR REPLACE  SEQUENCE public.document_template_id_seq
+CREATE SEQUENCE public.document_template_id_seq
 	INCREMENT BY 1
 	MINVALUE 1
 	MAXVALUE 2147483647
@@ -238,7 +238,7 @@ CREATE OR REPLACE  SEQUENCE public.document_template_id_seq
 
 -- DROP SEQUENCE public.document_type_id_seq;
 
-CREATE OR REPLACE  SEQUENCE public.document_type_id_seq
+CREATE SEQUENCE public.document_type_id_seq
 	INCREMENT BY 1
 	MINVALUE 1
 	MAXVALUE 2147483647
@@ -251,7 +251,7 @@ CREATE OR REPLACE  SEQUENCE public.document_type_id_seq
 
 -- DROP SEQUENCE public.document_type_provision_id_seq;
 
-CREATE OR REPLACE  SEQUENCE public.document_type_provision_id_seq
+CREATE SEQUENCE public.document_type_provision_id_seq
 	INCREMENT BY 1
 	MINVALUE 1
 	MAXVALUE 2147483647
@@ -264,7 +264,7 @@ CREATE OR REPLACE  SEQUENCE public.document_type_provision_id_seq
 
 -- DROP SEQUENCE public.provision_group_id_seq;
 
-CREATE OR REPLACE  SEQUENCE public.provision_group_id_seq
+CREATE SEQUENCE public.provision_group_id_seq
 	INCREMENT BY 1
 	MINVALUE 1
 	MAXVALUE 2147483647
@@ -277,7 +277,7 @@ CREATE OR REPLACE  SEQUENCE public.provision_group_id_seq
 
 -- DROP SEQUENCE public.provision_id_seq;
 
-CREATE OR REPLACE  SEQUENCE public.provision_id_seq
+CREATE SEQUENCE public.provision_id_seq
 	INCREMENT BY 1
 	MINVALUE 1
 	MAXVALUE 2147483647
@@ -290,7 +290,7 @@ CREATE OR REPLACE  SEQUENCE public.provision_id_seq
 
 -- DROP SEQUENCE public.provision_variable_id_seq;
 
-CREATE OR REPLACE  SEQUENCE public.provision_variable_id_seq
+CREATE SEQUENCE public.provision_variable_id_seq
 	INCREMENT BY 1
 	MINVALUE 1
 	MAXVALUE 2147483647

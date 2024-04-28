@@ -13,11 +13,11 @@ import { DocumentTypeProvision } from './provision/entities/document_type_provis
 const config: TypeOrmModuleOptions = {
   logging: ['error'],
   type: 'postgres',
-  host: process.env.POSTGRESQL_HOST || 'localhost',
+  host: process.env.POSTGRES_HOST || 'localhost',
   port: 5432,
-  database: process.env.POSTGRESQL_DATABASE || 'postgres',
-  username: process.env.POSTGRESQL_USER || 'postgres',
-  password: process.env.POSTGRESQL_PASSWORD,
+  database: process.env.POSTGRES_DATABASE || 'postgres',
+  username: process.env.POSTGRES_USER || 'postgres',
+  password: process.env.POSTGRES_PASSWORD,
   entities: [
     DocumentData,
     DocumentDataProvision,

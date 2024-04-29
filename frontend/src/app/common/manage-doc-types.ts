@@ -135,7 +135,7 @@ export const updateProvisionGroups = async (updatedProvisionGroups: ProvisionGro
 };
 
 export const removeProvisionGroup = async (provision_group_id: number) => {
-  const url = `${config.API_BASE_URL}/document-type/remove-provision-group`;
+  const url = `${config.API_BASE_URL}/document-type/remove-provision-group/${provision_group_id}`;
   const getParameters = api.generateApiParameters(url);
   const response = await api.post<any>(getParameters);
   console.log(response);

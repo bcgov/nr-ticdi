@@ -119,7 +119,6 @@ const getInterestedParties = (tenantAddr: TenantAddressResource[] | null): Inter
 };
 
 const getAreaList = (interestParcel: InterestParcel[]): AreaItem[] => {
-  console.log(interestParcel);
   return interestParcel.map((parcel) => ({
     areaInHectares: parcel.areaInHectares,
     legalDescription: parcel.legalDescription,
@@ -128,6 +127,8 @@ const getAreaList = (interestParcel: InterestParcel[]): AreaItem[] => {
 
 export const buildDTRDisplayData = (data: DTR): DTRDisplayObject => {
   if (data) {
+    console.log('DEBUG');
+    console.log(data);
     const tenantAddr: TenantAddressResource[] | null = (data && data.tenantAddr) ?? data.tenantAddr;
     const firstTenant: TenantAddressResource | null = tenantAddr ? tenantAddr[0] : null;
 

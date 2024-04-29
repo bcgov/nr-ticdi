@@ -1,72 +1,61 @@
 import React from 'react';
-import Button from 'react-bootstrap/Button';
+import { Modal } from 'react-bootstrap';
+import { Worker, Viewer } from '@react-pdf-viewer/core';
+import '@react-pdf-viewer/core/lib/styles/index.css';
 
-interface PreviewTemplateModalProps {
+interface Props {
+  pdfBlob: Blob | null;
   isOpen: boolean;
   toggleModal: () => void;
-  iframeSrcBlob: Blob | null;
 }
 
-const PreviewTemplateModal: React.FC<PreviewTemplateModalProps> = ({ isOpen, toggleModal, iframeSrcBlob }) => {
-  const iframeSrc = iframeSrcBlob ? window.URL.createObjectURL(iframeSrcBlob) : '';
+const PdfViewerModal: React.FC<Props> = ({ pdfBlob, isOpen, toggleModal }) => {
+  const [pdfUrl, setPdfUrl] = React.useState<string | null>(null);
 
-  const modalOverlayStyle: React.CSSProperties = {
-    position: 'fixed',
-    top: 0,
-    left: 0,
-    width: '100%',
-    height: '100%',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    zIndex: 9999,
-    display: isOpen ? 'flex' : 'none',
-    alignItems: 'center',
-    justifyContent: 'center',
-  };
+  React.useEffect(() => {
+    if (pdfBlob) {
+      const url = URL.createObjectURL(pdfBlob);
+      setPdfUrl(url);
+    } else {
+      setPdfUrl(null);
+    }
+    return () => {
+      if (pdfUrl) {
+        URL.revokeObjectURL(pdfUrl);
+        setPdfUrl(null);
+      }
+    };
+  }, [pdfBlob]);
 
-  const modalContentStyle: React.CSSProperties = {
-    width: '80%',
-    height: '80%',
-    backgroundColor: '#fff',
-    borderRadius: '8px',
-    overflow: 'hidden',
-    position: 'relative',
-    display: 'flex',
-    flexDirection: 'column',
-  };
-
-  const iframeContainerStyle: React.CSSProperties = {
-    flex: 1,
-    overflow: 'auto',
-    padding: '20px',
-  };
-
-  const buttonContainerStyle: React.CSSProperties = {
-    textAlign: 'right', // Align button to the right
-    padding: '20px',
+  const handleClose = () => {
+    toggleModal();
+    if (pdfUrl) {
+      URL.revokeObjectURL(pdfUrl);
+      setPdfUrl(null);
+    }
   };
 
   return (
-    <div style={modalOverlayStyle} onClick={toggleModal}>
-      <div style={modalContentStyle} onClick={(e) => e.stopPropagation()}>
-        <div style={iframeContainerStyle}>
-          <h2>Preview Document</h2>
-          {iframeSrc && (
-            <iframe
-              src={iframeSrc}
-              title="Example Iframe"
-              style={{ border: 'none', width: '100%', height: '100%' }}
-              allowFullScreen
-            />
-          )}
-        </div>
-        <div style={buttonContainerStyle}>
-          <Button variant="secondary" onClick={toggleModal}>
-            Close
-          </Button>
-        </div>
-      </div>
-    </div>
+    <Modal show={isOpen} onHide={toggleModal} size="lg" centered>
+      <Modal.Header closeButton>
+        <Modal.Title>Preview</Modal.Title>
+      </Modal.Header>
+      <Modal.Body>
+        {pdfUrl ? (
+          <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js">
+            <Viewer fileUrl={pdfUrl} />
+          </Worker>
+        ) : (
+          <div>No PDF file selected.</div>
+        )}
+      </Modal.Body>
+      <Modal.Footer>
+        <button onClick={handleClose} className="btn btn-secondary">
+          Close
+        </button>
+      </Modal.Footer>
+    </Modal>
   );
 };
 
-export default PreviewTemplateModal;
+export default PdfViewerModal;

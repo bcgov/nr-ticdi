@@ -1,6 +1,11 @@
 ---
 version: '3.8'
 
+x-var:
+  - &POSTGRES_USER default
+  - &POSTGRES_PASSWORD default
+  - &POSTGRES_DATABASE default
+
 services:
   database:
     container_name: database
@@ -15,6 +20,23 @@ services:
     restart: always
     volumes:
       - /pgdata
+    healthcheck:
+      test: ['CMD', 'pg_isready', '-U', *POSTGRES_USER]
+
+  migrations:
+    image: flyway/flyway:9-alpine
+    container_name: migrations
+    command: info migrate info
+    volumes: ['./migrations/sql:/flyway/sql:ro']
+    environment:
+      FLYWAY_URL: jdbc:postgresql://database:5432/postgres
+      FLYWAY_USER: *POSTGRES_USER
+      FLYWAY_PASSWORD: *POSTGRES_PASSWORD
+      FLYWAY_BASELINE_ON_MIGRATE: true
+      FLYWAY_DEFAULT_SCHEMA: USERS
+    depends_on:
+      database:
+        condition: service_healthy
 
   backend:
     container_name: backend
@@ -24,10 +46,10 @@ services:
       - 'npm i && npm run start'
     environment:
       NODE_ENV: development
-      POSTGRESQL_HOST: database
-      POSTGRESQL_USER: default
-      POSTGRESQL_PASSWORD: default
-      POSTGRESQL_DATABASE: default
+      POSTGRES_HOST: database
+      POSTGRES_USER: default
+      POSTGRES_PASSWORD: default
+      POSTGRES_DATABASE: default
       session_secret: asdfasdh
     healthcheck:
       test: ['CMD', 'curl', '-f', 'http://localhost:3000/report']
@@ -73,13 +95,3 @@ services:
       - ./frontend:/app:z
       - /app/node_modules
     working_dir: '/app'
-
-  flyway:
-    container_name: flyway
-    image: flyway/flyway:latest
-    command:
-      ['-url=jdbc:postgresql://database:5432/default', '-user=default', '-password=default', 'baseline', 'migrate']
-    volumes:
-      - ./backend/db/migrations:/flyway/sql
-    depends_on:
-      - database

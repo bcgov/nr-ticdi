@@ -23,7 +23,7 @@ const TemplateInfoTable: React.FC<TemplateInfoTableProps> = ({ documentType, ref
   const [currentlyActive, setCurrentlyActive] = useState<number>();
   const [loading, setLoading] = useState<boolean>(false);
   const [isOpen, setIsOpen] = useState<boolean>(false);
-  const [iframeSrcBlob, setIframeSrcBlob] = useState<Blob | null>(null);
+  const [pdfBlob, setPdfBlob] = useState<Blob | null>(null);
   const [isEditModalOpen, setisEditModalOpen] = useState<boolean>(false);
   const [documentId, setDocumentId] = useState<number>(10);
   const [documentName, setDocumentName] = useState<string>('');
@@ -78,7 +78,7 @@ const TemplateInfoTable: React.FC<TemplateInfoTableProps> = ({ documentType, ref
       setLoading(true);
       const response = await previewTemplate(id, fileName);
       if (response) {
-        setIframeSrcBlob(response);
+        setPdfBlob(response);
         setIsOpen(true);
         setLoading(false);
       }
@@ -225,7 +225,7 @@ const TemplateInfoTable: React.FC<TemplateInfoTableProps> = ({ documentType, ref
           onUpload={onTemplateUpdated}
         />
       )}
-      {isOpen && <PreviewTemplateModal isOpen={isOpen} toggleModal={toggleModal} iframeSrcBlob={iframeSrcBlob} />}
+      {isOpen && <PreviewTemplateModal isOpen={isOpen} toggleModal={toggleModal} pdfBlob={pdfBlob} />}
       <DataTable
         columns={columns}
         data={templateData}

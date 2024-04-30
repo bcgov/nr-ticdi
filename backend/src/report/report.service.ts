@@ -15,6 +15,7 @@ import {
   getLicenceHolder,
   getLicenceHolderName,
   getMailingAddress,
+  glAddressBuilder,
   grazingLeaseVariables,
   nfrAddressBuilder,
 } from '../util';
@@ -858,7 +859,7 @@ export class ReportService {
         console.log(err);
       });
     const documentTemplateObject = await this.documentTemplateService.findActiveByDocumentType(document_type_id);
-    const documentType = await this.documentTypeService.findById(document_type_id)
+    const documentType = await this.documentTypeService.findById(document_type_id);
 
     // Format variables with names that the document template expects
     const variables: any = {};
@@ -883,10 +884,17 @@ export class ReportService {
       }
     }
 
-    const DB_ADDRESS_MAILING_TENANT = tenantAddr[0] ? nfrAddressBuilder(tenantAddr) : '';
+    // const DB_ADDRESS_MAILING_TENANT = tenantAddr[0] ? nfrAddressBuilder(tenantAddr) : '';
+    // reuse grazing lease address building function
+    let { glMailingAddress, glStreetAddress } = tenantAddr[0]
+      ? glAddressBuilder(tenantAddr)
+      : { glMailingAddress: '', glStreetAddress: '' };
+    if (glMailingAddress === '') glMailingAddress = glStreetAddress;
+    if (glStreetAddress === '') glStreetAddress = glMailingAddress;
 
     const ttlsData = {
-      DB_ADDRESS_MAILING_TENANT: DB_ADDRESS_MAILING_TENANT,
+      DB_ADDRESS_STREET_TENANT: glStreetAddress,
+      DB_ADDRESS_MAILING_TENANT: glMailingAddress,
       DB_ADDRESS_REGIONAL_OFFICE: nfrAddressBuilder([
         {
           addrLine1: rawData.regOfficeStreet,
@@ -901,8 +909,8 @@ export class ReportService {
     }; // parse out the rawData, variableJson, and provisionJson into something useable
     // combine the formatted TTLS data, variables, and provision sections
     const data = Object.assign({}, ttlsData, variables);
-    console.log('data')
-    console.log(data)
+    console.log('data');
+    console.log(data);
     // Save the Document Data
     const provisionSaveData = provisionJson.map((provision) => {
       return { provision_id: provision.provision_id, doc_type_provision_id: provision.doc_type_provision_id };

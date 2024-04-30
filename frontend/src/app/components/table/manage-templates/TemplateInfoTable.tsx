@@ -92,7 +92,6 @@ const TemplateInfoTable: React.FC<TemplateInfoTableProps> = ({ documentType, ref
   };
 
   const handleEditTemplate = async (id: number, fileName: string, version: number) => {
-    setLoading(true);
     setDocumentId(id);
     setDocumentName(fileName);
     setDocumentVersion(version);

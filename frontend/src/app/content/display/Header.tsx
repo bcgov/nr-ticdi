@@ -4,8 +4,7 @@ import UserService from '../../service/user-service';
 
 const Header: FC = () => {
   const username = UserService.getUsername();
-  // const isAdmin = UserService.hasRole([Roles.TICDI_ADMIN]);
-  const isAdmin = true;
+  const isAdmin = UserService.hasRole([Roles.TICDI_ADMIN]);
 
   return (
     <header className="header">

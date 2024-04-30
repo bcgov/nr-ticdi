@@ -4,8 +4,8 @@
 }
 
 .collapsibleTitle {
-  font-size: 1.2rem;
-  font-family: Verdana, Geneva, sans-serif !important;
+  font-size: 1.4rem;
+  /* font-family: Verdana, Geneva, sans-serif !important; */
   cursor: pointer;
 }
 

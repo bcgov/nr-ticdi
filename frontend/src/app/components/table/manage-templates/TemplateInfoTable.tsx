@@ -29,8 +29,7 @@ const TemplateInfoTable: React.FC<TemplateInfoTableProps> = ({ documentType, ref
   const [documentName, setDocumentName] = useState<string>('');
   const [documentVersion, setDocumentVersion] = useState<number>(10);
   const [isTemplateUpdated, setTemplateUpdated] = useState<boolean>(false);
-  //]
-  //
+
   useEffect(() => {
     const fetchData = async () => {
       const data = await getTemplatesInfo(documentType.id);

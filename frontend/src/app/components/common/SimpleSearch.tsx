@@ -22,7 +22,14 @@ const SimpleSearch = <T extends Record<string, any>>({ searchKeys, data, onSearc
 
   return (
     <div>
-      <input type="text" placeholder="Search..." value={filterText} onChange={handleFilterChange} />
+      <input
+        type="text"
+        className="form-control"
+        style={{ maxWidth: '200px' }}
+        placeholder="Search..."
+        value={filterText}
+        onChange={handleFilterChange}
+      />
     </div>
   );
 };

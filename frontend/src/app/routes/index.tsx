@@ -79,7 +79,7 @@ export default function AppRoutes() {
       <Route
         path={`/manage-provisions`}
         element={
-          <ProtectedRoute requiredRoles={['Roles.TICDI_ADMIN']}>
+          <ProtectedRoute requiredRoles={[Roles.TICDI_ADMIN]}>
             <ContentWrapper>
               <ManageProvisionsPage />
             </ContentWrapper>

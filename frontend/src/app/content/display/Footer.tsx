@@ -1,4 +1,4 @@
-import { FC } from "react";
+import { FC } from 'react';
 
 const Footer: FC = () => {
   return (
@@ -57,7 +57,7 @@ const Footer: FC = () => {
               </a>
             </li>
           </ul>
-          <div className="version">Version 1.0.1</div>
+          <div className="version">Version 1.0.2</div>
         </div>
       </nav>
     </footer>

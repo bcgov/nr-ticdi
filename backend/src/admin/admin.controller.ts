@@ -28,17 +28,15 @@ import { JwtRoleGuard } from 'src/auth/jwtrole.guard';
 import { JwtAuthGuard } from 'src/auth/jwtauth.guard';
 import { Roles } from 'src/auth/decorators/roles.decorator';
 import { Role } from 'src/enum/role.enum';
+import { Public } from 'src/auth/decorators/public.decorator';
 
 let requestUrl: string;
 let requestConfig: AxiosRequestConfig;
 
 @Controller('admin')
-// @UseFilters(AuthenticationFilter)
-// @UseGuards(AuthenticationGuard)
-// @UseGuards(AdminGuard)
 @UseGuards(JwtAuthGuard)
-@UseGuards(JwtRoleGuard)
-@Roles(Role.TICDI_ADMIN)
+// @UseGuards(JwtRoleGuard)
+// @Roles(Role.TICDI_ADMIN)
 export class AdminController {
   constructor(private readonly adminService: AdminService) {
     const hostname = process.env.backend_url ? process.env.backend_url : `http://localhost`;
@@ -71,27 +69,30 @@ export class AdminController {
     @Param('document_type_id') document_type_id: number,
     @Param('documentNo') documentNo: number,
     @Param('documentName') documentName: string
-  ){
-   return this.adminService.updateTemplate({
-    id: id,
-    documentNo: documentNo,
-    documentName: documentName,
-    document_type_id: document_type_id,
-   });
+  ) {
+    return this.adminService.updateTemplate({
+      id: id,
+      documentNo: documentNo,
+      documentName: documentName,
+      document_type_id: document_type_id,
+    });
   }
 
   @Get('preview-template/:id')
   async previewTemplate(@Param('id') id: number, @Res() res) {
     try {
+      // const pdfBuffer = await this.adminService.getPreviewPdf(id);
+      // const streamableFile = new stream.PassThrough();
+      // streamableFile.end(pdfBuffer);
+      // res.set({
+      //   'Content-Type': 'application/pdf',
+      //   'Content-Disposition': 'inline; filename=preview.pdf',
+      //   'Content-Security-Policy': "default-src 'self' https://*.gov.bc.ca data:; frame-src 'self' blob:;",
+      // });
+      // streamableFile.pipe(res);
       const pdfBuffer = await this.adminService.getPreviewPdf(id);
-      const streamableFile = new stream.PassThrough();
-      streamableFile.end(pdfBuffer);
-      res.set({
-        'Content-Type': 'application/pdf',
-        'Content-Disposition': 'inline; filename=preview.pdf',
-        'Content-Security-Policy': "default-src 'self'; frame-src 'self' blob:;",
-      });
-      streamableFile.pipe(res);
+      const base64Data = pdfBuffer.toString('base64');
+      res.json({ data: base64Data });
     } catch (error) {
       console.error('Error:', error);
       res.status(500).send('Internal Server Error');

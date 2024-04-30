@@ -4,11 +4,11 @@ import Button from 'react-bootstrap/Button';
 interface PreviewTemplateModalProps {
   isOpen: boolean;
   toggleModal: () => void;
-  iframeSrcBlob: Blob | null;
+  pdfBlob: Blob | null;
 }
 
-const PreviewTemplateModal: React.FC<PreviewTemplateModalProps> = ({ isOpen, toggleModal, iframeSrcBlob }) => {
-  const iframeSrc = iframeSrcBlob ? window.URL.createObjectURL(iframeSrcBlob) : '';
+const PreviewTemplateModal: React.FC<PreviewTemplateModalProps> = ({ isOpen, toggleModal, pdfBlob }) => {
+  const iframeSrc = pdfBlob ? window.URL.createObjectURL(pdfBlob) : '';
 
   const modalOverlayStyle: React.CSSProperties = {
     position: 'fixed',
@@ -53,7 +53,7 @@ const PreviewTemplateModal: React.FC<PreviewTemplateModalProps> = ({ isOpen, tog
           {iframeSrc && (
             <iframe
               src={iframeSrc}
-              title="Example Iframe"
+              title="Preview Document"
               style={{ border: 'none', width: '100%', height: '100%' }}
               allowFullScreen
             />

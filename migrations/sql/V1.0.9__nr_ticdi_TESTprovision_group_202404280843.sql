@@ -1,0 +1,97 @@
+INSERT INTO public.provision_group (id,provision_group,provision_group_text,max,"documentTypeId") VALUES
+	 (1,1,'DOCUMENT TYPE',999,1),
+	 (2,2,'FEES',999,1),
+	 (3,5,'PREAMBLE',3,1),
+	 (4,15,'OCCUPATIONAL RENT',1,1),
+	 (5,20,'SECURITY',2,1),
+	 (6,25,'INSURANCE',2,1),
+	 (8,27,'ADDITIONAL REQUIREMENTS',999,1),
+	 (9,34,'ADDITIONAL REQUIREMENTS',999,1),
+	 (10,10,'SURVEY REQUIREMENTS',999,1),
+	 (11,14,'OBTAIN SURVEY',999,1);
+INSERT INTO public.provision_group (id,provision_group,provision_group_text,max,"documentTypeId") VALUES
+	 (12,12,'SURVEY FEES',1,1),
+	 (13,1,'DOCUMENT TYPE',999,2),
+	 (14,2,'FEES',999,2),
+	 (15,5,'PREAMBLE',3,2),
+	 (16,15,'OCCUPATIONAL RENT',1,2),
+	 (17,20,'SECURITY',2,2),
+	 (18,25,'INSURANCE',2,2),
+	 (19,28,'',3,2),
+	 (20,27,'ADDITIONAL REQUIREMENTS',999,2),
+	 (21,34,'ADDITIONAL REQUIREMENTS',999,2);
+INSERT INTO public.provision_group (id,provision_group,provision_group_text,max,"documentTypeId") VALUES
+	 (22,10,'SURVEY REQUIREMENTS',999,2),
+	 (23,14,'OBTAIN SURVEY',999,2),
+	 (24,12,'SURVEY FEES',1,2),
+	 (25,1,'DOCUMENT TYPE',999,3),
+	 (26,2,'FEES',999,3),
+	 (27,5,'PREAMBLE',3,3),
+	 (28,15,'OCCUPATIONAL RENT',1,3),
+	 (29,20,'SECURITY',2,3),
+	 (30,25,'INSURANCE',2,3),
+	 (31,28,'',3,3);
+INSERT INTO public.provision_group (id,provision_group,provision_group_text,max,"documentTypeId") VALUES
+	 (32,27,'ADDITIONAL REQUIREMENTS',999,3),
+	 (33,34,'ADDITIONAL REQUIREMENTS',999,3),
+	 (34,10,'SURVEY REQUIREMENTS',999,3),
+	 (35,14,'OBTAIN SURVEY',999,3),
+	 (36,12,'SURVEY FEES',1,3),
+	 (37,1,'DOCUMENT TYPE',999,4),
+	 (38,2,'FEES',999,4),
+	 (39,5,'PREAMBLE',3,4),
+	 (40,15,'OCCUPATIONAL RENT',1,4),
+	 (41,20,'SECURITY',2,4);
+INSERT INTO public.provision_group (id,provision_group,provision_group_text,max,"documentTypeId") VALUES
+	 (42,25,'INSURANCE',2,4),
+	 (43,28,'',3,4),
+	 (44,27,'ADDITIONAL REQUIREMENTS',999,4),
+	 (45,34,'ADDITIONAL REQUIREMENTS',999,4),
+	 (46,10,'SURVEY REQUIREMENTS',999,4),
+	 (47,14,'OBTAIN SURVEY',999,4),
+	 (48,12,'SURVEY FEES',1,4),
+	 (49,1,'DOCUMENT TYPE',999,5),
+	 (50,2,'FEES',999,5),
+	 (51,5,'PREAMBLE',3,5);
+INSERT INTO public.provision_group (id,provision_group,provision_group_text,max,"documentTypeId") VALUES
+	 (52,15,'OCCUPATIONAL RENT',1,5),
+	 (53,20,'SECURITY',2,5),
+	 (54,25,'INSURANCE',2,5),
+	 (55,28,'',3,5),
+	 (56,27,'ADDITIONAL REQUIREMENTS',999,5),
+	 (57,34,'ADDITIONAL REQUIREMENTS',999,5),
+	 (58,10,'SURVEY REQUIREMENTS',999,5),
+	 (59,14,'OBTAIN SURVEY',999,5),
+	 (60,12,'SURVEY FEES',1,5),
+	 (61,1,'DOCUMENT TYPE',999,6);
+INSERT INTO public.provision_group (id,provision_group,provision_group_text,max,"documentTypeId") VALUES
+	 (62,2,'FEES',999,6),
+	 (63,5,'PREAMBLE',3,6),
+	 (64,15,'OCCUPATIONAL RENT',1,6),
+	 (65,20,'SECURITY',2,6),
+	 (66,25,'INSURANCE',2,6),
+	 (67,28,'',3,6),
+	 (68,27,'ADDITIONAL REQUIREMENTS',999,6),
+	 (69,34,'ADDITIONAL REQUIREMENTS',999,6),
+	 (70,10,'SURVEY REQUIREMENTS',999,6),
+	 (71,14,'OBTAIN SURVEY',999,6);
+INSERT INTO public.provision_group (id,provision_group,provision_group_text,max,"documentTypeId") VALUES
+	 (72,12,'SURVEY FEES',1,6),
+	 (73,1,'DOCUMENT TYPE',999,7),
+	 (74,2,'FEES',999,7),
+	 (75,5,'PREAMBLE',3,7),
+	 (76,15,'OCCUPATIONAL RENT',1,7),
+	 (77,20,'SECURITY',2,7),
+	 (78,25,'INSURANCE',2,7),
+	 (79,28,'',3,7),
+	 (80,27,'ADDITIONAL REQUIREMENTS',999,7),
+	 (81,34,'ADDITIONAL REQUIREMENTS',999,7);
+INSERT INTO public.provision_group (id,provision_group,provision_group_text,max,"documentTypeId") VALUES
+	 (82,10,'SURVEY REQUIREMENTS',999,7),
+	 (83,14,'OBTAIN SURVEY',999,7),
+	 (84,12,'SURVEY FEES',1,7),
+	 (85,6,'TEST ERIC GROUP',3,9),
+	 (86,1,'TEST',2,8),
+	 (87,600,'TEST 600',2,8),
+	 (7,28,'NEEDS A DESCRIPTION',999,1),
+	 (88,999,'ERIC GROUP TEST',999,1);

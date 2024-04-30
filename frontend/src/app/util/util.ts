@@ -119,7 +119,6 @@ const getInterestedParties = (tenantAddr: TenantAddressResource[] | null): Inter
 };
 
 const getAreaList = (interestParcel: InterestParcel[]): AreaItem[] => {
-  console.log(interestParcel);
   return interestParcel.map((parcel) => ({
     areaInHectares: parcel.areaInHectares,
     legalDescription: parcel.legalDescription,

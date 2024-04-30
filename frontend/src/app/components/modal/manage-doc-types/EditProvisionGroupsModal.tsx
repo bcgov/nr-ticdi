@@ -44,12 +44,14 @@ const EditProvisionGroupsModal: FC<EditProvisionGroupsModalProps> = ({
     setDisplayAdd(false);
     setDisplayRemove(false);
     setDisplayEdit(true);
+    setShowError(false);
   };
 
   const displayAddHandler = () => {
     setDisplayEdit(false);
     setDisplayRemove(false);
     setDisplayAdd(true);
+    setShowError(false);
   };
 
   const displayRemoveHandler = (provisionGroup: ProvisionGroup) => {
@@ -57,6 +59,7 @@ const EditProvisionGroupsModal: FC<EditProvisionGroupsModalProps> = ({
     setDisplayAdd(false);
     setDisplayEdit(false);
     setDisplayRemove(true);
+    setShowError(false);
   };
 
   const onHideHandler = () => {

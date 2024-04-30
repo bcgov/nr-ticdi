@@ -909,8 +909,6 @@ export class ReportService {
     }; // parse out the rawData, variableJson, and provisionJson into something useable
     // combine the formatted TTLS data, variables, and provision sections
     const data = Object.assign({}, ttlsData, variables);
-    console.log('data');
-    console.log(data);
     // Save the Document Data
     const provisionSaveData = provisionJson.map((provision) => {
       return { provision_id: provision.provision_id, doc_type_provision_id: provision.doc_type_provision_id };

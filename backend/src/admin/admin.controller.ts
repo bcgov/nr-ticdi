@@ -81,18 +81,15 @@ export class AdminController {
   @Get('preview-template/:id')
   async previewTemplate(@Param('id') id: number, @Res() res) {
     try {
-      // const pdfBuffer = await this.adminService.getPreviewPdf(id);
-      // const streamableFile = new stream.PassThrough();
-      // streamableFile.end(pdfBuffer);
-      // res.set({
-      //   'Content-Type': 'application/pdf',
-      //   'Content-Disposition': 'inline; filename=preview.pdf',
-      //   'Content-Security-Policy': "default-src 'self' https://*.gov.bc.ca data:; frame-src 'self' blob:;",
-      // });
-      // streamableFile.pipe(res);
       const pdfBuffer = await this.adminService.getPreviewPdf(id);
-      const base64Data = pdfBuffer.toString('base64');
-      res.json({ data: base64Data });
+      const streamableFile = new stream.PassThrough();
+      streamableFile.end(pdfBuffer);
+      res.set({
+        'Content-Type': 'application/pdf',
+        'Content-Disposition': 'inline; filename=preview.pdf',
+        'Content-Security-Policy': "frame-src 'self' blob:;",
+      });
+      streamableFile.pipe(res);
     } catch (error) {
       console.error('Error:', error);
       res.status(500).send('Internal Server Error');

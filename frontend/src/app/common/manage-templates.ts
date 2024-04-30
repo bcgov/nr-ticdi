@@ -54,14 +54,11 @@ export const disableProvision = async (provisionId: number): Promise<void> => {
   console.log(response);
 };
 
-export const previewTemplate = async (id: number, fileName: string): Promise<Blob | null> => {
+export const previewTemplate = async (id: number): Promise<Blob | null> => {
   const url = `${config.API_BASE_URL}/admin/preview-template/${id}`;
   try {
-    const getParameters = api.generateApiParameters(url);
-    const response = await api.get<any>(getParameters);
-    const base64Data = response.data;
-    const blob = base64ToBlob(base64Data, 'application/pdf');
-    return blob;
+    const response = await api.handleFilePreviewGet(url);
+    return response;
   } catch (error) {
     console.error('Error retrieving preview:', error);
     return null;

@@ -1,14 +1,39 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Button from 'react-bootstrap/Button';
+import { previewTemplate } from '../../../common/manage-templates';
 
 interface PreviewTemplateModalProps {
   isOpen: boolean;
   toggleModal: () => void;
-  pdfBlob: Blob | null;
+  templateId: number;
 }
 
-const PreviewTemplateModal: React.FC<PreviewTemplateModalProps> = ({ isOpen, toggleModal, pdfBlob }) => {
-  const iframeSrc = pdfBlob ? window.URL.createObjectURL(pdfBlob) : '';
+const PreviewTemplateModal: React.FC<PreviewTemplateModalProps> = ({ isOpen, toggleModal, templateId }) => {
+  const [pdfUrl, setPdfUrl] = useState<string>('');
+
+  useEffect(() => {
+    if (isOpen && templateId) {
+      const getTemplate = async () => {
+        const blob = await previewTemplate(templateId);
+        if (blob) {
+          const url = window.URL.createObjectURL(blob);
+          setPdfUrl(url);
+        } else {
+          console.error('Failed to load the PDF document');
+          setPdfUrl('');
+        }
+      };
+
+      getTemplate();
+
+      return () => {
+        if (pdfUrl) {
+          window.URL.revokeObjectURL(pdfUrl);
+          setPdfUrl('');
+        }
+      };
+    }
+  }, [templateId, isOpen]);
 
   const modalOverlayStyle: React.CSSProperties = {
     position: 'fixed',
@@ -50,9 +75,9 @@ const PreviewTemplateModal: React.FC<PreviewTemplateModalProps> = ({ isOpen, tog
       <div style={modalContentStyle} onClick={(e) => e.stopPropagation()}>
         <div style={iframeContainerStyle}>
           <h2>Preview Document</h2>
-          {iframeSrc && (
+          {pdfUrl && (
             <iframe
-              src={iframeSrc}
+              src={pdfUrl}
               title="Preview Document"
               style={{ border: 'none', width: '100%', height: '100%' }}
               allowFullScreen

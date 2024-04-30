@@ -9,7 +9,7 @@ import {
 } from '../../../common/manage-templates';
 import { DocType, TemplateInfo } from '../../../types/types';
 import { Button } from 'react-bootstrap';
-import PreviewTemplateModal from '../../modal/admin/manage-templates/PreviewTemplateModal';
+import PreviewTemplateModal from '../../modal/manage-templates/PreviewTemplateModal';
 import EditTemplateModal from '../../modal/manage-templates/EditTemplateModal';
 
 interface TemplateInfoTableProps {
@@ -23,7 +23,7 @@ const TemplateInfoTable: React.FC<TemplateInfoTableProps> = ({ documentType, ref
   const [currentlyActive, setCurrentlyActive] = useState<number>();
   const [loading, setLoading] = useState<boolean>(false);
   const [isOpen, setIsOpen] = useState<boolean>(false);
-  const [pdfBlob, setPdfBlob] = useState<Blob | null>(null);
+  const [previewId, setPreviewId] = useState<number | null>(null);
   const [isEditModalOpen, setisEditModalOpen] = useState<boolean>(false);
   const [documentId, setDocumentId] = useState<number>(10);
   const [documentName, setDocumentName] = useState<string>('');
@@ -73,15 +73,16 @@ const TemplateInfoTable: React.FC<TemplateInfoTableProps> = ({ documentType, ref
     setIsOpen(!isOpen);
   };
 
-  const handlePreviewTemplate = async (id: number, fileName: string) => {
+  const handlePreviewTemplate = async (id: number) => {
     try {
       setLoading(true);
-      const response = await previewTemplate(id, fileName);
-      if (response) {
-        setPdfBlob(response);
-        setIsOpen(true);
-        setLoading(false);
-      }
+      setPreviewId(id);
+      // const response = await previewTemplate(id, fileName);
+      // if (response) {
+      //   setPdfBlob(response);
+      setIsOpen(true);
+      setLoading(false);
+      // }
     } catch (error) {
       console.log('Error downloading template');
       console.log(error);
@@ -150,10 +151,7 @@ const TemplateInfoTable: React.FC<TemplateInfoTableProps> = ({ documentType, ref
     columnHelper.accessor('preview', {
       id: 'preview',
       cell: (info) => (
-        <Button
-          variant="success"
-          onClick={() => handlePreviewTemplate(info.row.original.id, info.row.original.file_name)}
-        >
+        <Button variant="success" onClick={() => handlePreviewTemplate(info.row.original.id)}>
           Preview
         </Button>
       ),
@@ -224,7 +222,7 @@ const TemplateInfoTable: React.FC<TemplateInfoTableProps> = ({ documentType, ref
           onUpload={onTemplateUpdated}
         />
       )}
-      {isOpen && <PreviewTemplateModal isOpen={isOpen} toggleModal={toggleModal} pdfBlob={pdfBlob} />}
+      {isOpen && previewId && <PreviewTemplateModal isOpen={isOpen} toggleModal={toggleModal} templateId={previewId} />}
       <DataTable
         columns={columns}
         data={templateData}

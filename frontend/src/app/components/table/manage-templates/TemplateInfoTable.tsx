@@ -76,9 +76,9 @@ const TemplateInfoTable: React.FC<TemplateInfoTableProps> = ({ documentType, ref
   const handlePreviewTemplate = async (id: number, fileName: string) => {
     try {
       setLoading(true);
-      const responce = await previewTemplate(id, fileName);
-      if (responce) {
-        setIframeSrcBlob(responce);
+      const response = await previewTemplate(id, fileName);
+      if (response) {
+        setIframeSrcBlob(response);
         setIsOpen(true);
         setLoading(false);
       }
@@ -91,7 +91,6 @@ const TemplateInfoTable: React.FC<TemplateInfoTableProps> = ({ documentType, ref
   };
 
   const handleEditTemplate = async (id: number, fileName: string, version: number) => {
-    setLoading(true);
     setDocumentId(id);
     setDocumentName(fileName);
     setDocumentVersion(version);

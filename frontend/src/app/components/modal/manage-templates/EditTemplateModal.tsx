@@ -110,7 +110,7 @@ const EditTemplateModal: FC<EditTemplateModalProps> = ({
         <Button
           variant="primary"
           onClick={editButtonHandler}
-          disabled={documentName == documentNameText && documentVersion == documentVersionText}
+          disabled={(documentName == documentNameText && documentVersion == documentVersionText) || isLoading}
         >
           Save
         </Button>

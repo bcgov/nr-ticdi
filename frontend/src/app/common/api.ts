@@ -125,7 +125,7 @@ const fileDownloadPost = <T, M = {}>(parameters: ApiRequestParameters<M>): Promi
  * @param url
  * @param filename
  */
-export const handleFilePreviewGet = async (url: string, filename: string): Promise<Blob | null> => {
+export const handleFilePreviewGet = async (url: string): Promise<Blob | null> => {
   try {
     const getParameters = generateApiParameters(url);
     return new Promise<Blob>((resolve, reject) => {

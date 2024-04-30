@@ -57,9 +57,7 @@ export const disableProvision = async (provisionId: number): Promise<void> => {
 export const previewTemplate = async (id: number): Promise<Blob | null> => {
   const url = `${config.API_BASE_URL}/admin/preview-template/${id}`;
   try {
-    const getParameters = api.generateApiParameters(url);
-    const response = await api.get<Blob>(getParameters, { responseType: 'blob' });
-    console.log(response);
+    const response = await api.handleFilePreviewGet(url);
     return response;
   } catch (error) {
     console.error('Error retrieving preview:', error);

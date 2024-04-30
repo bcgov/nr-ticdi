@@ -9,7 +9,7 @@ import {
 } from '../../../common/manage-templates';
 import { DocType, TemplateInfo } from '../../../types/types';
 import { Button } from 'react-bootstrap';
-import PreviewTemplateModal from '../../modal/admin/manage-templates/PreviewTemplateModal';
+import PreviewTemplateModal from '../../modal/manage-templates/PreviewTemplateModal';
 import EditTemplateModal from '../../modal/manage-templates/EditTemplateModal';
 
 interface TemplateInfoTableProps {

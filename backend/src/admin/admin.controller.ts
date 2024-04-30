@@ -87,12 +87,9 @@ export class AdminController {
       res.set({
         'Content-Type': 'application/pdf',
         'Content-Disposition': 'inline; filename=preview.pdf',
-        'Content-Security-Policy': "default-src 'self'; frame-src 'self' blob:;",
+        'Content-Security-Policy': "frame-src 'self' blob:;",
       });
       streamableFile.pipe(res);
-      // const pdfBuffer = await this.adminService.getPreviewPdf(id);
-      // const base64Data = pdfBuffer.toString('base64');
-      // res.json({ data: base64Data });
     } catch (error) {
       console.error('Error:', error);
       res.status(500).send('Internal Server Error');

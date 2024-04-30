@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import Button from 'react-bootstrap/Button';
-import { previewTemplate } from '../../../../common/manage-templates';
+import { previewTemplate } from '../../../common/manage-templates';
 
 interface PreviewTemplateModalProps {
   isOpen: boolean;

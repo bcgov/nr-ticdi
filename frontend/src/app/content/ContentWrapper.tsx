@@ -11,7 +11,9 @@ const ContentWrapper: FC<ContentWrapperProps> = ({ children }) => {
         <main role="main">
           <form>
             <div className="main">
-              <div className="container">{children}</div>
+              <div className="container" style={{ paddingBottom: '10px' }}>
+                {children}
+              </div>
             </div>
           </form>
         </main>

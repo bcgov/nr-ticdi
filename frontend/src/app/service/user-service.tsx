@@ -53,7 +53,7 @@ const getUsername = () => _kc.tokenParsed?.idir_username;
  * @param roles
  * @returns True or false, inidicating if the user has the role or not.
  */
-const hasRole = (roles: any) => {
+const hasRole = (roles: string[]) => {
   const jwt = _kc.tokenParsed;
   const userroles = jwt?.client_roles;
 

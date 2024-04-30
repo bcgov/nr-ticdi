@@ -1,3 +1,4 @@
+BEGIN;
 -- aapl provs
 INSERT INTO provision (id, provision_name, free_text, help_text, category, active_flag, is_deleted, create_userid, update_userid, create_timestamp, update_timestamp) VALUES (250, 'Template Variables - Assignment/Assumption', '', '', '', TRUE, FALSE, 'system', 'system', NOW(), NOW());
 INSERT INTO provision (id, provision_name, free_text, help_text, category, active_flag, is_deleted, create_userid, update_userid, create_timestamp, update_timestamp) VALUES (251, 'Preamble Assignment - Standard', 'The Assignor and the Province entered into a «TENURE_TO_BE_ASSIGNED» (herein called the “Document”) over those lands more particularly known and described as: 

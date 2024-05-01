@@ -7,6 +7,7 @@ import { URLSearchParams } from 'url';
 import * as dotenv from 'dotenv';
 import * as base64 from 'base-64';
 import { formatPostalCode, getNFRMailingAddress } from 'src/util';
+import { DTR } from 'src/types';
 declare const Buffer;
 const axios = require('axios');
 
@@ -272,7 +273,7 @@ export class TTLSService {
     }
   }
 
-  callHttp(id: number): Observable<Array<Object>> {
+  callHttp(id: number): Observable<DTR> {
     const bearerToken = this.webade_token;
     const url = process.env.ttls_url + id;
     return this.http.get(url, { headers: { Authorization: 'Bearer ' + bearerToken } }).pipe(

@@ -4,8 +4,8 @@ import { firstValueFrom } from 'rxjs';
 import { DocumentTemplateService } from 'src/document_template/document_template.service';
 import { ProvisionService } from 'src/provision/provision.service';
 import { TTLSService } from 'src/ttls/ttls.service';
-import { GL_REPORT_TYPE, LUR_REPORT_TYPE, SL_REPORT_TYPE, numberWords, sectionTitles } from '../constants';
-import { ProvisionJSON, VariableJSON } from '../types';
+import { numberWords, sectionTitles } from '../constants';
+import { DTR, ProvisionJSON, VariableJSON } from '../types';
 import {
   convertToSpecialCamelCase,
   formatMoney,
@@ -22,8 +22,7 @@ import {
 import { DocumentDataService } from 'src/document_data/document_data.service';
 import { DocumentDataLogService } from 'src/document_data_log/document_data_log.service';
 import { DocumentTypeService } from 'src/document_type/document_type.service';
-import { Provision } from 'src/provision/entities/provision.entity';
-import { DocumentTypeProvision } from 'src/provision/entities/document_type_provision';
+
 const axios = require('axios');
 
 // generate report needs to be consolidated which is impossible until we figure out how provisions & variables will be dynamically inserted into the docx files
@@ -131,9 +130,10 @@ export class ReportService {
   async generateLURReport(dtid: number, username: string, document_type_id: number) {
     // get the view given the print request detail id
     await this.ttlsService.setWebadeToken();
-    const rawData: any = await firstValueFrom(this.ttlsService.callHttp(dtid))
+    let rawData: DTR;
+    await firstValueFrom(this.ttlsService.callHttp(dtid))
       .then((res) => {
-        return res;
+        rawData = res;
       })
       .catch((err) => {
         console.log(err);
@@ -281,9 +281,10 @@ export class ReportService {
   async generateGLReport(dtid: number, username: string, document_type_id: number) {
     // get raw ttls data for later
     await this.ttlsService.setWebadeToken();
-    const rawData: any = await firstValueFrom(this.ttlsService.callHttp(dtid))
+    let rawData: DTR;
+    await firstValueFrom(this.ttlsService.callHttp(dtid))
       .then((res) => {
-        return res;
+        rawData = res;
       })
       .catch((err) => {
         console.log(err);
@@ -374,9 +375,10 @@ export class ReportService {
   ) {
     // get raw ttls data for later
     await this.ttlsService.setWebadeToken();
-    const rawData: any = await firstValueFrom(this.ttlsService.callHttp(dtid))
+    let rawData: DTR;
+    await firstValueFrom(this.ttlsService.callHttp(dtid))
       .then((res) => {
-        return res;
+        rawData = res;
       })
       .catch((err) => {
         console.log(err);
@@ -468,9 +470,10 @@ export class ReportService {
   ) {
     // get raw ttls data for later
     await this.ttlsService.setWebadeToken();
-    const rawData: any = await firstValueFrom(this.ttlsService.callHttp(dtid))
+    let rawData: DTR;
+    await firstValueFrom(this.ttlsService.callHttp(dtid))
       .then((res) => {
-        return res;
+        rawData = res;
       })
       .catch((err) => {
         console.log(err);
@@ -854,9 +857,10 @@ export class ReportService {
   ) {
     // get raw ttls data for later
     await this.ttlsService.setWebadeToken();
-    const rawData: any = await firstValueFrom(this.ttlsService.callHttp(dtid))
+    let rawData: DTR;
+    await firstValueFrom(this.ttlsService.callHttp(dtid))
       .then((res) => {
-        return res;
+        rawData = res;
       })
       .catch((err) => {
         console.log(err);
@@ -995,9 +999,10 @@ export class ReportService {
   ) {
     // get raw ttls data for later
     await this.ttlsService.setWebadeToken();
-    const rawData: any = await firstValueFrom(this.ttlsService.callHttp(dtid))
+    let rawData: DTR;
+    await firstValueFrom(this.ttlsService.callHttp(dtid))
       .then((res) => {
-        return res;
+        rawData = res;
       })
       .catch((err) => {
         console.log(err);
@@ -1040,9 +1045,11 @@ export class ReportService {
       DB_ADDRESS_STREET_TENANT: glStreetAddress,
       DB_DOCUMENT_NUMBER: dtid,
       DB_DOCUMENT_TYPE: documentType.name,
-      DB_FILE_NUMBER: rawData.fileNum,
-      DB_TENURE_TYPE: '',
-      DB_REG_DOCUMENT_NUMBER: 0,
+      DB_FILE_NUMBER: rawData ? rawData.fileNum : null,
+      DB_TENURE_TYPE: rawData.type
+        ? rawData.type.toLowerCase().charAt(0).toUpperCase() + rawData.type.toLowerCase().slice(1)
+        : '',
+      DB_REG_DOCUMENT_NUMBER: rawData ? rawData.documentNum : null,
     }; // parse out the rawData, variableJson, and provisionJson into something useable
     // combine the formatted TTLS data, variables, and provision sections
     const data = Object.assign({}, ttlsData, variables);

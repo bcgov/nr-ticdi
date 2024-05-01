@@ -131,3 +131,76 @@ export type IdirObject = {
   family_name: string;
   email: string;
 };
+
+export interface DTR {
+  dtid: number | null;
+  fileNum: string | null;
+  orgUnit: string | null;
+  complexLevel: string | null;
+  purpose: string | null;
+  subPurpose: string | null;
+  subType: string | null;
+  type: string | null;
+  bcgsSheet: string | null;
+  airPhotoNum: string | null;
+  locLand: string | null;
+  inspectionDate: string | null;
+  contactCompanyName: string | null;
+  contactFirstName: string | null;
+  contactMiddleName: string | null;
+  contactLastName: string | null;
+  contactPhoneNumber: string | null;
+  contactEmail: string | null;
+  feePayableType: string | null;
+  feePayableAmount: number | null;
+  feePayableAmountGst: number | null;
+  regOfficeStreet: string | null;
+  regOfficeCity: string | null;
+  regOfficeProv: string | null;
+  regOfficePostalCode: string | null;
+  gstRate: number | null;
+  gstExempt: string | null;
+  gstExemptArea: number | null;
+  documentNum: number | null;
+  interestParcel: InterestParcel[];
+  tenantAddr: TenantAddressResource[];
+}
+
+export interface InterestParcel {
+  interestParcelId: number | null;
+  legalDescription: string | null;
+  areaCalcCode: string | null;
+  areaCalcDescription: string | null;
+  areaInHectares: number | null;
+  expiryDate: Date | null;
+  featureCode: string | null;
+  areaInSquareMetres: number | null;
+  areaLengthInMetres: number | null;
+  wktGeometry: string | null;
+}
+
+export interface TenantAddressResource {
+  firstName: string | null;
+  middleName: string | null;
+  lastName: string | null;
+  legalName: string | null;
+  incorporationNum: number | null;
+  emailAddress: string | null;
+  locationSid: number | null;
+  ipSid: number | null;
+  addrSid: number | null;
+  addrLine1: string | null;
+  postalCode: string | null;
+  city: string | null;
+  zipCode: string | null;
+  addrLine2: string | null;
+  addrLine3: string | null;
+  countryCd: string | null;
+  regionCd: string | null;
+  country: string | null;
+  provAbbr: string | null;
+  stateAbbr: string | null;
+  addrType: string | null;
+  areaCode: string | null;
+  phoneNumber: string | null;
+}

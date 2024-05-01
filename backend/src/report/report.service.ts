@@ -86,6 +86,8 @@ export class ReportService {
         prefix = 'GL';
       } else if (documentType.name.toLowerCase().includes('standard licence')) {
         prefix = 'SL';
+      } else if (documentType.name.toLowerCase().includes('assumption')) {
+        prefix = 'AA';
       }
     }
     return {
@@ -111,7 +113,9 @@ export class ReportService {
       } else if (documentType.name.toLowerCase().includes('grazing')) {
         return this.generateGLReport(dtid, idirUsername, document_type_id);
       } else if (documentType.name.toLowerCase().includes('standard licence')) {
-        return this.generateSLReport(dtid, document_type_id, idirUsername, idirName, variableJson, provisionJson);
+        return this.generateSLReport(dtid, document_type_id, idirUsername, variableJson, provisionJson);
+      } else if (documentType.name.toLowerCase().includes('assumption')) {
+        return this.generateAAReport(dtid, document_type_id, idirUsername, variableJson, provisionJson);
       }
     }
   }
@@ -845,7 +849,6 @@ export class ReportService {
     dtid: number,
     document_type_id: number,
     idirUsername: string,
-    idirName: string,
     variableJson: VariableJSON[],
     provisionJson: ProvisionJSON[]
   ) {
@@ -970,6 +973,140 @@ export class ReportService {
     });
     // response.data is the docx file after the first insertions
     return response.data; // one insertion is enough for standard licence
+    // // convert the docx file buffer to base64 for a second cdogs conversion
+    // const base64File = Buffer.from(firstFile).toString('base64');
+    // cdogsData.template.content = base64File;
+    // const md2 = JSON.stringify(cdogsData);
+    // conf.data = md2;
+    // const response2 = await ax(conf).catch((error) => {
+    //   console.log(error.response);
+    // });
+    // // response2.data is the docx file after the second insertions
+    // // (anything nested in a variable or provision should be inserted at this point)
+    // return response2.data;
+  }
+
+  async generateAAReport(
+    dtid: number,
+    document_type_id: number,
+    idirUsername: string,
+    variableJson: VariableJSON[],
+    provisionJson: ProvisionJSON[]
+  ) {
+    // get raw ttls data for later
+    await this.ttlsService.setWebadeToken();
+    const rawData: any = await firstValueFrom(this.ttlsService.callHttp(dtid))
+      .then((res) => {
+        return res;
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+    const documentTemplateObject = await this.documentTemplateService.findActiveByDocumentType(document_type_id);
+    const documentType = await this.documentTypeService.findById(document_type_id);
+
+    // Format variables with names that the document template expects
+    const variables: any = {};
+    variableJson.forEach(({ variable_name, variable_value }) => {
+      variables[`${variable_name}`] = variable_value;
+    });
+
+    // Format the raw ttls data
+    const tenantAddr = rawData.tenantAddr;
+    const interestParcels = rawData.interestParcel;
+    let concatLegalDescriptions = '';
+    if (interestParcels && interestParcels.length > 0) {
+      interestParcels.sort((a, b) => b.interestParcelId - a.interestParcelId);
+      let legalDescArray = [];
+      for (let ip of interestParcels) {
+        if (ip.legalDescription && ip.legalDescription != '') {
+          legalDescArray.push(ip.legalDescription);
+        }
+      }
+      if (legalDescArray.length > 0) {
+        concatLegalDescriptions = legalDescArray.join('\n');
+      }
+    }
+
+    // const DB_ADDRESS_MAILING_TENANT = tenantAddr[0] ? nfrAddressBuilder(tenantAddr) : '';
+    // reuse grazing lease address building function
+    let { glMailingAddress, glStreetAddress } = tenantAddr[0]
+      ? glAddressBuilder(tenantAddr)
+      : { glMailingAddress: '', glStreetAddress: '' };
+    if (glMailingAddress === '') glMailingAddress = glStreetAddress;
+    if (glStreetAddress === '') glStreetAddress = glMailingAddress;
+
+    const ttlsData = {
+      DB_ADDRESS_STREET_TENANT: glStreetAddress,
+      DB_DOCUMENT_NUMBER: dtid,
+      DB_DOCUMENT_TYPE: documentType.name,
+      DB_FILE_NUMBER: rawData.fileNum,
+      DB_TENURE_TYPE: '',
+      DB_REG_DOCUMENT_NUMBER: 0,
+    }; // parse out the rawData, variableJson, and provisionJson into something useable
+    // combine the formatted TTLS data, variables, and provision sections
+    const data = Object.assign({}, ttlsData, variables);
+    // Save the Document Data
+    const provisionSaveData = provisionJson.map((provision) => {
+      return { provision_id: provision.provision_id, doc_type_provision_id: provision.doc_type_provision_id };
+    });
+    const documentData = await this.saveDocument(
+      dtid,
+      document_type_id,
+      'Complete',
+      provisionSaveData,
+      variableJson,
+      idirUsername
+    );
+
+    // Log the request
+    await this.documentDataLogService.create({
+      dtid: dtid,
+      document_type_id: document_type_id,
+      document_data_id: documentData.id,
+      document_template_id: documentTemplateObject?.id,
+      request_app_user: idirUsername,
+      request_json: JSON.stringify(data),
+      create_userid: idirUsername,
+    });
+
+    // Generate the report
+    const cdogsToken = await this.ttlsService.callGetToken();
+    let bufferBase64 = documentTemplateObject.the_file;
+    let cdogsData = {
+      data,
+      formatters:
+        '{"myFormatter":"_function_myFormatter|function(data) { return data.slice(1); }","myOtherFormatter":"_function_myOtherFormatter|function(data) {return data.slice(2);}"}',
+      options: {
+        cacheReport: false,
+        convertTo: 'docx',
+        overwrite: true,
+        reportName: 'sl-report',
+      },
+      template: {
+        content: `${bufferBase64}`,
+        encodingType: 'base64',
+        fileType: 'docx',
+      },
+    };
+    const md = JSON.stringify(cdogsData);
+
+    let conf = {
+      method: 'post',
+      url: process.env.cdogs_url,
+      headers: {
+        Authorization: `Bearer ${cdogsToken}`,
+        'Content-Type': 'application/json',
+      },
+      responseType: 'arraybuffer',
+      data: md,
+    };
+    const ax = require('axios');
+    const response = await ax(conf).catch((error) => {
+      console.log(error.response);
+    });
+    // response.data is the docx file after the first insertions
+    return response.data; // one insertion is enough for assignment assumption
     // // convert the docx file buffer to base64 for a second cdogs conversion
     // const base64File = Buffer.from(firstFile).toString('base64');
     // cdogsData.template.content = base64File;

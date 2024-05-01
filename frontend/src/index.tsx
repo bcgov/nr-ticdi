@@ -5,6 +5,7 @@ import App from './app/App';
 import './app/App.css';
 import reportWebVitals from './reportWebVitals';
 import UserService from './app/service/user-service';
+import { HelmetProvider } from 'react-helmet-async';
 
 const container = document.getElementById('root')!;
 const root = createRoot(container);
@@ -12,7 +13,9 @@ const root = createRoot(container);
 const onAuthenticatedCallback = () =>
   root.render(
     <StrictMode>
-      <App />
+      <HelmetProvider>
+        <App />
+      </HelmetProvider>
     </StrictMode>
   );
 

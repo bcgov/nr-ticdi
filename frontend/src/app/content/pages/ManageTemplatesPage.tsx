@@ -5,6 +5,7 @@ import { DocType } from '../../types/types';
 import UploadTemplateModal from '../../components/modal/manage-templates/UploadTemplateModal';
 import RemoveTemplateModal from '../../components/modal/manage-templates/RemoveTemplateModal';
 import { getDocumentTypes } from '../../common/report';
+import { Helmet } from 'react-helmet-async';
 
 const ManageTemplatesPage: FC = () => {
   const [showUploadModal, setShowUploadModal] = useState<boolean>(false);
@@ -50,6 +51,14 @@ const ManageTemplatesPage: FC = () => {
 
   return (
     <>
+      <Helmet>
+        <meta
+          httpEquiv="Content-Security-Policy"
+          content={`
+        frame-src https://*.gov.bc.ca blob:;
+      `}
+        ></meta>
+      </Helmet>
       <h1>Manage Templates</h1>
       <hr />
       <div className="col-md-3">
@@ -61,7 +70,8 @@ const ManageTemplatesPage: FC = () => {
             id="reportTypes"
             style={{ minWidth: '200px' }}
             className="border border-1 rounded pl-2 ml-4"
-            onChange={selectedDocTypeHandler}>
+            onChange={selectedDocTypeHandler}
+          >
             {allDocTypes.map((docType) => (
               <option key={docType.id} value={docType.id}>
                 {docType.name}

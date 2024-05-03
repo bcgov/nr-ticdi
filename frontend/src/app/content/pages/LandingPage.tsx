@@ -25,14 +25,14 @@ import { ProvisionJson, SaveProvisionData } from '../../components/table/reports
 import VariablesTable, { SaveVariableData, VariableJson } from '../../components/table/reports/VariablesTable';
 import { Alert, Button, Row } from 'react-bootstrap';
 import { getDocumentTypes } from '../../common/manage-doc-types';
-import { getVariables, getVariablesByDocType } from '../../common/manage-provisions';
+import { getVariablesByDocType } from '../../common/manage-provisions';
 import { useDispatch, useSelector } from 'react-redux';
 import { setProvisionDataObjects, setSelectedProvisionIds } from '../../store/reducers/provisionSlice';
 import { setSelectedVariableIds, setVariables } from '../../store/reducers/variableSlice';
 import { RootState } from '../../store/store';
 import { setSearchState } from '../../store/reducers/searchSlice';
 import { useParams } from 'react-router-dom';
-import CustomCollapsible from './documentpreview/CustomCollapsible';
+// import Collapsible from './documentpreview/Collapsible';
 
 const LandingPage: FC = () => {
   const { dtidNumber, docTypeFromUrl } = useParams();
@@ -190,8 +190,10 @@ const LandingPage: FC = () => {
       setDtid(dtidValue);
       // Fetch any existing documentData
       const displayData: { dtr: DTRDisplayObject | null; error: string | null } = await getDisplayData(dtidValue);
-      if (!displayData.error) setData(displayData.dtr);
-      else {
+      if (!displayData.error) {
+        setData(displayData.dtr);
+        setIsOpen(true);
+      } else {
         setError(displayData.error);
         setShowError(true);
       }
@@ -275,7 +277,6 @@ const LandingPage: FC = () => {
     setIsOpen(false);
     setSelectedDocTypeId(null);
   };
-  const toggleCollapsible = () => setIsOpen(!isOpen);
 
   const getReportData = () => {
     const selectedProvisions = provisions.filter((provision) => selectedProvisionIds.includes(provision.provision_id));
@@ -381,30 +382,15 @@ const LandingPage: FC = () => {
         <div className="font-weight-bold inlineDiv mr-1">Primary Contact Name:</div>
         <div className="inlineDiv">{data?.primaryContactName}</div>
       </div>
-      <CustomCollapsible
-        title="Disposition Transaction ID Details"
-        isOpen={isOpen}
-        toggleCollapsible={toggleCollapsible}
-        isSpanRequired={false}
-      >
+      <Collapsible title="Disposition Transaction ID Details" isOpen={isOpen}>
         {data ? <DtidDetails data={data!} /> : <Skeleton />}
-      </CustomCollapsible>
-      <CustomCollapsible
-        title="Tenure Details"
-        isOpen={isOpen}
-        toggleCollapsible={toggleCollapsible}
-        isSpanRequired={false}
-      >
+      </Collapsible>
+      <Collapsible title="Tenure Details" isOpen={isOpen}>
         {data ? <TenureDetails data={data!} /> : <Skeleton />}
-      </CustomCollapsible>
-      <CustomCollapsible
-        title="Interested Parties"
-        isOpen={isOpen}
-        toggleCollapsible={toggleCollapsible}
-        isSpanRequired={false}
-      >
+      </Collapsible>
+      <Collapsible title="Interested Parties" isOpen={isOpen}>
         {data ? <InterestedParties data={data!} /> : <Skeleton />}
-      </CustomCollapsible>
+      </Collapsible>
 
       <hr />
       <h3>Create Document</h3>
@@ -430,11 +416,11 @@ const LandingPage: FC = () => {
       </Row>
       {provisionGroups && dtid && documentType ? (
         <>
-          <Collapsible title="Provisions">
+          <Collapsible title="Provisions" isOpen={false}>
             <Provisions dtid={dtid} documentType={documentType} provisionGroups={provisionGroups} />
           </Collapsible>
 
-          <Collapsible title="Variables">
+          <Collapsible title="Variables" isOpen={false}>
             <VariablesTable onVariableEdit={handleVariableEdit} />
           </Collapsible>
         </>

@@ -15,48 +15,46 @@ export interface IndexPageProps {
 }
 
 const IndexPage: FC<IndexPageProps> = ({ data }) => {
-  const { dtid } = useParams<{ dtid: string }>();
-  const dtidNumber = dtid ? parseInt(dtid, 10) : null;
-  const generateReportHandler = () => {
-    if (dtidNumber) {
-      // generateReportNew(dtidNumber, data!.fileNum, 'Land Use Report');
-    }
-  };
-
-  return (
-    <>
-      <div className="h1">Preview - Land Use Report (Draft)</div>
-      <hr />
-
-      <div className="mb-3 mt-3">
-        <div className="font-weight-bold inlineDiv mr-1">DTID:</div>
-        <div className="inlineDiv" id="dtid">
-          {data.dtid}
-        </div>
-      </div>
-      <div className="mb-3">
-        <div className="font-weight-bold inlineDiv mr-1">Tenure File Number:</div>
-        <div className="inlineDiv" id="tfn">
-          {data.fileNum}
-        </div>
-      </div>
-      <div className="mb-3">
-        <div className="font-weight-bold inlineDiv mr-1">Primary Contact Name:</div>
-        <div className="inlineDiv">{data.primaryContactName}</div>
-      </div>
-
-      <Collapsible title="Disposition Transaction ID Details">
-        <DtidDetails data={data} />
-      </Collapsible>
-      <Collapsible title="Tenure Details">
-        <TenureDetails data={data} />
-      </Collapsible>
-      <Collapsible title="Area">
-        <AreaDetails data={data} />
-      </Collapsible>
-      <Button onClick={generateReportHandler}>Create</Button>
-    </>
-  );
+  // const { dtid } = useParams<{ dtid: string }>();
+  // const dtidNumber = dtid ? parseInt(dtid, 10) : null;
+  // const generateReportHandler = () => {
+  //   if (dtidNumber) {
+  //     // generateReportNew(dtidNumber, data!.fileNum, 'Land Use Report');
+  //   }
+  // };
+  // return (
+  //   <>
+  //     <div className="h1">Preview - Land Use Report (Draft)</div>
+  //     <hr />
+  //     <div className="mb-3 mt-3">
+  //       <div className="font-weight-bold inlineDiv mr-1">DTID:</div>
+  //       <div className="inlineDiv" id="dtid">
+  //         {data.dtid}
+  //       </div>
+  //     </div>
+  //     <div className="mb-3">
+  //       <div className="font-weight-bold inlineDiv mr-1">Tenure File Number:</div>
+  //       <div className="inlineDiv" id="tfn">
+  //         {data.fileNum}
+  //       </div>
+  //     </div>
+  //     <div className="mb-3">
+  //       <div className="font-weight-bold inlineDiv mr-1">Primary Contact Name:</div>
+  //       <div className="inlineDiv">{data.primaryContactName}</div>
+  //     </div>
+  //     <Collapsible title="Disposition Transaction ID Details">
+  //       <DtidDetails data={data} />
+  //     </Collapsible>
+  //     <Collapsible title="Tenure Details">
+  //       <TenureDetails data={data} />
+  //     </Collapsible>
+  //     <Collapsible title="Area">
+  //       <AreaDetails data={data} />
+  //     </Collapsible>
+  //     <Button onClick={generateReportHandler}>Create</Button>
+  //   </>
+  // );
+  return <></>;
 };
 
 export default IndexPage;

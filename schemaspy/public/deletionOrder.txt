@@ -1,0 +1,12 @@
+flyway_schema_history
+document_data_log
+document_data_provision
+document_data_variable
+document_template
+document_type_provision
+provision_variable
+document_data
+provision_group
+spatial_ref_sys
+provision
+document_type

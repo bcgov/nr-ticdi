@@ -166,7 +166,7 @@ const TemplateInfoTable: React.FC<TemplateInfoTableProps> = ({ documentType, ref
           variant="info"
           onClick={() => handleDownloadTemplate(info.row.original.id, info.row.original.file_name)}
         >
-          View Doc
+          Download
         </Button>
       ),
       header: () => null,
@@ -182,7 +182,7 @@ const TemplateInfoTable: React.FC<TemplateInfoTableProps> = ({ documentType, ref
             handleEditTemplate(info.row.original.id, info.row.original.file_name, info.row.original.template_version)
           }
         >
-          Edit Doc
+          Edit
         </Button>
       ),
       header: () => null,

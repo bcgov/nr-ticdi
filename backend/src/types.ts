@@ -28,6 +28,7 @@ export type ProvisionJSON = {
   provision_group: number;
   free_text: string;
   provision_id: number;
+  sequence_value: number;
   doc_type_provision_id: number;
 };
 

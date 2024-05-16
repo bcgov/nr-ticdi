@@ -15,17 +15,12 @@ import {
   getLicenceHolder,
   getLicenceHolderName,
   getMailingAddress,
-  glAddressBuilder,
   grazingLeaseVariables,
   nfrAddressBuilder,
 } from '../util';
 import { DocumentDataService } from 'src/document_data/document_data.service';
 import { DocumentDataLogService } from 'src/document_data_log/document_data_log.service';
 import { DocumentTypeService } from 'src/document_type/document_type.service';
-
-const axios = require('axios');
-
-// generate report needs to be consolidated which is impossible until we figure out how provisions & variables will be dynamically inserted into the docx files
 
 dotenv.config();
 let hostname: string;
@@ -45,31 +40,6 @@ export class ReportService {
     // local development backend port is 3001, docker backend port is 3000
     port = process.env.backend_url ? 3000 : 3001;
   }
-
-  // /**
-  //  * Generates a LUR report name using tenure file number
-  //  * and a version number. The version number is incremented
-  //  * each time someone generates a LUR report.
-  //  *
-  //  * @param tenureFileNumber
-  //  * @returns
-  //  */
-  // async generateReportName(dtid: number, tenureFileNumber: string, documentType: string) {
-  //   const url = `${hostname}:${port}/print-request-log/version/${dtid}/${documentType}`;
-  //   // grab the next version string for the dtid
-  //   const version = await axios
-  //     .get(url, {
-  //       headers: {
-  //         'Content-Type': 'application/json',
-  //       },
-  //     })
-  //     .then((res) => {
-  //       return res.data;
-  //     });
-  //   return {
-  //     reportName: documentType + '_' + tenureFileNumber + '_' + version + '.docx',
-  //   };
-  // }
 
   async generateReportName(dtid: number, tenure_file_number: string, document_type_id: number) {
     const version = await this.documentDataLogService.findNextVersion(dtid, document_type_id);
@@ -111,13 +81,246 @@ export class ReportService {
         return this.generateLURReport(dtid, idirUsername, document_type_id);
       } else if (documentType.name.toLowerCase().includes('grazing')) {
         return this.generateGLReport(dtid, idirUsername, document_type_id);
-      } else if (documentType.name.toLowerCase().includes('standard licence')) {
-        return this.generateSLReport(dtid, document_type_id, idirUsername, variableJson, provisionJson);
-      } else if (documentType.name.toLowerCase().includes('assumption')) {
-        return this.generateAAReport(dtid, document_type_id, idirUsername, variableJson, provisionJson);
+      } else {
+        return this.generateReportNew(dtid, document_type_id, idirUsername, variableJson, provisionJson);
       }
     }
   }
+
+  async generateReportNew(
+    dtid: number,
+    document_type_id: number,
+    idirUsername: string,
+    variableJson: VariableJSON[],
+    provisionJson: ProvisionJSON[]
+  ) {
+    const documentTemplateObject = await this.documentTemplateService.findActiveByDocumentType(document_type_id);
+
+    // Format variables with names that the document template expects
+    const variables: any = {};
+    variableJson.forEach(({ variable_name, variable_value }) => {
+      if (variable_value.includes('«')) {
+        // regex which converts «DB_TENURE_TYPE» to {d.DB_Tenure_Type}, also works for VAR_
+        variable_value = variable_value.replace(/<<([^>>]+)>>/g, function (match, innerText) {
+          innerText = convertToSpecialCamelCase(innerText);
+          return '{d.' + innerText + '}';
+        });
+      } else if (variable_value.includes('<<')) {
+        // regex which converts <<DB_TENURE_TYPE>> to {d.DB_Tenure_Type}, also works for VAR_
+        variable_value = variable_value.replace(/<<([^>>]+)>>/g, function (match, innerText) {
+          innerText = convertToSpecialCamelCase(innerText);
+          return '{d.' + innerText + '}';
+        });
+      }
+      variables[`${variable_name}`] = variable_value;
+    });
+
+    // Format the provisions so that provision free_text gets passed into the document template
+    provisionJson.sort((a, b) => {
+      if (a.provision_group === b.provision_group) {
+        return a.sequence_value - b.sequence_value;
+      }
+      return a.provision_group - b.provision_group;
+    });
+    let provisions: { [key: string]: { provision_name: string; free_text: string }[] } = {};
+    provisionJson.forEach(({ provision_name, provision_group, free_text }) => {
+      if (free_text.includes('«')) {
+        // regex which converts «DB_TENURE_TYPE» to {d.DB_Tenure_Type}, also works for VAR_
+        free_text = free_text.replace(/«([^»]+)»/g, function (match, innerText) {
+          innerText = convertToSpecialCamelCase(innerText);
+          return '{d.' + innerText + '}';
+        });
+      } else if (free_text.includes('<<')) {
+        // regex which converts <<DB_TENURE_TYPE>> to {d.DB_Tenure_Type}, also works for VAR_
+        free_text = free_text.replace(/<<([^>>]+)>>/g, function (match, innerText) {
+          innerText = convertToSpecialCamelCase(innerText);
+          return '{d.' + innerText + '}';
+        });
+      }
+
+      const key = `SECTION_${provision_group}`;
+      if (!provisions[key]) {
+        provisions[key] = [];
+      }
+      provisions[key].push({ provision_name, free_text });
+    });
+    console.log(provisions);
+
+    // get the TTLS DB_ variables
+    const dbVars = await this.getDbVariables(dtid, document_type_id, idirUsername);
+
+    // combine the formatted TTLS data, variables, and provision sections to be passed to cdogs
+    const data = Object.assign({}, dbVars, variables, provisions);
+
+    // Save the Document Data to the database
+    const provisionSaveData = provisionJson.map((provision) => {
+      return { provision_id: provision.provision_id, doc_type_provision_id: provision.doc_type_provision_id };
+    });
+    const documentData = await this.saveDocument(
+      dtid,
+      document_type_id,
+      'Complete',
+      provisionSaveData,
+      variableJson,
+      idirUsername
+    );
+
+    // Log the request
+    await this.documentDataLogService.create({
+      dtid: dtid,
+      document_type_id: document_type_id,
+      document_data_id: documentData.id,
+      document_template_id: documentTemplateObject?.id,
+      request_app_user: idirUsername,
+      request_json: JSON.stringify(data),
+      create_userid: idirUsername,
+    });
+
+    // Generate the report
+    const cdogsToken = await this.ttlsService.callGetToken();
+    let bufferBase64 = documentTemplateObject.the_file;
+    let cdogsData = {
+      data,
+      formatters:
+        '{"myFormatter":"_function_myFormatter|function(data) { return data.slice(1); }","myOtherFormatter":"_function_myOtherFormatter|function(data) {return data.slice(2);}"}',
+      options: {
+        cacheReport: false,
+        convertTo: 'docx',
+        overwrite: true,
+        reportName: 'sl-report',
+      },
+      template: {
+        content: `${bufferBase64}`,
+        encodingType: 'base64',
+        fileType: 'docx',
+      },
+    };
+    const md = JSON.stringify(cdogsData);
+
+    let conf = {
+      method: 'post',
+      url: process.env.cdogs_url,
+      headers: {
+        Authorization: `Bearer ${cdogsToken}`,
+        'Content-Type': 'application/json',
+      },
+      responseType: 'arraybuffer',
+      data: md,
+    };
+    const ax = require('axios');
+    const response = await ax(conf).catch((error) => {
+      console.log(error.response);
+    });
+    // response.data is the docx file after the first insertions
+    const firstFile = response.data;
+    // convert the docx file buffer to base64 for a second cdogs conversion
+    const base64File = Buffer.from(firstFile).toString('base64');
+    cdogsData.template.content = base64File;
+    const md2 = JSON.stringify(cdogsData);
+    conf.data = md2;
+    const response2 = await ax(conf).catch((error) => {
+      console.log(error.response);
+    });
+    // response2.data is the docx file after the second insertions
+    // (anything nested in a variable or provision should be inserted at this point)
+    return response2.data;
+  }
+
+  async getDbVariables(dtid: number, document_type_id: number, idirName: string): Promise<any> {
+    await this.ttlsService.setWebadeToken();
+    let rawData: DTR;
+    await firstValueFrom(this.ttlsService.callHttp(dtid))
+      .then((res) => {
+        rawData = res;
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+
+    const interestParcel = rawData.interestParcel;
+    const tenantAddr = rawData.tenantAddr;
+    const regVars = {
+      regOfficeStreet: rawData && rawData.regOfficeStreet ? rawData.regOfficeStreet : '',
+      regOfficeCity: rawData && rawData.regOfficeCity ? rawData.regOfficeCity : '',
+      regOfficeProv: rawData && rawData.regOfficeProv ? rawData.regOfficeProv : '',
+      regOfficePostalCode: rawData && rawData.regOfficePostalCode ? rawData.regOfficePostalCode : '',
+    };
+    const glVariables = grazingLeaseVariables(tenantAddr, interestParcel, regVars);
+
+    const documentType = await this.documentTypeService.findById(document_type_id);
+
+    return {
+      DB_DOCUMENT_NUMBER: dtid,
+      DB_DOCUMENT_TYPE: documentType.name,
+      DB_FILE_NUMBER: rawData ? rawData.fileNum : null,
+      DB_ADDRESS_STREET_TENANT: glVariables.glStreetAddress || glVariables.glMailingAddress,
+      DB_ADDRESS_MAILING_TENANT: glVariables.glMailingAddress || glVariables.glStreetAddress,
+      DB_ADDRESS_REGIONAL_OFFICE: glVariables.addressRegionalOffice,
+      DB_NAME_TENANT: glVariables.mailingName,
+      DB_NAME_TENANT_LIST: glVariables.mailingNameList,
+      DB_NAME_CORPORATION: glVariables.mailingCorp,
+      DB_LEGAL_DESCRIPTION: glVariables.legalDescription,
+      DB_NAME_BCAL_CONTACT: idirName,
+      DB_TENURE_TYPE:
+        rawData && rawData.type
+          ? rawData.type.toLowerCase().charAt(0).toUpperCase() + rawData.type.toLowerCase().slice(1)
+          : '',
+      DB_REG_DOCUMENT_NUMBER: rawData ? rawData.documentNum : null,
+      // provide the variables in non-all caps format as well
+      DB_Document_Number: dtid,
+      DB_Document_Type: documentType.name,
+      DB_File_Number: rawData ? rawData.fileNum : null,
+      DB_Address_Street_Tenant: glVariables.glStreetAddress || glVariables.glMailingAddress,
+      DB_Address_Mailing_Tenant: glVariables.glMailingAddress || glVariables.glStreetAddress,
+      DB_Address_Regional_Office: glVariables.addressRegionalOffice,
+      DB_Name_Tenant: glVariables.mailingName,
+      DB_Name_Tenant_List: glVariables.mailingNameList,
+      DB_Name_Corporation: glVariables.mailingCorp,
+      DB_Legal_Description: glVariables.legalDescription,
+      DB_Name_Bcal_Contact: idirName,
+      DB_Tenure_Type:
+        rawData && rawData.type
+          ? rawData.type.toLowerCase().charAt(0).toUpperCase() + rawData.type.slice(1).toLowerCase()
+          : '',
+      DB_Reg_Document_Number: rawData ? rawData.documentNum : null,
+    };
+  }
+
+  // async callCdogs(base64Template: string, data: any) {
+  //   const cdogsToken = await this.ttlsService.callGetToken();
+  //   const md = JSON.stringify({
+  //     data,
+  //     formatters:
+  //       '{"myFormatter":"_function_myFormatter|function(data) { return data.slice(1); }","myOtherFormatter":"_function_myOtherFormatter|function(data) {return data.slice(2);}"}',
+  //     options: {
+  //       cacheReport: false,
+  //       convertTo: 'docx',
+  //       overwrite: true,
+  //       reportName: 'ticdi-report',
+  //     },
+  //     template: {
+  //       content: `${base64Template}`,
+  //       encodingType: 'base64',
+  //       fileType: 'docx',
+  //     },
+  //   });
+
+  //   const conf = {
+  //     method: 'post',
+  //     url: process.env.cdogs_url,
+  //     headers: {
+  //       Authorization: `Bearer ${cdogsToken}`,
+  //       'Content-Type': 'application/json',
+  //     },
+  //     responseType: 'arraybuffer',
+  //     data: md,
+  //   };
+  //   const ax = require('axios');
+  //   const response = await ax(conf).catch((error) => {
+  //     console.log(error.response);
+  //   });
+  //   return response.data;
+  // }
 
   /**
    * Generates the Land Use Report using CDOGS
@@ -234,7 +437,6 @@ export class ReportService {
     });
 
     const cdogsToken = await this.ttlsService.callGetToken();
-    console.log(data);
     const bufferBase64 = documentTemplateObject.the_file;
     const md = JSON.stringify({
       data,
@@ -361,105 +563,16 @@ export class ReportService {
   }
 
   /**
-   *
+   * Old report generation for Notice of Final Review, very specific
+   * to the report & its variants.
    * @param dtid
-   * @param idir_username
-   * @param reportType - id of the report type used to get report type & active template
-   */
-  async generateReportNew(
-    dtid: number,
-    username: string,
-    document_type_id: number,
-    variableJson: VariableJSON[],
-    provisionJson: ProvisionJSON[]
-  ) {
-    // get raw ttls data for later
-    await this.ttlsService.setWebadeToken();
-    let rawData: DTR;
-    await firstValueFrom(this.ttlsService.callHttp(dtid))
-      .then((res) => {
-        rawData = res;
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-    // get the document template
-    const documentTemplateObject = await this.documentTemplateService.findActiveByDocumentType(document_type_id);
-    const data = {};
-
-    await this.documentDataLogService.create({
-      document_data_id: null, // should eventually point to document_data object
-      document_template_id: documentTemplateObject.id,
-      document_type_id: document_type_id,
-      dtid: dtid,
-      request_app_user: username,
-      create_userid: username,
-      request_json: JSON.stringify(data),
-    });
-
-    const bufferBase64 = documentTemplateObject.the_file;
-    return await this.callCdogs(bufferBase64, data);
-  }
-
-  async callCdogs(base64Template: string, data: any) {
-    const cdogsToken = await this.ttlsService.callGetToken();
-    const md = JSON.stringify({
-      data,
-      formatters:
-        '{"myFormatter":"_function_myFormatter|function(data) { return data.slice(1); }","myOtherFormatter":"_function_myOtherFormatter|function(data) {return data.slice(2);}"}',
-      options: {
-        cacheReport: false,
-        convertTo: 'docx',
-        overwrite: true,
-        reportName: 'ticdi-report',
-      },
-      template: {
-        content: `${base64Template}`,
-        encodingType: 'base64',
-        fileType: 'docx',
-      },
-    });
-
-    const conf = {
-      method: 'post',
-      url: process.env.cdogs_url,
-      headers: {
-        Authorization: `Bearer ${cdogsToken}`,
-        'Content-Type': 'application/json',
-      },
-      responseType: 'arraybuffer',
-      data: md,
-    };
-    const ax = require('axios');
-    const response = await ax(conf).catch((error) => {
-      console.log(error.response);
-    });
-    return response.data;
-  }
-
-  /**
-   * Generates an NFR report name using tenure file number
-   * and a version number. The version number is incremented
-   * each time someone generates a NFR report.
-   *
-   * @param tenureFileNumber
+   * @param document_type_id
+   * @param idirUsername
+   * @param idirName
+   * @param variableJson
+   * @param provisionJson
    * @returns
    */
-  async generateNFRReportName(dtid: number, tenureFileNumber: string) {
-    const url = `${hostname}:${port}/document-data-log/version/` + dtid;
-    // grab the next version string for the dtid
-    const version = await axios
-      .get(url, {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      })
-      .then((res) => {
-        return res.data;
-      });
-    return { reportName: 'NFR_' + tenureFileNumber + '_' + version + '.docx' };
-  }
-
   async generateNFRReport(
     dtid: number,
     document_type_id: number,
@@ -848,284 +961,9 @@ export class ReportService {
     return response2.data;
   }
 
-  async generateSLReport(
-    dtid: number,
-    document_type_id: number,
-    idirUsername: string,
-    variableJson: VariableJSON[],
-    provisionJson: ProvisionJSON[]
-  ) {
-    // get raw ttls data for later
-    await this.ttlsService.setWebadeToken();
-    let rawData: DTR;
-    await firstValueFrom(this.ttlsService.callHttp(dtid))
-      .then((res) => {
-        rawData = res;
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-    const documentTemplateObject = await this.documentTemplateService.findActiveByDocumentType(document_type_id);
-    const documentType = await this.documentTypeService.findById(document_type_id);
-
-    // Format variables with names that the document template expects
-    const variables: any = {};
-    variableJson.forEach(({ variable_name, variable_value }) => {
-      variables[`${variable_name}`] = variable_value;
-    });
-
-    // Format the raw ttls data
-    const tenantAddr = rawData.tenantAddr;
-    const interestParcels = rawData.interestParcel;
-    let concatLegalDescriptions = '';
-    if (interestParcels && interestParcels.length > 0) {
-      interestParcels.sort((a, b) => b.interestParcelId - a.interestParcelId);
-      let legalDescArray = [];
-      for (let ip of interestParcels) {
-        if (ip.legalDescription && ip.legalDescription != '') {
-          legalDescArray.push(ip.legalDescription);
-        }
-      }
-      if (legalDescArray.length > 0) {
-        concatLegalDescriptions = legalDescArray.join('\n');
-      }
-    }
-
-    // const DB_ADDRESS_MAILING_TENANT = tenantAddr[0] ? nfrAddressBuilder(tenantAddr) : '';
-    // reuse grazing lease address building function
-    let { glMailingAddress, glStreetAddress } = tenantAddr[0]
-      ? glAddressBuilder(tenantAddr)
-      : { glMailingAddress: '', glStreetAddress: '' };
-    if (glMailingAddress === '') glMailingAddress = glStreetAddress;
-    if (glStreetAddress === '') glStreetAddress = glMailingAddress;
-
-    const ttlsData = {
-      DB_ADDRESS_STREET_TENANT: glStreetAddress,
-      DB_ADDRESS_MAILING_TENANT: glMailingAddress,
-      DB_ADDRESS_REGIONAL_OFFICE: nfrAddressBuilder([
-        {
-          addrLine1: rawData.regOfficeStreet,
-          city: rawData.regOfficeCity,
-          provAbbr: rawData.regOfficeProv,
-          postalCode: rawData.regOfficePostalCode,
-        },
-      ]),
-      DB_DOCUMENT_NUMBER: dtid,
-      DB_DOCUMENT_TYPE: documentType.name,
-      DB_FILE_NUMBER: rawData.fileNum,
-    }; // parse out the rawData, variableJson, and provisionJson into something useable
-    // combine the formatted TTLS data, variables, and provision sections
-    const data = Object.assign({}, ttlsData, variables);
-    // Save the Document Data
-    const provisionSaveData = provisionJson.map((provision) => {
-      return { provision_id: provision.provision_id, doc_type_provision_id: provision.doc_type_provision_id };
-    });
-    const documentData = await this.saveDocument(
-      dtid,
-      document_type_id,
-      'Complete',
-      provisionSaveData,
-      variableJson,
-      idirUsername
-    );
-
-    // Log the request
-    await this.documentDataLogService.create({
-      dtid: dtid,
-      document_type_id: document_type_id,
-      document_data_id: documentData.id,
-      document_template_id: documentTemplateObject?.id,
-      request_app_user: idirUsername,
-      request_json: JSON.stringify(data),
-      create_userid: idirUsername,
-    });
-
-    // Generate the report
-    const cdogsToken = await this.ttlsService.callGetToken();
-    let bufferBase64 = documentTemplateObject.the_file;
-    let cdogsData = {
-      data,
-      formatters:
-        '{"myFormatter":"_function_myFormatter|function(data) { return data.slice(1); }","myOtherFormatter":"_function_myOtherFormatter|function(data) {return data.slice(2);}"}',
-      options: {
-        cacheReport: false,
-        convertTo: 'docx',
-        overwrite: true,
-        reportName: 'sl-report',
-      },
-      template: {
-        content: `${bufferBase64}`,
-        encodingType: 'base64',
-        fileType: 'docx',
-      },
-    };
-    const md = JSON.stringify(cdogsData);
-
-    let conf = {
-      method: 'post',
-      url: process.env.cdogs_url,
-      headers: {
-        Authorization: `Bearer ${cdogsToken}`,
-        'Content-Type': 'application/json',
-      },
-      responseType: 'arraybuffer',
-      data: md,
-    };
-    const ax = require('axios');
-    const response = await ax(conf).catch((error) => {
-      console.log(error.response);
-    });
-    // response.data is the docx file after the first insertions
-    return response.data; // one insertion is enough for standard licence
-    // // convert the docx file buffer to base64 for a second cdogs conversion
-    // const base64File = Buffer.from(firstFile).toString('base64');
-    // cdogsData.template.content = base64File;
-    // const md2 = JSON.stringify(cdogsData);
-    // conf.data = md2;
-    // const response2 = await ax(conf).catch((error) => {
-    //   console.log(error.response);
-    // });
-    // // response2.data is the docx file after the second insertions
-    // // (anything nested in a variable or provision should be inserted at this point)
-    // return response2.data;
-  }
-
-  async generateAAReport(
-    dtid: number,
-    document_type_id: number,
-    idirUsername: string,
-    variableJson: VariableJSON[],
-    provisionJson: ProvisionJSON[]
-  ) {
-    // get raw ttls data for later
-    await this.ttlsService.setWebadeToken();
-    let rawData: DTR;
-    await firstValueFrom(this.ttlsService.callHttp(dtid))
-      .then((res) => {
-        rawData = res;
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-    const documentTemplateObject = await this.documentTemplateService.findActiveByDocumentType(document_type_id);
-    const documentType = await this.documentTypeService.findById(document_type_id);
-
-    // Format variables with names that the document template expects
-    const variables: any = {};
-    variableJson.forEach(({ variable_name, variable_value }) => {
-      variables[`${variable_name}`] = variable_value;
-    });
-
-    // Format the raw ttls data
-    const tenantAddr = rawData.tenantAddr;
-    const interestParcels = rawData.interestParcel;
-    let concatLegalDescriptions = '';
-    if (interestParcels && interestParcels.length > 0) {
-      interestParcels.sort((a, b) => b.interestParcelId - a.interestParcelId);
-      let legalDescArray = [];
-      for (let ip of interestParcels) {
-        if (ip.legalDescription && ip.legalDescription != '') {
-          legalDescArray.push(ip.legalDescription);
-        }
-      }
-      if (legalDescArray.length > 0) {
-        concatLegalDescriptions = legalDescArray.join('\n');
-      }
-    }
-
-    // const DB_ADDRESS_MAILING_TENANT = tenantAddr[0] ? nfrAddressBuilder(tenantAddr) : '';
-    // reuse grazing lease address building function
-    let { glMailingAddress, glStreetAddress } = tenantAddr[0]
-      ? glAddressBuilder(tenantAddr)
-      : { glMailingAddress: '', glStreetAddress: '' };
-    if (glMailingAddress === '') glMailingAddress = glStreetAddress;
-    if (glStreetAddress === '') glStreetAddress = glMailingAddress;
-
-    const ttlsData = {
-      DB_ADDRESS_STREET_TENANT: glStreetAddress,
-      DB_DOCUMENT_NUMBER: dtid,
-      DB_DOCUMENT_TYPE: documentType.name,
-      DB_FILE_NUMBER: rawData ? rawData.fileNum : null,
-      DB_TENURE_TYPE: rawData.type
-        ? rawData.type.toLowerCase().charAt(0).toUpperCase() + rawData.type.toLowerCase().slice(1)
-        : '',
-      DB_REG_DOCUMENT_NUMBER: rawData ? rawData.documentNum : null,
-    }; // parse out the rawData, variableJson, and provisionJson into something useable
-    // combine the formatted TTLS data, variables, and provision sections
-    const data = Object.assign({}, ttlsData, variables);
-    // Save the Document Data
-    const provisionSaveData = provisionJson.map((provision) => {
-      return { provision_id: provision.provision_id, doc_type_provision_id: provision.doc_type_provision_id };
-    });
-    const documentData = await this.saveDocument(
-      dtid,
-      document_type_id,
-      'Complete',
-      provisionSaveData,
-      variableJson,
-      idirUsername
-    );
-
-    // Log the request
-    await this.documentDataLogService.create({
-      dtid: dtid,
-      document_type_id: document_type_id,
-      document_data_id: documentData.id,
-      document_template_id: documentTemplateObject?.id,
-      request_app_user: idirUsername,
-      request_json: JSON.stringify(data),
-      create_userid: idirUsername,
-    });
-
-    // Generate the report
-    const cdogsToken = await this.ttlsService.callGetToken();
-    let bufferBase64 = documentTemplateObject.the_file;
-    let cdogsData = {
-      data,
-      formatters:
-        '{"myFormatter":"_function_myFormatter|function(data) { return data.slice(1); }","myOtherFormatter":"_function_myOtherFormatter|function(data) {return data.slice(2);}"}',
-      options: {
-        cacheReport: false,
-        convertTo: 'docx',
-        overwrite: true,
-        reportName: 'sl-report',
-      },
-      template: {
-        content: `${bufferBase64}`,
-        encodingType: 'base64',
-        fileType: 'docx',
-      },
-    };
-    const md = JSON.stringify(cdogsData);
-
-    let conf = {
-      method: 'post',
-      url: process.env.cdogs_url,
-      headers: {
-        Authorization: `Bearer ${cdogsToken}`,
-        'Content-Type': 'application/json',
-      },
-      responseType: 'arraybuffer',
-      data: md,
-    };
-    const ax = require('axios');
-    const response = await ax(conf).catch((error) => {
-      console.log(error.response);
-    });
-    // response.data is the docx file after the first insertions
-    return response.data; // one insertion is enough for assignment assumption
-    // // convert the docx file buffer to base64 for a second cdogs conversion
-    // const base64File = Buffer.from(firstFile).toString('base64');
-    // cdogsData.template.content = base64File;
-    // const md2 = JSON.stringify(cdogsData);
-    // conf.data = md2;
-    // const response2 = await ax(conf).catch((error) => {
-    //   console.log(error.response);
-    // });
-    // // response2.data is the docx file after the second insertions
-    // // (anything nested in a variable or provision should be inserted at this point)
-    // return response2.data;
-  }
+  // ~~~~~~~~~~~~~~~~~~~
+  // ~~~~~~~~~~~~~~~~~~~
+  // ~~~~~~~~~~~~~~~~~~~
 
   async getDocumentProvisionsByDocTypeIdAndDtid(document_type_id: number, dtid: number): Promise<any> {
     return this.documentDataService.getProvisionsByDocTypeIdAndDtid(document_type_id, dtid);
@@ -1188,38 +1026,6 @@ export class ReportService {
   async getDocumentDataByDocTypeIdAndDtid(document_type_id: number, dtid: number): Promise<any> {
     return this.documentDataService.findDocumentDataByDocTypeIdAndDtid(document_type_id, dtid);
   }
-
-  // async saveNFR(
-  //   dtid: number,
-  //   variant_name: string,
-  //   status: string,
-  //   provisionJsonArray: ProvisionJSON[],
-  //   variableJsonArray: VariableJSON[],
-  //   idir_username: string
-  // ) {
-  //   const templateUrl = `${hostname}:${port}/document-template/get-active-report/${variant_name}`;
-  //   const documentTemplate = await axios.get(templateUrl).then((res) => {
-  //     return res.data;
-  //   });
-  //   const url = `${hostname}:${port}/document-data`;
-  //   const data = {
-  //     dtid: dtid,
-  //     variant_name: variant_name,
-  //     template_id: documentTemplate.id,
-  //     status: status,
-  //     create_userid: idir_username,
-  //     ttls_data: [],
-  //     provisionJsonArray,
-  //     variableJsonArray,
-  //   };
-  //   await axios
-  //     .post(url, {
-  //       body: data,
-  //     })
-  //     .then((res) => {
-  //       return res.data;
-  //     });
-  // }
 
   async saveDocument(
     dtid: number,

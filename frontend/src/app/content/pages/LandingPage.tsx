@@ -284,6 +284,7 @@ const LandingPage: FC = () => {
       return {
         provision_id: provision.provision_id,
         provision_group: provision.provision_group.provision_group,
+        sequence_value: provision.sequence_value,
         doc_type_provision_id: provision.id,
         provision_name: provision.provision_name,
         free_text: provision.free_text,

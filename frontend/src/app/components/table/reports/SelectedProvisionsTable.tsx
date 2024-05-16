@@ -13,6 +13,7 @@ export type SaveProvisionData = { provision_id: number; doc_type_provision_id: n
 export type ProvisionJson = {
   provision_id: number;
   doc_type_provision_id: number;
+  sequence_value: number;
   provision_group: number;
   provision_name: string;
   free_text: string;

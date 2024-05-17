@@ -17,7 +17,6 @@ import { Public } from './auth/decorators/public.decorator';
 // // unused, to be cleaned up
 // let requestUrl: string;
 // let requestConfig: AxiosRequestConfig;
-//
 
 @Controller()
 export class AppController {

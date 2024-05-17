@@ -99,11 +99,11 @@ const EditProvisionGroupsModal: FC<EditProvisionGroupsModalProps> = ({
       setShowError(true);
       return;
     }
-    if (provisionGroups.find((pg) => pg.provision_group_text === provision_group_text)) {
-      setError('A provision group with that description already exists.');
-      setShowError(true);
-      return;
-    }
+    // if (provisionGroups.find((pg) => pg.provision_group_text === provision_group_text)) {
+    //   setError('A provision group with that description already exists.');
+    //   setShowError(true);
+    //   return;
+    // }
     // create provision group
     try {
       setLoading(true);

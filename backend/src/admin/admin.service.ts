@@ -256,12 +256,14 @@ export class AdminService {
   async removeAdmin(username: string): Promise<{ error: string | null }> {
     const ticdiAdminRole = 'ticdi_admin';
     const bearerToken = await this.getToken();
-    const url = `${process.env.users_api_base_url}/integrations/${process.env.integration_id}/${process.env.css_environment}/users/${username}@idir/roles/${ticdiAdminRole}`;
     try {
       await axios
-        .delete(url, {
-          headers: { Authorization: 'Bearer ' + bearerToken },
-        })
+        .delete(
+          `${process.env.users_api_base_url}/integrations/${process.env.integration_id}/${process.env.css_environment}/users/${username}@idir/roles/${ticdiAdminRole}`,
+          {
+            headers: { Authorization: 'Bearer ' + bearerToken },
+          }
+        )
         .then((res) => {
           return res;
         })

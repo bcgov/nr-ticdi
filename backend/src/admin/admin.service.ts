@@ -7,6 +7,7 @@ import { ProvisionService } from 'src/provision/provision.service';
 import { DocumentTypeService } from 'src/document_type/document_type.service';
 import { DocumentType } from 'src/document_type/entities/document_type.entity';
 import { TTLSService } from 'src/ttls/ttls.service';
+import { Role } from 'src/enum/role.enum';
 
 const axios = require('axios');
 
@@ -195,7 +196,24 @@ export class AdminService {
       .post(
         addAdminUrl,
         {
-          roleName: 'ticdi_admin',
+          roleName: Role.TICDI_ADMIN,
+          username: userObject.idirUsername + '@idir',
+          operation: 'add',
+        },
+        { headers: { Authorization: 'Bearer ' + bearerToken } }
+      )
+      .then((res) => {
+        return res.data;
+      })
+      .catch((err) => {
+        console.log(err);
+        throw new Error('Failed to add admin role');
+      });
+    await axios
+      .post(
+        addAdminUrl,
+        {
+          roleName: Role.GENERATE_DOCUMENTS,
           username: userObject.idirUsername + '@idir',
           operation: 'add',
         },

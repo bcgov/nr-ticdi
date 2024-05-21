@@ -7,16 +7,12 @@ import {
   Post,
   Param,
   UseGuards,
-  UseFilters,
   HttpException,
   HttpStatus,
 } from '@nestjs/common';
 import { IdirObject, ProvisionJSON, VariableJSON } from 'src/types';
 import { TTLSService } from '../ttls/ttls.service';
 import { AxiosRequestConfig } from 'axios';
-// import { AuthenticationFilter } from 'src/authentication/authentication.filter';
-// import { AuthenticationGuard } from 'src/authentication/authentication.guard';
-// import { GenerateReportGuard } from 'src/authentication/generate-report.guard';
 import { ReportService } from './report.service';
 import { firstValueFrom } from 'rxjs';
 import { User } from 'src/auth/decorators/user.decorator';
@@ -29,9 +25,6 @@ import { Public } from 'src/auth/decorators/public.decorator';
 let requestUrl: string;
 let requestConfig: AxiosRequestConfig;
 
-// @UseFilters(AuthenticationFilter)
-// @UseGuards(AuthenticationGuard)
-// @UseGuards(GenerateReportGuard)
 @UseGuards(JwtAuthGuard)
 @Controller('report')
 export class ReportController {

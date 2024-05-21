@@ -1,6 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post, UseGuards } from '@nestjs/common';
-import { ProvisionJSON, VariableJSON } from 'src/types';
-import { CreateDocumentDataDto } from './dto/create-document_data.dto';
+import { Controller, Delete, Get, Param, Post, UseGuards } from '@nestjs/common';
 import { DocumentDataService } from './document_data.service';
 import { JwtAuthGuard } from 'src/auth/jwtauth.guard';
 

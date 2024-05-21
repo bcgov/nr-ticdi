@@ -43,7 +43,6 @@ const VariablesTable: React.FC<{ onVariableEdit: (variableId: number, newValue: 
   const handleEdit = (variableId: number, newValue: string) => {
     onVariableEdit(variableId, newValue);
   };
-  console.log('re-render');
 
   const columnHelper = createColumnHelper<Variable>();
   const columns: ColumnDef<Variable, any>[] = [

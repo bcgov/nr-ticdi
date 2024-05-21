@@ -215,24 +215,7 @@ export function glAddressBuilder(
 
 export function grazingLeaseVariables(
   tenantAddr: TenantAddressResource[],
-  // {
-  //   addrLine1: string;
-  //   addrLine2: string;
-  //   addrLine3: string;
-  //   addrType: string;
-  //   firstName: string;
-  //   middleName: string;
-  //   lastName: string;
-  //   legalName: string;
-  //   city: string;
-  //   country: string;
-  //   provAbbr: string;
-  //   postalCode: string;
-  // }
   interestParcel: InterestParcel[],
-  // {
-  //   legalDescription: string;
-  // }
   regVars: { regOfficeStreet: string; regOfficeCity: string; regOfficeProv: string; regOfficePostalCode: string }
 ): {
   streetAddress: string;

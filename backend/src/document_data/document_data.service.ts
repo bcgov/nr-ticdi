@@ -10,7 +10,6 @@ import { DocumentDataVariable } from './entities/document_data_variable.entity';
 import { DocumentDataView } from './entities/document_data_vw';
 import { ProvisionService } from 'src/provision/provision.service';
 import { DocumentTemplateService } from 'src/document_template/document_template.service';
-import { DocumentType } from 'src/document_type/entities/document_type.entity';
 import { DocumentTypeService } from 'src/document_type/document_type.service';
 import { DocumentTypeProvision } from 'src/provision/entities/document_type_provision';
 

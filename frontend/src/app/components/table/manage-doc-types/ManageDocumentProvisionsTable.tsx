@@ -135,8 +135,6 @@ const ManageDocumentProvisionsTable: React.FC<ManageDocumentProvisionsTableProps
       if (provision.id === provisionId) {
         const updatedValue =
           columnId === 'provision_group' || columnId === 'sequence_value' ? parseInt(newValue, 10) : newValue;
-        console.log('columnId: ' + columnId);
-        console.log('updatedValue: ' + updatedValue);
         return { ...provision, [columnId]: updatedValue };
       }
       return provision;

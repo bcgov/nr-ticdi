@@ -45,12 +45,10 @@ const AddDocTypeModal: FC<AddDocTypeModalProps> = ({ allDocTypes, show, onHide, 
   };
 
   const handleCreatedByChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    console.log(e.target.value);
     setCreatedBy(e.target.value);
   };
 
   const handleCreatedDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    console.log(e.target.value);
     setCreatedDate(e.target.value);
   };
 

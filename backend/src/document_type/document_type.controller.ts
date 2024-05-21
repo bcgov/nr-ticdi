@@ -1,16 +1,10 @@
-import { Body, Controller, Get, Param, Post, Req, UseFilters, UseGuards } from '@nestjs/common';
-import { AuthenticationFilter } from 'src/authentication/authentication.filter';
-import { AuthenticationGuard } from 'src/authentication/authentication.guard';
-import { GenerateReportGuard } from 'src/authentication/generate-report.guard';
+import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
 import { DocumentTypeService } from './document_type.service';
 import { IdirObject } from 'src/types';
 import { ProvisionGroup } from './entities/provision_group.entity';
 import { User } from 'src/auth/decorators/user.decorator';
 import { JwtAuthGuard } from 'src/auth/jwtauth.guard';
 
-// @UseFilters(AuthenticationFilter)
-// @UseGuards(AuthenticationGuard)
-// @UseGuards(GenerateReportGuard)
 @UseGuards(JwtAuthGuard)
 @Controller('document-type')
 export class DocumentTypeController {
@@ -20,8 +14,6 @@ export class DocumentTypeController {
   findById(@Param('id') id: number) {
     return this.documentTypeService.findById(id);
   }
-
-  // Add is done through Admin controller due to circular dependency issues
 
   @Post('update')
   update(

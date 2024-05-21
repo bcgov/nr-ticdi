@@ -144,7 +144,6 @@ export class ReportService {
       }
       provisions[key].push({ provision_name, free_text });
     });
-    console.log(provisions);
 
     // get the TTLS DB_ variables
     const dbVars = await this.getDbVariables(dtid, document_type_id, idirUsername);
@@ -285,42 +284,6 @@ export class ReportService {
       DB_Reg_Document_Number: rawData ? rawData.documentNum : null,
     };
   }
-
-  // async callCdogs(base64Template: string, data: any) {
-  //   const cdogsToken = await this.ttlsService.callGetToken();
-  //   const md = JSON.stringify({
-  //     data,
-  //     formatters:
-  //       '{"myFormatter":"_function_myFormatter|function(data) { return data.slice(1); }","myOtherFormatter":"_function_myOtherFormatter|function(data) {return data.slice(2);}"}',
-  //     options: {
-  //       cacheReport: false,
-  //       convertTo: 'docx',
-  //       overwrite: true,
-  //       reportName: 'ticdi-report',
-  //     },
-  //     template: {
-  //       content: `${base64Template}`,
-  //       encodingType: 'base64',
-  //       fileType: 'docx',
-  //     },
-  //   });
-
-  //   const conf = {
-  //     method: 'post',
-  //     url: process.env.cdogs_url,
-  //     headers: {
-  //       Authorization: `Bearer ${cdogsToken}`,
-  //       'Content-Type': 'application/json',
-  //     },
-  //     responseType: 'arraybuffer',
-  //     data: md,
-  //   };
-  //   const ax = require('axios');
-  //   const response = await ax(conf).catch((error) => {
-  //     console.log(error.response);
-  //   });
-  //   return response.data;
-  // }
 
   /**
    * Generates the Land Use Report using CDOGS

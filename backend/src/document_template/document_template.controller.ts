@@ -1,7 +1,6 @@
 import { Body, Controller, Get, Post, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { DocumentTemplateService } from './document_template.service';
 import { CreateDocumentTemplateDto } from './dto/create-document_template.dto';
-import { UpdateDocumentTemplateDto } from './dto/update-document_template.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Express } from 'express';
 import { Param, UseGuards } from '@nestjs/common/decorators';
@@ -41,11 +40,6 @@ export class DocumentTemplateController {
   activateTemplate(@Body() data: { id: number; update_userid: string; document_type_id: number }): Promise<void> {
     return this.templateService.activateTemplate(data);
   }
-
-  // @Post('update')
-  // update(@Body() data: UpdateDocumentTemplateDto): Promise<DocumentTemplate> {
-  //   return this.templateService.update(data);
-  // }
 
   @Get('remove/:document_type/:id')
   remove(@Param('document_type') document_type_id: number, @Param('id') id: number): Promise<{ id: number }> {

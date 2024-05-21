@@ -39,7 +39,6 @@ const DocumentProvisionSearch: FC<DocumentProvisionSearchProps> = ({ onSearch })
 
   const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const { name, value } = e.target;
-    console.log(`name: ${name}, value: ${value}`);
     setSearchState((prevState) => ({
       ...prevState,
       [name]: value,

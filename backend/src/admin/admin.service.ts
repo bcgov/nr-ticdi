@@ -40,7 +40,12 @@ export class AdminService {
     return this.documentTemplateService.remove(document_type_id, id);
   }
 
-  updateTemplate(data: { id: number; documentNo: number; documentName: string; document_type_id: number }): Promise<any> {
+  updateTemplate(data: {
+    id: number;
+    documentNo: number;
+    documentName: string;
+    document_type_id: number;
+  }): Promise<any> {
     return this.documentTemplateService.updateTemplate(data);
   }
 
@@ -248,22 +253,26 @@ export class AdminService {
    * @param username
    * @returns null
    */
-  async removeAdmin(username: string) {
+  async removeAdmin(username: string): Promise<{ error: string | null }> {
     const ticdiAdminRole = 'ticdi_admin';
     const bearerToken = await this.getToken();
     const url = `${process.env.users_api_base_url}/integrations/${process.env.integration_id}/${process.env.css_environment}/users/${username}@idir/roles/${ticdiAdminRole}`;
-    const res = await axios
-      .delete(url, {
-        headers: { Authorization: 'Bearer ' + bearerToken },
-      })
-      .then((res) => {
-        return res;
-      })
-      .catch((err) => {
-        console.log(err.response.data);
-        return { message: 'Failed to remove admin privileges' };
-      });
-    return { message: 'error' };
+    try {
+      await axios
+        .delete(url, {
+          headers: { Authorization: 'Bearer ' + bearerToken },
+        })
+        .then((res) => {
+          return res;
+        })
+        .catch((err) => {
+          throw err;
+        });
+    } catch (err) {
+      console.log(err.response.data);
+      return { error: 'Failed to remove admin privileges' };
+    }
+    return { error: null };
   }
 
   async getDocumentTemplates(document_type_id: number): Promise<any> {

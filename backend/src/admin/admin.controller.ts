@@ -194,7 +194,7 @@ export class AdminController {
   }
 
   @Post('remove-admin')
-  removeAdmin(@Body() input: { idirUsername: string }): Promise<{ message: string }> {
+  removeAdmin(@Body() input: { idirUsername: string }): Promise<{ error: string | null }> {
     return this.adminService.removeAdmin(input.idirUsername);
   }
 

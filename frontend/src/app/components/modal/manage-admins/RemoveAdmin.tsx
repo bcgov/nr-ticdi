@@ -10,9 +10,10 @@ type RemoveAdminProps = {
   admin: AdminData;
   show: boolean;
   onHide: () => void;
+  refreshTable: () => void;
 };
 
-const RemoveAdmin: FC<RemoveAdminProps> = ({ admin, show, onHide }) => {
+const RemoveAdmin: FC<RemoveAdminProps> = ({ admin, show, onHide, refreshTable }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [showError, setShowError] = useState(false);
@@ -20,11 +21,12 @@ const RemoveAdmin: FC<RemoveAdminProps> = ({ admin, show, onHide }) => {
   const removeHandler = async () => {
     setLoading(true);
     try {
-      const { message } = await removeAdmin(admin.idirUsername);
-      if (message === 'success') {
+      const response = await removeAdmin(admin.idirUsername);
+      if (!response.error) {
+        refreshTable();
         onHide();
       } else {
-        setError(message);
+        setError(response.error);
         setShowError(true);
       }
     } catch (error) {

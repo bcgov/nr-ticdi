@@ -14,9 +14,10 @@ export type AdminData = {
 interface AdminDataTableProps {
   searchTerm: string;
   removeAdminModalHandler: (admin: AdminData) => void;
+  refreshTable: number;
 }
 
-const AdminDataTable: React.FC<AdminDataTableProps> = ({ searchTerm, removeAdminModalHandler }) => {
+const AdminDataTable: React.FC<AdminDataTableProps> = ({ searchTerm, removeAdminModalHandler, refreshTable }) => {
   const [adminData, setAdminData] = useState<AdminData[]>([]);
   const [filteredAdminData, setFilteredAdminData] = useState<AdminData[]>([]);
 
@@ -31,7 +32,7 @@ const AdminDataTable: React.FC<AdminDataTableProps> = ({ searchTerm, removeAdmin
     };
 
     fetchData();
-  }, []);
+  }, [refreshTable]);
 
   useEffect(() => {
     const filterData = () => {

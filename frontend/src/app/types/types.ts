@@ -373,3 +373,11 @@ export type VariableData = {
   update_timestamp: string;
   provision: Provision;
 };
+
+export type UserObject = {
+  name: string;
+  username: string;
+  email: string;
+  remove: string;
+  idirUsername: string;
+};

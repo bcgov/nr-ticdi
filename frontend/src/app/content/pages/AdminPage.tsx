@@ -1,18 +1,15 @@
 import { FC, useState } from 'react';
-// import { REPORT_TYPES } from '../../util/constants';
 import AddAdmin from '../../components/modal/manage-admins/AddAdmin';
 import RemoveAdmin from '../../components/modal/manage-admins/RemoveAdmin';
-// import { useNavigate } from 'react-router-dom';
 import { exportUsers } from '../../common/manage-admins';
 import AdminDataTable, { AdminData } from '../../components/table/manage-admins/AdminDataTable';
 
 const AdminPage: FC = () => {
-  // const navigate = useNavigate();
   const [selectedAdmin, setSelectedAdmin] = useState<AdminData | null>(null);
   const [showAddAdminModal, setShowAddAdminModal] = useState(false);
   const [showRemoveAdminModal, setShowRemoveAdminModal] = useState(false);
-  // const [selectedReport, setSelectedReport] = useState('0');
   const [searchTerm, setSearchTerm] = useState('');
+  const [refreshTable, setRefreshTable] = useState(0);
 
   const showAddAdminModalHandler = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
@@ -29,21 +26,17 @@ const AdminPage: FC = () => {
     setShowRemoveAdminModal(false);
   };
 
-  // const selectedReportHandler = (event: React.ChangeEvent<HTMLSelectElement>) => {
-  //   setSelectedReport(event.target.value);
-  // };
-
   const exportUserListHandler = async (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
     await exportUsers();
   };
 
-  // const manageReportsHandler = () => {
-  //   navigate(`/manage-templates/${selectedReport}`);
-  // };
-
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
+  };
+
+  const refreshTableHandler = () => {
+    setRefreshTable((prev) => prev + 1);
   };
 
   return (
@@ -64,7 +57,11 @@ const AdminPage: FC = () => {
 
       <div className="form-group row">
         <div className="col-md-12">
-          <AdminDataTable searchTerm={searchTerm} removeAdminModalHandler={showRemoveAdminModalHandler} />
+          <AdminDataTable
+            searchTerm={searchTerm}
+            removeAdminModalHandler={showRemoveAdminModalHandler}
+            refreshTable={refreshTable}
+          />
         </div>
       </div>
       <div className="form-group row">
@@ -85,43 +82,17 @@ const AdminPage: FC = () => {
           </button>
         </div>
       </div>
-      {/* <hr />
-      <div className="col-md-3">
-        <h3>Manage Templates</h3>
-      </div>
-      <div className="col-md-3">
-        <h4>Select a Template:</h4>
-      </div>
-      <div className="form-group row">
-        <div className="col-md-4">
-          <select
-            id="reportTypes"
-            style={{ minWidth: '200px' }}
-            className="border border-1 rounded pl-2 ml-4"
-            value={selectedReport}
-            onChange={selectedReportHandler}
-          >
-            {REPORT_TYPES.map((report) => (
-              <option key={report.reportIndex} value={report.reportIndex}>
-                {report.reportType}
-              </option>
-            ))}
-          </select>
-        </div>
-        <div className="col-md-3">
-          <button
-            id="manageButton"
-            className="btn"
-            onClick={manageReportsHandler}
-            style={{ backgroundColor: 'purple', color: 'white' }}
-          >
-            Manage
-          </button>
-        </div>
-      </div> */}
-      {showAddAdminModal && <AddAdmin show={showAddAdminModal} onHide={closeAddAdminModalHandler} />}
+
+      {showAddAdminModal && (
+        <AddAdmin show={showAddAdminModal} onHide={closeAddAdminModalHandler} refreshTable={refreshTableHandler} />
+      )}
       {selectedAdmin && showRemoveAdminModal && (
-        <RemoveAdmin admin={selectedAdmin} show={showRemoveAdminModal} onHide={closeRemoveAdminModalHandler} />
+        <RemoveAdmin
+          admin={selectedAdmin}
+          show={showRemoveAdminModal}
+          onHide={closeRemoveAdminModalHandler}
+          refreshTable={refreshTableHandler}
+        />
       )}
     </>
   );

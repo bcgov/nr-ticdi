@@ -1,6 +1,7 @@
 import config from '../../config';
 import { IdirUserObject } from '../components/modal/manage-admins/AddAdmin';
 import { AdminData } from '../components/table/manage-admins/AdminDataTable';
+import { UserObject } from '../types/types';
 import * as api from './api';
 
 /**
@@ -48,14 +49,16 @@ export const findIdirUser = async (
   return { foundUserObject: response.userObject || null, error: response.error || null };
 };
 
-export const addAdmin = async (idirUsername: string): Promise<void> => {
+export const addAdmin = async (idirUsername: string): Promise<{ userObject: UserObject; error: string }> => {
   const url = `${config.API_BASE_URL}/admin/add-admin`;
   const data = { idirUsername };
   const postParameters = api.generateApiParameters(url, data);
-  await api.post(postParameters);
+  console.log('addAdmin posting');
+  const response: { userObject: UserObject; error: string } = await api.post(postParameters);
+  return response;
 };
 
-export const removeAdmin = async (idirUsername: string): Promise<{ message: string }> => {
+export const removeAdmin = async (idirUsername: string): Promise<{ error: string | null }> => {
   const url = `${config.API_BASE_URL}/admin/remove-admin`;
   const data = { idirUsername };
   const postParameters = api.generateApiParameters(url, data);

@@ -3,11 +3,12 @@ import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import { Col, Row, Spinner } from 'react-bootstrap';
-import { findIdirUser } from '../../../common/manage-admins';
+import { addAdmin, findIdirUser } from '../../../common/manage-admins';
 
 type AddAdminProps = {
   show: boolean;
   onHide: () => void;
+  refreshTable: () => void;
 };
 
 export type IdirUserObject = {
@@ -17,7 +18,7 @@ export type IdirUserObject = {
   idirUsername: string;
 };
 
-const AddAdmin: FC<AddAdminProps> = ({ show, onHide }) => {
+const AddAdmin: FC<AddAdminProps> = ({ show, onHide, refreshTable }) => {
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const [userObject, setUserObject] = useState<IdirUserObject | null>(null);
@@ -25,6 +26,7 @@ const AddAdmin: FC<AddAdminProps> = ({ show, onHide }) => {
   const [showError, setShowError] = useState(false);
 
   const searchUsers = async () => {
+    setShowError(false);
     setLoading(true);
     try {
       const { foundUserObject, error } = await findIdirUser(email);
@@ -43,28 +45,24 @@ const AddAdmin: FC<AddAdminProps> = ({ show, onHide }) => {
     }
   };
 
-  const addAdmin = async () => {
-    setLoading(true);
-    const addParams = {
-      idirUsername: userObject?.idirUsername,
-    };
-    try {
-      const response = await fetch(`/admin/add-admin`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(addParams),
-      });
-      const resJson = await response.json();
-      if (!resJson.error) {
-        onHide();
-      } else {
-        setError(resJson.error);
+  const addAdminHandler = async () => {
+    if (userObject) {
+      setShowError(false);
+      setLoading(true);
+      try {
+        const response = await addAdmin(userObject.idirUsername);
+        if (!response.error || response.error === '') {
+          refreshTable();
+          onHide();
+        } else {
+          setError(response.error);
+        }
+      } catch (err) {
+        console.log(err);
+        setError('An error occurred while adding an administrator.');
+      } finally {
+        setLoading(false);
       }
-    } catch (err) {
-      console.log(err);
-      setError('An error occurred while adding an administrator.');
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -152,7 +150,7 @@ const AddAdmin: FC<AddAdminProps> = ({ show, onHide }) => {
           Cancel
         </Button>
 
-        <Button variant="primary" onClick={addAdmin} disabled={loading || !userObject}>
+        <Button variant="primary" onClick={addAdminHandler} disabled={loading || !userObject}>
           {loading ? (
             <Spinner as="span" animation="border" size="sm" role="status" aria-hidden="true" />
           ) : (

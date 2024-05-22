@@ -57,7 +57,6 @@ const EditDocTypeTable: FC<EditDocTypeTableProps> = ({ onUpdate, refreshDocTypes
 
   const updateHandler = (newValue: any) => {
     setCurrentDocType({ ...currentDocType, ...newValue });
-    console.log('updateHandler');
   };
 
   const columnHelper = createColumnHelper<DocType>();

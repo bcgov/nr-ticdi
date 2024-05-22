@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import * as dotenv from 'dotenv';
-import { HttpService } from '@nestjs/axios';
 import { SearchResultsItem, UserObject } from 'src/types';
 import { DocumentTemplateService } from 'src/document_template/document_template.service';
 import { ProvisionService } from 'src/provision/provision.service';
@@ -18,7 +17,6 @@ let port: number;
 @Injectable()
 export class AdminService {
   constructor(
-    private readonly httpService: HttpService,
     private readonly ttlsService: TTLSService,
     private readonly documentTemplateService: DocumentTemplateService,
     private readonly provisionService: ProvisionService,

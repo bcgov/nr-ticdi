@@ -73,8 +73,6 @@ const EditProvisionGroupsModal: FC<EditProvisionGroupsModalProps> = ({
   // this gets called every time a cell in the table is changed, could be more efficient
   const updateProvisionGroupsState = (newProvisionGroupState: ProvisionGroup[]) => {
     setUpdatedProvisionGroups(newProvisionGroupState);
-    console.log('updated');
-    console.log(newProvisionGroupState);
   };
 
   const saveProvisionGroups = async () => {
@@ -93,7 +91,6 @@ const EditProvisionGroupsModal: FC<EditProvisionGroupsModalProps> = ({
   };
 
   const addNewGroupHandler = async (provision_group: number, provision_group_text: string, max: number) => {
-    console.log('addNewGroupHandler');
     if (provisionGroups.find((pg) => pg.provision_group === provision_group)) {
       setError('A provision group with that group number already exists.');
       setShowError(true);

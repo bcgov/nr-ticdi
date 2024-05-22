@@ -152,9 +152,6 @@ export const handleFilePreviewGet = async (url: string): Promise<Blob | null> =>
  */
 export const handleFileDownloadGet = async (url: string, filename: string) => {
   const getParameters = generateApiParameters(url);
-
-  console.log(getParameters);
-
   await fileDownloadGet<Blob>(getParameters)
     .then(async (blob) => {
       fileDownload(blob, filename);

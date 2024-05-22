@@ -1,9 +1,7 @@
 import {
   Controller,
   Post,
-  Session,
   Body,
-  UseFilters,
   UseGuards,
   UploadedFile,
   UseInterceptors,
@@ -14,12 +12,9 @@ import {
   Param,
   Res,
 } from '@nestjs/common';
-import { ExportDataObject, IdirObject, SessionData, UserObject } from 'src/types';
+import { IdirObject, UserObject } from 'src/types';
 import { AxiosRequestConfig } from 'axios';
 import { AdminService } from './admin.service';
-import { AuthenticationFilter } from 'src/authentication/authentication.filter';
-import { AuthenticationGuard } from 'src/authentication/authentication.guard';
-import { AdminGuard } from './admin.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Express } from 'express';
 import * as stream from 'stream';
@@ -28,7 +23,6 @@ import { JwtRoleGuard } from 'src/auth/jwtrole.guard';
 import { JwtAuthGuard } from 'src/auth/jwtauth.guard';
 import { Roles } from 'src/auth/decorators/roles.decorator';
 import { Role } from 'src/enum/role.enum';
-import { Public } from 'src/auth/decorators/public.decorator';
 
 let requestUrl: string;
 let requestConfig: AxiosRequestConfig;

@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
 import { CreateDocumentTemplateDto } from './dto/create-document_template.dto';
-import { UpdateDocumentTemplateDto } from './dto/update-document_template.dto';
 import { DocumentTemplate } from './entities/document_template.entity';
 import { DocumentType } from '../document_type/entities/document_type.entity';
 import { DocumentData } from 'src/document_data/entities/document_data.entity';
@@ -65,9 +64,17 @@ export class DocumentTemplateService {
     return activatedTemplate;
   }
 
-  async updateTemplate(data:{id: number; documentNo: number; documentName: string; document_type_id: number }): Promise<any>{
-    const updatedTemplate = await this.documentTemplateRepository.update({ id: data.id }, { file_name: data.documentName, template_version: data.documentNo});
-    return updatedTemplate
+  async updateTemplate(data: {
+    id: number;
+    documentNo: number;
+    documentName: string;
+    document_type_id: number;
+  }): Promise<any> {
+    const updatedTemplate = await this.documentTemplateRepository.update(
+      { id: data.id },
+      { file_name: data.documentName, template_version: data.documentNo }
+    );
+    return updatedTemplate;
   }
 
   async checkForActiveTemplates(data: { id: number; update_userid: string; document_type_id: number }): Promise<any> {
@@ -133,36 +140,6 @@ export class DocumentTemplateService {
     await this.updateTemplates(document_type_id);
     return { id: 0 };
   }
-
-  // updates the updated_by and document_version columns
-  // unused - needs to be updated
-  // async update(templateData: UpdateDocumentTemplateDto): Promise<DocumentTemplate> {
-  //   const docType: DocumentType = await this.documentTypeService.findById(templateData.document_type_id);
-  //   const allTemplates = await this.documentTemplateRepository
-  //     .createQueryBuilder('documentTemplate')
-  //     .leftJoin('documentTemplate.document_type', 'documentType')
-  //     .where('documentType.id = :documentTypeId', { documentTypeId: templateData.document_type_id })
-  //     .getMany();
-  //   let mostRecentTemplate = allTemplates[0];
-  //   for (let template of allTemplates) {
-  //     if (template.template_version > mostRecentTemplate.template_version) {
-  //       mostRecentTemplate = template;
-  //     }
-  //   }
-  //   let templateToUpdate = await this.documentTemplateRepository.findOneByOrFail({
-  //     document_type: { id: templateData.document_type_id },
-  //     template_version: templateData.template_version,
-  //   });
-  //   templateToUpdate.document_type = docType;
-  //   templateToUpdate.template_version = mostRecentTemplate.template_version + 1;
-  //   templateToUpdate.template_author = templateData.template_author;
-  //   templateToUpdate.active_flag = templateData.active_flag;
-  //   templateToUpdate.mime_type = templateData.mime_type;
-  //   templateToUpdate.file_name = templateData.file_name;
-  //   templateToUpdate.the_file = templateData.the_file;
-  //   templateToUpdate.comments = templateData.comments;
-  //   return this.documentTemplateRepository.save(templateToUpdate);
-  // }
 
   async findAll(document_type_id: number): Promise<DocumentTemplate[]> {
     return this.documentTemplateRepository.find({

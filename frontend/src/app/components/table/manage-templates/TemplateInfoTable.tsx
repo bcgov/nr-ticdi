@@ -181,6 +181,7 @@ const TemplateInfoTable: React.FC<TemplateInfoTableProps> = ({ documentType, ref
           onClick={() =>
             handleEditTemplate(info.row.original.id, info.row.original.file_name, info.row.original.template_version)
           }
+          style={{ width: '100%' }}
         >
           Edit
         </Button>

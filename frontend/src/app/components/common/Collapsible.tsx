@@ -2,7 +2,7 @@ import React, { FC, useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { IconProp } from '@fortawesome/fontawesome-svg-core';
 import { faPlus, faMinus } from '@fortawesome/fontawesome-free-solid';
-import '../../content/pages/documentpreview/DocumentPreview.scss';
+import '../../css/DocumentPreview.scss';
 
 interface CollapsibleProps {
   title: string;

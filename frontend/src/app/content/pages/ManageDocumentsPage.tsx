@@ -94,12 +94,10 @@ const ManageDocumentsPage: FC = () => {
   }, [provisions]);
 
   const refreshDocTypes = () => {
-    console.log('refreshDocTypes');
     setRefreshDocTypesTrigger((prev) => prev + 1);
   };
 
   const refreshTables = () => {
-    console.log('refreshTables');
     setRefreshTrigger((prev) => prev + 1);
   };
 
@@ -156,7 +154,6 @@ const ManageDocumentsPage: FC = () => {
   };
 
   const updateProvisionsState = (newProvisionsState: ManageDocTypeProvision[]) => {
-    console.log('updating provisions');
     setUpdatedProvisions(newProvisionsState);
   };
 
@@ -173,27 +170,7 @@ const ManageDocumentsPage: FC = () => {
 
   const handleDocTypeEdit = useCallback((newValues: Partial<DocType>) => {
     setDocTypeEdits((prev) => ({ ...prev, ...newValues }));
-    console.log('updated:');
-    console.log(newValues);
   }, []);
-
-  // const saveDocType = async () => {
-  //   try {
-  //     setLoading(true);
-  //     await updateDocType(
-  //       selectedDocType.id,
-  //       updatedDocType.name,
-  //       updatedDocType.created_by,
-  //       updatedDocType.created_date
-  //     );
-  //     refreshDocTypes();
-  //   } catch (err) {
-  //     console.log('Error saving doc type');
-  //     console.log(err);
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
 
   const saveProvisions = async () => {
     try {
@@ -216,7 +193,6 @@ const ManageDocumentsPage: FC = () => {
   const setSearchStateHandler = (searchState: DocumentProvisionSearchState) => {
     setSearchState(searchState);
   };
-  console.log('re-render');
 
   return (
     <>

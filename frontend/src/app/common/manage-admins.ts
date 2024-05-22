@@ -53,7 +53,6 @@ export const addAdmin = async (idirUsername: string): Promise<{ userObject: User
   const url = `${config.API_BASE_URL}/admin/add-admin`;
   const data = { idirUsername };
   const postParameters = api.generateApiParameters(url, data);
-  console.log('addAdmin posting');
   const response: { userObject: UserObject; error: string } = await api.post(postParameters);
   return response;
 };

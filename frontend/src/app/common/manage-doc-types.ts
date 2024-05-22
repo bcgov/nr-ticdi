@@ -88,8 +88,6 @@ export const getGroupMax = async (): Promise<GroupMax[]> => {
   const url = `${config.API_BASE_URL}/document-type/get-group-max`;
   const getParameters = api.generateApiParameters(url);
   const response: GroupMax[] = await api.get<GroupMax[]>(getParameters);
-  console.log('getGroupMax response');
-  console.log(response);
   return response;
 };
 
@@ -98,8 +96,6 @@ export const getGroupMaxByDocTypeId = async (document_type_id: number): Promise<
   const url = `${config.API_BASE_URL}/document-type/get-group-max/${document_type_id}`;
   const getParameters = api.generateApiParameters(url);
   const response: GroupMax[] = await api.get<GroupMax[]>(getParameters);
-  console.log('getGroupMax response');
-  console.log(response);
   return response;
 };
 
@@ -118,7 +114,6 @@ export const addProvisionGroup = async (
   };
   const postParameters = api.generateApiParameters(url, data);
   const response = await api.post<any>(postParameters);
-  console.log(response);
   return response;
 };
 
@@ -130,7 +125,6 @@ export const updateProvisionGroups = async (updatedProvisionGroups: ProvisionGro
   };
   const postParameters = api.generateApiParameters(url, data);
   const response = await api.post<any>(postParameters);
-  console.log(response);
   return response;
 };
 
@@ -141,6 +135,5 @@ export const removeProvisionGroup = async (provision_group_id: number) => {
   };
   const postParameters = api.generateApiParameters(url, data);
   const response = await api.post<any>(postParameters);
-  console.log(response);
   return response;
 };

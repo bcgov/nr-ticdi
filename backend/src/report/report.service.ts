@@ -252,10 +252,13 @@ export class ReportService {
       DB_DOCUMENT_NUMBER: dtid,
       DB_DOCUMENT_TYPE: documentType.name,
       DB_FILE_NUMBER: rawData ? rawData.fileNum : null,
-      DB_ADDRESS_STREET_TENANT: glVariables.glStreetAddress || glVariables.glMailingAddress,
-      DB_ADDRESS_MAILING_TENANT: glVariables.glMailingAddress || glVariables.glStreetAddress,
+      // DB_ADDRESS_STREET_TENANT: glVariables.glStreetAddress || glVariables.glMailingAddress,
+      DB_ADDRESS_STREET_TENANT: glVariables.combinedAddress,
+      // DB_ADDRESS_MAILING_TENANT: glVariables.glMailingAddress || glVariables.glStreetAddress,
+      DB_ADDRESS_MAILING_TENANT: glVariables.combinedAddress,
       DB_ADDRESS_REGIONAL_OFFICE: glVariables.addressRegionalOffice,
-      DB_NAME_TENANT: glVariables.mailingName,
+      // DB_NAME_TENANT: glVariables.mailingName,
+      DB_NAME_TENANT: glVariables.combinedName,
       DB_NAME_TENANT_LIST: glVariables.mailingNameList,
       DB_NAME_CORPORATION: glVariables.mailingCorp,
       DB_LEGAL_DESCRIPTION: glVariables.legalDescription,
@@ -265,14 +268,19 @@ export class ReportService {
           ? rawData.type.toLowerCase().charAt(0).toUpperCase() + rawData.type.toLowerCase().slice(1)
           : '',
       DB_REG_DOCUMENT_NUMBER: rawData ? rawData.documentNum : null,
+      DB_NAME_TENANTS: glVariables.combinedName,
+      DB_ADDRESS_TENANT: glVariables.combinedAddress,
       // provide the variables in non-all caps format as well
       DB_Document_Number: dtid,
       DB_Document_Type: documentType.name,
       DB_File_Number: rawData ? rawData.fileNum : null,
-      DB_Address_Street_Tenant: glVariables.glStreetAddress || glVariables.glMailingAddress,
-      DB_Address_Mailing_Tenant: glVariables.glMailingAddress || glVariables.glStreetAddress,
+      // DB_Address_Street_Tenant: glVariables.glStreetAddress || glVariables.glMailingAddress,
+      DB_Address_Street_Tenant: glVariables.combinedAddress,
+      // DB_Address_Mailing_Tenant: glVariables.glMailingAddress || glVariables.glStreetAddress,
+      DB_Address_Mailing_Tenant: glVariables.combinedAddress,
       DB_Address_Regional_Office: glVariables.addressRegionalOffice,
-      DB_Name_Tenant: glVariables.mailingName,
+      // DB_Name_Tenant: glVariables.mailingName,
+      DB_Name_Tenant: glVariables.combinedName,
       DB_Name_Tenant_List: glVariables.mailingNameList,
       DB_Name_Corporation: glVariables.mailingCorp,
       DB_Legal_Description: glVariables.legalDescription,
@@ -282,6 +290,8 @@ export class ReportService {
           ? rawData.type.toLowerCase().charAt(0).toUpperCase() + rawData.type.slice(1).toLowerCase()
           : '',
       DB_Reg_Document_Number: rawData ? rawData.documentNum : null,
+      DB_Name_Tenants: glVariables.combinedName,
+      DB_Address_Tenant: glVariables.combinedAddress,
     };
   }
 
@@ -469,13 +479,18 @@ export class ReportService {
     const data = {
       DB_File_Number: rawData.fileNum,
       DB_Document_Number: dtid,
-      DB_Address_Street_Tenant: glVariables.glStreetAddress || glVariables.glMailingAddress,
+      // DB_Address_Street_Tenant: glVariables.glStreetAddress || glVariables.glMailingAddress,
+      DB_Address_Street_Tenant: glVariables.combinedAddress,
       DB_Address_Regional_Office: glVariables.addressRegionalOffice,
-      DB_Address_Mailing_Tenant: glVariables.glMailingAddress || glVariables.glStreetAddress,
-      DB_Name_Tenant: glVariables.mailingName,
+      // DB_Address_Mailing_Tenant: glVariables.glMailingAddress || glVariables.glStreetAddress,
+      DB_Address_Mailing_Tenant: glVariables.combinedAddress,
+      // DB_Name_Tenant: glVariables.mailingName,
+      DB_Name_Tenant: glVariables.combinedName,
       DB_Name_Tenant_List: glVariables.mailingNameList,
       DB_Name_Corporation: glVariables.mailingCorp,
       DB_Legal_Description: glVariables.legalDescription,
+      DB_Name_Tenants: glVariables.combinedName,
+      DB_Address_Tenant: glVariables.combinedAddress,
     };
 
     // log the request

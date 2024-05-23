@@ -1,0 +1,513 @@
+{{#> template}}
+  {{#*inline "content"}}
+    <main role="main">
+        <div class="container">
+            <h1>Manage Templates</h1>
+            <hr />
+
+            <fieldset class="form-group collapsible">
+                <legend style="cursor: pointer" class='togvis sectionTitle'><i class="fa fa-plus"></i>  <span id="reportTitle"></span></legend>
+                <div class="contents" style="display: none;">
+                    <hr />
+                    <div class="form-row">
+                        <div>
+                            <table id="documentTable">
+                                <thead>
+                                    <th style="min-width:50px">Doc No.</th>
+                                    <th style="min-width: 400px">Template Name</th>
+                                    <th style="min-width: 120px">Uploaded Date</th>
+                                    <th style="">Active</th>
+                                    <th></th> <!-- view -->
+                                    <th></th> <!-- remove -->
+                                    <th></th> <!-- id -->
+                                    <th></th> <!-- id -->
+                                </thead>
+                                <tbody id="documentTableBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <form class="upload">
+                        <div class="form-group row">
+                            <div class="col-md-3">
+                                <button type="button" class="btn btn-success" data-toggle="modal" data-target="#uploadModal">Upload New Version</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </fieldset>
+            <fieldset class="form-group collapsible nofr-section">
+                <legend style="cursor: pointer" class='togvis sectionTitle'><i class="fa fa-plus"></i>  <span>Notice of Final Review (Delayed)</span></legend>
+                <div class="contents" style="display: none;">
+                    <hr />
+                    <div class="form-row">
+                        <div>
+                            <table id="documentTable2">
+                                <thead>
+                                    <th style="min-width:50px">Doc No.</th>
+                                    <th style="min-width: 400px">Template Name</th>
+                                    <th style="min-width: 120px">Uploaded Date</th>
+                                    <th style="">Active</th>
+                                    <th></th> <!-- view -->
+                                    <th></th> <!-- remove -->
+                                    <th></th> <!-- id -->
+                                    <th></th> <!-- id -->
+                                </thead>
+                                <tbody id="documentTable2Body"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <form class="upload">
+                        <div class="form-group row">
+                            <div class="col-md-3">
+                                <button type="button" class="btn btn-success" data-toggle="modal" data-target="#uploadModal" data-variant="NOTICE OF FINAL REVIEW (DELAYED)">Upload New Version</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </fieldset>
+            <fieldset class="form-group collapsible nofr-section">
+                <legend style="cursor: pointer" class='togvis sectionTitle'><i class="fa fa-plus"></i>  <span id="variant3">Notice of Final Review (No Fees)</span></legend>
+                <div class="contents" style="display: none;">
+                    <hr />
+                    <div class="form-row">
+                        <div>
+                            <table id="documentTable3">
+                                <thead>
+                                    <th style="min-width:50px">Doc No.</th>
+                                    <th style="min-width: 400px">Template Name</th>
+                                    <th style="min-width: 120px">Uploaded Date</th>
+                                    <th style="">Active</th>
+                                    <th></th> <!-- view -->
+                                    <th></th> <!-- remove -->
+                                    <th></th> <!-- id -->
+                                    <th></th> <!-- id -->
+                                </thead>
+                                <tbody id="documentTable3Body"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <form class="upload">
+                        <div class="form-group row">
+                            <div class="col-md-3">
+                                <button type="button" class="btn btn-success" data-toggle="modal" data-target="#uploadModal" data-variant="NOTICE OF FINAL REVIEW (NO FEES)">Upload New Version</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </fieldset>
+            <fieldset class="form-group collapsible nofr-section">
+                <legend style="cursor: pointer" class='togvis sectionTitle'><i class="fa fa-plus"></i>  <span id="variant4">Notice of Final Review (Survey Required)</span></legend>
+                <div class="contents" style="display: none;">
+                    <hr />
+                    <div class="form-row">
+                        <div>
+                            <table id="documentTable4">
+                                <thead>
+                                    <th style="min-width:50px">Doc No.</th>
+                                    <th style="min-width: 400px">Template Name</th>
+                                    <th style="min-width: 120px">Uploaded Date</th>
+                                    <th style="">Active</th>
+                                    <th></th> <!-- view -->
+                                    <th></th> <!-- remove -->
+                                    <th></th> <!-- id -->
+                                    <th></th> <!-- id -->
+                                </thead>
+                                <tbody id="documentTable4Body"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <form class="upload">
+                        <div class="form-group row">
+                            <div class="col-md-3">
+                                <button type="button" class="btn btn-success" data-toggle="modal" data-target="#uploadModal" data-variant="NOTICE OF FINAL REVIEW (SURVEY REQUIRED)">Upload New Version</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </fieldset>
+            <fieldset class="form-group collapsible nofr-section">
+                <legend style="cursor: pointer" class='togvis sectionTitle'><i class="fa fa-plus"></i>  <span id="variant5">Notice of Final Review (To Obtain Survey)</span></legend>
+                <div class="contents" style="display: none;">
+                    <hr />
+                    <div class="form-row">
+                        <div>
+                            <table id="documentTable5">
+                                <thead>
+                                    <th style="min-width:50px">Doc No.</th>
+                                    <th style="min-width: 400px">Template Name</th>
+                                    <th style="min-width: 120px">Uploaded Date</th>
+                                    <th style="">Active</th>
+                                    <th></th> <!-- view -->
+                                    <th></th> <!-- remove -->
+                                    <th></th> <!-- id -->
+                                    <th></th> <!-- id -->
+                                </thead>
+                                <tbody id="documentTable5Body"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <form class="upload">
+                        <div class="form-group row">
+                            <div class="col-md-3">
+                                <button type="button" class="btn btn-success" data-toggle="modal" data-target="#uploadModal" data-variant="NOTICE OF FINAL REVIEW (TO OBTAIN SURVEY)">Upload New Version</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </fieldset>
+            <fieldset class="form-group collapsible nofr-section">
+                <legend style="cursor: pointer" class='togvis sectionTitle'><i class="fa fa-plus"></i>  Manage NFR Provisions</legend>
+                <div class="contents" style="display: none;">
+                    <hr />
+                    <div class="form-row">
+                        <div>
+                            <table id="provisionTable">
+                                <thead>
+                                    <th>Type</th>
+                                    <th>Group</th>
+                                    <th>Max</th>
+                                    <th style="min-width: 400px">Provision</th>
+                                    <th style="min-width: 50px">Free Text</th>
+                                    <th style="min-width: 200px">Category</th>
+                                    <th>Active</th><!-- Active column -->
+                                    <th></th><!-- Edit column -->
+                                    <th></th> <!-- Help Text -->
+                                    <th></th><!-- ID column -->
+                                    <th></th><!-- Variants column -->
+                                </thead>
+                                <tbody id="provisionTableBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <form class="provision">
+                        <div class="form-group row">
+                            <div class="col-md-3">
+                                <button type="button" class="btn btn-success" data-toggle="modal" data-target="#addProvisionModal">Add a Provision</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </fieldset>
+        </div>
+        <div style="display: none">
+            <table id="groupMaxTable"></table>
+        </div>
+        <div id="uploadModal" class="modal fade" role="dialog">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                <div class="modal-header">
+                    <h4 id="uploadTitle" class="modal-title">Upload New Version</h4>
+                    <h4 id="confirmTitle" class="modal-title" style="display:none">Confirm Upload</h4>
+                </div>
+                <div class="modal-body">
+                     <form class="upload">
+                        <div id="uploadBody">
+                            <div class="form-group row">
+                                <div class="col-md-12">
+                                    <input class="form-control-file upload-input" id="uploadFile" style="height: auto" type="file" accept=".docx">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-md-12">
+                                    <label for="uploadTemplateName" style="font-weight:bold">Template Name:</label>
+                                    <input id="uploadTemplateName" type="text" class="border border-1 rounded pl-2 ml-2 upload-input" style="min-width:400px" disabled>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="confirmBody" style="display:none">
+                            <p>Are you sure you would like to upload this template?</p>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="saveButton" class="btn btn-primary" onclick="saveButtonClicked()" disabled>Save</button>
+                    <button type="button" id="cancelButton" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button type="button" id="yesButton" class="btn btn-primary" onclick="uploadTemplate()" style="display:none">Yes</button>
+                    <button type="button" id="noButton" class="btn btn-secondary" data-dismiss="modal" style="display:none">No</button>
+                </div>
+                <input type="hidden" id="uploadReportType"></div>
+                </div>
+            </div>
+        </div>
+        <div id="removeModal" class="modal fade" role="dialog">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                <div class="modal-header">
+                    <h4 id="removeTitle" class="modal-title">Remove Template</h4>
+                </div>
+                <div class="modal-body">
+                    <div>
+                        <p>Are you sure you would like to remove this template?</p>
+                    </div>
+                    <input id="document-template-id" style="display:none" value=""></input>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-dismiss="modal" onclick='removeTemplate()'>Yes</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
+                </div>
+                </div>
+            </div>
+        </div>
+        <div id="editProvisionModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="editProvisionModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="editProvisionModalTitle">Edit Provision</h5>
+                        <h5 class="modal-title" id="editProvisionModalEditVarTitle" style="display: none">Edit Variable</h5>
+                        <h5 class="modal-title" id="editProvisionModalAddVarTitle" style="display: none">Add Variable</h5>
+                        <h5 class="modal-title" id="editProvisionModalRemVarTitle" style="display: none">Remove Variable</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div id="editProvisionDiv">
+                            <form id="editProvisionForm">
+                            <div class="form-group">
+                                <label for="editProvisionType">Type</label>
+                                <select class="form-control" id="editProvisionType" name="type">
+                                    <option value="O">O</option>
+                                    <option value="V">V</option>
+                                    <option value="B">B</option>
+                                    <option value="M">M</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="editProvisionGroup">Group</label>
+                                <input type="number" class="form-control provision-input" id="editProvisionGroup" name="provision_group" pattern="[0-9]+">
+                            </div>
+                            <div class="form-group">
+                                <label for="editProvisionGroupText">Group Description</label>
+                                <input type="text" class="form-control provision-input" id="editProvisionGroupText" name="provision_group">
+                            </div>
+                            <div class="form-group">
+                                <label for="editProvisionMax">Max</label>
+                                <input type="number" class="form-control provision-input" id="editProvisionMax" name="max" pattern="[0-9]+">
+                            </div>
+                            <div class="form-group">
+                                <div class="row mb-2 pl-2">
+                                <div class="col-sm-8">
+                                    <label for="editProvisionMaxUnlimited">No Maximum? {{{dots "No Maximum?" }}}</label>
+                                </div>
+                                <div class="col-sm-4">
+                                    <div class="form-check">
+                                        <input type="checkbox" class="form-check-input" id="editProvisionMaxUnlimited" name="max_unlimited">
+                                    </div>
+                                </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="editProvisionName">Provision</label>
+                                <input type="text" class="form-control provision-input" id="editProvisionName" name="provision">
+                            </div>
+                            <div class="form-group">
+                                <label for="editProvisionFreeText">Free Text</label>
+                                <textarea class="form-control provision-input" id="editProvisionFreeText" name="free_text"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="editProvisionHelpText">Help Text</label>
+                                <input type="text" class="form-control provision-input" id="editProvisionHelpText" name="help_text">
+                            </div>
+                            <div class="form-group">
+                                <label for="editProvisionCategory">Category</label>
+                                <input type="text" class="form-control provision-input" id="editProvisionCategory" name="type">
+                            </div>
+                            <div class="form-group">
+                                <label class="mb-2">Variants</label>
+                                {{#each variantJsonArray}}
+                                    <div class="row mb-2 pl-2">
+                                    <div class="col-sm-8">
+                                        <label class="form-check-label" for="editProvisionVariant-{{this.id}}" style="width:100%">
+                                        <span class="variant-name" style="width:100%">{{this.variant_name}} {{{dots this.variant_name }}}</span>
+                                        </label>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <div class="form-check">
+                                        <input type="checkbox" class="form-check-input editProvisionVariant" id="editProvisionVariant-{{this.id}}" data-id="{{this.id}}" name="variant-{{this.id}}">
+                                        </div>
+                                    </div>
+                                    </div>
+                                {{/each}}
+                            </div>
+                            <div class="form-group">
+                                <label class="mb-2">Variables</label>
+                                <div>
+                                    <table id="editProvisionVariableTable" style="width:100%"></table>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-md-3">
+                                    <button type="button" class="btn btn-success" onclick="showAddVariable()">Add a Variable</button>
+                                </div>
+                            </div>
+                            </form>
+                        </div>
+                        <div id="editProvisionConfirmationDiv" style="display: none">
+                            <p id="editGroupConfirmationText"></p>
+                        </div>
+                        <div id="editProvisionAddVariableDiv" style="display: none">
+                            <form>
+                            <div class="form-group">
+                                <label for="addVariableName">Variable Name</label>
+                                <input type="text" class="form-control" id="addVariableName">
+                            </div>
+                            <div class="form-group">
+                                <label for="addVariableValue">Variable Value</label>
+                                <input type="text" class="form-control" id="addVariableValue">
+                            </div>
+                            <div class="form-group">
+                                <label for="addVariableHelpText">Help Text</label>
+                                <textarea class="form-control" id="addVariableHelpText"></textarea>
+                            </div>
+                            </form>
+                        </div>
+                        <div id="editProvisionEditVariableDiv" style="display: none">
+                            <form>
+                            <div class="form-group">
+                                <label for="editVariableName">Variable Name</label>
+                                <input type="text" class="form-control" id="editVariableName">
+                            </div>
+                            <div class="form-group">
+                                <label for="editVariableValue">Variable Value</label>
+                                <input type="text" class="form-control" id="editVariableValue">
+                            </div>
+                            <div class="form-group">
+                                <label for="editVariableHelpText">Help Text</label>
+                                <textarea class="form-control" id="editVariableHelpText"></textarea>
+                            </div>
+                            <input type="hidden" id="editVariableId" value="">
+                            </form>
+                        </div>
+                        <div id="removeVariableDiv" style="display: none">
+                            <p>Are you sure you would like to remove this variable: <span id="removeVariableName"></span></p>
+                            <input type="hidden" id="removeVariableId" value="">
+                        </div>
+                        <div id="editProvisionId" value="" style="display: none"></div>
+                    </div>
+                    <div class="modal-footer">
+                        <div id="editProvisionFooter">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                            <button type="button" class="btn btn-primary" id="editProvisionBtn" onclick="editProvision()">Save</button>
+                        </div>
+                        <div id="editProvisionConfirmationFooter" style="display: none">
+                            <button type="button" class="btn btn-secondary" onclick="editProvisionGoBack()">Go back</button>
+                            <button type="button" class="btn btn-primary" id="editProvisionBtn" onclick="confirmEditProvision()">Save</button>
+                        </div>
+                        <div id="editProvisionAddVariableFooter" style="display: none">
+                            <button type="button" class="btn btn-secondary" onclick="editProvisionGoBack()">Go back</button>
+                            <button type="button" class="btn btn-primary" id="addVariableButton" onclick="addVariable()">Save</button>
+                        </div>
+                        <div id="editProvisionEditVariableFooter" style="display: none">
+                            <button type="button" class="btn btn-secondary" onclick="editProvisionGoBack()">Go back</button>
+                            <button type="button" class="btn btn-primary" id="updateVariableButton" onclick="updateVariable()">Save</button>
+                        </div>
+                        <div id="removeVariableFooter" style="display: none">
+                            <button type="button" class="btn btn-secondary" onclick="editProvisionGoBack()">Go back</button>
+                            <button type="button" class="btn btn-primary" id="updateVariableButton" onclick="removeVariable()">Remove</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="addProvisionModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="addProvisionModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addProvisionModalLabel">Add Provision</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div id="addProvisionDiv">
+                            <form id="addProvisionForm">
+                            <div class="form-group">
+                                <label for="addProvisionType">Type</label>
+                                <select class="form-control" id="addProvisionType" name="type">
+                                    <option value="O">O</option>
+                                    <option value="V">V</option>
+                                    <option value="B">B</option>
+                                    <option value="M">M</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="addProvisionGroup">Group</label>
+                                <input type="number" class="form-control provision-input" id="addProvisionGroup" name="provision_group" pattern="[0-9]+">
+                            </div>
+                            <div class="form-group">
+                                <label for="addProvisionGroup">Group Description</label>
+                                <input type="text" class="form-control provision-input" id="addProvisionGroupText" name="provision_group_text" >
+                            </div>
+                            <div class="form-group">
+                                <label for="addProvisionMax">Max</label>
+                                <input type="number" class="form-control provision-input" id="addProvisionMax" name="max" pattern="[0-9]+">
+                            </div>
+                            <div class="form-group">
+                                <div class="row mb-2 pl-2">
+                                <div class="col-sm-8">
+                                    <label for="addProvisionMaxUnlimited">No Maximum? {{{dots "No Maximum?" }}}</label>
+                                </div>
+                                <div class="col-sm-4">
+                                    <div class="form-check">
+                                        <input type="checkbox" class="form-check-input" id="addProvisionMaxUnlimited" name="max_unlimited">
+                                    </div>
+                                </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="addProvisionName">Provision</label>
+                                <input type="text" class="form-control provision-input" id="addProvisionName" name="provision">
+                            </div>
+                            <div class="form-group">
+                                <label for="addProvisionFreeText">Free Text</label>
+                                <textarea class="form-control provision-input" id="addProvisionFreeText" name="free_text"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="addProvisionHelpText">Help Text</label>
+                                <input type="text" class="form-control provision-input" id="addProvisionHelpText" name="help_text">
+                            </div>
+                            <div class="form-group">
+                                <label for="addProvisionCategory">Category</label>
+                                <input type="text" class="form-control provision-input" id="addProvisionCategory" name="type">
+                            </div>
+                            <div class="form-group">
+                                <label class="mb-2">Variants</label>
+                                {{#each variantJsonArray}}
+                                    <div class="row mb-2 pl-2">
+                                    <div class="col-sm-8">
+                                        <label class="form-check-label" for="addProvisionVariant-{{this.id}}" style="width:100%">
+                                        <span class="variant-name" style="width:100%">{{this.variant_name}} {{{dots this.variant_name }}}</span>
+                                        </label>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <div class="form-check">
+                                        <input type="checkbox" class="form-check-input addProvisionVariant" id="addProvisionVariant-{{this.id}}" data-id="{{this.id}}" name="variant-{{this.id}}">
+                                        </div>
+                                    </div>
+                                    </div>
+                                {{/each}}
+                            </div>
+                            </form>
+                        </div>
+                        <div id="addProvisionConfirmationDiv" style="display: none">
+                            <p id="addGroupConfirmationText"></p>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <div id="addProvisionFooter">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                            <button type="button" class="btn btn-primary" id="addProvisionBtn" onclick="addProvision()">Save</button>
+                        </div>
+                        <div id="addProvisionConfirmationFooter" style="display: none">
+                            <button type="button" class="btn btn-secondary" onclick="addProvisionGoBack()">Go back</button>
+                            <button type="button" class="btn btn-primary" id="addProvisionBtn" onclick="confirmAddProvision()">Save</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="mandatoryProvisionIds" value=""></div>
+    </main>
+    <script src="/js/manage-templates.js"></script>
+  {{/inline}}
+{{/template}}

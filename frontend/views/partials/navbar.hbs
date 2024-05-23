@@ -1,0 +1,55 @@
+<header>
+  <nav class="navbar navbar-expand-lg navbar-dark">
+    <div class="container">
+      <a class="navbar-brand" href="https://www2.gov.bc.ca">
+        <img
+          class="img-fluid d-none d-md-block"
+          src="/images/bcid-logo-rev-en.svg"
+          width="181"
+          height="44"
+          alt="B.C. Government Logo"
+        />
+        <img
+          class="img-fluid d-md-none"
+          src="/images/bcid-symbol-rev.svg"
+          width="64"
+          height="44"
+          alt="B.C. Government Logo"
+        />
+      </a>
+      <div class="navbar-brand">
+        TICDI
+      </div>
+      <button
+        class="navbar-toggler"
+        type="button"
+        data-toggle="collapse"
+        data-target="#navbarNavAltMarkup"
+        aria-controls="navbarNavAltMarkup"
+        aria-expanded="false"
+        aria-label="Toggle navigation"
+      >
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div
+        class="collapse navbar-collapse"
+        id="navbarNavAltMarkup"
+        style="width:auto"
+      >
+        <div class="navbar-nav" style="width:auto">
+          <div id="adminLinkDiv" style="width:auto"><a
+              class="nav-item nav-link"
+              id="adminLink"
+              href="/system-admin"
+            >{{displayAdmin}}</a></div>
+          <div id="searchLinkDiv" style="width:auto"><a
+              class="nav-item nav-link"
+              id="searchLink"
+              href="/search"
+            >Search</a></div>
+        </div>
+      </div>
+      <div style="float:right; color: white">{{idirUsername}}</div>
+    </div>
+  </nav>
+</header>

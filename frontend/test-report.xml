@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testExecutions version="1">
+  <file path="C:\Projects\Github\Ministry\nr-ticdi\frontend\src\app.controller.spec.ts">
+    <testCase name="AppController getHello should return &quot;Hello World!&quot;" duration="2"/>
+  </file>
+</testExecutions>

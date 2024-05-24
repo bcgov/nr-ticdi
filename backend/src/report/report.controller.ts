@@ -24,7 +24,7 @@ import { Public } from 'src/auth/decorators/public.decorator';
 
 let requestUrl: string;
 let requestConfig: AxiosRequestConfig;
-
+//
 @UseGuards(JwtAuthGuard)
 @Controller('report')
 export class ReportController {

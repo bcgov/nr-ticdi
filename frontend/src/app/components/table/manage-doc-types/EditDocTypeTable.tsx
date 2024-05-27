@@ -12,11 +12,10 @@ import { updateDocType } from '../../../common/manage-doc-types';
 import { Button } from 'react-bootstrap';
 
 interface EditDocTypeTableProps {
-  onUpdate: (documentType: Partial<DocType>) => void;
   refreshDocTypes: () => void;
 }
 
-const EditDocTypeTable: FC<EditDocTypeTableProps> = ({ onUpdate, refreshDocTypes }) => {
+const EditDocTypeTable: FC<EditDocTypeTableProps> = ({ refreshDocTypes }) => {
   const [isEditing, setIsEditing] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const dispatch = useDispatch();

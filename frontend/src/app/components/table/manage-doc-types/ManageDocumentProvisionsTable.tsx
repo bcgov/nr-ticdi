@@ -1,16 +1,11 @@
 import React, { FC, useEffect, useState } from 'react';
 import { DataTable } from '../common/DataTable';
 import { ColumnDef, Row, createColumnHelper } from '@tanstack/react-table';
-import {
-  ManageDocTypeProvision,
-  associateProvisionToDocType,
-  disassociateProvisionFromDocType,
-} from '../../../common/manage-doc-types';
+import { ManageDocTypeProvision } from '../../../common/manage-doc-types';
 import { ProvisionGroup } from '../../../types/types';
 import { DocumentProvisionSearchState } from '../../common/manage-doc-types/DocumentProvisionSearch';
 
 interface ManageDocumentProvisionsTableProps {
-  documentTypeId: number;
   provisions: ManageDocTypeProvision[] | undefined;
   provisionGroups: ProvisionGroup[] | undefined;
   searchState: DocumentProvisionSearchState;
@@ -18,7 +13,6 @@ interface ManageDocumentProvisionsTableProps {
 }
 
 const ManageDocumentProvisionsTable: React.FC<ManageDocumentProvisionsTableProps> = ({
-  documentTypeId,
   provisions,
   provisionGroups,
   searchState,

@@ -1,4 +1,4 @@
-import React, { FC, useCallback, useEffect, useState } from 'react';
+import { FC, useCallback, useEffect, useState } from 'react';
 import { Button, Col, Row } from 'react-bootstrap';
 import { DocType, ProvisionGroup } from '../../types/types';
 import { getDocumentTypes, getGroupMaxByDocTypeId } from '../../common/report';
@@ -10,7 +10,6 @@ import {
   addDocType,
   getManageDocumentTypeProvisions,
   removeDocType,
-  updateDocType,
   updateManageDocTypeProvisions,
 } from '../../common/manage-doc-types';
 import EditProvisionGroupsModal from '../../components/modal/manage-doc-types/EditProvisionGroupsModal';
@@ -22,7 +21,6 @@ import DocumentProvisionSearch, {
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../store/store';
 import { setDocType } from '../../store/reducers/docTypeSlice';
-// import TestProvisionTable from '../../components/table/manage-doc-types/TestProvisionTable';
 
 const ManageDocumentsPage: FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
@@ -52,12 +50,7 @@ const ManageDocumentsPage: FC = () => {
   });
 
   const dispatch = useDispatch();
-  const { selectedDocType, updatedDocType } = useSelector((state: RootState) => state.docType);
-  const [docTypeEdits, setDocTypeEdits] = useState<DocType>(selectedDocType);
-
-  useEffect(() => {
-    setDocTypeEdits(selectedDocType);
-  }, [selectedDocType]);
+  const { selectedDocType } = useSelector((state: RootState) => state.docType);
 
   useEffect(() => {
     const getData = async () => {
@@ -153,13 +146,13 @@ const ManageDocumentsPage: FC = () => {
     }
   };
 
+  // called when a provision is altered in the ManageDocumentProvisionstable
   const updateProvisionsState = (newProvisionsState: ManageDocTypeProvision[]) => {
     setUpdatedProvisions(newProvisionsState);
   };
 
   const saveButtonHandler = async () => {
     try {
-      // await saveDocType();
       await saveProvisions();
     } catch (err) {
       console.log('Error when saving');
@@ -168,20 +161,20 @@ const ManageDocumentsPage: FC = () => {
     }
   };
 
-  const handleDocTypeEdit = useCallback((newValues: Partial<DocType>) => {
-    setDocTypeEdits((prev) => ({ ...prev, ...newValues }));
-  }, []);
+  const findUpdatedProvisions = (): ManageDocTypeProvision[] => {
+    const updated = updatedProvisions.filter((updatedProvision) => {
+      const originalProvision = provisions.find((p) => p.id === updatedProvision.id);
+      return originalProvision && JSON.stringify(updatedProvision) !== JSON.stringify(originalProvision);
+    });
+    return updated;
+  };
 
   const saveProvisions = async () => {
     try {
       setLoading(true);
-      console.log('Saving Provisions...');
-      for (let prov of updatedProvisions) {
-        if (prov.associated) {
-          console.log(prov);
-        }
-      }
-      await updateManageDocTypeProvisions(selectedDocType.id, updatedProvisions);
+      const updated: ManageDocTypeProvision[] = findUpdatedProvisions();
+      console.log(updated);
+      await updateManageDocTypeProvisions(selectedDocType.id, updated);
     } catch (err) {
       console.log('Error updating provisions');
       console.log(err);
@@ -231,7 +224,7 @@ const ManageDocumentsPage: FC = () => {
           <hr />
           {/** Doc Type info / edit single row table */}
           {/** Document Type Name - Date Created - Created By - Last Updated Date - Last Updated By */}
-          <EditDocTypeTable refreshDocTypes={refreshDocTypes} onUpdate={handleDocTypeEdit} />
+          <EditDocTypeTable refreshDocTypes={refreshDocTypes} />
           <hr />
           <h1>Associate Provisions to {selectedDocType.name}</h1>
           <hr />
@@ -249,17 +242,11 @@ const ManageDocumentsPage: FC = () => {
 
           {/** Global Provisions table */}
           <ManageDocumentProvisionsTable
-            documentTypeId={selectedDocType.id}
             provisions={provisions}
             provisionGroups={provisionGroups}
             searchState={searchState}
             onUpdate={updateProvisionsState}
           />
-          {/* <TestProvisionTable
-            provisions={provisions}
-            provisionGroups={provisionGroups}
-            onUpdate={updateProvisionsState}
-          /> */}
           {/** ID - Type - Group - Seq - Max - Provision Name - Free Text - Category - Associated */}
           <EditProvisionGroupsModal
             provisionGroups={provisionGroups}

@@ -226,9 +226,13 @@ const LandingPage: FC = () => {
   };
 
   const validateProvisions = (): string | null => {
+    console.log('selectedProvisionIds');
+    console.log(selectedProvisionIds);
     const unselectedMandatoryIds = mandatoryProvisionIds.filter(
       (mandatoryId) => !selectedProvisionIds.includes(mandatoryId)
     );
+    console.log('unselectedMandatoryIds');
+    console.log(unselectedMandatoryIds);
     const matchingProvisionIds = selectedProvisionIds.filter((id) => unselectedMandatoryIds.includes(id));
     const matchingProvisions = provisions.filter((p) => matchingProvisionIds.includes(p.id));
     const matchingGroupNumbers = [...new Set(matchingProvisions.map((provision) => provision.provision_group))];

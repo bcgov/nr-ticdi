@@ -43,6 +43,8 @@ const LandingPage: FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [showError, setShowError] = useState<boolean>(false);
+  const [generateError, setGenerateError] = useState<string | null>(null);
+  const [showGenerateError, setShowGenerateError] = useState<boolean>(false);
 
   const [data, setData] = useState<DTRDisplayObject | null>(null);
   const [mandatoryProvisionIds, setMandatoryProvisionIds] = useState<number[]>([]);
@@ -225,15 +227,33 @@ const LandingPage: FC = () => {
     setDtidInput(!isNaN(parseInt(e.target.value)) ? parseInt(e.target.value) : null);
   };
 
+  /**
+   * Checks each provision group for mandatory provisions, then
+   * checks that those provision groups have at least one provision
+   * selected. If not, returns an error message.
+   *
+   * @returns the error message if any, otherwise null
+   */
   const validateProvisions = (): string | null => {
-    const unselectedMandatoryIds = mandatoryProvisionIds.filter(
-      (mandatoryId) => !selectedProvisionIds.includes(mandatoryId)
-    );
-    const matchingProvisionIds = selectedProvisionIds.filter((id) => unselectedMandatoryIds.includes(id));
-    const matchingProvisions = provisions.filter((p) => matchingProvisionIds.includes(p.id));
-    const matchingGroupNumbers = [...new Set(matchingProvisions.map((provision) => provision.provision_group))];
-    if (matchingGroupNumbers.length > 0) {
-      return `There are unselected mandatory provisions the following groups: ${matchingGroupNumbers.join(', ')}`;
+    const mandatoryGroups: number[] = [];
+    for (let p of provisions) {
+      if (p.type === 'M' && !mandatoryGroups.includes(p.provision_group.provision_group)) {
+        mandatoryGroups.push(p.provision_group.provision_group);
+      }
+    }
+    const nonEmptyProvisionGroups: number[] = [];
+    for (let p of provisions) {
+      if (
+        selectedProvisionIds.includes(p.provision_id) &&
+        !nonEmptyProvisionGroups.includes(p.provision_group.provision_group)
+      ) {
+        nonEmptyProvisionGroups.push(p.provision_group.provision_group);
+      }
+    }
+    const emptyMandatoryGroups = mandatoryGroups.filter((id) => !nonEmptyProvisionGroups.includes(id));
+    emptyMandatoryGroups.sort((a, b) => a - b);
+    if (emptyMandatoryGroups.length > 0) {
+      return `There are unselected mandatory provisions the following groups: ${emptyMandatoryGroups.join(', ')}`;
     } else {
       return null;
     }
@@ -276,6 +296,8 @@ const LandingPage: FC = () => {
     setData(null);
     setIsOpen(false);
     setSelectedDocTypeId(null);
+    setShowError(false);
+    setShowGenerateError(false);
   };
 
   const getReportData = () => {
@@ -297,36 +319,35 @@ const LandingPage: FC = () => {
     return { variableJsonArray, provisionJsonArray };
   };
 
-  const handleDocumentSave = () => {
-    const saveData = async () => {
-      if (dtid && documentType) {
-        try {
-          setLoading(true);
-          const { variableSaveData, provisionSaveData } = getSaveData();
-          await saveDocument(dtid, documentType.id, provisionSaveData, variableSaveData);
-        } catch (err) {
-          console.log('Error saving Document Data');
-          console.log(err);
-        } finally {
-          setLoading(false);
-        }
-      } else {
-        console.log('No DTID was found.');
+  const handleDocumentSave = async () => {
+    if (dtid && documentType) {
+      try {
+        setLoading(true);
+        const { variableSaveData, provisionSaveData } = getSaveData();
+        await saveDocument(dtid, documentType.id, provisionSaveData, variableSaveData);
+      } catch (err) {
+        console.log('Error saving Document Data');
+        console.log(err);
+      } finally {
+        setLoading(false);
       }
-    };
-    saveData();
+    } else {
+      console.log('No DTID was found.');
+    }
   };
 
-  const handleGenerateReport = () => {
+  const handleGenerateReport = async () => {
     try {
+      setShowGenerateError(false);
       setLoading(true);
-      handleDocumentSave();
+      await handleDocumentSave();
+      setLoading(true);
       if (dtid) {
         const errorMessage = validateProvisions();
         if (!errorMessage) {
           if (data && documentType && documentType.id) {
             const { variableJsonArray, provisionJsonArray } = getReportData();
-            generateReport(
+            await generateReport(
               dtid,
               data && data.fileNum ? data.fileNum : '',
               documentType.id,
@@ -335,11 +356,15 @@ const LandingPage: FC = () => {
             );
           }
         } else {
-          alert(errorMessage);
+          setGenerateError(errorMessage);
+          setShowGenerateError(true);
+          // alert(errorMessage);
         }
       }
     } catch (err) {
       console.log(err);
+      setGenerateError('Something went wrong.');
+      setShowGenerateError(true);
       // set error state
     } finally {
       setLoading(false);
@@ -428,7 +453,14 @@ const LandingPage: FC = () => {
       ) : (
         <></>
       )}
-
+      <>
+        {' '}
+        {showGenerateError && (
+          <Alert variant="danger" className="mb-3 d-inline-block" style={{ width: 'auto', maxWidth: '100%' }}>
+            {generateError}
+          </Alert>
+        )}
+      </>
       <div style={{ display: 'flex', gap: '10px', minHeight: '55px' }}>
         <>
           <Button

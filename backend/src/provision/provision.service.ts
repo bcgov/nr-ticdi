@@ -240,9 +240,9 @@ export class ProvisionService {
           id: document_type_id,
         },
       },
+      relations: ['provision'],
     });
-
-    return docTypeProvisions.map((provision) => provision.id);
+    return docTypeProvisions.map((provision) => provision.provision.id);
   }
 
   async getManageDocTypeProvisions(document_type_id: number) {
@@ -374,7 +374,6 @@ export class ProvisionService {
       return existingProv;
     });
     await this.documentTypeProvisionRepository.save(updatedProvisions);
-    console.log('Provisions updated successfully!');
   }
 
   /**

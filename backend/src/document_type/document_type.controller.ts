@@ -52,7 +52,6 @@ export class DocumentTypeController {
 
   @Post('remove-provision-group')
   removeProvisionGroup(@Body() data: { provision_group_id: number }) {
-    console.log('provision_group_id: ' + data.provision_group_id);
     return this.documentTypeService.removeProvisionGroup(data.provision_group_id);
   }
 }

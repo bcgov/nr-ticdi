@@ -240,9 +240,11 @@ export class ProvisionService {
           id: document_type_id,
         },
       },
+      relations: ['provision'],
     });
+    console.log(docTypeProvisions);
 
-    return docTypeProvisions.map((provision) => provision.id);
+    return docTypeProvisions.map((provision) => provision.provision.id);
   }
 
   async getManageDocTypeProvisions(document_type_id: number) {

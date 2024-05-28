@@ -347,7 +347,7 @@ const LandingPage: FC = () => {
         if (!errorMessage) {
           if (data && documentType && documentType.id) {
             const { variableJsonArray, provisionJsonArray } = getReportData();
-            generateReport(
+            await generateReport(
               dtid,
               data && data.fileNum ? data.fileNum : '',
               documentType.id,

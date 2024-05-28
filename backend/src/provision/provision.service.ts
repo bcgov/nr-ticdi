@@ -242,8 +242,6 @@ export class ProvisionService {
       },
       relations: ['provision'],
     });
-    console.log(docTypeProvisions);
-
     return docTypeProvisions.map((provision) => provision.provision.id);
   }
 
@@ -376,7 +374,6 @@ export class ProvisionService {
       return existingProv;
     });
     await this.documentTypeProvisionRepository.save(updatedProvisions);
-    console.log('Provisions updated successfully!');
   }
 
   /**

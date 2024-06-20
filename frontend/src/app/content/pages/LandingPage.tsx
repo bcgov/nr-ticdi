@@ -358,7 +358,6 @@ const LandingPage: FC = () => {
         } else {
           setGenerateError(errorMessage);
           setShowGenerateError(true);
-          // alert(errorMessage);
         }
       }
     } catch (err) {

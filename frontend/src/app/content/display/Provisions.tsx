@@ -60,7 +60,7 @@ const Provisions: FC<ProvisionsProps> = ({ dtid, documentType, provisionGroups }
 
   return (
     <>
-      <div>
+      <div style={{ display: 'flex', alignItems: 'center' }}>
         <label htmlFor="provisionGroupSelect" style={{ marginRight: '10px' }}>
           Select A Group
         </label>
@@ -81,6 +81,13 @@ const Provisions: FC<ProvisionsProps> = ({ dtid, documentType, provisionGroups }
             </option>
           ))}
         </select>
+        <div style={{ marginLeft: '10px' }}>
+          {selectedProvisionGroupMax
+            ? selectedProvisionGroupMax > 100
+              ? 'There is no max for this group.'
+              : `Max for this group is ${selectedProvisionGroupMax}`
+            : ''}
+        </div>
       </div>
       <ProvisionsTable
         provisions={provisions}

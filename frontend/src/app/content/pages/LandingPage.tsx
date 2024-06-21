@@ -32,7 +32,6 @@ import { setSelectedVariableIds, setVariables } from '../../store/reducers/varia
 import { RootState } from '../../store/store';
 import { setSearchState } from '../../store/reducers/searchSlice';
 import { useParams } from 'react-router-dom';
-// import Collapsible from './documentpreview/Collapsible';
 
 const LandingPage: FC = () => {
   const { dtidNumber, docTypeFromUrl } = useParams();
@@ -54,6 +53,7 @@ const LandingPage: FC = () => {
   const [selectedDocTypeId, setSelectedDocTypeId] = useState<number | null>(null);
   const [documentType, setDocumentType] = useState<DocType | null>(null);
   const [documentTypes, setDocumentTypes] = useState<DocType[]>([]);
+  const [filteredDocumentTypes, setFilteredDocumentTypes] = useState<DocType[]>([]);
 
   const [variableEdits, setVariableEdits] = useState<{ [variableId: number]: string }>({});
 
@@ -95,12 +95,13 @@ const LandingPage: FC = () => {
     }
   }, [documentTypes, docTypeFromUrl]);
 
+  // Gets all document types and sorts them
   useEffect(() => {
     const fetchBasicData = async () => {
       try {
-        const documentTypes: DocType[] = await getDocumentTypes();
-        documentTypes.sort((a, b) => a.name.localeCompare(b.name));
-        setDocumentTypes(documentTypes);
+        const dts: DocType[] = await getDocumentTypes();
+        dts.sort((a, b) => a.name.localeCompare(b.name));
+        setDocumentTypes(dts);
       } catch (error) {
         console.error('Failed to fetch doc types', error);
         setData(null);
@@ -117,6 +118,7 @@ const LandingPage: FC = () => {
     }
   }, [documentTypes, selectedDocTypeId]);
 
+  // Used when coming from the search page to automatically load data
   useEffect(() => {
     const applySearch = async () => {
       if (searchState.searching && searchState.dtid && searchState.document_type) {
@@ -185,6 +187,23 @@ const LandingPage: FC = () => {
     };
     fetchDocData();
   }, [documentType, dtid, dispatch]);
+
+  useEffect(() => {
+    if (data && data.type) {
+      switch (data.type) {
+        case 'LEASE':
+          // filter out document type that includes word LICENCE
+          setFilteredDocumentTypes(documentTypes.filter((dt) => !dt.name.toLowerCase().includes('licence')));
+          break;
+        case 'LICENCE':
+          // filter out document type that includes word LEASE
+          setFilteredDocumentTypes(documentTypes.filter((dt) => !dt.name.toLowerCase().includes('lease')));
+          break;
+        default:
+          setFilteredDocumentTypes(documentTypes);
+      }
+    }
+  }, [data, documentTypes]);
 
   const fetchData = async (dtidValue: number) => {
     try {
@@ -358,7 +377,6 @@ const LandingPage: FC = () => {
         } else {
           setGenerateError(errorMessage);
           setShowGenerateError(true);
-          // alert(errorMessage);
         }
       }
     } catch (err) {
@@ -432,7 +450,7 @@ const LandingPage: FC = () => {
             onChange={handleDocTypeChange}
           >
             <option value="-1">Select a document type</option>
-            {documentTypes.map((docType) => (
+            {filteredDocumentTypes.map((docType) => (
               <option key={docType.id} value={docType.id}>
                 {docType.name}
               </option>

@@ -27,6 +27,7 @@ const ManageProvisionsTable: React.FC<ManageProvisionsTableProps> = ({
     if (provisions) {
       const sortedData = basicSort(provisions);
       setAllProvisions(sortedData);
+      console.log(provisions[0]);
     }
     if (variables) {
       setAllVariables(variables);
@@ -38,8 +39,6 @@ const ManageProvisionsTable: React.FC<ManageProvisionsTableProps> = ({
     sortedData.sort((a, b) => {
       if (a.active_flag === false && b.active_flag === true) return 1;
       if (a.active_flag === true && b.active_flag === false) return -1;
-      if (a.provision_group < b.provision_group) return -1;
-      if (a.provision_group > b.provision_group) return 1;
       return a.provision_name.localeCompare(b.provision_name);
     });
     return sortedData;

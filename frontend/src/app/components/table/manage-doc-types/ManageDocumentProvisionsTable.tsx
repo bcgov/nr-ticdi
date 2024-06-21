@@ -2,14 +2,16 @@ import React, { FC, useEffect, useState } from 'react';
 import { DataTable } from '../common/DataTable';
 import { ColumnDef, Row, createColumnHelper } from '@tanstack/react-table';
 import { ManageDocTypeProvision } from '../../../common/manage-doc-types';
-import { ProvisionGroup } from '../../../types/types';
+import { Provision, ProvisionGroup } from '../../../types/types';
 import { DocumentProvisionSearchState } from '../../common/manage-doc-types/DocumentProvisionSearch';
+import { Modal } from 'react-bootstrap';
 
 interface ManageDocumentProvisionsTableProps {
   provisions: ManageDocTypeProvision[] | undefined;
   provisionGroups: ProvisionGroup[] | undefined;
   searchState: DocumentProvisionSearchState;
   onUpdate: (manageDocTypeProvisions: ManageDocTypeProvision[]) => void;
+  openModal: (provision_id: number) => void;
 }
 
 const ManageDocumentProvisionsTable: React.FC<ManageDocumentProvisionsTableProps> = ({
@@ -17,6 +19,7 @@ const ManageDocumentProvisionsTable: React.FC<ManageDocumentProvisionsTableProps
   provisionGroups,
   searchState,
   onUpdate,
+  openModal,
 }) => {
   const [allProvisions, setAllProvisions] = useState<ManageDocTypeProvision[]>([]);
   const [filteredProvisions, setFilteredProvisions] = useState<ManageDocTypeProvision[]>([]);
@@ -169,15 +172,28 @@ const ManageDocumentProvisionsTable: React.FC<ManageDocumentProvisionsTableProps
     onUpdate(allProvisions);
   };
 
+  const openGPModal = (provision_id: number) => {
+    openModal(provision_id);
+  };
+
   const columnHelper = createColumnHelper<ManageDocTypeProvision>();
 
   const columns: ColumnDef<ManageDocTypeProvision, any>[] = [
-    columnHelper.accessor('id', {
+    columnHelper.accessor('provision_id', {
       id: 'id',
-      cell: (info) => <input value={info.getValue()} className="form-control readonlyInput" readOnly />,
+      cell: (info) => (
+        <>
+          <input
+            value={info.getValue()}
+            className="form-control readonlyInput hoverUnderline"
+            readOnly
+            onClick={() => openGPModal(info.getValue())}
+          />
+        </>
+      ),
       header: () => 'ID',
       enableSorting: true,
-      meta: { customCss: { width: '5%' } },
+      meta: { customCss: { width: '8%' } },
     }),
     columnHelper.accessor('type', {
       id: 'type',
@@ -261,7 +277,7 @@ const ManageDocumentProvisionsTable: React.FC<ManageDocumentProvisionsTableProps
       ),
       header: () => 'Free Text',
       enableSorting: true,
-      meta: { customCss: { width: '10%' } },
+      meta: { customCss: { width: '8%' } },
     }),
     columnHelper.accessor('category', {
       id: 'category',

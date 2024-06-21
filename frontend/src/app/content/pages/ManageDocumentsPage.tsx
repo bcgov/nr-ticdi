@@ -1,6 +1,6 @@
-import { FC, useCallback, useEffect, useState } from 'react';
+import { FC, useEffect, useState } from 'react';
 import { Button, Col, Row } from 'react-bootstrap';
-import { DocType, ProvisionGroup } from '../../types/types';
+import { DocType, Provision, ProvisionGroup } from '../../types/types';
 import { getDocumentTypes, getGroupMaxByDocTypeId } from '../../common/report';
 import ManageDocTypesTable from '../../components/table/manage-doc-types/ManageDocTypesTable';
 import AddDocTypeModal from '../../components/modal/manage-doc-types/AddDocTypeModal';
@@ -8,6 +8,7 @@ import RemoveDocTypeModal from '../../components/modal/manage-doc-types/RemoveDo
 import {
   ManageDocTypeProvision,
   addDocType,
+  getGlobalProvisions,
   getManageDocumentTypeProvisions,
   removeDocType,
   updateManageDocTypeProvisions,
@@ -21,6 +22,7 @@ import DocumentProvisionSearch, {
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../store/store';
 import { setDocType } from '../../store/reducers/docTypeSlice';
+import GlobalProvisionModal from '../../components/modal/manage-doc-types/GlobalProvisionModal';
 
 const ManageDocumentsPage: FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
@@ -29,6 +31,9 @@ const ManageDocumentsPage: FC = () => {
   const [allDocTypes, setAllDocTypes] = useState<DocType[]>([]);
   const [provisionGroups, setProvisionGroups] = useState<ProvisionGroup[]>([]);
   const [provisions, setProvisions] = useState<ManageDocTypeProvision[]>([]);
+  const [globalProvisions, setGlobalProvisions] = useState<Provision[]>([]);
+  const [selectedGlobalProvision, setSelectedGlobalProvision] = useState<Provision | null>(null);
+  const [showGlobalProvisionModal, setShowGlobalProvisionModal] = useState<boolean>(false);
 
   const [showAddDocTypeModal, setShowAddDocTypeModal] = useState<boolean>(false);
   const [showRemoveDocTypeModal, setShowRemoveDocTypeModal] = useState<boolean>(false);
@@ -74,6 +79,8 @@ const ManageDocumentsPage: FC = () => {
         setProvisionGroups(groupData);
         const provisionData = await getManageDocumentTypeProvisions(selectedDocType.id);
         setProvisions(provisionData);
+        const globalProvisions = await getGlobalProvisions();
+        setGlobalProvisions(globalProvisions);
       } else {
         setProvisionGroups([]);
         setProvisions([]);
@@ -187,6 +194,15 @@ const ManageDocumentsPage: FC = () => {
     setSearchState(searchState);
   };
 
+  const openGlobalProvisionModal = (provision_id: number) => {
+    console.log('openGlobalProvisionModal');
+    const p = globalProvisions?.find((p) => p.id === provision_id) || null;
+    console.log(provision_id);
+    console.log(p);
+    setSelectedGlobalProvision(p);
+    setShowGlobalProvisionModal(true);
+  };
+
   return (
     <>
       {showMain && (
@@ -246,6 +262,7 @@ const ManageDocumentsPage: FC = () => {
             provisionGroups={provisionGroups}
             searchState={searchState}
             onUpdate={updateProvisionsState}
+            openModal={openGlobalProvisionModal}
           />
           {/** ID - Type - Group - Seq - Max - Provision Name - Free Text - Category - Associated */}
           <EditProvisionGroupsModal
@@ -269,6 +286,13 @@ const ManageDocumentsPage: FC = () => {
               Save
             </Button>
           </Col>
+          {showGlobalProvisionModal && (
+            <GlobalProvisionModal
+              show={showGlobalProvisionModal}
+              onHide={() => setShowGlobalProvisionModal(false)}
+              provision={selectedGlobalProvision}
+            />
+          )}
         </>
       )}
     </>

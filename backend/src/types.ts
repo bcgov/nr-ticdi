@@ -55,6 +55,7 @@ export type SearchResultsItem = {
 // type used by the frontend for displaying data in a table
 export type ManageDocTypeProvision = {
   id: number;
+  provision_id: number;
   type: string;
   provision_name: string;
   free_text: string;

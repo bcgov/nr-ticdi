@@ -1,9 +1,10 @@
 import config from '../../config';
-import { DocType, GroupMax, ProvisionGroup } from '../types/types';
+import { DocType, GroupMax, Provision, ProvisionGroup } from '../types/types';
 import * as api from './api';
 
 export type ManageDocTypeProvision = {
   id: number;
+  provision_id: number;
   type: string;
   provision_name: string;
   free_text: string;
@@ -56,6 +57,12 @@ export const getManageDocumentTypeProvisions = (document_type_id: number) => {
   const url = `${config.API_BASE_URL}/provision/get-manage-doc-type-provisions/${document_type_id}`;
   const getParameters = api.generateApiParameters(url);
   return api.get<ManageDocTypeProvision[]>(getParameters);
+};
+
+export const getGlobalProvisions = () => {
+  const url = `${config.API_BASE_URL}/provision`;
+  const getParameters = api.generateApiParameters(url);
+  return api.get<Provision[]>(getParameters);
 };
 
 export const associateProvisionToDocType = (provision_id: number, document_type_id: number) => {

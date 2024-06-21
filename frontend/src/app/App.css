@@ -16,6 +16,15 @@
   background-color: white !important;
 }
 
+.hoverUnderline {
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.hoverUnderline:hover {
+  text-decoration: underline;
+}
+
 .linkButton {
   text-decoration: underline;
   color: #1a5a96;

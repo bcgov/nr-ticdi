@@ -210,18 +210,17 @@ export type GroupMax = {
 };
 
 export type Provision = {
-  type: string;
-  provision_group: number;
-  max: number;
-  provision_name: string;
-  free_text: string;
-  category: string;
   active_flag: boolean;
-  edit: any; // remove from route
+  category: string;
+  create_timestamp: string;
+  create_userid: string;
+  free_text: string;
   help_text: string;
-  sequence_value: number;
   id: number;
-  document_type_ids: number[]; //
+  is_deleted: boolean;
+  provision_name: string;
+  update_timestamp: string;
+  update_userid: string;
 };
 
 export type Variable = {

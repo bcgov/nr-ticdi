@@ -261,6 +261,7 @@ export class ProvisionService {
     // map 'docTypeProvisions' to include a variable called 'associated' which is true or false
     const managedProvisions: ManageDocTypeProvision[] = docTypeProvisions.map((docTypeProvision) => ({
       id: docTypeProvision.id,
+      provision_id: docTypeProvision.provision.id,
       type: docTypeProvision.type,
       provision_name: docTypeProvision.provision.provision_name,
       free_text: docTypeProvision.provision.free_text,

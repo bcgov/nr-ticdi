@@ -90,7 +90,7 @@ const EditProvisionModal: FC<EditProvisionModalProps> = ({ provision, variables,
     try {
       setLoading(true);
       await updateProvision({ ...provisionUpload, id });
-      onHide();
+      handleOnHide();
       refreshTables();
     } catch (err) {
       console.log('Error updating provision');
@@ -134,8 +134,18 @@ const EditProvisionModal: FC<EditProvisionModalProps> = ({ provision, variables,
     }
   };
 
+  const handleOnHide = () => {
+    // Reset the state of the modal when it is closed
+    onHide();
+    setDisplayAddVariable(false);
+    setDisplayEditVariable(false);
+    setDisplayRemoveVariable(false);
+    setDisplayEditProvision(true);
+    setShowError(false);
+  };
+
   return (
-    <Modal show={show} onHide={onHide} size="lg">
+    <Modal show={show} onHide={handleOnHide} size="lg">
       {displayEditProvision && (
         <>
           <EditProvisionModalForm
@@ -143,7 +153,7 @@ const EditProvisionModal: FC<EditProvisionModalProps> = ({ provision, variables,
             variables={variables}
             loading={loading}
             updateProvisionHandler={handleUpdateProvision}
-            onHide={onHide}
+            onHide={handleOnHide}
             onDisplayAdd={handleDisplayAddVariable}
             onDisplayEdit={handleDisplayEditVariable}
             onDisplayRemove={handleDisplayRemoveVariable}
@@ -153,7 +163,7 @@ const EditProvisionModal: FC<EditProvisionModalProps> = ({ provision, variables,
       {displayAddVariable && (
         <AddVariableModalForm
           loading={loading}
-          onHide={onHide}
+          onHide={handleOnHide}
           onBack={returnToEditProvision}
           onSave={handleAddVariable}
         />
@@ -162,7 +172,7 @@ const EditProvisionModal: FC<EditProvisionModalProps> = ({ provision, variables,
         <EditVariableModalForm
           variable={currentVariable}
           loading={loading}
-          onHide={onHide}
+          onHide={handleOnHide}
           onBack={returnToEditProvision}
           onSave={handleUpdateVariable}
         />
@@ -171,7 +181,7 @@ const EditProvisionModal: FC<EditProvisionModalProps> = ({ provision, variables,
         <RemoveVariableModalForm
           variable={currentVariable}
           loading={loading}
-          onHide={onHide}
+          onHide={handleOnHide}
           onBack={returnToEditProvision}
           onRemove={handleRemoveVariable}
         />

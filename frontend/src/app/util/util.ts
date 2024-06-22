@@ -139,7 +139,13 @@ export const buildDTRDisplayData = (data: DTR): DTRDisplayObject => {
     let country: string = '';
 
     if (firstTenant) {
-      primaryContactName = getFullName(firstTenant.firstName, firstTenant.middleName, firstTenant.lastName);
+      primaryContactName =
+        firstTenant.firstName || firstTenant.middleName || firstTenant.lastName
+          ? getFullName(firstTenant.firstName, firstTenant.middleName, firstTenant.lastName)
+          : firstTenant.legalName
+          ? firstTenant.legalName
+          : '';
+
       primaryContactEmail = firstTenant.emailAddress ? firstTenant.emailAddress : '';
       primaryContactPhone = formatPhoneNumber(
         firstTenant.phoneNumber ? firstTenant.phoneNumber : '',

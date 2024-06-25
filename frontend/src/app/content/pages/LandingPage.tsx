@@ -229,6 +229,8 @@ const LandingPage: FC = () => {
   const fetchDataHandler = async () => {
     setError(null);
     setShowError(false);
+    setData(null);
+    setSelectedDocTypeId(null);
     if (dtidInput) {
       fetchData(dtidInput);
     } else {

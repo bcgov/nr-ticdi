@@ -233,7 +233,7 @@ export class ReportService {
         rawData = res;
       })
       .catch((err) => {
-        console.log(err);
+        console.log(err); //
       });
 
     const interestParcel = rawData.interestParcel;

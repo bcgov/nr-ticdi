@@ -58,21 +58,21 @@ const SelectedProvisionsTable: React.FC<SelectedProvisionsTableTableProps> = ({
       cell: (info) => <input value={info.getValue()} className="form-control readonlyInput" readOnly />,
       header: () => 'Group',
       enableSorting: true,
-      meta: { customCss: { width: '5%' } },
+      meta: { customCss: { width: '8%' } },
     }),
     columnHelper.accessor('provision_name', {
       id: 'provision_name',
       cell: (info) => <input value={info.getValue()} className="form-control readonlyInput" readOnly />,
       header: () => 'Provision',
       enableSorting: true,
-      meta: { customCss: { width: '50%' } },
+      meta: { customCss: { width: '60%' } },
     }),
     columnHelper.accessor('category', {
       id: 'category',
       cell: (info) => <input value={info.getValue()} className="form-control readonlyInput" readOnly />,
       header: () => 'Category',
       enableSorting: true,
-      meta: { customCss: { width: '30%' } },
+      meta: { customCss: { width: '27%' } },
     }),
   ];
 

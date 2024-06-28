@@ -180,7 +180,6 @@ const ManageDocumentsPage: FC = () => {
     try {
       setLoading(true);
       const updated: ManageDocTypeProvision[] = findUpdatedProvisions();
-      console.log(updated);
       await updateManageDocTypeProvisions(selectedDocType.id, updated);
     } catch (err) {
       console.log('Error updating provisions');

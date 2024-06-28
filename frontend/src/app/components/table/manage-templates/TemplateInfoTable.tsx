@@ -116,14 +116,14 @@ const TemplateInfoTable: React.FC<TemplateInfoTableProps> = ({ documentType, ref
       cell: (info) => <input value={info.getValue()} className="form-control readonlyInput" readOnly />,
       header: () => 'Doc No.',
       enableSorting: true,
-      meta: { customCss: { width: '5%' } },
+      meta: { customCss: { width: '8%' } },
     }),
     columnHelper.accessor('file_name', {
       id: 'file_name',
       cell: (info) => <input value={info.getValue()} className="form-control readonlyInput" readOnly />,
       header: () => 'Template Name',
       enableSorting: true,
-      meta: { customCss: { width: '50%' } },
+      meta: { customCss: { width: '47%' } },
     }),
     columnHelper.accessor('update_timestamp', {
       id: 'update_timestamp',

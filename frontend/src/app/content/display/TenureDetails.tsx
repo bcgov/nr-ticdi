@@ -26,7 +26,7 @@ const TenureDetails: FC<TenureDetailsProps> = ({ data }) => {
         <div className="form-row">
           <div className="col-md-5 form-group">
             <div className="font-weight-bold">Purpose</div>
-            <DataSection content={data.type} id="type" />
+            <DataSection content={data.purpose} id="purpose" />
           </div>
           <div className="col-md-5 form-group">
             <div className="font-weight-bold">Subpurpose</div>

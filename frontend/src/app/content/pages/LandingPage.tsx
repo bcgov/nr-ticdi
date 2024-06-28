@@ -200,7 +200,12 @@ const LandingPage: FC = () => {
           setFilteredDocumentTypes(documentTypes.filter((dt) => !dt.name.toLowerCase().includes('lease')));
           break;
         default:
-          setFilteredDocumentTypes(documentTypes);
+          // if data.type is neither LEASE nor LICENCE, exclude document types with lease or licence in name
+          setFilteredDocumentTypes(
+            documentTypes.filter(
+              (dt) => !dt.name.toLowerCase().includes('lease') && !dt.name.toLowerCase().includes('licence')
+            )
+          );
       }
     }
   }, [data, documentTypes]);

@@ -1,6 +1,7 @@
-import { FC, useState } from 'react';
+import { FC, useEffect, useState } from 'react';
 import { Button, Col, Form, Modal, Row, Spinner } from 'react-bootstrap';
 import { DocType } from '../../../types/types';
+import UserService from '../../../service/user-service';
 
 interface AddDocTypeModalProps {
   allDocTypes: DocType[];
@@ -10,8 +11,9 @@ interface AddDocTypeModalProps {
 }
 
 const AddDocTypeModal: FC<AddDocTypeModalProps> = ({ allDocTypes, show, onHide, onAdd }) => {
+  const username = UserService.getUsername();
   const [name, setName] = useState<string>('');
-  const [createdBy, setCreatedBy] = useState<string>('');
+  const [createdBy, setCreatedBy] = useState<string>(username);
   const [createdDate, setCreatedDate] = useState<string>(new Date().toISOString().substring(0, 10));
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
@@ -72,7 +74,7 @@ const AddDocTypeModal: FC<AddDocTypeModalProps> = ({ allDocTypes, show, onHide, 
               Created By:
             </Form.Label>
             <Col sm="10">
-              <Form.Control type="text" onChange={handleCreatedByChange} />
+              <Form.Control type="text" onChange={handleCreatedByChange} value={createdBy} />
             </Col>
           </Form.Group>
           <Form.Group as={Row} className="mb-3">

@@ -51,12 +51,17 @@ export class ReportService {
         prefix = 'NFR';
       } else if (documentType.name.toLowerCase().includes('land use report')) {
         prefix = 'LUR';
-      } else if (documentType.name.toLowerCase().includes('grazing')) {
-        prefix = 'GL';
+      } else if (
+        documentType.name.toLowerCase().includes('grazing') ||
+        documentType.name.toLowerCase().includes('lease')
+      ) {
+        prefix = 'Lease';
       } else if (documentType.name.toLowerCase().includes('standard licence')) {
-        prefix = 'SL';
+        prefix = 'Licence';
       } else if (documentType.name.toLowerCase().includes('assumption')) {
-        prefix = 'AA';
+        prefix = 'Assignment';
+      } else if (documentType.name.toLowerCase().includes('modification')) {
+        prefix = 'Modification';
       }
     }
     return {

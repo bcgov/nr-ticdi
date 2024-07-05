@@ -190,28 +190,29 @@ const DocumentProvisionSearch: FC<DocumentProvisionSearchProps> = ({ onSearch })
       ) : (
         <>
           {/* Basic Search Inputs */}
-          <Col sm={1}>
-            <input
-              className="form-control"
-              type="number"
-              name="id"
-              placeholder="ID"
-              value={searchState.id}
-              onChange={handleChange}
-              style={{ width: '100%' }}
-            />
+          <Col sm={4}>
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+              <input
+                className="form-control"
+                type="number"
+                name="id"
+                placeholder="ID"
+                value={searchState.id}
+                onChange={handleChange}
+                style={{ width: '30%' }}
+              />
+              <input
+                className="form-control ml-2"
+                type="text"
+                name="provisionName"
+                placeholder="Provision Name"
+                value={searchState.provisionName}
+                onChange={handleChange}
+                style={{ width: '60%' }}
+              />
+            </div>
           </Col>
-          <Col sm={3}>
-            <input
-              className="form-control ml-2"
-              type="text"
-              name="provisionName"
-              placeholder="Provision Name"
-              value={searchState.provisionName}
-              onChange={handleChange}
-              style={{ width: '100%' }}
-            />
-          </Col>
+
           <Col sm={2}>
             <Button variant="primary" onClick={toggleAdvancedSearch}>
               Advanced <FontAwesomeIcon icon={faCaretUp} />

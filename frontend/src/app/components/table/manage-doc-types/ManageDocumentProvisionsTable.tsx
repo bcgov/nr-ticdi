@@ -1,3 +1,5 @@
+// old tanstack implementation, will delete soon
+
 import React, { FC, useEffect, useState } from 'react';
 import { DataTable } from '../common/DataTable';
 import { ColumnDef, Row, createColumnHelper } from '@tanstack/react-table';

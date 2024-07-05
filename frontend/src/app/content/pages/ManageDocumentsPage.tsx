@@ -7,6 +7,7 @@ import AddDocTypeModal from '../../components/modal/manage-doc-types/AddDocTypeM
 import RemoveDocTypeModal from '../../components/modal/manage-doc-types/RemoveDocTypeModal';
 import {
   ManageDocTypeProvision,
+  ProvisionInfo,
   addDocType,
   getGlobalProvisions,
   getManageDocumentTypeProvisions,
@@ -23,6 +24,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../store/store';
 import { setDocType } from '../../store/reducers/docTypeSlice';
 import GlobalProvisionModal from '../../components/modal/manage-doc-types/GlobalProvisionModal';
+import ManageDocumentProvisionsTable2 from '../../components/table/manage-doc-types/ManageDocumentProvisionsTable2';
 
 const ManageDocumentsPage: FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
@@ -32,7 +34,7 @@ const ManageDocumentsPage: FC = () => {
   const [provisionGroups, setProvisionGroups] = useState<ProvisionGroup[]>([]);
   const [provisions, setProvisions] = useState<ManageDocTypeProvision[]>([]);
   const [globalProvisions, setGlobalProvisions] = useState<Provision[]>([]);
-  const [selectedGlobalProvision, setSelectedGlobalProvision] = useState<Provision | null>(null);
+  const [selectedGlobalProvision, setSelectedGlobalProvision] = useState<ProvisionInfo | null>(null);
   const [showGlobalProvisionModal, setShowGlobalProvisionModal] = useState<boolean>(false);
 
   const [showAddDocTypeModal, setShowAddDocTypeModal] = useState<boolean>(false);
@@ -55,7 +57,7 @@ const ManageDocumentsPage: FC = () => {
   });
 
   const dispatch = useDispatch();
-  const { selectedDocType } = useSelector((state: RootState) => state.docType);
+  const { selectedDocType, updatedProvisionsArray } = useSelector((state: RootState) => state.docType);
 
   useEffect(() => {
     const getData = async () => {
@@ -81,6 +83,7 @@ const ManageDocumentsPage: FC = () => {
         setProvisions(provisionData);
         const globalProvisions = await getGlobalProvisions();
         setGlobalProvisions(globalProvisions);
+        console.log(globalProvisions);
       } else {
         setProvisionGroups([]);
         setProvisions([]);
@@ -160,27 +163,8 @@ const ManageDocumentsPage: FC = () => {
 
   const saveButtonHandler = async () => {
     try {
-      await saveProvisions();
-    } catch (err) {
-      console.log('Error when saving');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const findUpdatedProvisions = (): ManageDocTypeProvision[] => {
-    const updated = updatedProvisions.filter((updatedProvision) => {
-      const originalProvision = provisions.find((p) => p.id === updatedProvision.id);
-      return originalProvision && JSON.stringify(updatedProvision) !== JSON.stringify(originalProvision);
-    });
-    return updated;
-  };
-
-  const saveProvisions = async () => {
-    try {
       setLoading(true);
-      const updated: ManageDocTypeProvision[] = findUpdatedProvisions();
-      await updateManageDocTypeProvisions(selectedDocType.id, updated);
+      await updateManageDocTypeProvisions(selectedDocType.id, updatedProvisionsArray);
     } catch (err) {
       console.log('Error updating provisions');
       console.log(err);
@@ -193,13 +177,11 @@ const ManageDocumentsPage: FC = () => {
     setSearchState(searchState);
   };
 
-  const openGlobalProvisionModal = (provision_id: number) => {
-    console.log('openGlobalProvisionModal');
-    const p = globalProvisions?.find((p) => p.id === provision_id) || null;
-    console.log(provision_id);
-    console.log(p);
-    setSelectedGlobalProvision(p);
-    setShowGlobalProvisionModal(true);
+  const openGlobalProvisionModal = (provision: ProvisionInfo | null) => {
+    if (provision) {
+      setSelectedGlobalProvision(provision);
+      setShowGlobalProvisionModal(true);
+    }
   };
 
   return (
@@ -245,7 +227,7 @@ const ManageDocumentsPage: FC = () => {
           <hr />
           {/** Search implementation */}
           {/** Advanced Search: different inputs - id, type, group, free text, category */}
-          <Row className="mt-3">
+          <Row className="mt-3 mb-3">
             <DocumentProvisionSearch onSearch={setSearchStateHandler} />
             {/** Name/group search box - Advanced Search - Associated - Edit Provision Groups*/}
             <Col sm={4}>
@@ -256,7 +238,7 @@ const ManageDocumentsPage: FC = () => {
           </Row>
 
           {/** Global Provisions table */}
-          <ManageDocumentProvisionsTable
+          <ManageDocumentProvisionsTable2
             provisions={provisions}
             provisionGroups={provisionGroups}
             searchState={searchState}

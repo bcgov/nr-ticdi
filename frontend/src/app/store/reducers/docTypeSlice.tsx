@@ -1,9 +1,11 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { DocType } from '../../types/types';
+import { ManageDocTypeProvision } from '../../common/manage-doc-types';
 
 interface DocumentTypeObjectState {
   selectedDocType: DocType;
   updatedDocType: DocType;
+  updatedProvisionsArray: ManageDocTypeProvision[];
 }
 
 const initialState: DocumentTypeObjectState = {
@@ -27,6 +29,7 @@ const initialState: DocumentTypeObjectState = {
     create_timestamp: '',
     update_timestamp: '',
   },
+  updatedProvisionsArray: [],
 };
 
 const documentTypeObjectSlice = createSlice({
@@ -40,9 +43,16 @@ const documentTypeObjectSlice = createSlice({
     setUpdatedDocType: (state, action: PayloadAction<DocType>) => {
       state.updatedDocType = action.payload;
     },
+    setUpdatedProvisionsArray: (state, action: PayloadAction<ManageDocTypeProvision[]>) => {
+      state.updatedProvisionsArray = action.payload;
+    },
+    clearUpdatedProvisionsArray: (state) => {
+      state.updatedProvisionsArray = [];
+    },
   },
 });
 
-export const { setDocType, setUpdatedDocType } = documentTypeObjectSlice.actions;
+export const { setDocType, setUpdatedDocType, setUpdatedProvisionsArray, clearUpdatedProvisionsArray } =
+  documentTypeObjectSlice.actions;
 
 export default documentTypeObjectSlice.reducer;

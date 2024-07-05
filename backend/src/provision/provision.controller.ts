@@ -23,6 +23,11 @@ export class ProvisionController {
     return this.provisionService.findAll();
   }
 
+  @Get('get-provision-info/:provision_id')
+  getProvisionInfo(@Param('provision_id') id: number) {
+    return this.provisionService.getProvisionInfo(id);
+  }
+
   @Get('variables')
   findAllVariables() {
     return this.provisionService.findAllVariables();

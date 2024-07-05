@@ -111,6 +111,13 @@ export class ProvisionService {
     return provisions;
   }
 
+  getProvisionInfo(id: number): Promise<Provision & { provision_variables: ProvisionVariable[] }> {
+    return this.provisionRepository.findOne({
+      where: { id },
+      relations: ['provision_variables'],
+    });
+  }
+
   async findAllVariables(): Promise<any[]> {
     const variables = await this.provisionVariableRepository.find({
       relations: ['provision'],

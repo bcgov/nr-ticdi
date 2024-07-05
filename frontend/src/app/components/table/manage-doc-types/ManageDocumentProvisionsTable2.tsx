@@ -183,6 +183,7 @@ const ManageDocumentProvisionsTable2: React.FC<ManageDocumentProvisionsTable2Pro
     {
       field: 'provision_id',
       headerName: 'ID',
+      headerAlign: 'left',
       width: 80,
       renderCell: (params) => (
         <input
@@ -196,6 +197,7 @@ const ManageDocumentProvisionsTable2: React.FC<ManageDocumentProvisionsTable2Pro
     {
       field: 'type',
       headerName: 'Type',
+      headerAlign: 'left',
       editable: true,
       type: 'singleSelect',
       valueOptions: ['', 'O', 'M', 'B', 'V'],
@@ -212,6 +214,7 @@ const ManageDocumentProvisionsTable2: React.FC<ManageDocumentProvisionsTable2Pro
     {
       field: 'provision_group',
       headerName: 'Group',
+      headerAlign: 'left',
       editable: true,
       type: 'number',
       width: 80,
@@ -227,6 +230,7 @@ const ManageDocumentProvisionsTable2: React.FC<ManageDocumentProvisionsTable2Pro
     {
       field: 'sequence_value',
       headerName: 'Seq',
+      headerAlign: 'left',
       editable: true,
       type: 'number',
       width: 80,
@@ -242,6 +246,7 @@ const ManageDocumentProvisionsTable2: React.FC<ManageDocumentProvisionsTable2Pro
     {
       field: 'max',
       headerName: 'Max',
+      headerAlign: 'left',
       type: 'number',
       width: 80,
       renderCell: (params) => (
@@ -256,6 +261,7 @@ const ManageDocumentProvisionsTable2: React.FC<ManageDocumentProvisionsTable2Pro
     {
       field: 'provision_name',
       headerName: 'Provision',
+      headerAlign: 'left',
       width: 400,
       renderCell: (params) => (
         <input
@@ -270,6 +276,7 @@ const ManageDocumentProvisionsTable2: React.FC<ManageDocumentProvisionsTable2Pro
     {
       field: 'free_text',
       headerName: 'Free Text',
+      headerAlign: 'left',
       width: 80,
       renderCell: (params) => (
         <input
@@ -284,6 +291,7 @@ const ManageDocumentProvisionsTable2: React.FC<ManageDocumentProvisionsTable2Pro
     {
       field: 'category',
       headerName: 'Category',
+      headerAlign: 'left',
       width: 120,
       renderCell: (params) => (
         <input
@@ -298,6 +306,7 @@ const ManageDocumentProvisionsTable2: React.FC<ManageDocumentProvisionsTable2Pro
     {
       field: 'associated',
       headerName: 'Associated',
+      headerAlign: 'left',
       editable: true,
       type: 'boolean',
       width: 100,

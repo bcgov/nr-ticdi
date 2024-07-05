@@ -1,26 +1,18 @@
-import React, { FC, useEffect, useState } from 'react';
-import { DataTable } from '../common/DataTable';
-import { ColumnDef, Row, createColumnHelper } from '@tanstack/react-table';
-import { ManageDocTypeProvision } from '../../../common/manage-doc-types';
-import { ProvisionGroup } from '../../../types/types';
+import React, { useEffect, useState } from 'react';
+import { Checkbox } from '@mui/material';
+import { getProvisionInfo, ManageDocTypeProvision, ProvisionInfo } from '../../../common/manage-doc-types';
+import { Provision, ProvisionGroup } from '../../../types/types';
 import { DocumentProvisionSearchState } from '../../common/manage-doc-types/DocumentProvisionSearch';
-import {
-  DataGrid,
-  GridCellEditStopParams,
-  GridCellParams,
-  GridColDef,
-  GridRowId,
-  GridValueOptionsParams,
-  GridValueSetter,
-  MuiEvent,
-} from '@mui/x-data-grid';
+import { DataGrid, GridCellModes, GridCellModesModel, GridCellParams, GridColDef } from '@mui/x-data-grid';
+import { useDispatch } from 'react-redux';
+import { setUpdatedProvisionsArray } from '../../../store/reducers/docTypeSlice';
 
 interface ManageDocumentProvisionsTable2Props {
   provisions: ManageDocTypeProvision[] | undefined;
   provisionGroups: ProvisionGroup[] | undefined;
   searchState: DocumentProvisionSearchState;
   onUpdate: (manageDocTypeProvisions: ManageDocTypeProvision[]) => void;
-  openModal: (provision_id: number) => void;
+  openModal: (provision: ProvisionInfo | null) => void;
 }
 
 const ManageDocumentProvisionsTable2: React.FC<ManageDocumentProvisionsTable2Props> = ({
@@ -33,8 +25,10 @@ const ManageDocumentProvisionsTable2: React.FC<ManageDocumentProvisionsTable2Pro
   const [allProvisions, setAllProvisions] = useState<ManageDocTypeProvision[]>([]);
   const [filteredProvisions, setFilteredProvisions] = useState<ManageDocTypeProvision[]>([]);
   const [updatedProvisions, setUpdatedProvisions] = useState<ManageDocTypeProvision[]>([]);
-  const [loading, setLoading] = useState<boolean>(false);
+  const [cellModesModel, setCellModesModel] = React.useState<GridCellModesModel>({});
+  const dispatch = useDispatch();
 
+  // initialize provisions
   useEffect(() => {
     if (provisions) {
       setAllProvisions(provisions);
@@ -42,9 +36,60 @@ const ManageDocumentProvisionsTable2: React.FC<ManageDocumentProvisionsTable2Pro
   }, [provisions]);
 
   useEffect(() => {
+    onUpdate(allProvisions);
+  }, [allProvisions, onUpdate]);
+
+  useEffect(() => {
+    dispatch(setUpdatedProvisionsArray(updatedProvisions));
+  }, [updatedProvisions, dispatch]);
+
+  const openGPModal = async (provision_id: number) => {
+    const provision = await getProvisionInfo(provision_id);
+    openModal(provision ? provision : null);
+  };
+
+  const handleCellClick = React.useCallback((params: GridCellParams) => {
+    if (params.field === 'provision_id') {
+      openGPModal(params.value as number);
+    }
+    if (params.isEditable && params.field !== 'type' && params.field !== 'associated') {
+      setCellModesModel((prevModel) => {
+        return {
+          // Revert the mode of the other cells from other rows
+          ...Object.keys(prevModel).reduce(
+            (acc, id) => ({
+              ...acc,
+              [id]: Object.keys(prevModel[id]).reduce(
+                (acc2, field) => ({
+                  ...acc2,
+                  [field]: { mode: GridCellModes.View },
+                }),
+                {}
+              ),
+            }),
+            {}
+          ),
+          [params.id]: {
+            // Revert the mode of other cells in the same row
+            ...Object.keys(prevModel[params.id] || {}).reduce(
+              (acc, field) => ({ ...acc, [field]: { mode: GridCellModes.View } }),
+              {}
+            ),
+            [params.field]: { mode: GridCellModes.Edit },
+          },
+        };
+      });
+    }
+  }, []);
+
+  const handleCellModesModelChange = React.useCallback((newModel: any) => {
+    setCellModesModel(newModel);
+  }, []);
+
+  useEffect(() => {
     const searchFilteredProvisions = allProvisions.filter((provision) => {
       // Basic search checks (applies in both basic and advanced search modes)
-      const matchesId = searchState.id ? provision.id === Number(searchState.id) : true;
+      const matchesId = searchState.id ? provision.provision_id.toString().includes(searchState.id) : true;
       const matchesProvisionName = searchState.provisionName
         ? provision.provision_name.toLowerCase().includes(searchState.provisionName.toLowerCase())
         : true;
@@ -89,123 +134,49 @@ const ManageDocumentProvisionsTable2: React.FC<ManageDocumentProvisionsTable2Pro
     setFilteredProvisions(searchFilteredProvisions);
   }, [allProvisions, searchState]);
 
-  useEffect(() => {
-    onUpdate(allProvisions);
-  }, [allProvisions, onUpdate]);
-
-  const associateCheckboxHandler = async (provisionId: number, newValue: boolean) => {
-    try {
-      setLoading(true);
-      let updatedAllProvisions: ManageDocTypeProvision[] = [];
-      let updatedFilteredProvisions: ManageDocTypeProvision[] = [];
-
-      // Update all provisions and store the updated list in a variable
-      setAllProvisions((prevProvisions) => {
-        updatedAllProvisions = prevProvisions.map((provision) => {
-          if (provision.id === provisionId) {
-            return { ...provision, associated: newValue };
-          }
-          return provision;
-        });
-        return updatedAllProvisions;
-      });
-
-      // Update filtered provisions and store the updated list in a variable
-      setFilteredProvisions((prevProvisions) => {
-        updatedFilteredProvisions = prevProvisions.map((provision) => {
-          if (provision.id === provisionId) {
-            return { ...provision, associated: newValue };
-          }
-          return provision;
-        });
-        return updatedFilteredProvisions;
-      });
-    } catch (error) {
-      console.log('Error enabling/disabling provision');
-      console.log(error);
-    } finally {
-      setLoading(false);
+  const handleRowUpdate = (
+    updatedRow: ManageDocTypeProvision,
+    originalRow: ManageDocTypeProvision
+  ): ManageDocTypeProvision => {
+    if (updatedRow.provision_group !== originalRow.provision_group) {
+      const provisionGroup = provisionGroups
+        ? provisionGroups.find((group) => group.provision_group === updatedRow.provision_group)
+        : null;
+      if (provisionGroup) {
+        updatedRow = {
+          ...updatedRow,
+          provision_group_object: provisionGroup ? provisionGroup : null,
+          max: provisionGroup?.max || 999,
+        };
+      } else {
+        updatedRow = originalRow;
+      }
     }
-  };
 
-  const handleCellUpdate = (provisionId: number, columnId: keyof ManageDocTypeProvision, newValue: any) => {
-    const newFilteredProvisions = filteredProvisions.map((provision, index) => {
-      if (provision.id === provisionId) {
-        const updatedValue =
-          columnId === 'provision_group' || columnId === 'sequence_value' ? parseInt(newValue, 10) : newValue;
+    setUpdatedProvisions((prevUpdatedProvisions) => {
+      const existingProvisionIndex = prevUpdatedProvisions.findIndex((provision) => provision.id === updatedRow.id);
 
-        return { ...provision, [columnId]: updatedValue };
+      if (existingProvisionIndex >= 0) {
+        const updatedProvisionsCopy = [...prevUpdatedProvisions];
+        updatedProvisionsCopy[existingProvisionIndex] = updatedRow;
+        return updatedProvisionsCopy;
+      } else {
+        return [...prevUpdatedProvisions, updatedRow];
       }
-      return provision;
     });
-    const newProvisions = allProvisions.map((provision, index) => {
-      if (provision.id === provisionId) {
-        const updatedValue =
-          columnId === 'provision_group' || columnId === 'sequence_value' ? parseInt(newValue, 10) : newValue;
-        return { ...provision, [columnId]: updatedValue };
+    setAllProvisions((prevAllProvisions) => {
+      const existingProvisionIndex = prevAllProvisions.findIndex((provision) => provision.id === updatedRow.id);
+
+      if (existingProvisionIndex >= 0) {
+        const updatedProvisionsCopy = [...prevAllProvisions];
+        updatedProvisionsCopy[existingProvisionIndex] = updatedRow;
+        return updatedProvisionsCopy;
+      } else {
+        return prevAllProvisions;
       }
-      return provision;
     });
 
-    setFilteredProvisions(newFilteredProvisions);
-    setAllProvisions(newProvisions);
-    onUpdate(newProvisions);
-  };
-
-  const handleProvisionGroupUpdate = (provisionId: number, provisionGroup: ProvisionGroup | undefined) => {
-    // console.log(provisionId);
-    // console.log(provisionGroup);
-    console.log('adjusting');
-    setAllProvisions((currentProvisions) =>
-      currentProvisions.map((provision) => {
-        if (provision.id === provisionId && provisionGroup) {
-          return {
-            ...provision,
-            provision_group: provisionGroup?.provision_group,
-            provision_group_object: provisionGroup,
-            max: provisionGroup?.max,
-          };
-        }
-        return provision;
-      })
-    );
-    setFilteredProvisions((currentProvisions) =>
-      currentProvisions.map((provision) => {
-        if (provision.id === provisionId && provisionGroup) {
-          return {
-            ...provision,
-            provision_group: provisionGroup?.provision_group,
-            provision_group_object: provisionGroup,
-            max: provisionGroup?.max,
-          };
-        }
-        return provision;
-      })
-    );
-    onUpdate(allProvisions);
-  };
-
-  const openGPModal = (provision_id: number) => {
-    openModal(provision_id);
-  };
-
-  //   const handleCellEditStop = (params: GridCellEditStopParams) => {
-  //     console.log('handleEditStop');
-  //     console.log(params);
-  //     if (params.field === 'provision_group' && provisionGroups) {
-  //       const provisionGroup = provisionGroups.find((group) => group.provision_group === params.value) || undefined;
-  //       handleProvisionGroupUpdate(params.id as number, provisionGroup);
-  //     }
-  //     // params = data row, add this edited version to a state, on save, update the ManageDocTypeProvisions in this state
-  //   };
-
-  const handleRowUpdate = (updatedRow: any, originalRow: any) => {
-    console.log(updatedRow);
-    console.log(originalRow);
-  };
-
-  const trackUpdate = (id: GridRowId, field: string, value: any) => {
-    console.log(id, field, value);
+    return updatedRow;
   };
 
   const columns: GridColDef[] = [
@@ -215,7 +186,7 @@ const ManageDocumentProvisionsTable2: React.FC<ManageDocumentProvisionsTable2Pro
       width: 80,
       renderCell: (params) => (
         <input
-          value={params.value}
+          value={params.value ? params.value : ''}
           className="form-control readonlyInput hoverUnderline"
           readOnly
           style={{ marginTop: '5px', marginBottom: '5px' }}
@@ -228,10 +199,10 @@ const ManageDocumentProvisionsTable2: React.FC<ManageDocumentProvisionsTable2Pro
       editable: true,
       type: 'singleSelect',
       valueOptions: ['', 'O', 'M', 'B', 'V'],
-      width: 80,
+      width: 65,
       renderCell: (params) => (
         <input
-          value={params.value}
+          value={params.value !== null ? params.value : ''}
           className="form-control readonlyInput hoverUnderline"
           readOnly
           style={{ marginTop: '5px', marginBottom: '5px' }}
@@ -246,7 +217,7 @@ const ManageDocumentProvisionsTable2: React.FC<ManageDocumentProvisionsTable2Pro
       width: 80,
       renderCell: (params) => (
         <input
-          value={params.value}
+          value={params.value ? params.value : ''}
           className="form-control readonlyInput hoverUnderline"
           readOnly
           style={{ marginTop: '5px', marginBottom: '5px' }}
@@ -261,7 +232,7 @@ const ManageDocumentProvisionsTable2: React.FC<ManageDocumentProvisionsTable2Pro
       width: 80,
       renderCell: (params) => (
         <input
-          value={params.value}
+          value={params.value ? params.value : ''}
           className="form-control readonlyInput hoverUnderline"
           readOnly
           style={{ marginTop: '5px', marginBottom: '5px' }}
@@ -275,7 +246,7 @@ const ManageDocumentProvisionsTable2: React.FC<ManageDocumentProvisionsTable2Pro
       width: 80,
       renderCell: (params) => (
         <input
-          value={params.value}
+          value={params.value ? params.value : ''}
           className="form-control readonlyInput hoverUnderline"
           readOnly
           style={{ marginTop: '5px', marginBottom: '5px' }}
@@ -288,7 +259,8 @@ const ManageDocumentProvisionsTable2: React.FC<ManageDocumentProvisionsTable2Pro
       width: 400,
       renderCell: (params) => (
         <input
-          value={params.value}
+          value={params.value ? params.value : ''}
+          title={params.value ? params.value : ''}
           className="form-control readonlyInput hoverUnderline"
           readOnly
           style={{ marginTop: '5px', marginBottom: '5px' }}
@@ -301,7 +273,8 @@ const ManageDocumentProvisionsTable2: React.FC<ManageDocumentProvisionsTable2Pro
       width: 80,
       renderCell: (params) => (
         <input
-          value={params.value}
+          value={params.value ? params.value : ''}
+          title={params.value ? params.value : ''}
           className="form-control readonlyInput hoverUnderline"
           readOnly
           style={{ marginTop: '5px', marginBottom: '5px' }}
@@ -314,7 +287,8 @@ const ManageDocumentProvisionsTable2: React.FC<ManageDocumentProvisionsTable2Pro
       width: 120,
       renderCell: (params) => (
         <input
-          value={params.value}
+          value={params.value ? params.value : ''}
+          title={params.value ? params.value : ''}
           className="form-control readonlyInput hoverUnderline"
           readOnly
           style={{ marginTop: '5px', marginBottom: '5px' }}
@@ -327,60 +301,46 @@ const ManageDocumentProvisionsTable2: React.FC<ManageDocumentProvisionsTable2Pro
       editable: true,
       type: 'boolean',
       width: 100,
+      renderCell: (params) => (
+        <Checkbox
+          checked={params.value}
+          onChange={(event) => {
+            const newValue = event.target.checked;
+            const updatedRow = { ...params.row, associated: newValue };
+            handleRowUpdate(updatedRow, params.row);
+          }}
+        />
+      ),
     },
   ];
 
   return (
-    <div style={{ height: '632px', width: '100%' }}>
-      <DataGrid
-        rows={filteredProvisions}
-        columns={columns}
-        initialState={{
-          pagination: { paginationModel: { pageSize: 10 } },
-        }}
-        processRowUpdate={(updatedRow, originalRow) => {
-          console.log('originalRow: ', originalRow);
-          console.log('updatedRow: ', updatedRow);
-          return updatedRow;
-        }}
-        onProcessRowUpdateError={(error) => {
-          console.error('Error updating row:', error);
-        }}
-        pageSizeOptions={[10, 20, 50]}
-        // onCellEditStop={(params) => {
-        //   console.log(params);
-        // }}
-        onCellClick={(params) => {
-          if (params.field === 'provision_id') {
-            openGPModal(params.value as number);
-          }
-        }}
-        getRowId={(row) => {
-          return row?.id as number;
-        }}
-      />
-    </div>
-  );
-};
-
-// custom cell for associated column
-interface CheckboxCellProps {
-  provisionId: number;
-  initialValue: boolean;
-  onChange: (id: number, newChecked: boolean) => Promise<void>;
-  loading: boolean;
-}
-const CheckboxCell: React.FC<CheckboxCellProps> = ({ provisionId, initialValue, onChange, loading }) => {
-  const [checked, setChecked] = useState<boolean>(initialValue);
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newChecked = e.target.checked;
-    setChecked(newChecked);
-    onChange(provisionId, newChecked);
-  };
-
-  return (
-    <input type="checkbox" checked={checked} onChange={handleChange} disabled={loading} style={{ width: '100%' }} />
+    <DataGrid
+      rows={filteredProvisions}
+      columns={columns}
+      initialState={{
+        pagination: { paginationModel: { pageSize: 10 } },
+      }}
+      processRowUpdate={(updatedRow, originalRow) => {
+        return handleRowUpdate(updatedRow, originalRow);
+      }}
+      onProcessRowUpdateError={(error) => {
+        console.error('Error updating row:', error);
+      }}
+      pageSizeOptions={[10, 20, 50]}
+      cellModesModel={cellModesModel}
+      onCellModesModelChange={handleCellModesModelChange}
+      onCellClick={handleCellClick}
+      getRowId={(row) => {
+        return row?.id as number;
+      }}
+      autoHeight={true}
+      sx={{
+        '& .MuiDataGrid-footerContainer p': {
+          marginTop: '12px',
+        },
+      }}
+    />
   );
 };
 

@@ -23,6 +23,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../store/store';
 import { setDocType } from '../../store/reducers/docTypeSlice';
 import GlobalProvisionModal from '../../components/modal/manage-doc-types/GlobalProvisionModal';
+import ManageDocumentProvisionsTable2 from '../../components/table/manage-doc-types/ManageDocumentProvisionsTable2';
 
 const ManageDocumentsPage: FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
@@ -256,7 +257,7 @@ const ManageDocumentsPage: FC = () => {
           </Row>
 
           {/** Global Provisions table */}
-          <ManageDocumentProvisionsTable
+          <ManageDocumentProvisionsTable2
             provisions={provisions}
             provisionGroups={provisionGroups}
             searchState={searchState}

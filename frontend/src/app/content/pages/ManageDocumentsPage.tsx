@@ -33,7 +33,6 @@ const ManageDocumentsPage: FC = () => {
   const [allDocTypes, setAllDocTypes] = useState<DocType[]>([]);
   const [provisionGroups, setProvisionGroups] = useState<ProvisionGroup[]>([]);
   const [provisions, setProvisions] = useState<ManageDocTypeProvision[]>([]);
-  const [globalProvisions, setGlobalProvisions] = useState<Provision[]>([]);
   const [selectedGlobalProvision, setSelectedGlobalProvision] = useState<ProvisionInfo | null>(null);
   const [showGlobalProvisionModal, setShowGlobalProvisionModal] = useState<boolean>(false);
 
@@ -81,9 +80,6 @@ const ManageDocumentsPage: FC = () => {
         setProvisionGroups(groupData);
         const provisionData = await getManageDocumentTypeProvisions(selectedDocType.id);
         setProvisions(provisionData);
-        const globalProvisions = await getGlobalProvisions();
-        setGlobalProvisions(globalProvisions);
-        console.log(globalProvisions);
       } else {
         setProvisionGroups([]);
         setProvisions([]);

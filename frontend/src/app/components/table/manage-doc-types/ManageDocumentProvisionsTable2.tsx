@@ -252,7 +252,7 @@ const ManageDocumentProvisionsTable2: React.FC<ManageDocumentProvisionsTable2Pro
       renderCell: (params) => (
         <input
           value={params.value ? params.value : ''}
-          className="form-control readonlyInput hoverUnderline"
+          className="form-control readonlyInput"
           readOnly
           style={{ marginTop: '5px', marginBottom: '5px' }}
         />
@@ -267,7 +267,7 @@ const ManageDocumentProvisionsTable2: React.FC<ManageDocumentProvisionsTable2Pro
         <input
           value={params.value ? params.value : ''}
           title={params.value ? params.value : ''}
-          className="form-control readonlyInput hoverUnderline"
+          className="form-control readonlyInput"
           readOnly
           style={{ marginTop: '5px', marginBottom: '5px' }}
         />
@@ -282,7 +282,7 @@ const ManageDocumentProvisionsTable2: React.FC<ManageDocumentProvisionsTable2Pro
         <input
           value={params.value ? params.value : ''}
           title={params.value ? params.value : ''}
-          className="form-control readonlyInput hoverUnderline"
+          className="form-control readonlyInput"
           readOnly
           style={{ marginTop: '5px', marginBottom: '5px' }}
         />
@@ -297,7 +297,7 @@ const ManageDocumentProvisionsTable2: React.FC<ManageDocumentProvisionsTable2Pro
         <input
           value={params.value ? params.value : ''}
           title={params.value ? params.value : ''}
-          className="form-control readonlyInput hoverUnderline"
+          className="form-control readonlyInput"
           readOnly
           style={{ marginTop: '5px', marginBottom: '5px' }}
         />
@@ -344,6 +344,7 @@ const ManageDocumentProvisionsTable2: React.FC<ManageDocumentProvisionsTable2Pro
         return row?.id as number;
       }}
       autoHeight={true}
+      disableRowSelectionOnClick
       sx={{
         '& .MuiDataGrid-footerContainer p': {
           marginTop: '12px',

@@ -194,6 +194,7 @@ export type DocumentDataObject = {
 export type TemplateInfo = {
   template_version: number;
   file_name: string;
+  create_timestamp: string;
   update_timestamp: string;
   active_flag: boolean;
   view: any; // remove from route

@@ -125,8 +125,8 @@ const TemplateInfoTable: React.FC<TemplateInfoTableProps> = ({ documentType, ref
       enableSorting: true,
       meta: { customCss: { width: '47%' } },
     }),
-    columnHelper.accessor('update_timestamp', {
-      id: 'update_timestamp',
+    columnHelper.accessor('create_timestamp', {
+      id: 'create_timestamp',
       cell: (info) => <input value={info.getValue()} className="form-control readonlyInput" readOnly />,
       header: () => 'Uploaded Date',
       enableSorting: true,

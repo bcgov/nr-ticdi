@@ -8,5 +8,4 @@ export class AppController {
   getHello(): string {
     return 'Hello Backend!';
   }
-  //
 }

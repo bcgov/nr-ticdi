@@ -300,6 +300,7 @@ export class AdminService {
         template_version: template.template_version,
         file_name: template.file_name,
         active_flag: template.active_flag,
+        create_timestamp: formattedDate(template.create_timestamp),
         update_timestamp: formattedDate(template.update_timestamp),
       };
     });

@@ -116,6 +116,7 @@
          <column autoUpdated="false" defaultValue="null" digits="0" id="5" name="update_userid" nullable="false" remarks="" size="2147483647" type="varchar" typeCode="12"/>
          <column autoUpdated="false" defaultValue="now()" digits="6" id="6" name="create_timestamp" nullable="false" remarks="" size="29" type="timestamp" typeCode="93"/>
          <column autoUpdated="false" defaultValue="now()" digits="6" id="7" name="update_timestamp" nullable="false" remarks="" size="29" type="timestamp" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="''::character varying" digits="0" id="8" name="prefix" nullable="true" remarks="" size="50" type="varchar" typeCode="12"/>
          <primaryKey column="id" sequenceNumberInPK="1"/>
          <index name="PK_document_type" unique="true">
             <column ascending="true" name="id"/>

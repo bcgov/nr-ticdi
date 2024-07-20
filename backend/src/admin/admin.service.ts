@@ -322,9 +322,10 @@ export class AdminService {
     return this.provisionService.disable(id);
   }
 
-  async addDocumentType(name: string, created_by: string, created_date: string, create_userid: string) {
+  async addDocumentType(name: string, prefix: string, created_by: string, created_date: string, create_userid: string) {
     const documentType: DocumentType = await this.documentTypeService.add(
       name,
+      prefix,
       created_by,
       created_date,
       create_userid

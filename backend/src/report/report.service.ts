@@ -44,24 +44,28 @@ export class ReportService {
   async generateReportName(dtid: number, tenure_file_number: string, document_type_id: number) {
     const version = await this.documentDataLogService.findNextVersion(dtid, document_type_id);
     const documentType = await this.documentTypeService.findById(document_type_id);
-    // probably a better way of doing this
-    let prefix = 'report';
+    let prefix = 'report'; // fallback prefix
     if (documentType) {
-      if (documentType.name.toLowerCase().includes('notice of final review')) {
-        prefix = 'NFR';
-      } else if (documentType.name.toLowerCase().includes('land use report')) {
-        prefix = 'LUR';
-      } else if (
-        documentType.name.toLowerCase().includes('grazing') ||
-        documentType.name.toLowerCase().includes('lease')
-      ) {
-        prefix = 'Lease';
-      } else if (documentType.name.toLowerCase().includes('standard licence')) {
-        prefix = 'Licence';
-      } else if (documentType.name.toLowerCase().includes('assumption')) {
-        prefix = 'Assignment';
-      } else if (documentType.name.toLowerCase().includes('modification')) {
-        prefix = 'Modification';
+      prefix = documentType.prefix;
+      console.log('prefix pulled from db::: ' + prefix);
+      // fallback logic left in for now
+      if (prefix === '' || prefix === null || prefix === 'report') {
+        if (documentType.name.toLowerCase().includes('notice of final review')) {
+          prefix = 'NFR';
+        } else if (documentType.name.toLowerCase().includes('land use report')) {
+          prefix = 'LUR';
+        } else if (
+          documentType.name.toLowerCase().includes('grazing') ||
+          documentType.name.toLowerCase().includes('lease')
+        ) {
+          prefix = 'Lease';
+        } else if (documentType.name.toLowerCase().includes('standard licence')) {
+          prefix = 'Licence';
+        } else if (documentType.name.toLowerCase().includes('assumption')) {
+          prefix = 'Assignment';
+        } else if (documentType.name.toLowerCase().includes('modification')) {
+          prefix = 'Modification';
+        }
       }
     }
     return {

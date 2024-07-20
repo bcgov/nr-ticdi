@@ -28,10 +28,11 @@ export const getDocumentTypes = () => {
   return api.get<DocType[]>(getParameters);
 };
 
-export const addDocType = (name: string, created_by: string, created_date: string) => {
+export const addDocType = (name: string, prefix: string, created_by: string, created_date: string) => {
   const url = `${config.API_BASE_URL}/admin/add-document-type`;
   const data = {
     name,
+    prefix,
     created_by,
     created_date,
   };
@@ -39,11 +40,12 @@ export const addDocType = (name: string, created_by: string, created_date: strin
   return api.post<DocType>(postParameters);
 };
 
-export const updateDocType = (id: number, name: string, created_by: string, created_date: string) => {
+export const updateDocType = (id: number, name: string, prefix: string, created_by: string, created_date: string) => {
   const url = `${config.API_BASE_URL}/document-type/update`;
   const data = {
     id,
     name,
+    prefix,
     created_by,
     created_date,
   };

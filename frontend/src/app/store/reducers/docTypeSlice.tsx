@@ -12,6 +12,7 @@ const initialState: DocumentTypeObjectState = {
   selectedDocType: {
     id: -1,
     name: '',
+    prefix: '',
     created_by: '',
     created_date: '',
     create_userid: '',
@@ -22,6 +23,7 @@ const initialState: DocumentTypeObjectState = {
   updatedDocType: {
     id: -1,
     name: '',
+    prefix: '',
     created_by: '',
     created_date: '',
     create_userid: '',

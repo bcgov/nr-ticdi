@@ -36,6 +36,7 @@ const EditDocTypeTable: FC<EditDocTypeTableProps> = ({ refreshDocTypes }) => {
       await updateDocType(
         selectedDocType.id,
         currentDocType.name,
+        currentDocType.prefix,
         currentDocType.created_by,
         currentDocType.created_date
       );
@@ -67,7 +68,21 @@ const EditDocTypeTable: FC<EditDocTypeTableProps> = ({ refreshDocTypes }) => {
       ),
       header: () => 'Document Type Name',
       enableSorting: false,
-      meta: { customCss: { width: '17%' }, type: 'text' },
+      meta: { customCss: { width: '24%' }, type: 'text' },
+    }),
+    columnHelper.accessor('prefix', {
+      id: 'prefix',
+      cell: ({ row }) => (
+        <TableCell
+          getValue={() => row.original.prefix}
+          columnId="prefix"
+          onUpdate={updateHandler}
+          isEditing={isEditing}
+        />
+      ),
+      header: () => 'File Prefix',
+      enableSorting: true,
+      meta: { customCss: { width: '12%' }, type: 'text' },
     }),
     columnHelper.accessor('created_date', {
       id: 'created_date',
@@ -81,7 +96,7 @@ const EditDocTypeTable: FC<EditDocTypeTableProps> = ({ refreshDocTypes }) => {
       ),
       header: () => 'Date Created',
       enableSorting: false,
-      meta: { customCss: { width: '17%', margin: '0px' }, type: 'text' },
+      meta: { customCss: { width: '12%', margin: '0px' }, type: 'text' },
     }),
     columnHelper.accessor('created_by', {
       id: 'created_by',
@@ -95,7 +110,7 @@ const EditDocTypeTable: FC<EditDocTypeTableProps> = ({ refreshDocTypes }) => {
       ),
       header: () => 'Created By',
       enableSorting: false,
-      meta: { customCss: { width: '17%' }, type: 'text' },
+      meta: { customCss: { width: '12%' }, type: 'text' },
     }),
     columnHelper.accessor('update_timestamp', {
       id: 'update_timestamp',
@@ -104,14 +119,14 @@ const EditDocTypeTable: FC<EditDocTypeTableProps> = ({ refreshDocTypes }) => {
       ),
       header: () => 'Last Updated Date',
       enableSorting: false,
-      meta: { customCss: { width: '17%' }, type: 'text' },
+      meta: { customCss: { width: '12%' }, type: 'text' },
     }),
     columnHelper.accessor('update_userid', {
       id: 'update_userid',
       cell: (info) => <input value={info.getValue()} className="form-control readonlyInput" readOnly />,
       header: () => 'Last Updated By',
       enableSorting: false,
-      meta: { customCss: { width: '17%' }, type: 'text' },
+      meta: { customCss: { width: '12%' }, type: 'text' },
     }),
     columnHelper.display({
       id: 'edit_and_save',
@@ -156,9 +171,6 @@ interface TableCellProps<T> {
 }
 
 const TableCell: FC<TableCellProps<DocType>> = ({ getValue, columnId, onUpdate, isEditing }) => {
-  // const dispatch = useDispatch();
-  // const updatedDocType = useSelector((state: RootState) => state.docType.updatedDocType);
-  // const initialValue = getValue() ? (columnId === 'created_date' ? getValue().substring(0, 10) : getValue()) : '';
   let initialValue = getValue() ? getValue() : '';
   const [value, setValue] = useState(initialValue);
 
@@ -167,7 +179,6 @@ const TableCell: FC<TableCellProps<DocType>> = ({ getValue, columnId, onUpdate, 
   }, [initialValue]);
 
   const handleBlur = () => {
-    // dispatch(setUpdatedDocType({ ...updatedDocType, [columnId]: value }));
     onUpdate({ [columnId]: value });
   };
 

@@ -218,8 +218,17 @@ export class AdminController {
   }
 
   @Post('add-document-type')
-  addDocumentType(@User() user: IdirObject, @Body() data: { name: string; created_by: string; created_date: string }) {
-    return this.adminService.addDocumentType(data.name, data.created_by, data.created_date, user.idir_username);
+  addDocumentType(
+    @User() user: IdirObject,
+    @Body() data: { name: string; prefix: string; created_by: string; created_date: string }
+  ) {
+    return this.adminService.addDocumentType(
+      data.name,
+      data.prefix,
+      data.created_by,
+      data.created_date,
+      user.idir_username
+    );
   }
 
   @Get('remove-document-type/:id')

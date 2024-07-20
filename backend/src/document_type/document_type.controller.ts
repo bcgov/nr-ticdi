@@ -17,10 +17,17 @@ export class DocumentTypeController {
 
   @Post('update')
   update(
-    @Body() data: { id: number; name: string; created_by: string; created_date: string },
+    @Body() data: { id: number; name: string; prefix: string; created_by: string; created_date: string },
     @User() user: IdirObject
   ) {
-    return this.documentTypeService.update(data.id, data.name, data.created_by, data.created_date, user.idir_username);
+    return this.documentTypeService.update(
+      data.id,
+      data.name,
+      data.prefix,
+      data.created_by,
+      data.created_date,
+      user.idir_username
+    );
   }
 
   @Get()

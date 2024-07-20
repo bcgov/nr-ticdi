@@ -118,10 +118,10 @@ const ManageDocumentsPage: FC = () => {
     setShowAddDocTypeModal(true);
   };
 
-  const addDocTypeHandler = async (name: string, created_by: string, created_date: string) => {
+  const addDocTypeHandler = async (name: string, prefix: string, created_by: string, created_date: string) => {
     try {
       setLoading(true);
-      await addDocType(name, created_by, created_date);
+      await addDocType(name, prefix, created_by, created_date);
       refreshDocTypes();
     } catch (err) {
       console.log('Error adding doc type');

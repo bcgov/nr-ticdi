@@ -33,9 +33,10 @@ export class DocumentTypeService {
     return this.documentTypeRepository.find();
   }
 
-  add(name: string, created_by: string, created_date: string, userid: string): Promise<DocumentType> {
+  add(name: string, prefix: string, created_by: string, created_date: string, userid: string): Promise<DocumentType> {
     const newDocumentType = this.documentTypeRepository.create({
       name: name,
+      prefix: prefix,
       created_by: created_by,
       created_date: created_date,
       create_userid: userid,
@@ -47,11 +48,12 @@ export class DocumentTypeService {
   async update(
     id: number,
     name: string,
+    prefix: string,
     created_by: string,
     created_date: string,
     userid: string
   ): Promise<DocumentType> {
-    await this.documentTypeRepository.update(id, { name, created_by, created_date, update_userid: userid });
+    await this.documentTypeRepository.update(id, { name, prefix, created_by, created_date, update_userid: userid });
     const updatedDocumentType = await this.documentTypeRepository.findOneBy({ id });
     if (!updatedDocumentType) {
       throw new Error('DocumentType not found');

@@ -1,18 +1,20 @@
-import { FC, useEffect, useState } from 'react';
-import { Button, Col, Form, Modal, Row, Spinner } from 'react-bootstrap';
+import { FC, useState } from 'react';
+import { Button, Col, Form, Modal, OverlayTrigger, Row, Spinner, Tooltip } from 'react-bootstrap';
 import { DocType } from '../../../types/types';
 import UserService from '../../../service/user-service';
+import '@fortawesome/fontawesome-free/css/all.min.css';
 
 interface AddDocTypeModalProps {
   allDocTypes: DocType[];
   show: boolean;
   onHide: () => void;
-  onAdd: (name: string, created_by: string, created_date: string) => void;
+  onAdd: (name: string, prefix: string, created_by: string, created_date: string) => void;
 }
 
 const AddDocTypeModal: FC<AddDocTypeModalProps> = ({ allDocTypes, show, onHide, onAdd }) => {
   const username = UserService.getUsername();
   const [name, setName] = useState<string>('');
+  const [prefix, setPrefix] = useState<string>('');
   const [createdBy, setCreatedBy] = useState<string>(username);
   const [createdDate, setCreatedDate] = useState<string>(new Date().toISOString().substring(0, 10));
   const [loading, setLoading] = useState<boolean>(false);
@@ -26,7 +28,7 @@ const AddDocTypeModal: FC<AddDocTypeModalProps> = ({ allDocTypes, show, onHide, 
       setShowError(false);
       const isNameUnique = !allDocTypes.some((docType) => docType.name === name);
       if (isNameUnique) {
-        onAdd(name, createdBy, createdDate);
+        onAdd(name, prefix, createdBy, createdDate);
         onHide();
       } else {
         setError('That document type name already exists');
@@ -44,6 +46,11 @@ const AddDocTypeModal: FC<AddDocTypeModalProps> = ({ allDocTypes, show, onHide, 
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (defaultDisabled) setDefaultDisabled(false);
     setName(e.target.value);
+  };
+
+  const handlePrefixChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (defaultDisabled) setDefaultDisabled(false);
+    setPrefix(e.target.value);
   };
 
   const handleCreatedByChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -69,6 +76,27 @@ const AddDocTypeModal: FC<AddDocTypeModalProps> = ({ allDocTypes, show, onHide, 
               <Form.Control type="text" onChange={handleNameChange} />
             </Col>
           </Form.Group>
+          <Form.Group as={Row} className="mb-3">
+            <Form.Label column sm="10">
+              File Prefix:
+              <OverlayTrigger
+                placement="right"
+                overlay={
+                  <Tooltip id="button-tooltip-2">
+                    The file prefix is the value added to the beginning of the generated document's filename.
+                  </Tooltip>
+                }
+              >
+                <span className="ml-1" style={{ cursor: 'pointer' }}>
+                  <i className="fas fa-info-circle"></i>
+                </span>
+              </OverlayTrigger>
+            </Form.Label>
+            <Col sm="10">
+              <Form.Control type="text" onChange={handlePrefixChange} />
+            </Col>
+          </Form.Group>
+
           <Form.Group as={Row} className="mb-3">
             <Form.Label column sm="10">
               Created By:

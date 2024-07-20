@@ -261,6 +261,7 @@ export type SearchData = {
 export type DocType = {
   id: number;
   name: string;
+  prefix: string;
   created_by: string;
   created_date: string;
   create_userid: string;

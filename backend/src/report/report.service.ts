@@ -84,9 +84,15 @@ export class ReportService {
     // For now, hardcode this to call the different static report routes based on document type
     const documentType = await this.documentTypeService.findById(document_type_id);
     if (documentType) {
-      if (documentType.name.toLowerCase().includes('notice of final review')) {
+      if (
+        documentType.name.toLowerCase().includes('notice of final review') ||
+        documentType.name.toLowerCase().includes('nfr')
+      ) {
         return this.generateNFRReport(dtid, document_type_id, idirUsername, idirName, variableJson, provisionJson);
-      } else if (documentType.name.toLowerCase().includes('land use')) {
+      } else if (
+        documentType.name.toLowerCase().includes('land use') ||
+        documentType.name.toLowerCase().includes('lur')
+      ) {
         return this.generateLURReport(dtid, idirUsername, document_type_id);
       } else if (documentType.name.toLowerCase().includes('grazing')) {
         return this.generateGLReport(dtid, idirUsername, document_type_id);

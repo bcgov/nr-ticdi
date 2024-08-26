@@ -153,6 +153,14 @@ export class ReportService {
         });
       }
 
+      // individual Signing block takes 2 cdogs requests to be fully filled in, so this regex
+      // makes sure that the db_name_tenant variable is formatted correctly
+      if (free_text.toLowerCase().includes('db_name_tenant}')) {
+        free_text = free_text.replace(/db_name_tenant}/gi, 'DB_NAME_TENANT:convCRLF()}');
+      } else if (free_text.toLowerCase().includes('db_name_tenant:convcrlf()}')) {
+        free_text = free_text.replace(/db_name_tenant:convcrlf\(\)}/gi, 'DB_NAME_TENANT:convCRLF()}');
+      }
+
       const key = `SECTION_${provision_group}`;
       if (!provisions[key]) {
         provisions[key] = [];

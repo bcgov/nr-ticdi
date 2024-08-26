@@ -12,7 +12,6 @@ import {
   removeProvision,
   updateProvision,
 } from '../../common/manage-provisions';
-import SimpleSearch from '../../components/common/SimpleSearch';
 
 interface ManageProvisionsPageProps {}
 
@@ -27,6 +26,7 @@ const ManageProvisionsPage: FC<ManageProvisionsPageProps> = () => {
   const [showRemoveProvisionModal, setShowRemoveProvisionModal] = useState<boolean>(false);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
   const [filteredProvisions, setFilteredProvisions] = useState<Provision[]>([]);
+  const [filterText, setFilterText] = useState('');
 
   useEffect(() => {
     const getData = async () => {
@@ -46,7 +46,11 @@ const ManageProvisionsPage: FC<ManageProvisionsPageProps> = () => {
 
   useEffect(() => {
     if (data.allProvisions) {
-      setFilteredProvisions(data.allProvisions);
+      if (!filterText || filterText === '') {
+        setFilteredProvisions(data.allProvisions);
+      } else {
+        handleFilterProvisions(filterText);
+      }
     }
   }, [data.allProvisions]);
 
@@ -76,8 +80,22 @@ const ManageProvisionsPage: FC<ManageProvisionsPageProps> = () => {
     refreshTables();
   };
 
-  const handleSearch = (filteredProvisions: Provision[]) => {
-    setFilteredProvisions(filteredProvisions);
+  const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const text: string = event.target.value;
+    handleFilterProvisions(text);
+  };
+
+  const handleFilterProvisions = (searchTerm: string) => {
+    const searchKeys: string[] = ['provision_name', 'category'];
+    setFilterText(searchTerm);
+
+    const fp: Provision[] = data.allProvisions
+      ? data.allProvisions.filter((item) =>
+          searchKeys.some((key) => (item as any)[key]?.toString().toLowerCase().includes(searchTerm.toLowerCase()))
+        )
+      : [];
+
+    setFilteredProvisions(fp);
   };
 
   const currentVariables = data.allVariables?.filter((v) => v.provision_id === currentProvision?.id) || [];
@@ -86,11 +104,16 @@ const ManageProvisionsPage: FC<ManageProvisionsPageProps> = () => {
     <>
       <h1>Manage Provisions</h1>
       <hr />
-      <SimpleSearch
-        searchKeys={['provision_name', 'category']}
-        data={data.allProvisions ? data.allProvisions : []}
-        onSearch={handleSearch}
-      />
+      <div>
+        <input
+          type="text"
+          className="form-control"
+          style={{ maxWidth: '200px' }}
+          placeholder="Search..."
+          value={filterText}
+          onChange={handleSearch}
+        />
+      </div>
       <ManageProvisionsTable
         provisions={filteredProvisions}
         variables={data.allVariables}

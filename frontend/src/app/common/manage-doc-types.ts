@@ -59,6 +59,26 @@ export const removeDocType = (id: number) => {
   return api.get<DocType>(getParameters);
 };
 
+export const getActiveDocTypes = () => {
+  const url = `${config.API_BASE_URL}/document-type/active-doc-types`;
+  const getParameters = api.generateApiParameters(url);
+  return api.get<DocType[]>(getParameters);
+};
+
+// used to activate doc type so that it displays in dropdowns
+export const activateDocType = (document_type_id: number) => {
+  const url = `${config.API_BASE_URL}/document-type/activate/${document_type_id}`;
+  const getParameters = api.generateApiParameters(url);
+  return api.get<any>(getParameters);
+};
+
+// used to deactivate doc type so that it does not display in dropdowns
+export const deactivateDocType = (document_type_id: number) => {
+  const url = `${config.API_BASE_URL}/document-type/deactivate/${document_type_id}`;
+  const getParameters = api.generateApiParameters(url);
+  return api.get<any>(getParameters);
+};
+
 export const getManageDocumentTypeProvisions = (document_type_id: number) => {
   const url = `${config.API_BASE_URL}/provision/get-manage-doc-type-provisions/${document_type_id}`;
   const getParameters = api.generateApiParameters(url);

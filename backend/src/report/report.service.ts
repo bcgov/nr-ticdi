@@ -996,7 +996,7 @@ export class ReportService {
   }
 
   async getDocumentData() {
-    const documentData = await this.documentDataService.findAll();
+    const documentData = await this.documentDataService.findAllWithActiveDT();
     const templateIds = documentData.map((d) => d.template_id);
     const allTemplates = await this.documentTemplateService.getTemplatesInfoByIds(templateIds);
 

@@ -10,7 +10,7 @@ import SearchDataTable from '../../components/table/search/SearchDataTable';
 import { DocType } from '../../types/types';
 import { setSearchState } from '../../store/reducers/searchSlice';
 import { useDispatch } from 'react-redux';
-import { getDocumentTypes } from '../../common/manage-doc-types';
+import { getActiveDocTypes } from '../../common/manage-doc-types';
 import { Row, Col } from 'react-bootstrap';
 
 const SearchPage: FC = () => {
@@ -26,7 +26,7 @@ const SearchPage: FC = () => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const data = await getDocumentTypes();
+        const data = await getActiveDocTypes();
         setDocTypes(data);
       } catch (error) {
         console.log('Error fetching doc types');

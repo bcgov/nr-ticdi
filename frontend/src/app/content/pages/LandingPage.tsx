@@ -24,7 +24,7 @@ import Provisions from '../display/Provisions';
 import { ProvisionJson, SaveProvisionData } from '../../components/table/reports/SelectedProvisionsTable';
 import VariablesTable, { SaveVariableData, VariableJson } from '../../components/table/reports/VariablesTable';
 import { Alert, Button, Row } from 'react-bootstrap';
-import { getDocumentTypes } from '../../common/manage-doc-types';
+import { getActiveDocTypes } from '../../common/manage-doc-types';
 import { getVariablesByDocType } from '../../common/manage-provisions';
 import { useDispatch, useSelector } from 'react-redux';
 import { setProvisionDataObjects, setSelectedProvisionIds } from '../../store/reducers/provisionSlice';
@@ -99,7 +99,7 @@ const LandingPage: FC = () => {
   useEffect(() => {
     const fetchBasicData = async () => {
       try {
-        const dts: DocType[] = await getDocumentTypes();
+        const dts: DocType[] = await getActiveDocTypes();
         dts.sort((a, b) => a.name.localeCompare(b.name));
         setDocumentTypes(dts);
       } catch (error) {

@@ -618,6 +618,15 @@ export class ReportService {
     // Format provisions in a way that the document template expects
     const groupIndexMap = new Map<number, number>();
     const showProvisionSections: Record<string, any> = {};
+
+    // Format the provisions so that provision free_text gets passed into the document template
+    provisionJson.sort((a, b) => {
+      if (a.provision_group === b.provision_group) {
+        return a.sequence_value - b.sequence_value;
+      }
+      return a.provision_group - b.provision_group;
+    });
+
     provisionJson.forEach((provision) => {
       const group = provision.provision_group;
       const index = (groupIndexMap.get(group) ?? 0) + 1;

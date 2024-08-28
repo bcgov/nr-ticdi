@@ -14,7 +14,6 @@ import {
   generateReport,
   getDisplayData,
   saveDocument,
-  getMandatoryProvisionsByDocTypeId,
   getGroupMaxByDocTypeId,
   getDocumentData,
 } from '../../common/report';
@@ -46,7 +45,6 @@ const LandingPage: FC = () => {
   const [showGenerateError, setShowGenerateError] = useState<boolean>(false);
 
   const [data, setData] = useState<DTRDisplayObject | null>(null);
-  const [mandatoryProvisionIds, setMandatoryProvisionIds] = useState<number[]>([]);
   const [provisionGroups, setProvisionGroups] = useState<ProvisionGroup[]>([]);
   const [dtidInput, setDtidInput] = useState<number | null>();
   const [dtid, setDtid] = useState<number | null>(null);
@@ -170,9 +168,6 @@ const LandingPage: FC = () => {
               .filter((provision) => provision.active_flag && !provision.is_deleted && provision.provision_group)
               .map((provision) => provision.provision_group.id)
           );
-          // mandatory provisions, will be validated against
-          const mpIds: number[] = await getMandatoryProvisionsByDocTypeId(documentType.id);
-          setMandatoryProvisionIds(mpIds);
           // get provision groups and filter out the empty ones
           const provisionGroupsObject: ProvisionGroup[] = await getGroupMaxByDocTypeId(documentType.id);
           const activeProvisionGroups = provisionGroupsObject.filter((group) => activeProvisionIDs.has(group.id));

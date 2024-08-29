@@ -476,19 +476,18 @@ const LandingPage: FC = () => {
         {data ? <InterestedParties data={data!} /> : <Skeleton />}
       </Collapsible>
 
-      {provisionGroups && dtid && documentType ? (
-        <>
-          <Collapsible title="Provisions" isOpen={false}>
-            <Provisions dtid={dtid} documentType={documentType} provisionGroups={provisionGroups} />
-          </Collapsible>
+      <Collapsible title="Provisions" isOpen={false} enabled={provisionGroups && dtid && documentType ? true : false}>
+        {provisionGroups && dtid && documentType ? (
+          <Provisions dtid={dtid} documentType={documentType} provisionGroups={provisionGroups} />
+        ) : (
+          <></>
+        )}
+      </Collapsible>
 
-          <Collapsible title="Variables" isOpen={false}>
-            <VariablesTable onVariableEdit={handleVariableEdit} />
-          </Collapsible>
-        </>
-      ) : (
-        <></>
-      )}
+      <Collapsible title="Variables" isOpen={false} enabled={provisionGroups && dtid && documentType ? true : false}>
+        {provisionGroups && dtid && documentType ? <VariablesTable onVariableEdit={handleVariableEdit} /> : <></>}
+      </Collapsible>
+
       <>
         {' '}
         {showGenerateError && (

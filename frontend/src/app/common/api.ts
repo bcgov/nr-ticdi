@@ -72,12 +72,11 @@ export const get = <T, M = {}>(parameters: ApiRequestParameters<M>, headers?: {}
   const { url, requiresAuthentication, params } = parameters;
   let config: AxiosRequestConfig = { headers: headers };
 
-  if (requiresAuthentication) {
-    config.headers = {
-      ...config.headers,
-      Authorization: `Bearer ${UserService.getToken()}`,
-    };
-  }
+  // always send JWT
+  config.headers = {
+    ...config.headers,
+    Authorization: `Bearer ${UserService.getToken()}`,
+  };
 
   if (params) {
     config.params = params;
@@ -90,7 +89,7 @@ export const post = <T, M = {}>(parameters: ApiRequestParameters<M>): Promise<T>
   const { url, requiresAuthentication, params } = parameters;
   let config: AxiosRequestConfig = { headers: {} };
 
-  if (requiresAuthentication && config && config.headers) {
+  if (config && config.headers) {
     config.headers['Authorization'] = `Bearer ${UserService.getToken()}`;
   }
 
@@ -101,7 +100,7 @@ const fileDownloadGet = <T, M = {}>(parameters: ApiRequestParameters<M>): Promis
   const { url, requiresAuthentication } = parameters;
   let config: AxiosRequestConfig = { headers: {}, responseType: 'blob' };
 
-  if (requiresAuthentication && config && config.headers) {
+  if (config && config.headers) {
     config.headers['Authorization'] = `Bearer ${UserService.getToken()}`;
   }
 
@@ -112,7 +111,7 @@ const fileDownloadPost = <T, M = {}>(parameters: ApiRequestParameters<M>): Promi
   const { url, requiresAuthentication, params } = parameters;
   let config: AxiosRequestConfig = { headers: {}, responseType: 'blob' };
 
-  if (requiresAuthentication && config && config.headers) {
+  if (config && config.headers) {
     config.headers['Authorization'] = `Bearer ${UserService.getToken()}`;
   }
 
@@ -172,7 +171,7 @@ export const put = <T, M = {}>(parameters: ApiRequestParameters<M>): Promise<T> 
   const { url, requiresAuthentication, params: data } = parameters;
   let config: AxiosRequestConfig = { headers: {} };
 
-  if (requiresAuthentication && config && config.headers) {
+  if (config && config.headers) {
     config.headers['Authorization'] = `Bearer ${UserService.getToken()}`;
   }
 
@@ -183,7 +182,7 @@ export const putFile = <T, M = {}>(parameters: ApiRequestParameters<M>, headers:
   const { url, requiresAuthentication } = parameters;
   let config: AxiosRequestConfig = { headers: headers };
 
-  if (requiresAuthentication && config && config.headers) {
+  if (config && config.headers) {
     config.headers['Authorization'] = `Bearer ${UserService.getToken()}`;
   }
 

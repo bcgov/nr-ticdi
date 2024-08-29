@@ -4,7 +4,7 @@ import { Button } from 'react-bootstrap';
 import { DocType } from '../../types/types';
 import UploadTemplateModal from '../../components/modal/manage-templates/UploadTemplateModal';
 import RemoveTemplateModal from '../../components/modal/manage-templates/RemoveTemplateModal';
-import { getDocumentTypes } from '../../common/report';
+import { getActiveDocTypes } from '../../common/manage-doc-types';
 
 const ManageTemplatesPage: FC = () => {
   const [showUploadModal, setShowUploadModal] = useState<boolean>(false);
@@ -16,7 +16,7 @@ const ManageTemplatesPage: FC = () => {
 
   useEffect(() => {
     const getData = async () => {
-      const docTypeData = await getDocumentTypes();
+      const docTypeData = await getActiveDocTypes();
       setAllDocTypes(docTypeData);
       if (docTypeData.length > 0) {
         setSelectedDocType(docTypeData[0]);

@@ -212,11 +212,19 @@ export class DocumentDataService {
     return null;
   }
 
-  // Used by the search page.
+  // Used by the search page. *can probably be removed*
   async findAll(): Promise<DocumentData[]> {
     return await this.documentDataRepository.find({
       relations: ['document_type'],
     });
+  }
+
+  // Used by the search page. Filters document data for inactive doc types
+  async findAllWithActiveDT(): Promise<DocumentData[]> {
+    const documentData = await this.documentDataRepository.find({
+      relations: ['document_type'],
+    });
+    return documentData.filter((data) => data.document_type.active === true);
   }
 
   async findByDocumentDataId(documentDataId: number): Promise<{

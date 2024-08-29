@@ -156,4 +156,17 @@ export class DocumentTypeService {
       return accumulator;
     }, []);
   }
+
+  findActiveDocTypes() {
+    return this.documentTypeRepository.find({ where: { active: true } });
+  }
+
+  // Active variable determines whether or not doc type is displayed in drop down lists
+  activateDocType(id: number) {
+    return this.documentTypeRepository.update(id, { active: true });
+  }
+
+  deactivateDocType(id: number) {
+    return this.documentTypeRepository.update(id, { active: false });
+  }
 }

@@ -38,6 +38,8 @@ const SelectedProvisionsTable: React.FC<SelectedProvisionsTableTableProps> = ({
       const filteredAndSorted: ReducedProvisionDataObject[] = [...filtered].sort((a, b) => {
         if (a.provision_group < b.provision_group) return -1;
         if (a.provision_group > b.provision_group) return 1;
+        if (a.sequence_value < b.sequence_value) return -1;
+        if (a.sequence_value > b.sequence_value) return 1;
         return a.provision_name.localeCompare(b.provision_name);
       });
       setSelectedProvisions(filteredAndSorted);

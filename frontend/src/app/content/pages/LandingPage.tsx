@@ -24,7 +24,7 @@ import Provisions from '../display/Provisions';
 import { ProvisionJson, SaveProvisionData } from '../../components/table/reports/SelectedProvisionsTable';
 import VariablesTable, { SaveVariableData, VariableJson } from '../../components/table/reports/VariablesTable';
 import { Alert, Button, Row } from 'react-bootstrap';
-import { getDocumentTypes } from '../../common/manage-doc-types';
+import { getActiveDocTypes } from '../../common/manage-doc-types';
 import { getVariablesByDocType } from '../../common/manage-provisions';
 import { useDispatch, useSelector } from 'react-redux';
 import { setProvisionDataObjects, setSelectedProvisionIds } from '../../store/reducers/provisionSlice';
@@ -99,7 +99,7 @@ const LandingPage: FC = () => {
   useEffect(() => {
     const fetchBasicData = async () => {
       try {
-        const dts: DocType[] = await getDocumentTypes();
+        const dts: DocType[] = await getActiveDocTypes();
         dts.sort((a, b) => a.name.localeCompare(b.name));
         setDocumentTypes(dts);
       } catch (error) {
@@ -130,8 +130,10 @@ const LandingPage: FC = () => {
         const displayData: { dtr: DTRDisplayObject | null; error: string | null } = await getDisplayData(
           searchState.dtid
         );
-        if (!displayData.error) setData(displayData.dtr);
-        else {
+        if (!displayData.error) {
+          setData(displayData.dtr);
+          setIsOpen(true);
+        } else {
           setError(displayData.error);
           setShowError(true);
         }
@@ -236,6 +238,9 @@ const LandingPage: FC = () => {
     setShowError(false);
     setData(null);
     setSelectedDocTypeId(null);
+    // clear tables on search
+    setDocumentType(null);
+    setProvisionGroups([]);
     if (dtidInput) {
       fetchData(dtidInput);
     } else {
@@ -403,7 +408,22 @@ const LandingPage: FC = () => {
       <div className="mb-3 mt-3">
         <div className="font-weight-bold inlineDiv">DTID:</div>
         <div className="inlineDiv ml-4 mr-4">
-          <input type="number" className="form-control" id="dtid" value={dtidInput || ''} onChange={handleDtidChange} />
+          <input
+            type="number"
+            className="form-control"
+            id="dtid"
+            value={dtidInput || ''}
+            onChange={handleDtidChange}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                e.preventDefault();
+                fetchDataHandler();
+                if (document.activeElement instanceof HTMLElement) {
+                  document.activeElement.blur();
+                }
+              }
+            }}
+          />
         </div>
         <Button variant="success" onClick={fetchDataHandler} style={{ marginRight: '10px', width: '150px' }}>
           Retrieve

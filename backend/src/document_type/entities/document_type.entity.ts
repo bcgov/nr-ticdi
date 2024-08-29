@@ -12,8 +12,11 @@ export class DocumentType {
   @Column()
   name: string;
 
-  @Column()
+  @Column({ nullable: true })
   prefix: string;
+
+  @Column({ nullable: true })
+  active: boolean;
 
   @Column({ nullable: true })
   created_by: string;

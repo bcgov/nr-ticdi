@@ -10,11 +10,6 @@ import { JwtAuthGuard } from 'src/auth/jwtauth.guard';
 export class DocumentTypeController {
   constructor(private documentTypeService: DocumentTypeService) {}
 
-  @Get(':id')
-  findById(@Param('id') id: number) {
-    return this.documentTypeService.findById(id);
-  }
-
   @Post('update')
   update(
     @Body() data: { id: number; name: string; prefix: string; created_by: string; created_date: string },
@@ -33,6 +28,11 @@ export class DocumentTypeController {
   @Get()
   findAll() {
     return this.documentTypeService.findAll();
+  }
+
+  @Get('active-doc-types')
+  findActiveDocTypes() {
+    return this.documentTypeService.findActiveDocTypes();
   }
 
   @Get('get-group-max/:document_type_id')
@@ -60,5 +60,15 @@ export class DocumentTypeController {
   @Post('remove-provision-group')
   removeProvisionGroup(@Body() data: { provision_group_id: number }) {
     return this.documentTypeService.removeProvisionGroup(data.provision_group_id);
+  }
+
+  @Get('activate/:document_type_id')
+  activateDocType(@Param('document_type_id') id: number) {
+    return this.documentTypeService.activateDocType(id);
+  }
+
+  @Get('deactivate/:document_type_id')
+  deactivateDocType(@Param('document_type_id') id: number) {
+    return this.documentTypeService.deactivateDocType(id);
   }
 }

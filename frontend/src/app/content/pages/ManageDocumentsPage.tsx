@@ -1,6 +1,6 @@
 import { FC, useEffect, useState } from 'react';
 import { Button, Col, Row } from 'react-bootstrap';
-import { DocType, Provision, ProvisionGroup } from '../../types/types';
+import { DocType, ProvisionGroup } from '../../types/types';
 import { getDocumentTypes, getGroupMaxByDocTypeId } from '../../common/report';
 import ManageDocTypesTable from '../../components/table/manage-doc-types/ManageDocTypesTable';
 import AddDocTypeModal from '../../components/modal/manage-doc-types/AddDocTypeModal';
@@ -9,13 +9,11 @@ import {
   ManageDocTypeProvision,
   ProvisionInfo,
   addDocType,
-  getGlobalProvisions,
   getManageDocumentTypeProvisions,
   removeDocType,
   updateManageDocTypeProvisions,
 } from '../../common/manage-doc-types';
 import EditProvisionGroupsModal from '../../components/modal/manage-doc-types/EditProvisionGroupsModal';
-import ManageDocumentProvisionsTable from '../../components/table/manage-doc-types/ManageDocumentProvisionsTable';
 import EditDocTypeTable from '../../components/table/manage-doc-types/EditDocTypeTable';
 import DocumentProvisionSearch, {
   DocumentProvisionSearchState,

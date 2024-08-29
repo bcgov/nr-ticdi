@@ -39,7 +39,6 @@ const Collapsible: FC<CollapsibleProps> = ({ title, children, isOpen }) => {
         </div>
       </div>
 
-      <hr />
       <div style={contentStyle}>{children}</div>
     </div>
   );

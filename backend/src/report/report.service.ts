@@ -241,7 +241,8 @@ export class ReportService {
     const md2 = JSON.stringify(cdogsData);
     conf.data = md2;
     const response2 = await ax(conf).catch((error) => {
-      console.log(error.response);
+      console.log('cdogs error');
+      console.log(error);
     });
     // response2.data is the docx file after the second insertions
     // (anything nested in a variable or provision should be inserted at this point)

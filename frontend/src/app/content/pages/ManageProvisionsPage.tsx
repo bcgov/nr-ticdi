@@ -86,7 +86,7 @@ const ManageProvisionsPage: FC<ManageProvisionsPageProps> = () => {
   };
 
   const handleFilterProvisions = (searchTerm: string) => {
-    const searchKeys: string[] = ['provision_name', 'category'];
+    const searchKeys: string[] = ['id', 'provision_name', 'category'];
     setFilterText(searchTerm);
 
     const fp: Provision[] = data.allProvisions

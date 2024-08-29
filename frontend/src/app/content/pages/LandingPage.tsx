@@ -130,7 +130,6 @@ const LandingPage: FC = () => {
         );
         if (!displayData.error) {
           setData(displayData.dtr);
-          setIsOpen(true);
         } else {
           setError(displayData.error);
           setShowError(true);
@@ -215,7 +214,6 @@ const LandingPage: FC = () => {
       const displayData: { dtr: DTRDisplayObject | null; error: string | null } = await getDisplayData(dtidValue);
       if (!displayData.error) {
         setData(displayData.dtr);
-        setIsOpen(true);
       } else {
         setError(displayData.error);
         setShowError(true);
@@ -448,19 +446,7 @@ const LandingPage: FC = () => {
         <div className="font-weight-bold inlineDiv mr-1">Primary Contact Name:</div>
         <div className="inlineDiv">{data?.primaryContactName}</div>
       </div>
-      <Collapsible title="Disposition Transaction ID Details" isOpen={isOpen}>
-        {data ? <DtidDetails data={data!} /> : <Skeleton />}
-      </Collapsible>
-      <Collapsible title="Tenure Details" isOpen={isOpen}>
-        {data ? <TenureDetails data={data!} /> : <Skeleton />}
-      </Collapsible>
-      <Collapsible title="Interested Parties" isOpen={isOpen}>
-        {data ? <InterestedParties data={data!} /> : <Skeleton />}
-      </Collapsible>
-
-      <hr />
       <h3>Create Document</h3>
-      <hr />
       <Row className="mb-3">
         <div className="ml-3 mr-3">
           <b>Document Type:</b>
@@ -480,6 +466,16 @@ const LandingPage: FC = () => {
           </select>
         </div>
       </Row>
+      <Collapsible title="Disposition Transaction ID Details" isOpen={isOpen}>
+        {data ? <DtidDetails data={data!} /> : <Skeleton />}
+      </Collapsible>
+      <Collapsible title="Tenure Details" isOpen={isOpen}>
+        {data ? <TenureDetails data={data!} /> : <Skeleton />}
+      </Collapsible>
+      <Collapsible title="Interested Parties" isOpen={isOpen}>
+        {data ? <InterestedParties data={data!} /> : <Skeleton />}
+      </Collapsible>
+
       {provisionGroups && dtid && documentType ? (
         <>
           <Collapsible title="Provisions" isOpen={false}>

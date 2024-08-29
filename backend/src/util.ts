@@ -345,8 +345,9 @@ export function grazingLeaseVariables(
   };
 }
 
-function getFullName(tenant: { firstName: string; middleName: string; lastName: string }): string {
+function getFullName(tenant: { firstName: string; middleName: string; lastName: string; legalName: string }): string {
   const nameParts = [];
+  let legalName;
   if (tenant.firstName !== null) {
     nameParts.push(tenant.firstName);
   }
@@ -356,7 +357,14 @@ function getFullName(tenant: { firstName: string; middleName: string; lastName: 
   if (tenant.lastName !== null) {
     nameParts.push(tenant.lastName);
   }
-  const fullName = nameParts.join(' ');
+  if (tenant.legalName !== null) {
+    legalName = tenant.legalName;
+  }
+
+  let fullName = nameParts.join(' ');
+  if (fullName.length === 0 && legalName) {
+    fullName = legalName;
+  }
 
   return fullName;
 }

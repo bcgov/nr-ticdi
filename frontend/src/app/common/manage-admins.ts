@@ -49,11 +49,11 @@ export const findIdirUser = async (
   return { foundUserObject: response.userObject || null, error: response.error || null };
 };
 
-export const addAdmin = async (idirUsername: string): Promise<{ userObject: UserObject; error: string }> => {
+export const addAdmin = async (idirUsername: string): Promise<{ error: string }> => {
   const url = `${config.API_BASE_URL}/admin/add-admin`;
   const data = { idirUsername };
   const postParameters = api.generateApiParameters(url, data);
-  const response: { userObject: UserObject; error: string } = await api.post(postParameters);
+  const response: { error: string } = await api.post(postParameters);
   return response;
 };
 

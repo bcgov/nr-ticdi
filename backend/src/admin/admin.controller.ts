@@ -160,12 +160,12 @@ export class AdminController {
   }
 
   @Post('add-admin')
-  async addAdmin(@Body() searchInputs: { idirUsername: string }): Promise<{ userObject: UserObject; error: string }> {
+  async addAdmin(@Body() searchInputs: { idirUsername: string }): Promise<{ error: string }> {
     try {
-      const user = await this.adminService.addAdmin(searchInputs.idirUsername);
-      return { userObject: user, error: null };
+      await this.adminService.addAdmin(searchInputs.idirUsername);
+      return { error: null };
     } catch (err) {
-      return { userObject: null, error: err.message };
+      return { error: err.message };
     }
   }
 

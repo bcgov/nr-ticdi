@@ -83,7 +83,7 @@ const AddAdmin: FC<AddAdminProps> = ({ show, onHide, refreshTable }) => {
           </Form.Group>
           <Form.Group as={Row} className="mb-3">
             <Col sm={{ span: 10, offset: 2 }}>
-              <Button variant="success" onClick={searchUsers} disabled={loading}>
+              <Button variant="success" onClick={searchUsers} disabled={loading} style={{ minWidth: '70px' }}>
                 {loading ? (
                   <Spinner as="span" animation="border" size="sm" role="status" aria-hidden="true" />
                 ) : (
@@ -146,11 +146,16 @@ const AddAdmin: FC<AddAdminProps> = ({ show, onHide, refreshTable }) => {
         {showError && <div className="alert alert-danger">{error}</div>}
       </Modal.Body>
       <Modal.Footer>
-        <Button variant="secondary" onClick={onHide}>
-          Cancel
+        <Button variant="secondary" onClick={onHide} style={{ minWidth: '70px' }}>
+          {loading ? <Spinner as="span" animation="border" size="sm" role="status" aria-hidden="true" /> : 'Cancel'}
         </Button>
 
-        <Button variant="primary" onClick={addAdminHandler} disabled={loading || !userObject}>
+        <Button
+          variant="primary"
+          onClick={addAdminHandler}
+          disabled={loading || !userObject}
+          style={{ minWidth: '160px' }}
+        >
           {loading ? (
             <Spinner as="span" animation="border" size="sm" role="status" aria-hidden="true" />
           ) : (

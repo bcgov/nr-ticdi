@@ -3,7 +3,7 @@ import { AdminData } from '../../table/manage-admins/AdminDataTable';
 import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
-import { Col, Row } from 'react-bootstrap';
+import { Col, Row, Spinner } from 'react-bootstrap';
 import { removeAdmin } from '../../../common/manage-admins';
 
 type RemoveAdminProps = {
@@ -75,10 +75,11 @@ const RemoveAdmin: FC<RemoveAdminProps> = ({ admin, show, onHide, refreshTable }
       </Modal.Body>
       <Modal.Footer>
         <Button variant="secondary" onClick={onHide} disabled={loading}>
-          No
+          {loading ? <Spinner as="span" animation="border" size="sm" role="status" aria-hidden="true" /> : 'No'}
         </Button>
+
         <Button variant="primary" onClick={() => removeHandler()} disabled={loading}>
-          Yes
+          {loading ? <Spinner as="span" animation="border" size="sm" role="status" aria-hidden="true" /> : 'Yes'}
         </Button>
       </Modal.Footer>
     </Modal>

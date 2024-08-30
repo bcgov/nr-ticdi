@@ -110,6 +110,7 @@ export class AdminService {
   }> {
     const url = `${process.env.users_api_base_url}/${process.env.css_environment}/idir/users?&email=${email}`;
     const bearerToken = await this.getToken();
+
     const searchData: SearchResultsItem[] = await axios
       .get(url, {
         headers: { Authorization: 'Bearer ' + bearerToken },
@@ -139,7 +140,8 @@ export class AdminService {
       username: username,
       idirUsername: idirUsername,
     };
-    const roleUrl = `${process.env.users_api_base_url}/integrations/${process.env.integration_id}/${process.env.css_environment}/users/${idirUsername}@idir/roles`;
+    const cleanIdirUsername = idirUsername.split('@')[0].concat('@idir');
+    const roleUrl = `${process.env.users_api_base_url}/integrations/${process.env.integration_id}/${process.env.css_environment}/users/${cleanIdirUsername}/roles`;
     const roles = await axios
       .get(roleUrl, {
         headers: { Authorization: 'Bearer ' + bearerToken },
@@ -165,66 +167,105 @@ export class AdminService {
 
   /**
    * Searches for an IDIR user with the given search params and if only one is found
-   * then gives them the ticdi_admin role
+   * then gives them the ticdi_admin & generate_documents roles in both IDIR and AzureIDIR
    *
    * @param firstName
    * @param lastName
    * @param email
    * @returns user object to be displayed in the frontend
    */
-  async addAdmin(idirUsername: string): Promise<UserObject> {
-    const url = `${process.env.users_api_base_url}/${process.env.css_environment}/idir/users?&guid=${idirUsername}`;
+  async addAdmin(username: string): Promise<void> {
+    username = username.split('@')[0]; // remove any '@idir' or '@azureidir' from the username
     const addAdminUrl = `${process.env.users_api_base_url}/integrations/${process.env.integration_id}/${process.env.css_environment}/user-role-mappings`;
     const bearerToken = await this.getToken();
-    const searchData: SearchResultsItem[] = await axios
-      .get(url, {
-        headers: { Authorization: 'Bearer ' + bearerToken },
-      })
-      .then((res) => {
-        return res.data.data;
-      })
-      .catch((err) => console.log(err.response.data));
-    if (searchData.length > 1) {
-      throw new Error('More than one user was found');
-    } else if (searchData.length == 0) {
-      throw new Error('No users were found');
+
+    try {
+      const idirRolesUrl = `${process.env.users_api_base_url}/integrations/${process.env.integration_id}/${
+        process.env.css_environment
+      }/users/${username + '@idir'}/roles`;
+      const idirRoleData = await axios
+        .get(idirRolesUrl, { headers: { Authorization: 'Bearer ' + bearerToken } })
+        .then((res) => {
+          return res.data.data;
+        })
+        .catch((err) => console.log(err.response.data));
+      if (idirRoleData.length > 0) {
+        const existingUserRoles = idirRoleData.map((item) => item.name).join(', ');
+        console.log(`User already has roles: ${existingUserRoles}`);
+        // throw new Error('User already has roles.');
+      }
+
+      await axios
+        .post(
+          addAdminUrl,
+          {
+            roleName: Role.TICDI_ADMIN,
+            username: username + '@idir',
+            operation: 'add',
+          },
+          { headers: { Authorization: 'Bearer ' + bearerToken } }
+        )
+        .then((res) => {
+          return res.data;
+        })
+        .catch((err) => {
+          console.log(err);
+          throw new Error('Failed to add idir ticdi_admin role');
+        });
+      await axios
+        .post(
+          addAdminUrl,
+          {
+            roleName: Role.GENERATE_DOCUMENTS,
+            username: username + '@idir',
+            operation: 'add',
+          },
+          { headers: { Authorization: 'Bearer ' + bearerToken } }
+        )
+        .then((res) => {
+          return res.data;
+        })
+        .catch((err) => {
+          console.log(err);
+          throw new Error('Failed to add idir generate_documents role');
+        });
+      await axios
+        .post(
+          addAdminUrl,
+          {
+            roleName: Role.TICDI_ADMIN,
+            username: username + '@azureidir',
+            operation: 'add',
+          },
+          { headers: { Authorization: 'Bearer ' + bearerToken } }
+        )
+        .then((res) => {
+          return res.data;
+        })
+        .catch((err) => {
+          console.log(err);
+          throw new Error('Failed to add azureidir ticdi_admin role');
+        });
+      await axios
+        .post(
+          addAdminUrl,
+          {
+            roleName: Role.GENERATE_DOCUMENTS,
+            username: username + '@azureidir',
+            operation: 'add',
+          },
+          { headers: { Authorization: 'Bearer ' + bearerToken } }
+        )
+        .then((res) => {
+          return res.data;
+        })
+        .catch((err) => {
+          console.log(err);
+          throw new Error('Failed to add azureidir generate_documents role');
+        });
+    } catch (err) {
+      console.log(err);
     }
-    const userObject: UserObject = this.formatSearchData(searchData)[0];
-    await axios
-      .post(
-        addAdminUrl,
-        {
-          roleName: Role.TICDI_ADMIN,
-          username: userObject.idirUsername + '@idir',
-          operation: 'add',
-        },
-        { headers: { Authorization: 'Bearer ' + bearerToken } }
-      )
-      .then((res) => {
-        return res.data;
-      })
-      .catch((err) => {
-        console.log(err);
-        throw new Error('Failed to add admin role');
-      });
-    await axios
-      .post(
-        addAdminUrl,
-        {
-          roleName: Role.GENERATE_DOCUMENTS,
-          username: userObject.idirUsername + '@idir',
-          operation: 'add',
-        },
-        { headers: { Authorization: 'Bearer ' + bearerToken } }
-      )
-      .then((res) => {
-        return res.data;
-      })
-      .catch((err) => {
-        console.log(err);
-        throw new Error('Failed to add admin role');
-      });
-    return userObject;
   }
 
   /**
@@ -234,7 +275,7 @@ export class AdminService {
    */
   async getAdminUsers(): Promise<UserObject[]> {
     const bearerToken = await this.getToken();
-    const url = `${process.env.users_api_base_url}/integrations/${process.env.integration_id}/${process.env.css_environment}/roles/ticdi_admin/users`;
+    const url = `${process.env.users_api_base_url}/integrations/${process.env.integration_id}/${process.env.css_environment}/roles/${Role.TICDI_ADMIN}/users`;
     const data: SearchResultsItem[] = await axios
       .get(url, {
         headers: { Authorization: 'Bearer ' + bearerToken },
@@ -249,7 +290,7 @@ export class AdminService {
 
   async getExportData(): Promise<string> {
     const bearerToken = await this.getToken();
-    const url = `${process.env.users_api_base_url}/integrations/${process.env.integration_id}/${process.env.css_environment}/roles/ticdi_admin/users`;
+    const url = `${process.env.users_api_base_url}/integrations/${process.env.integration_id}/${process.env.css_environment}/roles/${Role.TICDI_ADMIN}/users`;
     const data: SearchResultsItem[] = await axios
       .get(url, {
         headers: { Authorization: 'Bearer ' + bearerToken },
@@ -264,18 +305,22 @@ export class AdminService {
   }
 
   /**
-   * Removes the ticdi_admin role from an IDIR user
+   * Removes the ticdi_admin & generate_documents role from an IDIR user
    *
    * @param username
    * @returns null
    */
   async removeAdmin(username: string): Promise<{ error: string | null }> {
-    const ticdiAdminRole = 'ticdi_admin';
     const bearerToken = await this.getToken();
-    const url = `${process.env.users_api_base_url}/integrations/${process.env.integration_id}/${process.env.css_environment}/users/${username}@idir/roles/${ticdiAdminRole}`;
+    const idirUsername = username?.split('@')[0].concat('@idir');
+    const azureidirUsername = username?.split('@')[0].concat('@azureidir');
+    const idirAdminUrl = `${process.env.users_api_base_url}/integrations/${process.env.integration_id}/${process.env.css_environment}/users/${idirUsername}/roles/${Role.TICDI_ADMIN}`;
+    const idirGDUrl = `${process.env.users_api_base_url}/integrations/${process.env.integration_id}/${process.env.css_environment}/users/${idirUsername}/roles/${Role.GENERATE_DOCUMENTS}`;
+    const azureidirAdminUrl = `${process.env.users_api_base_url}/integrations/${process.env.integration_id}/${process.env.css_environment}/users/${azureidirUsername}/roles/${Role.TICDI_ADMIN}`;
+    const azureidirGDUrl = `${process.env.users_api_base_url}/integrations/${process.env.integration_id}/${process.env.css_environment}/users/${azureidirUsername}/roles/${Role.GENERATE_DOCUMENTS}`;
     try {
       await axios
-        .delete(url, {
+        .delete(idirAdminUrl, {
           headers: { Authorization: 'Bearer ' + bearerToken },
         })
         .then((res) => {
@@ -286,7 +331,68 @@ export class AdminService {
         });
     } catch (err) {
       console.log(err.response.data);
-      return { error: 'Failed to remove admin privileges' };
+      if (err?.response?.data?.message?.includes('not associated')) {
+        // ignore error if user is not associated with the role
+      } else {
+        return { error: 'Failed to remove idir_admin role' };
+      }
+    }
+    try {
+      await axios
+        .delete(idirGDUrl, {
+          headers: { Authorization: 'Bearer ' + bearerToken },
+        })
+        .then((res) => {
+          return res;
+        })
+        .catch((err) => {
+          throw err;
+        });
+    } catch (err) {
+      console.log(err.response.data);
+      if (err?.response?.data?.message?.includes('not associated')) {
+        // ignore error if user is not associated with the role
+      } else {
+        return { error: 'Failed to remove generate_documents role' };
+      }
+    }
+    try {
+      await axios
+        .delete(azureidirAdminUrl, {
+          headers: { Authorization: 'Bearer ' + bearerToken },
+        })
+        .then((res) => {
+          return res;
+        })
+        .catch((err) => {
+          throw err;
+        });
+    } catch (err) {
+      console.log(err.response.data);
+      if (err?.response?.data?.message?.includes('not associated')) {
+        // ignore error if user is not associated with the role
+      } else {
+        return { error: 'Failed to remove idir_admin role' };
+      }
+    }
+    try {
+      await axios
+        .delete(azureidirGDUrl, {
+          headers: { Authorization: 'Bearer ' + bearerToken },
+        })
+        .then((res) => {
+          return res;
+        })
+        .catch((err) => {
+          throw err;
+        });
+    } catch (err) {
+      console.log(err.response.data);
+      if (err?.response?.data?.message?.includes('not associated')) {
+        // ignore error if user is not associated with the role
+      } else {
+        return { error: 'Failed to remove generate_documents role' };
+      }
     }
     return { error: null };
   }
@@ -351,12 +457,23 @@ export class AdminService {
    */
   formatSearchData(data: SearchResultsItem[]): UserObject[] {
     let userObjectArray = [];
+    let usernames = new Set();
+
     for (let entry of data) {
+      const idirUsername = entry.username ? entry.username.split('@')[0] : '';
+
+      // if this username has already been added, skip this entry
+      if (usernames.has(idirUsername)) {
+        continue;
+      }
+
+      usernames.add(idirUsername);
+
       const firstName = entry.firstName ? entry.firstName : '';
       const lastName = entry.lastName ? entry.lastName : '';
       const username = entry.attributes.idir_username[0] ? entry.attributes.idir_username[0] : '';
       const email = entry.email ? entry.email : '';
-      const idirUsername = entry.username ? entry.username.replace('@idir', '') : '';
+
       const userObject: UserObject = {
         name: firstName + ' ' + lastName,
         username: username,

@@ -14,7 +14,7 @@ export class Provision {
   @Column({ nullable: true })
   free_text: string;
 
-  @Column({ nullable: true })
+  @Column({ type: 'text', array: true, default: '{}' })
   list_items: string[];
 
   @Column({ nullable: true })

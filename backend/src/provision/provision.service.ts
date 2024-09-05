@@ -272,6 +272,8 @@ export class ProvisionService {
       type: docTypeProvision.type,
       provision_name: docTypeProvision.provision.provision_name,
       free_text: docTypeProvision.provision.free_text,
+      list_items: docTypeProvision.provision.list_items,
+      list_enabled: docTypeProvision.provision.list_enabled,
       help_text: docTypeProvision.provision.help_text,
       category: docTypeProvision.provision.category,
       active_flag: docTypeProvision.provision.active_flag,

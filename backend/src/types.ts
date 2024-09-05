@@ -27,6 +27,8 @@ export type ProvisionJSON = {
   provision_name: string;
   provision_group: number;
   free_text: string;
+  list_items: string[];
+  list_enabled: boolean;
   provision_id: number;
   sequence_value: number;
   doc_type_provision_id: number;
@@ -59,6 +61,8 @@ export type ManageDocTypeProvision = {
   type: string;
   provision_name: string;
   free_text: string;
+  list_items: string[];
+  list_enabled: boolean;
   help_text: string;
   category: string;
   active_flag: boolean;

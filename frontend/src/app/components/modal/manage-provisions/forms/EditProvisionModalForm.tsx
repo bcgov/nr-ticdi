@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import { Provision, ProvisionUpload, Variable } from '../../../../types/types';
 import { Button, Col, Form, Modal, Spinner } from 'react-bootstrap';
 import ManageVariablesTable from '../../../table/manage-provisions/ManageVariablesTable';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPlus, faMinus } from '@fortawesome/free-solid-svg-icons';
 
 interface EditProvisionModalFormProps {
   provision: Provision | undefined;
@@ -26,6 +28,8 @@ const EditProvisionModalForm: React.FC<EditProvisionModalFormProps> = ({
 }) => {
   const [provisionName, setProvisionName] = useState<string>('');
   const [freeText, setFreeText] = useState<string>('');
+  const [listItems, setListItems] = useState<string[]>(['']);
+  const [listEnabled, setListEnabled] = useState<boolean>(false);
   const [helpText, setHelpText] = useState<string>('');
   const [category, setCategory] = useState<string>('');
 
@@ -34,6 +38,8 @@ const EditProvisionModalForm: React.FC<EditProvisionModalFormProps> = ({
       if (provision) {
         setProvisionName(provision.provision_name);
         setFreeText(provision.free_text);
+        setListItems(provision.list_items);
+        setListEnabled(provision.list_enabled);
         setHelpText(provision.help_text);
         setCategory(provision.category);
       }
@@ -58,14 +64,37 @@ const EditProvisionModalForm: React.FC<EditProvisionModalFormProps> = ({
     setCategory(e.target.value);
   };
 
+  const handleListEnabledChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setListEnabled(e.target.checked);
+  };
+
+  const handleListItemChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, index: number) => {
+    const newListItems = [...listItems];
+    newListItems[index] = e.target.value;
+    setListItems(newListItems);
+  };
+
+  const handleAddListItem = () => {
+    setListItems([...listItems, '']);
+  };
+
+  const handleRemoveListItem = (index: number) => {
+    const newListItems = [...listItems];
+    newListItems.splice(index, 1);
+    setListItems(newListItems);
+  };
+
   const handleSaveButton = () => {
     if (provision) {
       const provisionUpload: ProvisionUpload = {
         provision_name: provisionName,
         free_text: freeText,
+        list_items: listItems,
+        list_enabled: listEnabled,
         help_text: helpText,
         category: category,
       };
+      console.log(provisionUpload);
       updateProvisionHandler(provisionUpload, provision.id);
     }
   };
@@ -103,20 +132,49 @@ const EditProvisionModalForm: React.FC<EditProvisionModalFormProps> = ({
             </Col>
           </Form.Group>
 
-          <Form.Group className="mb-3">
-            <Form.Label column sm="12">
-              Free Text
-            </Form.Label>
-            <Col sm="10">
-              <Form.Control
-                as="textarea"
-                rows={3}
-                name="free_text"
-                defaultValue={freeText}
-                onChange={handleFreeTextChange}
-              />
-            </Col>
+          <Form.Group className="mb-3" style={{ marginLeft: '15px', marginTop: '30px' }}>
+            <Form.Check type="checkbox" label="Enable List" checked={listEnabled} onChange={handleListEnabledChange} />
           </Form.Group>
+
+          {listEnabled ? (
+            <Form.Group className="mb-3">
+              <Form.Label column sm="12">
+                List Items
+              </Form.Label>
+              {listItems.map((item, index) => (
+                <div key={index} style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
+                  <Col sm="10">
+                    <Form.Control
+                      as="input"
+                      type="text"
+                      name={`list_item_${index}`}
+                      value={item}
+                      onChange={(e) => handleListItemChange(e, index)}
+                    />
+                  </Col>
+                  <Col sm="2">
+                    <Button variant="link" onClick={() => handleRemoveListItem(index)}>
+                      <FontAwesomeIcon icon={faMinus} />
+                    </Button>
+                  </Col>
+                </div>
+              ))}
+              <div style={{ marginLeft: '15px' }}>
+                <Button variant="success" onClick={handleAddListItem}>
+                  <FontAwesomeIcon icon={faPlus} />
+                </Button>
+              </div>
+            </Form.Group>
+          ) : (
+            <Form.Group className="mb-3">
+              <Form.Label column sm="12">
+                Free Text
+              </Form.Label>
+              <Col sm="10">
+                <Form.Control as="textarea" rows={3} name="free_text" onChange={handleFreeTextChange} />
+              </Col>
+            </Form.Group>
+          )}
 
           <Form.Group className="mb-3">
             <Form.Label column sm="12">

@@ -70,10 +70,12 @@ const ManageProvisionsPage: FC<ManageProvisionsPageProps> = () => {
 
   const updateProvisionHandler = async (provisionUpload: ProvisionUpload, provisionId: number) => {
     await updateProvision({ ...provisionUpload, id: provisionId });
+    refreshTables();
   };
 
   const addProvisionHandler = async (provisionUpload: ProvisionUpload) => {
     await addProvision(provisionUpload);
+    refreshTables();
   };
   const removeProvisionHandler = async (id: number) => {
     await removeProvision(id);
@@ -136,7 +138,6 @@ const ManageProvisionsPage: FC<ManageProvisionsPageProps> = () => {
         show={showAddProvisionModal}
         onHide={() => setShowAddProvisionModal(false)}
         addProvisionHandler={addProvisionHandler}
-        refreshTables={refreshTables}
       />
       <RemoveProvisionModal
         provision={currentProvision}

@@ -27,7 +27,6 @@ const ManageProvisionsTable: React.FC<ManageProvisionsTableProps> = ({
     if (provisions) {
       const sortedData = basicSort(provisions);
       setAllProvisions(sortedData);
-      console.log(provisions[0]);
     }
     if (variables) {
       setAllVariables(variables);

@@ -35,7 +35,7 @@ const Collapsible: FC<CollapsibleProps> = ({ title, children, isOpen, enabled = 
           className={`inlineDiv collapsibleTitle`}
           onClick={toggleCollapsibleOnClick}
         />
-        <div className={`ml-2 inlineDiv collapsibleTitle boldText`} onClick={toggleCollapsibleOnClick}>
+        <div className={`ml-2 inlineDiv collapsibleTitle`} onClick={toggleCollapsibleOnClick}>
           {title}
         </div>
       </div>

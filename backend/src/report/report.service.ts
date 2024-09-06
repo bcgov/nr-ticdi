@@ -137,8 +137,10 @@ export class ReportService {
       }
       return a.provision_group - b.provision_group;
     });
-    let provisions: { [key: string]: { provision_name: string; free_text: string }[] } = {};
-    provisionJson.forEach(({ provision_name, provision_group, free_text }) => {
+    let provisions: {
+      [key: string]: { provision_name: string; free_text: string; list: { item: string }[] }[];
+    } = {};
+    provisionJson.forEach(({ provision_name, provision_group, free_text, list_items, list_enabled }) => {
       if (free_text.includes('«')) {
         // regex which converts «DB_TENURE_TYPE» to {d.DB_Tenure_Type}, also works for VAR_
         free_text = free_text.replace(/«([^»]+)»/g, function (match, innerText) {
@@ -161,11 +163,41 @@ export class ReportService {
         free_text = free_text.replace(/db_name_tenant:convcrlf\(\)}/gi, 'DB_NAME_TENANT:convCRLF()}');
       }
 
+      // do same conversions for list items
+      let list = list_items.map((item) => {
+        if (item.includes('«')) {
+          // regex which converts «DB_TENURE_TYPE» to {d.DB_Tenure_Type}, also works for VAR_
+          item = item.replace(/«([^»]+)»/g, function (match, innerText) {
+            innerText = convertToSpecialCamelCase(innerText);
+            return '{d.' + innerText + '}';
+          });
+        } else if (item.includes('<<')) {
+          // regex which converts <<DB_TENURE_TYPE>> to {d.DB_Tenure_Type}, also works for VAR_
+          item = item.replace(/<<([^>>]+)>>/g, function (match, innerText) {
+            innerText = convertToSpecialCamelCase(innerText);
+            return '{d.' + innerText + '}';
+          });
+        }
+
+        if (item.toLowerCase().includes('db_name_tenant}')) {
+          item = item.replace(/db_name_tenant}/gi, 'DB_NAME_TENANT:convCRLF()}');
+        } else if (item.toLowerCase().includes('db_name_tenant:convcrlf()}')) {
+          item = item.replace(/db_name_tenant:convcrlf\(\)}/gi, 'DB_NAME_TENANT:convCRLF()}');
+        }
+        return { item };
+      });
+
       const key = `SECTION_${provision_group}`;
       if (!provisions[key]) {
         provisions[key] = [];
       }
-      provisions[key].push({ provision_name, free_text });
+
+      // for now, only pass free_text or list, not both
+      if (list_enabled) {
+        provisions[key].push({ provision_name, free_text: null, list });
+      } else {
+        provisions[key].push({ provision_name, free_text, list: [] });
+      }
     });
 
     // get the TTLS DB_ variables

@@ -60,6 +60,8 @@ export class ProvisionController {
       id: number;
       provision: string;
       free_text: string;
+      list_items: string[];
+      list_enabled: boolean;
       help_text: string;
       category: string;
     },

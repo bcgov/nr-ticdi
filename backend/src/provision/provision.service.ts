@@ -48,6 +48,8 @@ export class ProvisionService {
     const existingProvision: Provision = await this.provisionRepository.findOneBy({ id });
     existingProvision.provision_name = provision.provision_name;
     existingProvision.free_text = provision.free_text;
+    existingProvision.list_items = provision.list_items;
+    existingProvision.list_enabled = provision.list_enabled;
     existingProvision.help_text = provision.help_text;
     existingProvision.category = provision.category;
     existingProvision.update_userid = provision.update_userid;
@@ -272,6 +274,8 @@ export class ProvisionService {
       type: docTypeProvision.type,
       provision_name: docTypeProvision.provision.provision_name,
       free_text: docTypeProvision.provision.free_text,
+      list_items: docTypeProvision.provision.list_items,
+      list_enabled: docTypeProvision.provision.list_enabled,
       help_text: docTypeProvision.provision.help_text,
       category: docTypeProvision.provision.category,
       active_flag: docTypeProvision.provision.active_flag,

@@ -1,3 +1,7 @@
+/************************
+ ************************
+ * TTLS Types
+ */
 export interface DTR {
   dtid: number | null;
   fileNum: string | null;
@@ -112,47 +116,16 @@ export interface InterestedParties {
   address: string | null;
 }
 
-export type DocumentDataVariableObject = {
-  data_variable_value: string;
-  id: number;
-  provision_variable: ProvisionVariableObject;
-};
+/*********************************************
+ * Provision
+ */
 
-export type ProvisionVariableObject = {
-  id: number;
-  variable_name: string;
-  variable_value: string;
-  help_text: string;
-  create_userid: string;
-  update_userid: string;
-  create_timestamp: string;
-  update_timestamp: string;
-  provision: Provision;
-};
-
-export type SimpleVariableObject = {
-  id: number;
-  variable_name: string;
-  variable_value: string;
-  help_text: string;
-  create_userid: string;
-  update_userid: string;
-  create_timestamp: string;
-  update_timestamp: string;
-  provision_id: number;
-};
-
-export type DocumentDataProvisionObject = {
-  provision_free_text: string;
-  id: number;
-  provision: ProvisionObject;
-};
-
-// Used on manage-templates page?
 export type ProvisionObject = {
   type: string;
   provision_name: string;
   free_text: string;
+  list_items: string[];
+  list_enabled: boolean;
   category: string;
   active_flag: boolean;
   create_userid: string;
@@ -171,6 +144,153 @@ export type ProvisionGroup = {
   provision_group_text: string;
   max: number;
 };
+
+export type GroupMax = {
+  provision_group: number;
+  max: number;
+  provision_group_text: string;
+};
+
+export type Provision = {
+  active_flag: boolean;
+  category: string;
+  create_timestamp: string;
+  create_userid: string;
+  free_text: string;
+  list_items: string[];
+  list_enabled: boolean;
+  help_text: string;
+  id: number;
+  is_deleted: boolean;
+  provision_name: string;
+  update_timestamp: string;
+  update_userid: string;
+};
+
+// used on Manage Provisions page
+export type ProvisionUpload = {
+  provision_name: string;
+  free_text: string;
+  list_items: string[];
+  list_enabled: boolean;
+  help_text: string;
+  category: string;
+};
+
+// doc types have their own version of each global provision known as a DocType Provision
+export type DocTypeProvision = {
+  id: number;
+  associated: boolean;
+  sequence_value: number;
+  type: string;
+  document_type?: DocumentType;
+  provision?: Provision;
+  provision_group?: ProvisionGroup;
+  document_data_provisions?: DocumentDataProvision[];
+};
+
+// used in various tables
+export type ProvisionDataObject = {
+  id: number;
+  associated: boolean;
+  sequence_value: number;
+  type: string;
+  provision_id: number;
+  provision_name: string;
+  category: string;
+  free_text: string;
+  list_items: string[];
+  list_enabled: boolean;
+  help_text: string;
+  active_flag: boolean; // from global provision
+  is_deleted: boolean; // from global provision
+  create_userid: string;
+  create_timestamp: string;
+  update_userid: string;
+  update_timestamp: string;
+  provision_group: ProvisionGroup;
+  document_type: DocumentType;
+};
+
+export type ReducedProvisionDataObject = {
+  id: number;
+  associated: boolean;
+  sequence_value: number;
+  type: string;
+  provision_id: number;
+  provision_name: string;
+  category: string;
+  free_text: string;
+  list_items: string[];
+  list_enabled: boolean;
+  help_text: string;
+  active_flag: boolean; // from global provision
+  is_deleted: boolean; // from global provision
+  create_userid: string;
+  create_timestamp: string;
+  update_userid: string;
+  update_timestamp: string;
+  provision_group: ProvisionGroup;
+};
+
+/*********************************************
+ * Variable
+ */
+
+export type Variable = {
+  variable_name: string;
+  variable_value: string;
+  help_text: string;
+  id: number;
+  provision_id: number;
+};
+
+export type DocumentDataVariableObject = {
+  data_variable_value: string;
+  id: number;
+  provision_variable: ProvisionVariableObject;
+};
+
+export type ProvisionVariableObject = {
+  id: number;
+  variable_name: string;
+  variable_value: string;
+  help_text: string;
+  create_userid: string;
+  update_userid: string;
+  create_timestamp: string;
+  update_timestamp: string;
+  provision: Provision;
+};
+
+export type VariableUpload = {
+  provision_id: number;
+  variable_name: string;
+  variable_value: string;
+  help_text: string;
+};
+
+// used on Landing Page
+export type SavedVariableInfo = {
+  id: number;
+  variable_id: number;
+  saved_value: string;
+};
+
+export type VariableData = {
+  id: number;
+  variable_name: string;
+  variable_value: string;
+  help_text: string;
+  create_userid: string;
+  update_userid: string;
+  create_timestamp: string;
+  update_timestamp: string;
+  provision: Provision;
+};
+/*********************************************
+ * Document Data
+ */
 
 export type DocumentDataObject = {
   documentData: {
@@ -191,61 +311,54 @@ export type DocumentDataObject = {
   variableIds: number[];
 };
 
-export type TemplateInfo = {
-  template_version: number;
-  file_name: string;
-  create_timestamp: string;
-  update_timestamp: string;
-  active_flag: boolean;
-  view: any; // remove from route
-  remove: any; // remove from route
-  preview: any; // remove from route
-  edit: any;
+export type DocumentDataProvisionObject = {
+  provision_free_text: string;
+  provision_list_items: string[];
+  provision_list_enabled: boolean;
   id: number;
+  provision: ProvisionObject;
 };
 
-export type GroupMax = {
-  provision_group: number;
-  max: number;
-  provision_group_text: string;
-};
-
-export type Provision = {
-  active_flag: boolean;
-  category: string;
-  create_timestamp: string;
+export type DocumentData = {
+  dtid: number;
+  template_id: number;
+  status: string;
+  active: boolean;
   create_userid: string;
-  free_text: string;
-  help_text: string;
-  id: number;
-  is_deleted: boolean;
-  provision_name: string;
-  update_timestamp: string;
   update_userid: string;
+  create_timestamp: Date;
+  update_timestamp: Date;
+  document_data_provisions?: DocumentDataProvision[];
+  document_data_variables?: DocumentDataVariable[];
+  document_type?: DocumentType;
 };
 
-export type Variable = {
-  variable_name: string;
-  variable_value: string;
-  help_text: string;
+export type DocumentDataProvision = {
   id: number;
-  provision_id: number;
+  document_type_provision?: DocTypeProvision;
+  document_provision?: Provision;
+  document_data?: DocumentData;
 };
 
-// used on Manage Provisions page
-export type ProvisionUpload = {
-  provision_name: string;
-  free_text: string;
-  help_text: string;
-  category: string;
+export type DocumentDataVariable = {
+  id: number;
+  data_variable_value: string;
+  document_variable_id: number;
+  document_data_id: number;
 };
 
-export type VariableUpload = {
-  provision_id: number;
-  variable_name: string;
-  variable_value: string;
-  help_text: string;
+export type DocumentDataDTO = {
+  provisions: ProvisionDataObject[];
+  variables: ProvisionVariableObject[];
+  preselectedProvisionIds: number[];
+  preselectedVariableIds: number[];
+  documentDataProvisions: DocumentDataProvision[];
+  savedVariableInfo: SavedVariableInfo[];
 };
+
+/*********************************************
+ * Other
+ */
 
 export type SearchData = {
   dtid: number;
@@ -271,109 +384,17 @@ export type DocType = {
   update_timestamp: string;
 };
 
-export type DocumentData = {
-  dtid: number;
-  template_id: number;
-  status: string;
-  active: boolean;
-  create_userid: string;
-  update_userid: string;
-  create_timestamp: Date;
-  update_timestamp: Date;
-  document_data_provisions?: DocumentDataProvision[];
-  document_data_variables?: DocumentDataVariable[];
-  document_type?: DocumentType;
-};
-
-export type DocTypeProvision = {
-  id: number;
-  associated: boolean;
-  sequence_value: number;
-  type: string;
-  document_type?: DocumentType;
-  provision?: Provision;
-  provision_group?: ProvisionGroup;
-  document_data_provisions?: DocumentDataProvision[];
-};
-
-export type DocumentDataProvision = {
-  id: number;
-  document_type_provision?: DocTypeProvision;
-  document_provision?: Provision;
-  document_data?: DocumentData;
-};
-
-export type DocumentDataVariable = {
-  id: number;
-  data_variable_value: string;
-  document_variable_id: number;
-  document_data_id: number;
-};
-
-export type SavedVariableInfo = {
-  id: number;
-  variable_id: number;
-  saved_value: string;
-};
-
-export type DocumentDataDTO = {
-  provisions: ProvisionDataObject[];
-  variables: ProvisionVariableObject[];
-  preselectedProvisionIds: number[];
-  preselectedVariableIds: number[];
-  documentDataProvisions: DocumentDataProvision[];
-  savedVariableInfo: SavedVariableInfo[];
-};
-
-export type ProvisionDataObject = {
-  id: number;
-  associated: boolean;
-  sequence_value: number;
-  type: string;
-  provision_id: number;
-  provision_name: string;
-  category: string;
-  free_text: string;
-  help_text: string;
-  active_flag: boolean; // from global provision
-  is_deleted: boolean; // from global provision
-  create_userid: string;
-  create_timestamp: string;
-  update_userid: string;
-  update_timestamp: string;
-  provision_group: ProvisionGroup;
-  document_type: DocumentType;
-};
-
-export type ReducedProvisionDataObject = {
-  id: number;
-  associated: boolean;
-  sequence_value: number;
-  type: string;
-  provision_id: number;
-  provision_name: string;
-  category: string;
-  free_text: string;
-  help_text: string;
-  active_flag: boolean; // from global provision
-  is_deleted: boolean; // from global provision
-  create_userid: string;
-  create_timestamp: string;
-  update_userid: string;
-  update_timestamp: string;
-  provision_group: ProvisionGroup;
-};
-
-export type VariableData = {
-  id: number;
-  variable_name: string;
-  variable_value: string;
-  help_text: string;
-  create_userid: string;
-  update_userid: string;
+export type TemplateInfo = {
+  template_version: number;
+  file_name: string;
   create_timestamp: string;
   update_timestamp: string;
-  provision: Provision;
+  active_flag: boolean;
+  view: any; // remove from route
+  remove: any; // remove from route
+  preview: any; // remove from route
+  edit: any;
+  id: number;
 };
 
 export type UserObject = {

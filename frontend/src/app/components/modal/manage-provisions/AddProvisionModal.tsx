@@ -69,7 +69,7 @@ const AddProvisionModal: React.FC<AddProvisionModalProps> = ({ show, addProvisio
       };
 
       await addProvisionHandler(provisionUpload);
-      onHide();
+      handleOnHide();
     } catch (err) {
       console.log('Error adding provision');
       console.log(err);
@@ -78,13 +78,19 @@ const AddProvisionModal: React.FC<AddProvisionModalProps> = ({ show, addProvisio
     }
   };
 
+  const handleOnHide = () => {
+    onHide();
+    setListEnabled(false);
+    setListItems(['']);
+  };
+
   return (
-    <Modal show={show} onHide={onHide} size="lg">
+    <Modal show={show} onHide={handleOnHide} size="lg">
       <Modal.Header>
         <Modal.Title>Add Provision</Modal.Title>
         <Button
           variant="none"
-          onClick={onHide}
+          onClick={handleOnHide}
           style={{
             marginLeft: 'auto',
             border: 'none',
@@ -176,7 +182,7 @@ const AddProvisionModal: React.FC<AddProvisionModalProps> = ({ show, addProvisio
         </Form>
       </Modal.Body>
       <Modal.Footer>
-        <Button variant="secondary" onClick={onHide}>
+        <Button variant="secondary" onClick={handleOnHide}>
           Cancel
         </Button>
 

@@ -94,7 +94,6 @@ const EditProvisionModalForm: React.FC<EditProvisionModalFormProps> = ({
         help_text: helpText,
         category: category,
       };
-      console.log(provisionUpload);
       updateProvisionHandler(provisionUpload, provision.id);
     }
   };

@@ -133,7 +133,13 @@ const EditProvisionModalForm: React.FC<EditProvisionModalFormProps> = ({
           </Form.Group>
 
           <Form.Group className="mb-3" style={{ marginLeft: '15px', marginTop: '30px' }}>
-            <Form.Check type="checkbox" label="Enable List" checked={listEnabled} onChange={handleListEnabledChange} />
+            <Form.Check
+              type="checkbox"
+              id="listEnabledCheckbox"
+              label={<label htmlFor="listEnabledCheckbox">Enable List</label>}
+              checked={listEnabled}
+              onChange={handleListEnabledChange}
+            />
           </Form.Group>
 
           {listEnabled ? (

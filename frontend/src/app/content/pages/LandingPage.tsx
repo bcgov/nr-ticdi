@@ -401,7 +401,9 @@ const LandingPage: FC = () => {
       <div className="h1">{documentType ? `Preview - ${documentType.name}` : 'Document Preview'}</div>
       <hr />
       <div className="mb-3 mt-3">
-        <div className="font-weight-bold inlineDiv">DTID:</div>
+        <div className="inlineDiv">
+          <b>DTID:</b>
+        </div>
         <div className="inlineDiv ml-4 mr-4">
           <input
             type="number"
@@ -432,29 +434,35 @@ const LandingPage: FC = () => {
           Clear
         </Button>
       </div>
-
       {showError && (
         <Alert variant="danger" className="mb-3 d-inline-block" style={{ width: 'auto', maxWidth: '100%' }}>
           {error}
         </Alert>
       )}
       <div className="mb-3">
-        <div className="font-weight-bold inlineDiv mr-1">Tenure File Number:</div>
+        <div className="inlineDiv mr-1">
+          <b>Tenure File Number:</b>
+        </div>
         <div className="inlineDiv" id="tfn">
           {data?.fileNum || <Skeleton />}
         </div>
       </div>
       <div className="mb-3">
-        <div className="font-weight-bold inlineDiv mr-1">Primary Contact Name:</div>
+        <div className="inlineDiv mr-1">
+          <b>Primary Contact Name:</b>
+        </div>
         <div className="inlineDiv">{data?.primaryContactName}</div>
       </div>
       <h3>Create Document</h3>
       <Row className="mb-3">
-        <div className="ml-3 mr-3">
+        <div className="ml-3">
           <b>Document Type:</b>
         </div>
-        <div>
+      </Row>
+      <Row className="mb-3">
+        <div className="ml-3">
           <select
+            className="form-control"
             value={selectedDocTypeId || ''}
             disabled={loading || !dtid || !data || showError}
             onChange={handleDocTypeChange}
@@ -477,7 +485,6 @@ const LandingPage: FC = () => {
       <Collapsible title="Interested Parties" isOpen={isOpen}>
         {data ? <InterestedParties data={data!} /> : <Skeleton />}
       </Collapsible>
-
       <Collapsible title="Provisions" isOpen={false} enabled={provisionGroups && dtid && documentType ? true : false}>
         {provisionGroups && dtid && documentType ? (
           <Provisions dtid={dtid} documentType={documentType} provisionGroups={provisionGroups} />
@@ -485,11 +492,9 @@ const LandingPage: FC = () => {
           <></>
         )}
       </Collapsible>
-
       <Collapsible title="Variables" isOpen={false} enabled={provisionGroups && dtid && documentType ? true : false}>
         {provisionGroups && dtid && documentType ? <VariablesTable onVariableEdit={handleVariableEdit} /> : <></>}
       </Collapsible>
-
       <>
         {' '}
         {showGenerateError && (

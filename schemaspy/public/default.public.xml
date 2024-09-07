@@ -201,6 +201,8 @@
          <column autoUpdated="false" defaultValue="null" digits="0" id="8" name="update_userid" nullable="true" remarks="" size="2147483647" type="varchar" typeCode="12"/>
          <column autoUpdated="false" defaultValue="now()" digits="6" id="9" name="create_timestamp" nullable="false" remarks="" size="29" type="timestamp" typeCode="93"/>
          <column autoUpdated="false" defaultValue="now()" digits="6" id="10" name="update_timestamp" nullable="false" remarks="" size="29" type="timestamp" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="'{}'::text[]" digits="0" id="11" name="list_items" nullable="true" remarks="" size="2147483647" type="_text" typeCode="2003"/>
+         <column autoUpdated="false" defaultValue="false" digits="0" id="12" name="list_enabled" nullable="true" remarks="" size="1" type="bool" typeCode="-7"/>
          <primaryKey column="id" sequenceNumberInPK="1"/>
          <index name="PK_provision" unique="true">
             <column ascending="true" name="id"/>

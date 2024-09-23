@@ -176,7 +176,13 @@ const EditProvisionModalForm: React.FC<EditProvisionModalFormProps> = ({
                 Free Text
               </Form.Label>
               <Col sm="10">
-                <Form.Control as="textarea" rows={3} name="free_text" onChange={handleFreeTextChange} />
+                <Form.Control
+                  as="textarea"
+                  defaultValue={freeText}
+                  rows={3}
+                  name="free_text"
+                  onChange={handleFreeTextChange}
+                />
               </Col>
             </Form.Group>
           )}

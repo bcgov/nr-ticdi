@@ -452,4 +452,10 @@ export class DocumentDataService {
       return { deleted: false, message: err.message };
     }
   }
+
+  async removeByDocTypeId(document_type_id: number) {
+    return this.documentDataRepository.delete({
+      document_type: { id: document_type_id },
+    });
+  }
 }

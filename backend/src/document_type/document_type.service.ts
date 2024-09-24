@@ -127,6 +127,10 @@ export class DocumentTypeService {
     }
   }
 
+  async removeProvisionGroupByDocTypeId(document_type_id: number) {
+    return this.provisionGroupRepository.delete({ document_type: { id: document_type_id } });
+  }
+
   async updateGroupMaximums(provision_group: number, max: number, provision_group_text: string) {
     let provisionGroup: ProvisionGroup = await this.provisionGroupRepository.findOneBy({
       provision_group: provision_group,

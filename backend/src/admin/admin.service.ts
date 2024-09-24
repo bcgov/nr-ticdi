@@ -7,6 +7,7 @@ import { DocumentTypeService } from 'src/document_type/document_type.service';
 import { DocumentType } from 'src/document_type/entities/document_type.entity';
 import { TTLSService } from 'src/ttls/ttls.service';
 import { Role } from 'src/enum/role.enum';
+import { DocumentDataService } from 'src/document_data/document_data.service';
 
 const axios = require('axios');
 
@@ -20,7 +21,8 @@ export class AdminService {
     private readonly ttlsService: TTLSService,
     private readonly documentTemplateService: DocumentTemplateService,
     private readonly provisionService: ProvisionService,
-    private readonly documentTypeService: DocumentTypeService
+    private readonly documentTypeService: DocumentTypeService,
+    private readonly documentDataService: DocumentDataService
   ) {
     hostname = process.env.backend_url ? process.env.backend_url : `http://localhost`;
     // local development backend port is 3001, docker backend port is 3000
@@ -443,6 +445,12 @@ export class AdminService {
     try {
       // remove the related doc type provisions
       await this.provisionService.removeDocTypeProvisions(document_type_id);
+      // remove the related doc type provision groups
+      await this.documentTypeService.removeProvisionGroupByDocTypeId(document_type_id);
+      // remove templates related to the doc type
+      await this.documentTemplateService.removeByDocTypeId(document_type_id);
+      // remove the related doc type data
+      await this.documentDataService.removeByDocTypeId(document_type_id);
       // remove the doc type
       await this.documentTypeService.remove(document_type_id);
     } catch (err) {

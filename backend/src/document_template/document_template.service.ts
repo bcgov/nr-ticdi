@@ -141,6 +141,10 @@ export class DocumentTemplateService {
     return { id: 0 };
   }
 
+  async removeByDocTypeId(document_type_id: number): Promise<void> {
+    await this.documentTemplateRepository.delete({ document_type: { id: document_type_id } });
+  }
+
   async findAll(document_type_id: number): Promise<DocumentTemplate[]> {
     return this.documentTemplateRepository.find({
       where: { is_deleted: false, document_type: { id: document_type_id } },

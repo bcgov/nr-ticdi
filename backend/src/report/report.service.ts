@@ -140,7 +140,7 @@ export class ReportService {
     let provisions: {
       [key: string]: { provision_name: string; free_text: string; list: { item: string }[] }[];
     } = {};
-    provisionJson.forEach(({ provision_name, provision_group, free_text, list_items, list_enabled }) => {
+    provisionJson.forEach(({ provision_name, provision_group, free_text, list_items }) => {
       if (free_text.includes('«')) {
         // regex which converts «DB_TENURE_TYPE» to {d.DB_Tenure_Type}, also works for VAR_
         free_text = free_text.replace(/«([^»]+)»/g, function (match, innerText) {
@@ -192,12 +192,7 @@ export class ReportService {
         provisions[key] = [];
       }
 
-      // for now, only pass free_text or list, not both
-      if (list_enabled) {
-        provisions[key].push({ provision_name, free_text: null, list });
-      } else {
-        provisions[key].push({ provision_name, free_text, list: [] });
-      }
+      provisions[key].push({ provision_name, free_text, list });
     });
 
     // get the TTLS DB_ variables

@@ -18,9 +18,6 @@ export class Provision {
   list_items: string[];
 
   @Column({ nullable: true })
-  list_enabled: boolean;
-
-  @Column({ nullable: true })
   help_text: string;
 
   @Column({ nullable: true })
@@ -66,7 +63,6 @@ export class Provision {
     provision_name?: string,
     free_text?: string,
     list_items?: string[],
-    list_enabled?: boolean,
     category?: string,
     active_flag?: boolean,
     create_userid?: string,
@@ -75,7 +71,6 @@ export class Provision {
     this.provision_name = provision_name || '';
     this.free_text = free_text || '';
     this.list_items = list_items || [];
-    this.list_enabled = list_enabled || false;
     this.category = category || '';
     this.active_flag = active_flag || true;
     this.create_userid = create_userid || '';

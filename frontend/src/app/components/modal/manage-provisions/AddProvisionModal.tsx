@@ -15,7 +15,6 @@ const AddProvisionModal: React.FC<AddProvisionModalProps> = ({ show, addProvisio
   const [provisionName, setProvisionName] = useState<string>('');
   const [freeText, setFreeText] = useState<string>('');
   const [listItems, setListItems] = useState<string[]>(['']);
-  const [listEnabled, setListEnabled] = useState<boolean>(false);
   const [helpText, setHelpText] = useState<string>('');
   const [category, setCategory] = useState<string>('');
 
@@ -33,10 +32,6 @@ const AddProvisionModal: React.FC<AddProvisionModalProps> = ({ show, addProvisio
 
   const handleCategoryTextChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setCategory(e.target.value);
-  };
-
-  const handleListEnabledChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setListEnabled(e.target.checked);
   };
 
   const handleListItemChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, index: number) => {
@@ -62,8 +57,7 @@ const AddProvisionModal: React.FC<AddProvisionModalProps> = ({ show, addProvisio
       const provisionUpload: ProvisionUpload = {
         provision_name: provisionName,
         free_text: freeText,
-        list_items: listEnabled ? listItems : [],
-        list_enabled: listEnabled,
+        list_items: listItems ? listItems : [],
         help_text: helpText,
         category: category,
       };
@@ -80,7 +74,6 @@ const AddProvisionModal: React.FC<AddProvisionModalProps> = ({ show, addProvisio
 
   const handleOnHide = () => {
     onHide();
-    setListEnabled(false);
     setListItems(['']);
   };
 
@@ -112,55 +105,43 @@ const AddProvisionModal: React.FC<AddProvisionModalProps> = ({ show, addProvisio
             </Col>
           </Form.Group>
 
-          <Form.Group className="mb-3" style={{ marginLeft: '15px', marginTop: '30px' }}>
-            <Form.Check
-              type="checkbox"
-              id="listEnabledCheckbox"
-              label={<label htmlFor="listEnabledCheckbox">Enable List</label>}
-              checked={listEnabled}
-              onChange={handleListEnabledChange}
-            />
+          <Form.Group className="mb-3">
+            <Form.Label column sm="12">
+              Free Text
+            </Form.Label>
+            <Col sm="10">
+              <Form.Control as="textarea" rows={3} name="free_text" onChange={handleFreeTextChange} />
+            </Col>
           </Form.Group>
 
-          {listEnabled ? (
-            <Form.Group className="mb-3">
-              <Form.Label column sm="12">
-                List Items
-              </Form.Label>
-              {listItems.map((item, index) => (
-                <div key={index} style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
-                  <Col sm="10">
-                    <Form.Control
-                      as="input"
-                      type="text"
-                      name={`list_item_${index}`}
-                      value={item}
-                      onChange={(e) => handleListItemChange(e, index)}
-                    />
-                  </Col>
-                  <Col sm="2">
-                    <Button variant="link" onClick={() => handleRemoveListItem(index)}>
-                      <FontAwesomeIcon icon={faMinus} />
-                    </Button>
-                  </Col>
-                </div>
-              ))}
-              <div style={{ marginLeft: '15px' }}>
-                <Button variant="success" onClick={handleAddListItem}>
-                  <FontAwesomeIcon icon={faPlus} />
-                </Button>
+          <Form.Group className="mb-3">
+            <Form.Label column sm="12">
+              List Items
+            </Form.Label>
+            {listItems.map((item, index) => (
+              <div key={index} style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
+                <Col sm="10">
+                  <Form.Control
+                    as="input"
+                    type="text"
+                    name={`list_item_${index}`}
+                    value={item}
+                    onChange={(e) => handleListItemChange(e, index)}
+                  />
+                </Col>
+                <Col sm="2">
+                  <Button variant="link" onClick={() => handleRemoveListItem(index)}>
+                    <FontAwesomeIcon icon={faMinus} />
+                  </Button>
+                </Col>
               </div>
-            </Form.Group>
-          ) : (
-            <Form.Group className="mb-3">
-              <Form.Label column sm="12">
-                Free Text
-              </Form.Label>
-              <Col sm="10">
-                <Form.Control as="textarea" rows={3} name="free_text" onChange={handleFreeTextChange} />
-              </Col>
-            </Form.Group>
-          )}
+            ))}
+            <div style={{ marginLeft: '15px' }}>
+              <Button variant="success" onClick={handleAddListItem}>
+                <FontAwesomeIcon icon={faPlus} />
+              </Button>
+            </div>
+          </Form.Group>
 
           <Form.Group className="mb-3">
             <Form.Label column sm="12">

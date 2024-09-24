@@ -125,7 +125,6 @@ export type ProvisionObject = {
   provision_name: string;
   free_text: string;
   list_items: string[];
-  list_enabled: boolean;
   category: string;
   active_flag: boolean;
   create_userid: string;
@@ -158,7 +157,6 @@ export type Provision = {
   create_userid: string;
   free_text: string;
   list_items: string[];
-  list_enabled: boolean;
   help_text: string;
   id: number;
   is_deleted: boolean;
@@ -172,7 +170,6 @@ export type ProvisionUpload = {
   provision_name: string;
   free_text: string;
   list_items: string[];
-  list_enabled: boolean;
   help_text: string;
   category: string;
 };
@@ -200,7 +197,6 @@ export type ProvisionDataObject = {
   category: string;
   free_text: string;
   list_items: string[];
-  list_enabled: boolean;
   help_text: string;
   active_flag: boolean; // from global provision
   is_deleted: boolean; // from global provision
@@ -222,7 +218,6 @@ export type ReducedProvisionDataObject = {
   category: string;
   free_text: string;
   list_items: string[];
-  list_enabled: boolean;
   help_text: string;
   active_flag: boolean; // from global provision
   is_deleted: boolean; // from global provision
@@ -314,7 +309,6 @@ export type DocumentDataObject = {
 export type DocumentDataProvisionObject = {
   provision_free_text: string;
   provision_list_items: string[];
-  provision_list_enabled: boolean;
   id: number;
   provision: ProvisionObject;
 };

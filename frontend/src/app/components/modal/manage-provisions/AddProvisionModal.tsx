@@ -14,7 +14,7 @@ const AddProvisionModal: React.FC<AddProvisionModalProps> = ({ show, addProvisio
   const [loading, setLoading] = useState<boolean>(false);
   const [provisionName, setProvisionName] = useState<string>('');
   const [freeText, setFreeText] = useState<string>('');
-  const [listItems, setListItems] = useState<string[]>(['']);
+  const [listItems, setListItems] = useState<string[]>([]);
   const [helpText, setHelpText] = useState<string>('');
   const [category, setCategory] = useState<string>('');
 

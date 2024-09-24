@@ -335,7 +335,6 @@ const LandingPage: FC = () => {
         provision_name: provision.provision_name,
         free_text: provision.free_text,
         list_items: provision.list_items,
-        list_enabled: provision.list_enabled,
       };
     });
     const selectedVariables: Variable[] = variables.filter((variable) => selectedVariableIds.includes(variable.id));

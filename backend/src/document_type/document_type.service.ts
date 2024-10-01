@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
 import { DocumentType } from './entities/document_type.entity';
 import { ProvisionGroup } from './entities/provision_group.entity';
+import { DocumentTypeProvision } from 'src/provision/entities/document_type_provision';
 
 @Injectable()
 export class DocumentTypeService {
@@ -10,7 +11,9 @@ export class DocumentTypeService {
     @InjectRepository(DocumentType)
     private documentTypeRepository: Repository<DocumentType>,
     @InjectRepository(ProvisionGroup)
-    private provisionGroupRepository: Repository<ProvisionGroup>
+    private provisionGroupRepository: Repository<ProvisionGroup>,
+    @InjectRepository(DocumentTypeProvision)
+    private documentTypeProvisionRepository: Repository<DocumentTypeProvision>
   ) {}
 
   async findById(id: number): Promise<DocumentType | undefined> {
@@ -120,6 +123,11 @@ export class DocumentTypeService {
   }
 
   async removeProvisionGroup(provision_group_id: number) {
+    await this.documentTypeProvisionRepository.update(
+      { provision_group: { id: provision_group_id } },
+      { provision_group: null }
+    );
+
     const result = await this.provisionGroupRepository.delete(provision_group_id);
 
     if (result.affected === 0) {

@@ -261,7 +261,7 @@ const LandingPage: FC = () => {
   const validateProvisions = (): string | null => {
     const mandatoryGroups: number[] = [];
     for (let p of provisions) {
-      if (p.type === 'M' && !mandatoryGroups.includes(p.provision_group.provision_group)) {
+      if (p.type === 'M' && p.provision_group && !mandatoryGroups.includes(p.provision_group.provision_group)) {
         mandatoryGroups.push(p.provision_group.provision_group);
       }
     }

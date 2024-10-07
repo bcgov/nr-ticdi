@@ -415,7 +415,7 @@ export class ReportService {
         mailing_country_code: tenantAddr ? tenantAddr.countryCd : '',
         mailing_country: tenantAddr ? tenantAddr.country : '',
         location_description: rawData.locLand,
-        tenure: tenure ? JSON.stringify(tenure) : '',
+        tenure: tenure ? tenure : '',
       };
       data = {
         DTID: mappedData.dtid,

@@ -32,7 +32,6 @@ const GlobalProvisionModal: FC<GlobalProvisionModalProps> = ({ provision, show, 
       meta: { customCss: { width: '40%' } },
     }),
   ];
-  console.log(provision);
   return (
     <Modal show={show} onHide={onHide} size="lg">
       <Modal.Header closeButton>

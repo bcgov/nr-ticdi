@@ -51,6 +51,21 @@ const GlobalProvisionModal: FC<GlobalProvisionModalProps> = ({ provision, show, 
           value={provision?.free_text}
           style={{ minHeight: '100px' }}
         />
+        <label style={{ marginTop: '15px', fontWeight: 'bold' }}>List Items:</label>
+        {/** map list items here, the object is a string list accessible with: provision?.list */}
+        {provision && provision.list_items && provision.list_items.length > 0 ? (
+          provision?.list_items.map((item, index) => (
+            <input
+              key={index}
+              className="form-control readonlyInput"
+              readOnly
+              value={item}
+              style={{ marginBottom: '5px' }}
+            />
+          ))
+        ) : (
+          <input className="form-control readonlyInput" readOnly value="" style={{ marginBottom: '5px' }} />
+        )}
         <label style={{ marginTop: '15px', fontWeight: 'bold' }}>Help Text:</label>
         <textarea
           className="form-control readonlyInput"

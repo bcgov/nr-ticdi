@@ -1,1 +1,0 @@
-UPDATE document_type_provision SET type='' WHERE type IS NULL;

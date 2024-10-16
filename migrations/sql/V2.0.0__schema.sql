@@ -16,14 +16,14 @@ SET xmloption = content;
 SET client_min_messages = warning;
 SET row_security = off;
 
---
--- Name: USERS; Type: SCHEMA; Schema: -; Owner: nr-ticdi
---
+-- --
+-- -- Name: USERS; Type: SCHEMA; Schema: -; Owner: nr-ticdi
+-- --
 
-CREATE SCHEMA "USERS";
+-- CREATE SCHEMA "USERS";
 
 
-ALTER SCHEMA "USERS" OWNER TO "nr-ticdi";
+-- ALTER SCHEMA "USERS" OWNER TO "nr-ticdi";
 
 --
 -- Name: public; Type: SCHEMA; Schema: -; Owner: nr-ticdi
@@ -32,31 +32,31 @@ ALTER SCHEMA "USERS" OWNER TO "nr-ticdi";
 -- *not* creating schema, since initdb creates it
 
 
-ALTER SCHEMA public OWNER TO "nr-ticdi";
+-- ALTER SCHEMA public OWNER TO "nr-ticdi";
 
 SET default_tablespace = '';
 
 SET default_table_access_method = heap;
 
---
--- Name: flyway_schema_history; Type: TABLE; Schema: USERS; Owner: nr-ticdi
---
+-- --
+-- -- Name: flyway_schema_history; Type: TABLE; Schema: USERS; Owner: nr-ticdi
+-- --
 
-CREATE TABLE "USERS".flyway_schema_history (
-    installed_rank integer NOT NULL,
-    version character varying(50),
-    description character varying(200) NOT NULL,
-    type character varying(20) NOT NULL,
-    script character varying(1000) NOT NULL,
-    checksum integer,
-    installed_by character varying(100) NOT NULL,
-    installed_on timestamp without time zone DEFAULT now() NOT NULL,
-    execution_time integer NOT NULL,
-    success boolean NOT NULL
-);
+-- CREATE TABLE "USERS".flyway_schema_history (
+--     installed_rank integer NOT NULL,
+--     version character varying(50),
+--     description character varying(200) NOT NULL,
+--     type character varying(20) NOT NULL,
+--     script character varying(1000) NOT NULL,
+--     checksum integer,
+--     installed_by character varying(100) NOT NULL,
+--     installed_on timestamp without time zone DEFAULT now() NOT NULL,
+--     execution_time integer NOT NULL,
+--     success boolean NOT NULL
+-- );
 
 
-ALTER TABLE "USERS".flyway_schema_history OWNER TO "nr-ticdi";
+-- ALTER TABLE "USERS".flyway_schema_history OWNER TO "nr-ticdi";
 
 --
 -- Name: document_data; Type: TABLE; Schema: public; Owner: nr-ticdi

@@ -88,7 +88,7 @@ export class ReportController {
     }
   ) {
     const idir_username = user && user.idir_username ? user.idir_username : '';
-    const idir_full_name = user && user.given_name && user.family_name ? `${user.family_name}, ${user.given_name}` : '';
+    const idir_full_name = user && user.given_name && user.family_name ? `${user.given_name} ${user.family_name}` : '';
     return new StreamableFile(
       await this.reportService.generateReport(
         data.dtid,

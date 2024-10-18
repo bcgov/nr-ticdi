@@ -521,19 +521,49 @@ export class AdminService {
     const documentTemplateObject = await this.documentTemplateService.findOne(id);
 
     const bufferBase64 = documentTemplateObject.the_file;
-    const data = {};
+    const data = {
+      DB_DOCUMENT_NUMBER: 'DB_DOCUMENT_NUMBER',
+      DB_DOCUMENT_TYPE: 'DB_DOCUMENT_TYPE',
+      DB_FILE_NUMBER: 'DB_FILE_NUMBER',
+      DB_ADDRESS_STREET_TENANT: 'DB_ADDRESS_STREET_TENANT',
+      DB_ADDRESS_MAILING_TENANT: 'DB_ADDRESS_MAILING_TENANT',
+      DB_ADDRESS_REGIONAL_OFFICE: 'DB_ADDRESS_REGIONAL_OFFICE',
+      DB_NAME_TENANT: 'DB_NAME_TENANT',
+      DB_NAME_TENANT_LIST: 'DB_NAME_TENANT_LIST',
+      DB_NAME_CORPORATION: 'DB_NAME_CORPORATION',
+      DB_LEGAL_DESCRIPTION: 'DB_LEGAL_DESCRIPTION',
+      DB_NAME_BCAL_CONTACT: 'DB_NAME_BCAL_CONTACT',
+      DB_TENURE_TYPE: 'DB_TENURE_TYPE',
+      DB_REG_DOCUMENT_NUMBER: 'DB_REG_DOCUMENT_NUMBER',
+      DB_NAME_TENANTS: 'DB_NAME_TENANTS',
+      DB_ADDRESS_TENANT: 'DB_ADDRESS_TENANT',
+      DB_Document_Number: 'DB_Document_Number',
+      DB_Document_Type: 'DB_Document_Type',
+      DB_File_Number: 'DB_File_Number',
+      DB_Address_Street_Tenant: 'DB_Address_Street_Tenant',
+      DB_Address_Mailing_Tenant: 'DB_Address_Mailing_Tenant',
+      DB_Address_Regional_Office: 'DB_Address_Regional_Office',
+      DB_Name_Tenant: 'DB_Name_Tenant',
+      DB_Name_Tenant_List: 'DB_Name_Tenant_List',
+      DB_Name_Corporation: 'DB_Name_Corporation',
+      DB_Legal_Description: 'DB_Legal_Description',
+      DB_Name_Bcal_Contact: 'DB_Name_Bcal_Contact',
+      DB_Tenure_Type: 'DB_Tenure_Type',
+      DB_Reg_Document_Number: 'DB_Reg_Document_Number',
+      DB_Name_Tenants: 'DB_Name_Tenants',
+      DB_Address_Tenant: 'DB_Address_Tenant',
+    };
     const md = JSON.stringify({
       data,
       formatters:
         '{"myFormatter":"_function_myFormatter|function(data) { return data.slice(1); }","myOtherFormatter":"_function_myOtherFormatter|function(data) {return data.slice(2);}"}',
       options: {
-        cacheReport: false,
         convertTo: 'pdf',
         overwrite: true,
-        reportName: 'ticdi-report',
+        reportName: 'preview_ticdi_report',
       },
       template: {
-        content: `${bufferBase64}`,
+        content: bufferBase64,
         encodingType: 'base64',
         fileType: 'docx',
       },
@@ -551,9 +581,8 @@ export class AdminService {
     };
     const ax = require('axios');
     const response = await ax(conf).catch((error) => {
-      console.log(error.response);
+      console.log(error);
     });
-    console.log('time - ' + Date.now());
     return response.data;
   }
 }

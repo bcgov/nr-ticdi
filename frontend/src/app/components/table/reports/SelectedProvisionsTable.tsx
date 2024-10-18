@@ -55,7 +55,7 @@ const SelectedProvisionsTable: React.FC<SelectedProvisionsTableTableProps> = ({
       enableSorting: true,
       meta: { customCss: { width: '5%' } },
     }),
-    columnHelper.accessor((row) => row.provision_group.provision_group, {
+    columnHelper.accessor((row) => row.provision_group?.provision_group, {
       id: 'provision_group',
       cell: (info) => <input value={info.getValue()} className="form-control readonlyInput" readOnly />,
       header: () => 'Group',

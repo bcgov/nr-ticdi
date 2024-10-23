@@ -79,11 +79,11 @@ spec:
                 secretKeyRef: 
                   name: ticdi-sessions
                   key: session_secret
-            - name: KEYCLOAK_URL
+            - name: keycloak_base_url
               valueFrom:
                 secretKeyRef: 
-                  name: react-app
-                  key: keycloak-url
+                  name: keycloak
+                  key: keycloak_base_url
             - name: keycloak_realm
               valueFrom:
                 secretKeyRef: 

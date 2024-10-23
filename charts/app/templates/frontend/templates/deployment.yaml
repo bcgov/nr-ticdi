@@ -44,6 +44,11 @@ spec:
               value: '0'
             - name: session_path
               value: '/mnt/sessions'
+            - name: KEYCLOAK_URL
+              valueFrom:
+                secretKeyRef: 
+                  name: react-app
+                  key: keycloak-url
           ports:
             - name: http
               containerPort: 3000

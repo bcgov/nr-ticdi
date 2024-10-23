@@ -1,0 +1,106 @@
+INSERT INTO public.provision_variable (id,variable_name,variable_value,help_text,create_userid,update_userid,create_timestamp,update_timestamp,"provisionId") VALUES
+	 (3,'DATE_OF_NOTICE','','Date of letter: Month Day ,Year',NULL,NULL,'2023-06-02 15:57:07.279427','2023-06-02 15:57:07.279427',1),
+	 (4,'DEADLINE_COMPLETION_REQUIREMENTS','','Enter the date (month day, year) for completion of requirements',NULL,NULL,'2023-06-02 15:57:07.279427','2023-06-02 15:57:07.279427',1),
+	 (5,'FACSIMILE_NUMBER','','Type in your facsimile number - "250 ___-____"',NULL,NULL,'2023-06-02 15:57:07.279427','2023-06-02 15:57:07.279427',1),
+	 (7,'PURPOSE_GENERIC','','used for "_________" purposes.',NULL,NULL,'2023-06-02 15:57:07.279427','2023-06-02 15:57:07.279427',1),
+	 (8,'SALUTATION','','Dear "______":  Type in the person’’s name or Sir or Madam.',NULL,NULL,'2023-06-02 15:57:07.279427','2023-06-02 15:57:07.279427',1),
+	 (9,'TELEPHONE_NUMBER','','Type in your telephone number - "250 ___-____"',NULL,NULL,'2023-06-02 15:57:07.279427','2023-06-02 15:57:07.279427',1),
+	 (17,'SECURITY_AMOUNT','','#.## to post as security - indicate an amount even if blanket bond applies. Put in Decimal.',NULL,NULL,'2023-06-02 15:57:07.279427','2023-06-02 15:57:07.279427',7),
+	 (24,'COAST_GUARD_ADDRESS','','Type in the address of the Canadian Coast Guard office.',NULL,NULL,'2023-06-02 15:57:07.279427','2023-06-02 15:57:07.279427',22),
+	 (27,'DATE_OF_NOTICE','','Date of letter: Month Day ,Year',NULL,NULL,'2023-06-02 15:57:07.279427','2023-06-02 15:57:07.279427',23),
+	 (28,'DEADLINE_COMPLETION_REQUIREMENTS','','Enter the date (month day, year) for completion of requirements',NULL,NULL,'2023-06-02 15:57:07.279427','2023-06-02 15:57:07.279427',23);
+INSERT INTO public.provision_variable (id,variable_name,variable_value,help_text,create_userid,update_userid,create_timestamp,update_timestamp,"provisionId") VALUES
+	 (29,'FACSIMILE_NUMBER','','Type in your facsimile number - "250 ___-____"',NULL,NULL,'2023-06-02 15:57:07.279427','2023-06-02 15:57:07.279427',23),
+	 (31,'PURPOSE_GENERIC','','used for "_________" purposes.',NULL,NULL,'2023-06-02 15:57:07.279427','2023-06-02 15:57:07.279427',23),
+	 (33,'SALUTATION','','Dear "______":  Type in the person’’s name or Sir or Madam.',NULL,NULL,'2023-06-02 15:57:07.279427','2023-06-02 15:57:07.279427',23),
+	 (34,'TELEPHONE_NUMBER','','Type in your telephone number - "250 ___-____"',NULL,NULL,'2023-06-02 15:57:07.279427','2023-06-02 15:57:07.279427',23),
+	 (46,'DATE_OF_NOTICE','','Date of letter: Month Day ,Year',NULL,NULL,'2023-06-02 15:57:07.279427','2023-06-02 15:57:07.279427',41),
+	 (47,'DEADLINE_COMPLETION_REQUIREMENTS','','Enter the date (month day, year) for completion of requirements',NULL,NULL,'2023-06-02 15:57:07.279427','2023-06-02 15:57:07.279427',41),
+	 (48,'FACSIMILE_NUMBER','','Type in your facsimile number - "250 ___-____"',NULL,NULL,'2023-06-02 15:57:07.279427','2023-06-02 15:57:07.279427',41),
+	 (50,'PURPOSE_GENERIC','','used for "_________" purposes.',NULL,NULL,'2023-06-02 15:57:07.279427','2023-06-02 15:57:07.279427',41),
+	 (2,'CLIENT_FILE_NO','','Your file:  "______"',NULL,NULL,'2023-06-02 15:57:07.279427','2023-06-13 21:20:25.383347',1),
+	 (30,'NUMBER_OF_COPIES','','type the number (two) of how many copies of the tenure documents are being forwarded to client to sign. ',NULL,NULL,'2023-06-02 15:57:07.279427','2023-06-13 21:26:39.628364',23);
+INSERT INTO public.provision_variable (id,variable_name,variable_value,help_text,create_userid,update_userid,create_timestamp,update_timestamp,"provisionId") VALUES
+	 (6,'NUMBER_OF_COPIES','','type the number (two) of how many copies of the tenure documents are being forwarded to client to sign. ',NULL,NULL,'2023-06-02 15:57:07.279427','2023-06-13 21:25:44.257358',1),
+	 (25,'ATTENTION_LINE','','Attention: "______"',NULL,NULL,'2023-06-02 15:57:07.279427','2023-06-13 21:26:50.872419',23),
+	 (26,'CLIENT_FILE_NO','','Your file:  "______"',NULL,NULL,'2023-06-02 15:57:07.279427','2023-06-13 21:27:04.425352',23),
+	 (44,'ATTENTION_LINE','','Attention: "______"',NULL,NULL,'2023-06-02 15:57:07.279427','2023-06-13 21:28:04.897347',41),
+	 (45,'CLIENT_FILE_NO','','Your file:  "______" ',NULL,NULL,'2023-06-02 15:57:07.279427','2023-06-13 21:28:12.654356',41),
+	 (49,'NUMBER_OF_COPIES','','type the number (two) of how many copies of the tenure documents are being forwarded to client to sign. ',NULL,NULL,'2023-06-02 15:57:07.279427','2023-06-13 21:28:32.644364',41),
+	 (11,'FEE_DOCUMENTATION_AMOUNT','','EG: "1000.00" (no comma, and use decimals)',NULL,NULL,'2023-06-02 15:57:07.279427','2023-06-20 19:47:18.08737',2),
+	 (12,'FEE_OCCUPATIONAL_RENTAL_AMOUNT','','EG: "1000.00" (no comma, and use decimals)',NULL,NULL,'2023-06-02 15:57:07.279427','2023-06-20 19:47:36.347441',2),
+	 (18,'BLANKET_BOND_NAME','','enter details of blanket security',NULL,NULL,'2023-06-02 15:57:07.279427','2023-06-22 17:16:22.131377',8),
+	 (10,'FEE_APPLICATION_AMOUNT','','EG: "1000.00" (no comma, and use decimals)',NULL,NULL,'2023-06-02 15:57:07.279427','2023-06-20 19:47:25.315439',2);
+INSERT INTO public.provision_variable (id,variable_name,variable_value,help_text,create_userid,update_userid,create_timestamp,update_timestamp,"provisionId") VALUES
+	 (15,'WHY_LAND_DIFFERS','','The Land differs from what you applied for because "____". Explain why area is different.',NULL,NULL,'2023-06-02 15:57:07.279427','2023-06-13 21:36:29.985325',4),
+	 (14,'REPLACEMENT_TENURE_TYPE','','Specify type and tenure number which is being replaced e.g. Lease No. 999999.',NULL,NULL,'2023-06-02 15:57:07.279427','2023-06-16 20:36:04.20696',3),
+	 (13,'FEE_OTHER_CREDIT_AMOUNT','','EG: "1000.00" (no comma, and use decimals)',NULL,NULL,'2023-06-02 15:57:07.279427','2023-06-20 19:47:45.891637',2),
+	 (51,'SALUTATION','','Dear "______":  Type in the person’’s name or Sir or Madam.',NULL,NULL,'2023-06-02 15:57:07.279427','2023-06-02 15:57:07.279427',41),
+	 (52,'TELEPHONE_NUMBER','','Type in your telephone number - "250 ___-____"',NULL,NULL,'2023-06-02 15:57:07.279427','2023-06-02 15:57:07.279427',41),
+	 (63,'RATE_PER_METRE','','$"#.## per square metre/per hectare"  Put in the decimal.',NULL,NULL,'2023-06-02 15:57:07.279427','2023-06-02 15:57:07.279427',46),
+	 (65,'DEPOSIT_AMOUNT_SURVEY','','$"#.##" Enter amount of survey deposit.  Put in the decimal.',NULL,NULL,'2023-06-02 15:57:07.279427','2023-06-02 15:57:07.279427',47),
+	 (78,'DATE_OF_NOTICE','','Date of letter: Month Day ,Year',NULL,NULL,'2023-06-02 15:57:07.279427','2023-06-02 15:57:07.279427',66),
+	 (79,'DEADLINE_COMPLETION_REQUIREMENTS','','Enter the date (month day, year) for completion of requirements',NULL,NULL,'2023-06-02 15:57:07.279427','2023-06-02 15:57:07.279427',66),
+	 (80,'FACSIMILE_NUMBER','','Type in your facsimile number - "250 ___-____"',NULL,NULL,'2023-06-02 15:57:07.279427','2023-06-02 15:57:07.279427',66);
+INSERT INTO public.provision_variable (id,variable_name,variable_value,help_text,create_userid,update_userid,create_timestamp,update_timestamp,"provisionId") VALUES
+	 (81,'INTERIM_TENURE_TYPE','','Insert the type of tenure now being used. e.g. Licence.',NULL,NULL,'2023-06-02 15:57:07.279427','2023-06-02 15:57:07.279427',66),
+	 (83,'PURPOSE_GENERIC','','used for "_________" purposes.',NULL,NULL,'2023-06-02 15:57:07.279427','2023-06-02 15:57:07.279427',66),
+	 (84,'SALUTATION','','Dear "______":  Type in the person’’s name or Sir or Madam.',NULL,NULL,'2023-06-02 15:57:07.279427','2023-06-02 15:57:07.279427',66),
+	 (85,'TELEPHONE_NUMBER','','Type in your telephone number - "250 ___-____"',NULL,NULL,'2023-06-02 15:57:07.279427','2023-06-02 15:57:07.279427',66),
+	 (92,'DEADLINE_SURVEY_DEPOSIT','','Deadline to pay survey deposit. Enter Month, Day, Year',NULL,NULL,'2023-06-02 15:57:07.279427','2023-06-02 15:57:07.279427',72),
+	 (93,'DEPOSIT_AMOUNT_SURVEY','','$"#.##" Enter amount of survey deposit.  Put in the decimal.',NULL,NULL,'2023-06-02 15:57:07.279427','2023-06-02 15:57:07.279427',72),
+	 (94,'DEADLINE_CONFIRM_SURVEY','','Enter "On or before [date]" OR "Within [45] days from the date of this letter".  Capitalize first character as this is the start of a sentence.',NULL,NULL,'2023-06-02 15:57:07.279427','2023-06-02 15:57:07.279427',73),
+	 (97,'SECURITY_AMOUNT','','#.## to post as security - indicate an amount even if blanket bond applies. Put in Decimal.',NULL,NULL,'2023-06-02 15:57:07.279427','2023-06-02 15:57:07.279427',76),
+	 (76,'ATTENTION_LINE','','Attention: "______" ',NULL,NULL,'2023-06-02 15:57:07.279427','2023-06-13 21:28:50.005304',66),
+	 (77,'CLIENT_FILE_NO','','Your file:  "______" ',NULL,NULL,'2023-06-02 15:57:07.279427','2023-06-13 21:28:57.756376',66);
+INSERT INTO public.provision_variable (id,variable_name,variable_value,help_text,create_userid,update_userid,create_timestamp,update_timestamp,"provisionId") VALUES
+	 (82,'NUMBER_OF_COPIES','','type the number (two) of how many copies of the tenure documents are being forwarded to client to sign. ',NULL,NULL,'2023-06-02 15:57:07.279427','2023-06-13 21:29:17.789098',66),
+	 (66,'MAXIMUM_AREA_SURVEY_DEPOSIT_DELAYED','','Enter the number of hectares. EG. "0.5 hectares"',NULL,NULL,'2023-06-02 15:57:07.279427','2023-06-23 20:26:40.639362',47),
+	 (62,'MAXIMUM_AREA','','Enter the number of hectares. EG. "0.5 hectares"',NULL,NULL,'2023-06-02 15:57:07.279427','2023-06-23 18:33:30.847392',46),
+	 (61,'DEADLINE_CONFIRM_SURVEY','','Enter: "On or before [date]"  this date is when the survey plan must be submitted to the SGs office',NULL,NULL,'2023-06-02 15:57:07.279427','2023-06-20 18:00:21.374354',46),
+	 (64,'DEADLINE_SURVEY_DEPOSIT','','Deadline to pay survey deposit. Enter [date]',NULL,NULL,'2023-06-02 15:57:07.279427','2023-06-23 20:11:04.128362',47),
+	 (60,'DEADLINE_COMPLETE_SURVEY','','Enter: [date] the survey must be completed by',NULL,NULL,'2023-06-02 15:57:07.279427','2023-06-21 15:43:07.536357',46),
+	 (67,'RATE_PER_METRE_SURVEY_DEPOSIT_DELAYED','','$"#.## per square metre/per hectare"  Put in the decimal.',NULL,NULL,'2023-06-02 15:57:07.279427','2023-06-15 17:41:36.463885',47),
+	 (99,'INTERIM_TENURE_TYPE','','(Blanket Security) Insert the type of tenure now being used. e.g. Licence.',NULL,NULL,'2023-06-02 15:57:07.279427','2023-06-22 17:24:43.417375',77),
+	 (96,'INTERIM_TENURE_TYPE','','(Security) Insert the type of tenure now being used. e.g. Licence.',NULL,NULL,'2023-06-02 15:57:07.279427','2023-06-22 17:25:02.184734',76),
+	 (98,'BLANKET_BOND_NAME','','enter details of blanket security',NULL,NULL,'2023-06-02 15:57:07.279427','2023-06-22 17:16:03.192347',77);
+INSERT INTO public.provision_variable (id,variable_name,variable_value,help_text,create_userid,update_userid,create_timestamp,update_timestamp,"provisionId") VALUES
+	 (111,'FACSIMILE_NUMBER','','Type in your facsimile number - "250 ___-____"',NULL,NULL,'2023-06-02 15:57:07.364365','2023-06-02 15:57:07.364365',90),
+	 (114,'PURPOSE_GENERIC','','used for "_________" purposes.',NULL,NULL,'2023-06-02 15:57:07.364365','2023-06-02 15:57:07.364365',90),
+	 (115,'RATE_PER_METRE','','$"#.## per square metre/per hectare"  Put in the decimal.',NULL,NULL,'2023-06-02 15:57:07.364365','2023-06-02 15:57:07.364365',90),
+	 (116,'SALUTATION','','Dear "______":  Type in the person’’s name or Sir or Madam.',NULL,NULL,'2023-06-02 15:57:07.364365','2023-06-02 15:57:07.364365',90),
+	 (117,'TELEPHONE_NUMBER','','Type in your telephone number - "250 ___-____"',NULL,NULL,'2023-06-02 15:57:07.364365','2023-06-02 15:57:07.364365',90),
+	 (118,'FEE_APPLICATION_AMOUNT','','$"#.##" payable. Fill in either amount, or "0" if nothing payable for this category of fee. Put in decimals.',NULL,NULL,'2023-06-02 15:57:07.364365','2023-06-02 15:57:07.364365',91),
+	 (120,'FEE_OCCUPATIONAL_RENTAL_AMOUNT','','$"#.##" payable. Fill in either amount, or "0" if nothing payable for this category of fee. Put in decimals.',NULL,NULL,'2023-06-02 15:57:07.364365','2023-06-02 15:57:07.364365',91),
+	 (121,'FEE_OTHER_CREDIT_AMOUNT','','$"#.##" payable. Fill in either amount, or "0" if nothing payable for this category of fee. Put in decimals.',NULL,NULL,'2023-06-02 15:57:07.364365','2023-06-02 15:57:07.364365',91),
+	 (124,'DEADLINE_SURVEY_DEPOSIT','','Deadline to pay survey deposit. Enter Month, Day, Year',NULL,NULL,'2023-06-02 15:57:07.364365','2023-06-02 15:57:07.364365',96),
+	 (125,'DEPOSIT_AMOUNT_SURVEY','','$"#.##" Enter amount of survey deposit.  Put in the decimal.',NULL,NULL,'2023-06-02 15:57:07.364365','2023-06-02 15:57:07.364365',96);
+INSERT INTO public.provision_variable (id,variable_name,variable_value,help_text,create_userid,update_userid,create_timestamp,update_timestamp,"provisionId") VALUES
+	 (130,'SECURITY_AMOUNT','','#.## to post as security - indicate an amount even if blanket bond applies. Put in Decimal.',NULL,NULL,'2023-06-02 15:57:07.364365','2023-06-02 15:57:07.364365',101),
+	 (133,'LOCAL_GOVERNMENT','','Type in the name of the local government.',NULL,NULL,'2023-06-02 15:57:07.364365','2023-06-02 15:57:07.364365',110),
+	 (135,'TAX_COLLECTOR_OFFICE','','Type in the address of the local Provincial Tax Collector’’s office.',NULL,NULL,'2023-06-02 15:57:07.364365','2023-06-02 15:57:07.364365',112),
+	 (137,'DOCUMENT_TO_OBTAIN','','You must obtain the [specify the name of the document(s)] and ....',NULL,NULL,'2023-06-02 15:57:07.364365','2023-06-02 15:57:07.364365',114),
+	 (134,'PURPOSE_GENERIC_ZONING','','used for "_________" purposes.',NULL,NULL,'2023-06-02 15:57:07.364365','2023-06-13 18:06:54.115699',110),
+	 (1,'ATTENTION_LINE','','Attention: "______" ',NULL,NULL,'2023-06-02 15:57:07.279427','2023-06-13 21:16:49.648451',1),
+	 (109,'DAYS_TO_RETURN_DOCUMENTS','','Enter [# days]  "You must sign and return them to us within (# days) of our letter to you .....’’',NULL,NULL,'2023-06-02 15:57:07.364365','2023-06-21 15:56:28.489881',90),
+	 (106,'CLIENT_FILE_NO','','Your file:  "______"',NULL,NULL,'2023-06-02 15:57:07.364365','2023-06-13 21:29:43.260364',90),
+	 (107,'DATE_OF_NOTICE','','Date of letter: Month Day ,Year',NULL,NULL,'2023-06-02 15:57:07.364365','2023-06-13 21:30:06.91673',90),
+	 (113,'NUMBER_OF_COPIES','','type the number (two) of how many copies of the tenure documents are being forwarded to client to sign. ',NULL,NULL,'2023-06-02 15:57:07.364365','2023-06-13 21:30:30.231347',90);
+INSERT INTO public.provision_variable (id,variable_name,variable_value,help_text,create_userid,update_userid,create_timestamp,update_timestamp,"provisionId") VALUES
+	 (127,'DEADLINE_CONFIRM_SURVEY','','Enter "On or before [date]" .. this is the date the surveyor must be hired by',NULL,NULL,'2023-06-02 15:57:07.364365','2023-06-14 22:18:37.124318',97),
+	 (143,'PREAMBLE_FREE_FIELD','','Use when you want to enter additional information for the preamble','LOMILLER',NULL,'2023-06-26 17:30:55.159152','2023-06-26 17:31:31.493375',5),
+	 (105,'ATTENTION_LINE','','Attention: "______"',NULL,NULL,'2023-06-02 15:57:07.364365','2023-06-16 21:02:12.755383',90),
+	 (144,'INSURANCE_FREE_FIELD','','Use when you want to enter additional information for insurance.','LOMILLER',NULL,'2023-06-26 17:45:00.98355','2023-06-26 18:38:56.168009',12),
+	 (110,'DEADLINE_COMPLETION_REQUIREMENTS','','Enter the date (month day, year) for completion of requirements for the NFR',NULL,NULL,'2023-06-02 15:57:07.364365','2023-06-20 17:48:10.48195',90),
+	 (112,'MAXIMUM_AREA','','Enter: "# hectares"',NULL,NULL,'2023-06-02 15:57:07.364365','2023-06-20 18:01:49.180358',90),
+	 (128,'OCC_RENT_DETAILS','','Occupational Rental is payable for your occupation of the Land for the period from "___". ',NULL,NULL,'2023-06-02 15:57:07.364365','2023-06-20 23:08:37.630361',99),
+	 (145,'ADDITIONAL_REQUIREMENTS_FREE_FIELD','','Use where you want to state additional conditions of the offer.','LOMILLER',NULL,'2023-06-26 17:48:35.340383','2023-06-26 18:39:33.478342',107),
+	 (126,'DEADLINE_COMPLETE_SURVEY','','Enter the date (month day, year) the plan must be submitted to the SG''s office',NULL,NULL,'2023-06-02 15:57:07.364365','2023-06-21 15:50:26.530352',97),
+	 (108,'DAYS_TO_DELIVER_DOCUMENTS','','Enter [# days] .. "We will forward the documents to you within # days of the survey being completed.....’’',NULL,NULL,'2023-06-02 15:57:07.364365','2023-06-21 15:55:14.497797',90);
+INSERT INTO public.provision_variable (id,variable_name,variable_value,help_text,create_userid,update_userid,create_timestamp,update_timestamp,"provisionId") VALUES
+	 (139,'INTERIM_TENURE_TYPE','','(Insurance Other) Insert the type of tenure now being used. e.g. Licence.','BSALL',NULL,'2023-06-15 18:18:50.859363','2023-06-22 17:23:27.119879',30),
+	 (138,'INTERIM_TENURE_TYPE','','(Insurance Certificate) Insert the type of tenure now being used. e.g. Licence.','BSALL',NULL,'2023-06-15 18:15:43.795116','2023-06-22 17:24:10.979754',79),
+	 (141,'SECURITY_FREE_FIELD','','Use where you need to add information regarding security.','LOMILLER',NULL,'2023-06-23 21:00:33.78888','2023-06-23 21:00:33.78888',9),
+	 (136,'DEADLINE_TO_DELIVER','','(Obtain and Deliver) Enter "on or before [date]" OR "within [45] days from the date of this letter.',NULL,NULL,'2023-06-02 15:57:07.364365','2023-06-27 22:08:08.797474',114),
+	 (146,'TEST ERIC VARIABLE TO 115 PROV','AKJNKJ','','EANDERSO',NULL,'2024-04-22 19:30:44.126685','2024-04-22 19:30:44.126685',115),
+	 (147,'A NICE NEW VARIABLE FROM ERIC','A VALUE','Helpfully helpful','EANDERSO',NULL,'2024-04-23 22:27:42.19545','2024-04-23 22:27:42.19545',119);

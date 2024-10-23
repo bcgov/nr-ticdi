@@ -1,1 +1,0 @@
-SELECT setval('document_data_log_id_seq', 1200, true);

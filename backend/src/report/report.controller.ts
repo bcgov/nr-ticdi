@@ -62,7 +62,7 @@ export class ReportController {
   getDocumentDataByDocTypeIdAndDtid(@Param('document_type_id') document_type_id: number, @Param('dtid') dtid: number) {
     return this.reportService.getDocumentDataByDocTypeIdAndDtid(document_type_id, dtid);
   }
-
+  //
   @Get('get-report-name/:dtid/:tfn/:document_type_id')
   getReportNameNew(
     @Param('dtid') dtid: number,

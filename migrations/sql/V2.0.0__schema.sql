@@ -20,7 +20,7 @@ SET row_security = off;
 -- Name: USERS; Type: SCHEMA; Schema: -; Owner: nr-ticdi
 --
 
-CREATE SCHEMA "USERS";
+-- CREATE SCHEMA "USERS";
 
 
 ALTER SCHEMA "USERS" OWNER TO "nr-ticdi";

@@ -42,6 +42,10 @@ spec:
               value: "USERS"
             - name: FLYWAY_CONNECT_RETRIES
               value: "10"
+            - name: FLYWAY_ENCODING
+              value: "UTF-8"
+            - name: FLYWAY_PLACEHOLDER_REPLACEMENT
+              value: "false"
           resources:
             limits:
               cpu: 400m

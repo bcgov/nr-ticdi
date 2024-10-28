@@ -519,7 +519,7 @@ export class AdminService {
   async getPreviewPdf(id: number): Promise<Buffer> {
     const cdogsToken = await this.ttlsService.callGetToken();
     const documentTemplateObject = await this.documentTemplateService.findOne(id);
-
+    //
     const bufferBase64 = documentTemplateObject.the_file;
     const data = {};
     const md = JSON.stringify({

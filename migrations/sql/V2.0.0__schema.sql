@@ -42,21 +42,21 @@ SET default_table_access_method = heap;
 -- Name: flyway_schema_history; Type: TABLE; Schema: USERS; Owner: nr-ticdi
 --
 
-CREATE TABLE "USERS".flyway_schema_history (
-    installed_rank integer NOT NULL,
-    version character varying(50),
-    description character varying(200) NOT NULL,
-    type character varying(20) NOT NULL,
-    script character varying(1000) NOT NULL,
-    checksum integer,
-    installed_by character varying(100) NOT NULL,
-    installed_on timestamp without time zone DEFAULT now() NOT NULL,
-    execution_time integer NOT NULL,
-    success boolean NOT NULL
-);
+-- CREATE TABLE "USERS".flyway_schema_history (
+--     installed_rank integer NOT NULL,
+--     version character varying(50),
+--     description character varying(200) NOT NULL,
+--     type character varying(20) NOT NULL,
+--     script character varying(1000) NOT NULL,
+--     checksum integer,
+--     installed_by character varying(100) NOT NULL,
+--     installed_on timestamp without time zone DEFAULT now() NOT NULL,
+--     execution_time integer NOT NULL,
+--     success boolean NOT NULL
+-- );
 
 
-ALTER TABLE "USERS".flyway_schema_history OWNER TO "nr-ticdi";
+-- ALTER TABLE "USERS".flyway_schema_history OWNER TO "nr-ticdi";
 
 --
 -- Name: document_data; Type: TABLE; Schema: public; Owner: nr-ticdi
@@ -538,8 +538,8 @@ ALTER TABLE ONLY public.provision_variable ALTER COLUMN id SET DEFAULT nextval('
 -- Name: flyway_schema_history flyway_schema_history_pk; Type: CONSTRAINT; Schema: USERS; Owner: nr-ticdi
 --
 
-ALTER TABLE ONLY "USERS".flyway_schema_history
-    ADD CONSTRAINT flyway_schema_history_pk PRIMARY KEY (installed_rank);
+-- ALTER TABLE ONLY "USERS".flyway_schema_history
+--     ADD CONSTRAINT flyway_schema_history_pk PRIMARY KEY (installed_rank);
 
 
 --
@@ -626,7 +626,7 @@ ALTER TABLE ONLY public.provision_variable
 -- Name: flyway_schema_history_s_idx; Type: INDEX; Schema: USERS; Owner: nr-ticdi
 --
 
-CREATE INDEX flyway_schema_history_s_idx ON "USERS".flyway_schema_history USING btree (success);
+-- CREATE INDEX flyway_schema_history_s_idx ON "USERS".flyway_schema_history USING btree (success);
 
 
 --

@@ -169,7 +169,7 @@ export class AdminService {
 
   /**
    * Searches for an IDIR user with the given search params and if only one is found
-   * then gives them the ticdi_admin & generate_documents roles in both IDIR and AzureIDIR
+   * then gives them the ticdi_admin role in both IDIR and AzureIDIR
    *
    * @param firstName
    * @param lastName
@@ -218,23 +218,6 @@ export class AdminService {
         .post(
           addAdminUrl,
           {
-            roleName: Role.GENERATE_DOCUMENTS,
-            username: username + '@idir',
-            operation: 'add',
-          },
-          { headers: { Authorization: 'Bearer ' + bearerToken } }
-        )
-        .then((res) => {
-          return res.data;
-        })
-        .catch((err) => {
-          console.log(err);
-          throw new Error('Failed to add idir generate_documents role');
-        });
-      await axios
-        .post(
-          addAdminUrl,
-          {
             roleName: Role.TICDI_ADMIN,
             username: username + '@azureidir',
             operation: 'add',
@@ -247,23 +230,6 @@ export class AdminService {
         .catch((err) => {
           console.log(err);
           throw new Error('Failed to add azureidir ticdi_admin role');
-        });
-      await axios
-        .post(
-          addAdminUrl,
-          {
-            roleName: Role.GENERATE_DOCUMENTS,
-            username: username + '@azureidir',
-            operation: 'add',
-          },
-          { headers: { Authorization: 'Bearer ' + bearerToken } }
-        )
-        .then((res) => {
-          return res.data;
-        })
-        .catch((err) => {
-          console.log(err);
-          throw new Error('Failed to add azureidir generate_documents role');
         });
     } catch (err) {
       console.log(err);
@@ -307,7 +273,7 @@ export class AdminService {
   }
 
   /**
-   * Removes the ticdi_admin & generate_documents role from an IDIR user
+   * Removes the ticdi_admin role from an IDIR user
    *
    * @param username
    * @returns null
@@ -317,9 +283,7 @@ export class AdminService {
     const idirUsername = username?.split('@')[0].concat('@idir');
     const azureidirUsername = username?.split('@')[0].concat('@azureidir');
     const idirAdminUrl = `${process.env.users_api_base_url}/integrations/${process.env.integration_id}/${process.env.css_environment}/users/${idirUsername}/roles/${Role.TICDI_ADMIN}`;
-    const idirGDUrl = `${process.env.users_api_base_url}/integrations/${process.env.integration_id}/${process.env.css_environment}/users/${idirUsername}/roles/${Role.GENERATE_DOCUMENTS}`;
     const azureidirAdminUrl = `${process.env.users_api_base_url}/integrations/${process.env.integration_id}/${process.env.css_environment}/users/${azureidirUsername}/roles/${Role.TICDI_ADMIN}`;
-    const azureidirGDUrl = `${process.env.users_api_base_url}/integrations/${process.env.integration_id}/${process.env.css_environment}/users/${azureidirUsername}/roles/${Role.GENERATE_DOCUMENTS}`;
     try {
       await axios
         .delete(idirAdminUrl, {
@@ -341,25 +305,6 @@ export class AdminService {
     }
     try {
       await axios
-        .delete(idirGDUrl, {
-          headers: { Authorization: 'Bearer ' + bearerToken },
-        })
-        .then((res) => {
-          return res;
-        })
-        .catch((err) => {
-          throw err;
-        });
-    } catch (err) {
-      console.log(err.response.data);
-      if (err?.response?.data?.message?.includes('not associated')) {
-        // ignore error if user is not associated with the role
-      } else {
-        return { error: 'Failed to remove generate_documents role' };
-      }
-    }
-    try {
-      await axios
         .delete(azureidirAdminUrl, {
           headers: { Authorization: 'Bearer ' + bearerToken },
         })
@@ -375,25 +320,6 @@ export class AdminService {
         // ignore error if user is not associated with the role
       } else {
         return { error: 'Failed to remove idir_admin role' };
-      }
-    }
-    try {
-      await axios
-        .delete(azureidirGDUrl, {
-          headers: { Authorization: 'Bearer ' + bearerToken },
-        })
-        .then((res) => {
-          return res;
-        })
-        .catch((err) => {
-          throw err;
-        });
-    } catch (err) {
-      console.log(err.response.data);
-      if (err?.response?.data?.message?.includes('not associated')) {
-        // ignore error if user is not associated with the role
-      } else {
-        return { error: 'Failed to remove generate_documents role' };
       }
     }
     return { error: null };

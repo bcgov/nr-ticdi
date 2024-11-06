@@ -319,7 +319,8 @@ export class AdminService {
       if (err?.response?.data?.message?.includes('not associated')) {
         // ignore error if user is not associated with the role
       } else {
-        return { error: 'Failed to remove idir_admin role' };
+        console.log('Failed to remove azureidir idir_admin role - not displaying an error');
+        return { error: null };
       }
     }
     return { error: null };

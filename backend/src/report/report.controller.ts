@@ -72,9 +72,7 @@ export class ReportController {
     return this.reportService.generateReportName(dtid, tenure_file_number, document_type_id);
   }
 
-  // remember to update
   @Post('generate-report')
-  @UseGuards(JwtRoleGuard)
   @Header('Content-Type', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document')
   @Header('Content-Disposition', 'attachment; filename=report.docx')
   async generateReport(

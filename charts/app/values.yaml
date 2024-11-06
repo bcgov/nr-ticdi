@@ -276,7 +276,7 @@ backup:
     - name: backup
       registry: 'docker.io'
       repository: 'bcgovimages' # example, it includes registry and repository
-      image: backup-container # the exact component name, be it backend, api-1 etc...
+      image: backup-container # the exact component name, be it backend, api-1 etc.
       tag: latest # the tag of the image, it can be latest, 1.0.0 etc..., or the sha256 hash
       command:
         - '/bin/bash'

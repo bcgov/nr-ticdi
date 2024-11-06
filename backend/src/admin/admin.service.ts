@@ -228,8 +228,8 @@ export class AdminService {
           return res.data;
         })
         .catch((err) => {
-          console.log(err);
-          throw new Error('Failed to add azureidir ticdi_admin role');
+          console.log('Error: ' + err?.data?.message);
+          // throw new Error('Failed to add azureidir ticdi_admin role');
         });
     } catch (err) {
       console.log(err);

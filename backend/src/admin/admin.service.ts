@@ -228,8 +228,8 @@ export class AdminService {
           return res.data;
         })
         .catch((err) => {
-          console.log(err);
-          throw new Error('Failed to add azureidir ticdi_admin role');
+          console.log('Error: ' + err?.data?.message);
+          // throw new Error('Failed to add azureidir ticdi_admin role');
         });
     } catch (err) {
       console.log(err);
@@ -319,7 +319,8 @@ export class AdminService {
       if (err?.response?.data?.message?.includes('not associated')) {
         // ignore error if user is not associated with the role
       } else {
-        return { error: 'Failed to remove idir_admin role' };
+        console.log('Failed to remove azureidir idir_admin role - not displaying an error');
+        return { error: null };
       }
     }
     return { error: null };

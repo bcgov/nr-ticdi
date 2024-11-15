@@ -63,6 +63,8 @@ const LandingPage: FC = () => {
   const searchState = useSelector((state: RootState) => state.search);
   const [isOpen, setIsOpen] = useState(false);
 
+  const [generateReportState, setGenerateReportState] = useState(false);
+
   // Old route compatibility, set dtid from url, set doc type to lur if none given
   useEffect(() => {
     if (dtidFromUrl && initializeDtid) {
@@ -365,21 +367,12 @@ const LandingPage: FC = () => {
     try {
       setShowGenerateError(false);
       setLoading(true);
-      await handleDocumentSave();
-      setLoading(true);
-      if (dtid) {
+      if (dtid && documentType) {
+        await handleDocumentSave();
+
         const errorMessage = validateProvisions();
         if (!errorMessage) {
-          if (data && documentType && documentType.id) {
-            const { variableJsonArray, provisionJsonArray } = getReportData();
-            await generateReport(
-              dtid,
-              data && data.fileNum ? data.fileNum : '',
-              documentType.id,
-              provisionJsonArray,
-              variableJsonArray
-            );
-          }
+          setGenerateReportState(true);
         } else {
           setGenerateError(errorMessage);
           setShowGenerateError(true);
@@ -394,6 +387,31 @@ const LandingPage: FC = () => {
       setLoading(false);
     }
   };
+
+  // generateReportHandler sets generateReportState to true, which triggers the useEffect hook below to generate the report
+  useEffect(() => {
+    const genReport = async () => {
+      try {
+        if (generateReportState) {
+          if (data && documentType && documentType.id && dtid) {
+            const { variableJsonArray, provisionJsonArray } = getReportData();
+            await generateReport(
+              dtid,
+              data && data.fileNum ? data.fileNum : '',
+              documentType.id,
+              provisionJsonArray,
+              variableJsonArray
+            );
+          }
+        }
+      } catch (err) {
+        console.log(err);
+      } finally {
+        setGenerateReportState(false);
+      }
+    };
+    genReport();
+  }, [generateReportState]);
 
   return (
     <>

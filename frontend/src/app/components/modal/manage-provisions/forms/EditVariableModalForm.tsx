@@ -41,7 +41,7 @@ const EditVariableModalForm: React.FC<EditVariableModalFormProps> = ({ variable,
     setVariableName(e.target.value);
   };
 
-  const handleVariableValueChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleVariableValueChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setVariableValue(e.target.value);
   };
 
@@ -81,7 +81,12 @@ const EditVariableModalForm: React.FC<EditVariableModalFormProps> = ({ variable,
               Variable Value
             </Form.Label>
             <Col sm="10">
-              <Form.Control type="text" defaultValue={variable?.variable_value} onChange={handleVariableValueChange} />
+              <Form.Control
+                as="textarea"
+                rows={3}
+                defaultValue={variable?.variable_value}
+                onChange={handleVariableValueChange}
+              />
             </Col>
           </Form.Group>
           <Form.Group className="mb-3">

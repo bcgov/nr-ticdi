@@ -21,7 +21,7 @@ const AddVariableModalForm: React.FC<AddVariableModalFormProps> = ({ loading, on
     setVariableName(e.target.value);
   };
 
-  const handleVariableValueChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleVariableValueChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setVariableValue(e.target.value);
   };
 
@@ -61,7 +61,7 @@ const AddVariableModalForm: React.FC<AddVariableModalFormProps> = ({ loading, on
               Variable Value
             </Form.Label>
             <Col sm="10">
-              <Form.Control type="text" onChange={handleVariableValueChange} />
+              <Form.Control as="textarea" rows={3} onChange={handleVariableValueChange} />
             </Col>
           </Form.Group>
           <Form.Group className="mb-3">

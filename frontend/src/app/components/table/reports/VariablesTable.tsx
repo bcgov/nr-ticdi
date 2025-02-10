@@ -125,18 +125,17 @@ const TableCell: FC<TableCellProps> = ({ getValue, variableId, onCellUpdate }) =
     onCellUpdate(variableId, value);
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement | HTMLSelectElement>) => {
     setValue(e.target.value);
   };
 
   return (
-    <input
-      type="text"
+    <textarea
       className="form-control"
       value={value}
       onChange={handleChange}
       onBlur={handleBlur}
-      style={{ width: '100%' }}
+      style={{ width: '100%', height: '40px', resize: 'vertical' }}
     />
   );
 };

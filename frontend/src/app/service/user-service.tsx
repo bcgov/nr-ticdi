@@ -14,7 +14,7 @@ const initKeycloak = (onAuthenticatedCallback: () => void) => {
       pkceMethod: 'S256',
       checkLoginIframe: false,
     })
-    .then((authenticated) => {
+    .then((authenticated: boolean) => {
       if (!authenticated) {
         console.log('User is not authenticated.');
       } else {
@@ -25,7 +25,7 @@ const initKeycloak = (onAuthenticatedCallback: () => void) => {
     .catch(console.error);
 
   _kc.onTokenExpired = () => {
-    _kc.updateToken(5).then((refreshed) => {
+    _kc.updateToken(5).then((refreshed: boolean) => {
       if (refreshed) {
         localStorage.setItem(AUTH_TOKEN, `${_kc.token}`);
       }
@@ -54,7 +54,7 @@ const updateToken = (minValidity: number = 10): Promise<string> => {
     if (tokenAge > 180) {
       _kc
         .updateToken(-1) // Force refresh
-        .then((refreshed) => {
+        .then((refreshed: boolean) => {
           if (refreshed) {
             const newToken = _kc.token;
             localStorage.setItem(AUTH_TOKEN, `${newToken}`);
@@ -63,13 +63,13 @@ const updateToken = (minValidity: number = 10): Promise<string> => {
             resolve(_kc.token!); // Token is still valid
           }
         })
-        .catch((error) => {
+        .catch((error: any) => {
           reject(error);
         });
     } else {
       _kc
         .updateToken(minValidity)
-        .then((refreshed) => {
+        .then((refreshed: boolean) => {
           if (refreshed) {
             const newToken = _kc.token;
             localStorage.setItem(AUTH_TOKEN, `${newToken}`);
@@ -78,7 +78,7 @@ const updateToken = (minValidity: number = 10): Promise<string> => {
             resolve(_kc.token!); // Token is still valid
           }
         })
-        .catch((error) => {
+        .catch((error: any) => {
           reject(error);
         });
     }

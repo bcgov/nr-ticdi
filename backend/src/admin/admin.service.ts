@@ -124,6 +124,10 @@ export class AdminService {
         console.log(err.response.data);
         throw new Error('No users found');
       });
+
+    if (searchData.length === 0) {
+      throw new Error('No users found');
+    }
     const firstName = searchData[0].firstName ? searchData[0].firstName : '';
     const lastName = searchData[0].lastName ? searchData[0].lastName : '';
     const username = searchData[0].attributes

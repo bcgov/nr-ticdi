@@ -124,6 +124,10 @@ export class AdminService {
         console.log(err.response.data);
         throw new Error('No users found');
       });
+
+    if (searchData.length === 0) {
+      throw new Error('No users found');
+    }
     const firstName = searchData[0].firstName ? searchData[0].firstName : '';
     const lastName = searchData[0].lastName ? searchData[0].lastName : '';
     const username = searchData[0].attributes
@@ -178,7 +182,6 @@ export class AdminService {
    */
   async addAdmin(username: string): Promise<void> {
     username = username.split('@')[0]; // remove any '@idir' or '@azureidir' from the username
-    const addAdminUrl = `${process.env.users_api_base_url}/integrations/${process.env.integration_id}/${process.env.css_environment}/user-role-mappings`;
     const bearerToken = await this.getToken();
 
     try {
@@ -197,14 +200,17 @@ export class AdminService {
         // throw new Error('User already has roles.');
       }
 
+      const addAdminUrl = `${process.env.users_api_base_url}/integrations/${process.env.integration_id}/${
+        process.env.css_environment
+      }/users/${username + '@idir'}/roles`;
       await axios
         .post(
           addAdminUrl,
-          {
-            roleName: Role.TICDI_ADMIN,
-            username: username + '@idir',
-            operation: 'add',
-          },
+          [
+            {
+              name: Role.TICDI_ADMIN,
+            },
+          ],
           { headers: { Authorization: 'Bearer ' + bearerToken } }
         )
         .then((res) => {
@@ -214,23 +220,23 @@ export class AdminService {
           console.log(err);
           throw new Error('Failed to add idir ticdi_admin role');
         });
-      await axios
-        .post(
-          addAdminUrl,
-          {
-            roleName: Role.TICDI_ADMIN,
-            username: username + '@azureidir',
-            operation: 'add',
-          },
-          { headers: { Authorization: 'Bearer ' + bearerToken } }
-        )
-        .then((res) => {
-          return res.data;
-        })
-        .catch((err) => {
-          console.log('Error: ' + err?.data?.message);
-          // throw new Error('Failed to add azureidir ticdi_admin role');
-        });
+      // await axios
+      //   .post(
+      //     addAdminUrl,
+      //     {
+      //       roleName: Role.TICDI_ADMIN,
+      //       username: username + '@azureidir',
+      //       operation: 'add',
+      //     },
+      //     { headers: { Authorization: 'Bearer ' + bearerToken } }
+      //   )
+      //   .then((res) => {
+      //     return res.data;
+      //   })
+      //   .catch((err) => {
+      //     console.log('Error: ' + err?.data?.message);
+      //     // throw new Error('Failed to add azureidir ticdi_admin role');
+      //   });
     } catch (err) {
       console.log(err);
     }

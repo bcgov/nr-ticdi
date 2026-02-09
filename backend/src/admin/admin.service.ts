@@ -288,9 +288,16 @@ export class AdminService {
    * @returns null
    */
   async removeAdmin(username: string): Promise<{ error: string | null }> {
+    // Validate and sanitize username to prevent SSRF
+    username = (username || '').trim().split('@')[0]; // remove any '@idir' or '@azureidir' from the username
+    const usernamePattern = /^[A-Za-z0-9._-]+$/;
+    if (!username || username.length > 50 || !usernamePattern.test(username)) {
+      throw new Error('Invalid IDIR username');
+    }
+
     const bearerToken = await this.getToken();
-    const idirUsername = username?.split('@')[0].concat('@idir');
-    const azureidirUsername = username?.split('@')[0].concat('@azureidir');
+    const idirUsername = username.concat('@idir');
+    const azureidirUsername = username.concat('@azureidir');
     const idirAdminUrl = `${process.env.users_api_base_url}/integrations/${process.env.integration_id}/${process.env.css_environment}/users/${idirUsername}/roles/${Role.TICDI_ADMIN}`;
     const azureidirAdminUrl = `${process.env.users_api_base_url}/integrations/${process.env.integration_id}/${process.env.css_environment}/users/${azureidirUsername}/roles/${Role.TICDI_ADMIN}`;
     try {

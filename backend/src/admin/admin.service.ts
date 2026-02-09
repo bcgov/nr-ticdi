@@ -181,9 +181,12 @@ export class AdminService {
    * @returns user object to be displayed in the frontend
    */
   async addAdmin(username: string): Promise<void> {
-    username = username.split('@')[0]; // remove any '@idir' or '@azureidir' from the username
+    username = (username || '').trim().split('@')[0]; // remove any '@idir' or '@azureidir' from the username
+    const usernamePattern = /^[A-Za-z0-9._-]+$/;
+    if (!username || username.length > 50 || !usernamePattern.test(username)) {
+      throw new Error('Invalid IDIR username');
+    }
     const bearerToken = await this.getToken();
-
     try {
       const idirRolesUrl = `${process.env.users_api_base_url}/integrations/${process.env.integration_id}/${
         process.env.css_environment

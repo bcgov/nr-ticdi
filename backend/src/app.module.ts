@@ -7,7 +7,6 @@ import { DocumentTemplateModule } from './document_template/document_template.mo
 import { DocumentDataLogModule } from './document_data_log/document_data_log.module';
 import { ProvisionModule } from './provision/provision.module';
 import { DocumentDataModule } from './document_data/document_data.module';
-import { HttpModule } from '@nestjs/axios';
 import { TTLSService } from './ttls/ttls.service';
 import { SessionModule } from 'nestjs-session';
 import { AdminController } from './admin/admin.controller';
@@ -36,7 +35,6 @@ if (process.env.POSTGRES_PASSWORD != null) {
     DocumentDataModule,
     DocumentDataLogModule,
     ProvisionModule,
-    HttpModule,
     JWTAuthModule,
     AdminModule,
     ReportModule,

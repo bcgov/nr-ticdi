@@ -35,6 +35,10 @@
   ],
   "author": "Derek Roberts",
   "license": "Apache-2.0",
+  "engines": {
+    "node": ">=20.0.0",
+    "npm": ">=8.0.0"
+  },
   "bugs": {
     "url": "https://github.com/bcgov/greenfield-template/issues"
   },

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Checkbox } from '@mui/material';
 import { getProvisionInfo, ManageDocTypeProvision, ProvisionInfo } from '../../../common/manage-doc-types';
-import { Provision, ProvisionGroup } from '../../../types/types';
+import { ProvisionGroup } from '../../../types/types';
 import { DocumentProvisionSearchState } from '../../common/manage-doc-types/DocumentProvisionSearch';
 import { DataGrid, GridCellModes, GridCellModesModel, GridCellParams, GridColDef } from '@mui/x-data-grid';
 import { useDispatch } from 'react-redux';

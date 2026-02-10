@@ -1,7 +1,6 @@
 import config from '../../config';
 import { IdirUserObject } from '../components/modal/manage-admins/AddAdmin';
 import { AdminData } from '../components/table/manage-admins/AdminDataTable';
-import { UserObject } from '../types/types';
 import * as api from './api';
 
 /**

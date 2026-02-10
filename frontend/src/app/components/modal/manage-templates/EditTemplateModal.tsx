@@ -1,6 +1,6 @@
 import { FC, useState } from 'react';
 import Modal from 'react-bootstrap/Modal';
-import { editTemplate, uploadTemplate } from '../../../common/manage-templates';
+import { editTemplate } from '../../../common/manage-templates';
 import { Button, Col, Row } from 'react-bootstrap';
 
 type EditTemplateModalProps = {
@@ -110,7 +110,7 @@ const EditTemplateModal: FC<EditTemplateModalProps> = ({
         <Button
           variant="primary"
           onClick={editButtonHandler}
-          disabled={(documentName == documentNameText && documentVersion == documentVersionText) || isLoading}
+          disabled={(documentName === documentNameText && documentVersion === documentVersionText) || isLoading}
         >
           Save
         </Button>

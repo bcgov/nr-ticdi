@@ -48,6 +48,11 @@ const SelectedProvisionsTable: React.FC<SelectedProvisionsTableTableProps> = ({
 
   const columnHelper = createColumnHelper<ReducedProvisionDataObject>();
   const columns: ColumnDef<ReducedProvisionDataObject, any>[] = [
+    columnHelper.accessor('sequence_value', {
+      id: 'sequence_value',
+      enableSorting: true,
+      meta: { customCss: { display: 'none' } },
+    }),
     columnHelper.accessor('type', {
       id: 'type',
       cell: (info) => <input value={info.getValue()} className="form-control readonlyInput" readOnly />,
@@ -85,7 +90,7 @@ const SelectedProvisionsTable: React.FC<SelectedProvisionsTableTableProps> = ({
       enableSorting={true}
       initialSorting={[
         { id: 'provision_group', desc: false },
-        // { id: 'provision_name', desc: false },
+        { id: 'sequence_value', desc: false },
       ]}
     />
   );

@@ -1,5 +1,5 @@
 # https://catalog.redhat.com/software/containers/ubi8/nodejs-20-minimal/627d1c38e35da88581633bf1
-FROM registry.access.redhat.com/ubi8/nodejs-20-minimal:latest AS builder
+FROM registry.access.redhat.com/ubi8/nodejs-20-minimal:1 AS builder
 
 # Install packages, build and keep only prod packages
 USER root
@@ -31,9 +31,6 @@ COPY --from=builder /usr/lib64/libbrotlicommon.so.1 /usr/lib64/
 WORKDIR /app
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/dist ./dist
-
-# Create non-privileged user
-RUN useradd -r app
 
 # Port and health check
 EXPOSE 3000

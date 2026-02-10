@@ -1,5 +1,5 @@
 # https://catalog.redhat.com/software/containers/ubi8/nodejs-20-minimal/627d1c38e35da88581633bf1
-FROM registry.access.redhat.com/ubi8/nodejs-20-minimal:latest
+FROM registry.access.redhat.com/ubi8/nodejs-20-minimal:latest AS builder
 
 # Install packages, build and keep only prod packages
 USER root

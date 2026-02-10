@@ -115,13 +115,13 @@ export class ReportService {
     variableJson.forEach(({ variable_name, variable_value }) => {
       if (variable_value.includes('«')) {
         // regex which converts «DB_TENURE_TYPE» to {d.DB_Tenure_Type}, also works for VAR_
-        variable_value = variable_value.replace(/<<([^>>]+)>>/g, function (match, innerText) {
+        variable_value = variable_value.replace(/<<((?:(?!>>).)+?)>>/g, function (match, innerText) {
           innerText = convertToSpecialCamelCase(innerText);
           return '{d.' + innerText + '}';
         });
       } else if (variable_value.includes('<<')) {
         // regex which converts <<DB_TENURE_TYPE>> to {d.DB_Tenure_Type}, also works for VAR_
-        variable_value = variable_value.replace(/<<([^>>]+)>>/g, function (match, innerText) {
+        variable_value = variable_value.replace(/<<((?:(?!>>).)+?)>>/g, function (match, innerText) {
           innerText = convertToSpecialCamelCase(innerText);
           return '{d.' + innerText + '}';
         });
@@ -148,7 +148,7 @@ export class ReportService {
         });
       } else if (free_text.includes('<<')) {
         // regex which converts <<DB_TENURE_TYPE>> to {d.DB_Tenure_Type}, also works for VAR_
-        free_text = free_text.replace(/<<([^>>]+)>>/g, function (match, innerText) {
+        free_text = free_text.replace(/<<((?:(?!>>).)+?)>>/g, function (match, innerText) {
           innerText = convertToSpecialCamelCase(innerText);
           return '{d.' + innerText + '}';
         });
@@ -171,8 +171,8 @@ export class ReportService {
             return '{d.' + innerText + '}';
           });
         } else if (item.includes('<<')) {
-          // regex which converts <<DB_TENURE_TYPE>> to {d.DB_Tenure_Type}, also works for VAR_
-          item = item.replace(/<<([^>>]+)>>/g, function (match, innerText) {
+          // regex which converts <<DB_TENURE_TYPE>> to {d.DB_TENURE_Type}, also works for VAR_
+          item = item.replace(/<<((?:(?!>>).)+?)>>/g, function (match, innerText) {
             innerText = convertToSpecialCamelCase(innerText);
             return '{d.' + innerText + '}';
           });
@@ -626,13 +626,13 @@ export class ReportService {
 
       if (variable_value.includes('«')) {
         // regex which converts «DB_TENURE_TYPE» to {d.DB_Tenure_Type}, also works for VAR_
-        variable_value = variable_value.replace(/<<([^>>]+)>>/g, function (match, innerText) {
+        variable_value = variable_value.replace(/<<((?:(?!>>).)+?)>>/g, function (match, innerText) {
           innerText = convertToSpecialCamelCase(innerText);
           return '{d.' + innerText + '}';
         });
       } else if (variable_value.includes('<<')) {
         // regex which converts <<DB_TENURE_TYPE>> to {d.DB_Tenure_Type}, also works for VAR_
-        variable_value = variable_value.replace(/<<([^>>]+)>>/g, function (match, innerText) {
+        variable_value = variable_value.replace(/<<((?:(?!>>).)+?)>>/g, function (match, innerText) {
           innerText = convertToSpecialCamelCase(innerText);
           return '{d.' + innerText + '}';
         });
@@ -669,7 +669,7 @@ export class ReportService {
         });
       } else if (provision.free_text.includes('<<')) {
         // regex which converts <<DB_TENURE_TYPE>> to {d.DB_Tenure_Type}, also works for VAR_
-        provision.free_text = provision.free_text.replace(/<<([^>>]+)>>/g, function (match, innerText) {
+        provision.free_text = provision.free_text.replace(/<<((?:(?!>>).)+?)>>/g, function (match, innerText) {
           innerText = convertToSpecialCamelCase(innerText);
           return '{d.' + innerText + '}';
         });

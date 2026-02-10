@@ -1,5 +1,4 @@
 import { Module } from '@nestjs/common';
-import { HttpModule } from '@nestjs/axios';
 
 import { AdminGuard } from './admin.guard';
 import { AdminService } from './admin.service';
@@ -13,7 +12,7 @@ import { TTLSService } from 'src/ttls/ttls.service';
 import { DocumentDataModule } from 'src/document_data/document_data.module';
 
 @Module({
-  imports: [HttpModule, JWTAuthModule, DocumentTemplateModule, ProvisionModule, DocumentTypeModule, DocumentDataModule],
+  imports: [JWTAuthModule, DocumentTemplateModule, ProvisionModule, DocumentTypeModule, DocumentDataModule],
   providers: [AdminGuard, AdminService, JwtAuthGuard, TTLSService],
   exports: [AdminService],
   controllers: [AdminController],

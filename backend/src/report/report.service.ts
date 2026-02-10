@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import * as dotenv from 'dotenv';
-import { firstValueFrom } from 'rxjs';
 import { DocumentTemplateService } from 'src/document_template/document_template.service';
 import { ProvisionService } from 'src/provision/provision.service';
 import { TTLSService } from 'src/ttls/ttls.service';
@@ -116,13 +115,13 @@ export class ReportService {
     variableJson.forEach(({ variable_name, variable_value }) => {
       if (variable_value.includes('«')) {
         // regex which converts «DB_TENURE_TYPE» to {d.DB_Tenure_Type}, also works for VAR_
-        variable_value = variable_value.replace(/<<([^>>]+)>>/g, function (match, innerText) {
+        variable_value = variable_value.replace(/<<((?:(?!>>).)+?)>>/g, function (match, innerText) {
           innerText = convertToSpecialCamelCase(innerText);
           return '{d.' + innerText + '}';
         });
       } else if (variable_value.includes('<<')) {
         // regex which converts <<DB_TENURE_TYPE>> to {d.DB_Tenure_Type}, also works for VAR_
-        variable_value = variable_value.replace(/<<([^>>]+)>>/g, function (match, innerText) {
+        variable_value = variable_value.replace(/<<((?:(?!>>).)+?)>>/g, function (match, innerText) {
           innerText = convertToSpecialCamelCase(innerText);
           return '{d.' + innerText + '}';
         });
@@ -149,7 +148,7 @@ export class ReportService {
         });
       } else if (free_text.includes('<<')) {
         // regex which converts <<DB_TENURE_TYPE>> to {d.DB_Tenure_Type}, also works for VAR_
-        free_text = free_text.replace(/<<([^>>]+)>>/g, function (match, innerText) {
+        free_text = free_text.replace(/<<((?:(?!>>).)+?)>>/g, function (match, innerText) {
           innerText = convertToSpecialCamelCase(innerText);
           return '{d.' + innerText + '}';
         });
@@ -172,8 +171,8 @@ export class ReportService {
             return '{d.' + innerText + '}';
           });
         } else if (item.includes('<<')) {
-          // regex which converts <<DB_TENURE_TYPE>> to {d.DB_Tenure_Type}, also works for VAR_
-          item = item.replace(/<<([^>>]+)>>/g, function (match, innerText) {
+          // regex which converts <<DB_TENURE_TYPE>> to {d.DB_TENURE_Type}, also works for VAR_
+          item = item.replace(/<<((?:(?!>>).)+?)>>/g, function (match, innerText) {
             innerText = convertToSpecialCamelCase(innerText);
             return '{d.' + innerText + '}';
           });
@@ -279,13 +278,11 @@ export class ReportService {
   async getDbVariables(dtid: number, document_type_id: number, idirName: string): Promise<any> {
     await this.ttlsService.setWebadeToken();
     let rawData: DTR;
-    await firstValueFrom(this.ttlsService.callHttp(dtid))
-      .then((res) => {
-        rawData = res;
-      })
-      .catch((err) => {
-        console.log(err); //
-      });
+    try {
+      rawData = await this.ttlsService.callHttp(dtid);
+    } catch (err) {
+      console.log(err); //
+    }
 
     const interestParcel = rawData.interestParcel;
     const tenantAddr = rawData.tenantAddr;
@@ -358,13 +355,11 @@ export class ReportService {
     // get the view given the print request detail id
     await this.ttlsService.setWebadeToken();
     let rawData: DTR;
-    await firstValueFrom(this.ttlsService.callHttp(dtid))
-      .then((res) => {
-        rawData = res;
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+    try {
+      rawData = await this.ttlsService.callHttp(dtid);
+    } catch (err) {
+      console.log(err);
+    }
     let data;
     if (rawData) {
       const tenantAddr = rawData.tenantAddr[0];
@@ -508,13 +503,11 @@ export class ReportService {
     // get raw ttls data for later
     await this.ttlsService.setWebadeToken();
     let rawData: DTR;
-    await firstValueFrom(this.ttlsService.callHttp(dtid))
-      .then((res) => {
-        rawData = res;
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+    try {
+      rawData = await this.ttlsService.callHttp(dtid);
+    } catch (err) {
+      console.log(err);
+    }
     // get the document template
     const documentTemplateObject = await this.documentTemplateService.findActiveByDocumentType(document_type_id);
     const interestParcel = rawData.interestParcel;
@@ -613,13 +606,11 @@ export class ReportService {
     // get raw ttls data for later
     await this.ttlsService.setWebadeToken();
     let rawData: DTR;
-    await firstValueFrom(this.ttlsService.callHttp(dtid))
-      .then((res) => {
-        rawData = res;
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+    try {
+      rawData = await this.ttlsService.callHttp(dtid);
+    } catch (err) {
+      console.log(err);
+    }
 
     const documentTemplateObject = await this.documentTemplateService.findActiveByDocumentType(document_type_id);
 
@@ -635,13 +626,13 @@ export class ReportService {
 
       if (variable_value.includes('«')) {
         // regex which converts «DB_TENURE_TYPE» to {d.DB_Tenure_Type}, also works for VAR_
-        variable_value = variable_value.replace(/<<([^>>]+)>>/g, function (match, innerText) {
+        variable_value = variable_value.replace(/<<((?:(?!>>).)+?)>>/g, function (match, innerText) {
           innerText = convertToSpecialCamelCase(innerText);
           return '{d.' + innerText + '}';
         });
       } else if (variable_value.includes('<<')) {
         // regex which converts <<DB_TENURE_TYPE>> to {d.DB_Tenure_Type}, also works for VAR_
-        variable_value = variable_value.replace(/<<([^>>]+)>>/g, function (match, innerText) {
+        variable_value = variable_value.replace(/<<((?:(?!>>).)+?)>>/g, function (match, innerText) {
           innerText = convertToSpecialCamelCase(innerText);
           return '{d.' + innerText + '}';
         });
@@ -678,7 +669,7 @@ export class ReportService {
         });
       } else if (provision.free_text.includes('<<')) {
         // regex which converts <<DB_TENURE_TYPE>> to {d.DB_Tenure_Type}, also works for VAR_
-        provision.free_text = provision.free_text.replace(/<<([^>>]+)>>/g, function (match, innerText) {
+        provision.free_text = provision.free_text.replace(/<<((?:(?!>>).)+?)>>/g, function (match, innerText) {
           innerText = convertToSpecialCamelCase(innerText);
           return '{d.' + innerText + '}';
         });

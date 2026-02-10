@@ -1,8 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { HttpService } from '@nestjs/axios';
-import { AxiosResponse } from 'axios';
-import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
 import { URLSearchParams } from 'url';
 import * as dotenv from 'dotenv';
 import * as base64 from 'base-64';
@@ -22,7 +18,7 @@ export class TTLSService {
   private readonly webade_secret: string;
   private readonly tantalis_api: string;
   private webade_token: string;
-  constructor(private readonly http: HttpService) {
+  constructor() {
     hostname = process.env.backend_url ? process.env.backend_url : `http://localhost`;
     // local development backend port is 3001, docker backend port is 3000
     port = process.env.backend_url ? 3000 : 3001;
@@ -273,14 +269,11 @@ export class TTLSService {
     }
   }
 
-  callHttp(id: number): Observable<DTR> {
+  async callHttp(id: number): Promise<DTR> {
     const bearerToken = this.webade_token;
     const url = process.env.ttls_url + id;
-    return this.http.get(url, { headers: { Authorization: 'Bearer ' + bearerToken } }).pipe(
-      map((axiosResponse: AxiosResponse) => {
-        return axiosResponse.data;
-      })
-    );
+    const response = await axios.get(url, { headers: { Authorization: 'Bearer ' + bearerToken } });
+    return response.data;
   }
 
   // grab a CDOGS token for future requests

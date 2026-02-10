@@ -14,7 +14,6 @@ import { IdirObject, ProvisionJSON, VariableJSON } from 'src/types';
 import { TTLSService } from '../ttls/ttls.service';
 import { AxiosRequestConfig } from 'axios';
 import { ReportService } from './report.service';
-import { firstValueFrom } from 'rxjs';
 import { User } from 'src/auth/decorators/user.decorator';
 import { JwtAuthGuard } from 'src/auth/jwtauth.guard';
 import { JwtRoleGuard } from 'src/auth/jwtrole.guard';
@@ -43,19 +42,17 @@ export class ReportController {
   @Get('get-data/:dtid')
   async getData(@Param('dtid') dtid: number) {
     await this.ttlsService.setWebadeToken();
-    const response: any = await firstValueFrom(this.ttlsService.callHttp(dtid))
-      .then((res) => {
-        return res;
-      })
-      .catch((err) => {
-        console.log('callHttp failed');
-        console.log(err);
-        console.log(err.response.data);
-        const errorMessage = `Disposition Transaction not found with id ${dtid}`;
-        throw new HttpException(errorMessage, HttpStatus.INTERNAL_SERVER_ERROR);
-      });
-    //
-    return response;
+    try {
+      const response: any = await this.ttlsService.callHttp(dtid);
+      console.log(response);
+      return response;
+    } catch (err) {
+      console.log('callHttp failed');
+      console.log(err);
+      console.log(err.response.data);
+      const errorMessage = `Disposition Transaction not found with id ${dtid}`;
+      throw new HttpException(errorMessage, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
 
   @Get('get-document-data/:document_type_id/:dtid')

@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import * as dotenv from 'dotenv';
-import { firstValueFrom } from 'rxjs';
 import { DocumentTemplateService } from 'src/document_template/document_template.service';
 import { ProvisionService } from 'src/provision/provision.service';
 import { TTLSService } from 'src/ttls/ttls.service';
@@ -279,13 +278,11 @@ export class ReportService {
   async getDbVariables(dtid: number, document_type_id: number, idirName: string): Promise<any> {
     await this.ttlsService.setWebadeToken();
     let rawData: DTR;
-    await firstValueFrom(this.ttlsService.callHttp(dtid))
-      .then((res) => {
-        rawData = res;
-      })
-      .catch((err) => {
-        console.log(err); //
-      });
+    try {
+      rawData = await this.ttlsService.callHttp(dtid);
+    } catch (err) {
+      console.log(err); //
+    }
 
     const interestParcel = rawData.interestParcel;
     const tenantAddr = rawData.tenantAddr;
@@ -358,13 +355,11 @@ export class ReportService {
     // get the view given the print request detail id
     await this.ttlsService.setWebadeToken();
     let rawData: DTR;
-    await firstValueFrom(this.ttlsService.callHttp(dtid))
-      .then((res) => {
-        rawData = res;
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+    try {
+      rawData = await this.ttlsService.callHttp(dtid);
+    } catch (err) {
+      console.log(err);
+    }
     let data;
     if (rawData) {
       const tenantAddr = rawData.tenantAddr[0];
@@ -508,13 +503,11 @@ export class ReportService {
     // get raw ttls data for later
     await this.ttlsService.setWebadeToken();
     let rawData: DTR;
-    await firstValueFrom(this.ttlsService.callHttp(dtid))
-      .then((res) => {
-        rawData = res;
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+    try {
+      rawData = await this.ttlsService.callHttp(dtid);
+    } catch (err) {
+      console.log(err);
+    }
     // get the document template
     const documentTemplateObject = await this.documentTemplateService.findActiveByDocumentType(document_type_id);
     const interestParcel = rawData.interestParcel;
@@ -613,13 +606,11 @@ export class ReportService {
     // get raw ttls data for later
     await this.ttlsService.setWebadeToken();
     let rawData: DTR;
-    await firstValueFrom(this.ttlsService.callHttp(dtid))
-      .then((res) => {
-        rawData = res;
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+    try {
+      rawData = await this.ttlsService.callHttp(dtid);
+    } catch (err) {
+      console.log(err);
+    }
 
     const documentTemplateObject = await this.documentTemplateService.findActiveByDocumentType(document_type_id);
 

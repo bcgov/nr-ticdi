@@ -2,7 +2,7 @@ FROM node:20-bullseye AS build
 
 WORKDIR /app
 COPY . .
-RUN npm ci --omit=dev --legacy-peer-deps && \
+RUN npm ci && \
     npm run build
 
 FROM caddy:2.6.4-alpine AS deploy

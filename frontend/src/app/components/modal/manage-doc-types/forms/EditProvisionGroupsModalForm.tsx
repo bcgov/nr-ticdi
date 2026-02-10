@@ -1,4 +1,4 @@
-import { FC, useState } from 'react';
+import { FC } from 'react';
 import { Button, Col, Modal, Spinner } from 'react-bootstrap';
 import ProvisionGroupsTable from '../../../table/manage-doc-types/ProvisionGroupsTable';
 import { ProvisionGroup } from '../../../../types/types';

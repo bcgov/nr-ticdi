@@ -1,12 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { DataTable } from '../common/DataTable';
 import { ColumnDef, createColumnHelper } from '@tanstack/react-table';
-import {
-  activateTemplate,
-  downloadTemplate,
-  getTemplatesInfo,
-  previewTemplate,
-} from '../../../common/manage-templates';
+import { activateTemplate, downloadTemplate, getTemplatesInfo } from '../../../common/manage-templates';
 import { DocType, TemplateInfo } from '../../../types/types';
 import { Button } from 'react-bootstrap';
 import PreviewTemplateModal from '../../modal/manage-templates/PreviewTemplateModal';

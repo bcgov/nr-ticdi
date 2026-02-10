@@ -73,7 +73,7 @@ const LandingPage: FC = () => {
       fetchData(dtidFromUrl);
       setInitializeDtid(false);
     }
-  }, [dtidFromUrl]);
+  }, [dtidFromUrl, initializeDtid]);
 
   // Old route compatibility, set doc type from url
   useEffect(() => {

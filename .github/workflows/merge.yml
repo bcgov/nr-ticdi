@@ -1,5 +1,9 @@
 name: Merge
 
+permissions:
+  contents: read
+  packages: read
+
 on:
   push:
     branches: [main]

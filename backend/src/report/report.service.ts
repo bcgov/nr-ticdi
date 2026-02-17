@@ -710,7 +710,7 @@ export class ReportService {
         }
       }
       if (legalDescArray.length > 0) {
-        concatLegalDescriptions = legalDescArray.join('\n');
+        concatLegalDescriptions = legalDescArray.join('\n\n');
       }
     }
 

@@ -8,7 +8,6 @@ COPY *.json ./
 COPY ./src /app/src
 RUN npm ci --omit=dev && \
     npm run build
-USER node
 
 # Deployment container
 FROM registry.access.redhat.com/ubi8/ubi-minimal:8.7

@@ -266,10 +266,14 @@ export function grazingLeaseVariables(
         mailingAddress =
           mailingAddress.length > 0 ? [mailingAddress, tempMailingAddress].join('\n ') : tempMailingAddress;
         const tempMailingName = getFullName(tenant);
-        mailingNameList.push({ name: tempMailingName });
+        if (!mailingNameList.some((entry) => entry.name === tempMailingName)) {
+          mailingNameList.push({ name: tempMailingName });
+        }
         mailingName = mailingName.length > 0 ? [mailingName, tempMailingName].join('\n ') : tempMailingName;
         const tempMailingCorp = getCorp(tenant);
-        mailingCorp = mailingCorp.length > 0 ? [mailingCorp, tempMailingCorp].join('\n ') : tempMailingCorp;
+        if (!mailingCorp.split('\n ').includes(tempMailingCorp)) {
+          mailingCorp = mailingCorp.length > 0 ? [mailingCorp, tempMailingCorp].join('\n ') : tempMailingCorp;
+        }
       } else if (tenant.addrType == 'STREET') {
         const tempStreetAddress = getMailingAddress(tenant);
         streetAddress = streetAddress.length > 0 ? [streetAddress, tempStreetAddress].join('\n ') : tempStreetAddress;
@@ -279,7 +283,10 @@ export function grazingLeaseVariables(
         const tempStreetCorp = getCorp(tenant);
         streetCorp = streetCorp.length > 0 ? [streetCorp, tempStreetCorp].join('\n ') : tempStreetCorp;
       }
-      combinedName = combinedName.length > 0 ? [combinedName, getFullName(tenant)].join('\n ') : getFullName(tenant);
+      const tempCombinedName = getFullName(tenant);
+      if (!combinedName.split('\n ').includes(tempCombinedName)) {
+        combinedName = combinedName.length > 0 ? [combinedName, tempCombinedName].join('\n ') : tempCombinedName;
+      }
     }
 
     // if either address is empty, set it to the other

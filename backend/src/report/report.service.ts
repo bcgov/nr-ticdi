@@ -697,7 +697,7 @@ export class ReportService {
       }
     }
 
-    // Format the raw ttls data
+    // Format the raw ttls data //
     const tenantAddr = rawData.tenantAddr;
     const interestParcels = rawData.interestParcel;
     let concatLegalDescriptions = '';

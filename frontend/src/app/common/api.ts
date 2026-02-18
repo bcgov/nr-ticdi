@@ -25,7 +25,7 @@ interface ApiRequestParameters<T = {}> {
 
 const axiosInstance = axios.create();
 
-// check the token status on every request, refresh it if it is 3 minutes old (5min expiry time) //
+// check the token status on every request, refresh it if it is 3 minutes old (5min expiry time)
 axiosInstance.interceptors.request.use(
   async (config) => {
     if (config.headers.Authorization) {

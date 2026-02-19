@@ -6,6 +6,7 @@ import { TTLSService } from 'src/ttls/ttls.service';
 import { numberWords, sectionTitles } from '../constants';
 import { DTR, ProvisionJSON, VariableJSON } from '../types';
 import {
+  buildLegalDescription,
   convertToSpecialCamelCase,
   formatMoney,
   formatPhoneNumber,
@@ -309,7 +310,7 @@ export class ReportService {
       DB_NAME_TENANT: glVariables.combinedName,
       DB_NAME_TENANT_LIST: glVariables.mailingNameList,
       DB_NAME_CORPORATION: glVariables.mailingCorp,
-      DB_LEGAL_DESCRIPTION: glVariables.legalDescription,
+      DB_LEGAL_DESCRIPTION: buildLegalDescription(rawData.interestParcel),
       DB_NAME_BCAL_CONTACT: idirName,
       DB_TENURE_TYPE:
         rawData && rawData.type
@@ -331,7 +332,7 @@ export class ReportService {
       DB_Name_Tenant: glVariables.combinedName,
       DB_Name_Tenant_List: glVariables.mailingNameList,
       DB_Name_Corporation: glVariables.mailingCorp,
-      DB_Legal_Description: glVariables.legalDescription,
+      DB_Legal_Description: buildLegalDescription(rawData.interestParcel),
       DB_Name_Bcal_Contact: idirName,
       DB_Tenure_Type:
         rawData && rawData.type
@@ -532,7 +533,7 @@ export class ReportService {
       DB_Name_Tenant: glVariables.combinedName,
       DB_Name_Tenant_List: glVariables.mailingNameList,
       DB_Name_Corporation: glVariables.mailingCorp,
-      DB_Legal_Description: glVariables.legalDescription,
+      DB_Legal_Description: buildLegalDescription(rawData.interestParcel),
       DB_Name_Tenants: glVariables.combinedName,
       DB_Address_Tenant: glVariables.combinedAddress,
     };
@@ -699,20 +700,7 @@ export class ReportService {
 
     // Format the raw ttls data
     const tenantAddr = rawData.tenantAddr;
-    const interestParcels = rawData.interestParcel;
-    let concatLegalDescriptions = '';
-    if (interestParcels && interestParcels.length > 0) {
-      interestParcels.sort((a, b) => b.interestParcelId - a.interestParcelId);
-      let legalDescArray = [];
-      for (let ip of interestParcels) {
-        if (ip.legalDescription && ip.legalDescription != '') {
-          legalDescArray.push(ip.legalDescription);
-        }
-      }
-      if (legalDescArray.length > 0) {
-        concatLegalDescriptions = legalDescArray.join('\n\n');
-      }
-    }
+    const concatLegalDescriptions = buildLegalDescription(rawData.interestParcel);
 
     const DB_Address_Mailing_Tenant = tenantAddr[0] ? nfrAddressBuilder(tenantAddr) : '';
 

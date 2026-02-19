@@ -1,5 +1,12 @@
 import { InterestParcel, TenantAddressResource } from './types';
 
+export function buildLegalDescription(interestParcels: InterestParcel[]): string {
+  if (!interestParcels || interestParcels.length === 0) return '';
+  const sorted = [...interestParcels].sort((a, b) => (b.interestParcelId ?? 0) - (a.interestParcelId ?? 0));
+  const descriptions = sorted.map((ip) => ip.legalDescription).filter((desc): desc is string => !!desc && desc !== '');
+  return descriptions.join('\n\n');
+}
+
 export function formatMoney(value: number): string {
   return value.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
 }

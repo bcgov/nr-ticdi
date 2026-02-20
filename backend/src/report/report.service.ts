@@ -163,6 +163,13 @@ export class ReportService {
         free_text = free_text.replace(/db_name_tenant:convcrlf\(\)}/gi, 'DB_NAME_TENANT:convCRLF()}');
       }
 
+      // make sure that the db_legal_description variable keeps line break formatting
+      if (free_text.toLowerCase().includes('db_legal_description}')) {
+        free_text = free_text.replace(/db_legal_description}/gi, 'DB_Legal_Description:convCRLF()}');
+      } else if (free_text.toLowerCase().includes('db_legal_description:convcrlf()}')) {
+        free_text = free_text.replace(/db_legal_description:convcrlf\(\)}/gi, 'DB_Legal_Description:convCRLF()}');
+      }
+
       // do same conversions for list items
       let list = list_items.map((item) => {
         if (item.includes('«')) {
@@ -183,6 +190,13 @@ export class ReportService {
           item = item.replace(/db_name_tenant}/gi, 'DB_NAME_TENANT:convCRLF()}');
         } else if (item.toLowerCase().includes('db_name_tenant:convcrlf()}')) {
           item = item.replace(/db_name_tenant:convcrlf\(\)}/gi, 'DB_NAME_TENANT:convCRLF()}');
+        }
+
+        // make sure that the db_legal_description variable keeps line break formatting
+        if (item.toLowerCase().includes('db_legal_description}')) {
+          item = item.replace(/db_legal_description}/gi, 'DB_Legal_Description:convCRLF()}');
+        } else if (item.toLowerCase().includes('db_legal_description:convcrlf()}')) {
+          item = item.replace(/db_legal_description:convcrlf\(\)}/gi, 'DB_Legal_Description:convCRLF()}');
         }
         return { item };
       });
@@ -675,6 +689,14 @@ export class ReportService {
           return '{d.' + innerText + '}';
         });
       }
+
+      // make sure that the db_legal_description variable keeps line break formatting
+      if (provision.free_text.toLowerCase().includes('db_legal_description}')) {
+        provision.free_text = provision.free_text.replace(/db_legal_description}/gi, 'DB_Legal_Description:convCRLF()}');
+      } else if (provision.free_text.toLowerCase().includes('db_legal_description:convcrlf()}')) {
+        provision.free_text = provision.free_text.replace(/db_legal_description:convcrlf\(\)}/gi, 'DB_Legal_Description:convCRLF()}');
+      }
+
       showProvisionSections[varName] = provision.free_text;
       // workaround for template formatting
       if (showProvisionSections[varName] != '') {

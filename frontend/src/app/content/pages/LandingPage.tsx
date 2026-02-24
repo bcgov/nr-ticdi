@@ -58,6 +58,7 @@ const LandingPage: FC = () => {
   const [sourceDocTypeId, setSourceDocTypeId] = useState<number | null>(null);
   const [loadingSource, setLoadingSource] = useState<boolean>(false);
   const [loadError, setLoadError] = useState<string | null>(null);
+  const [showLoadModal, setShowLoadModal] = useState<boolean>(false);
   const [showLoadConfirm, setShowLoadConfirm] = useState<boolean>(false);
   const [pendingLoad, setPendingLoad] = useState<{
     filteredProvisionIds: number[];
@@ -409,6 +410,16 @@ const LandingPage: FC = () => {
     setLoadError(null);
     setPendingLoad(null);
     setShowLoadConfirm(false);
+    setShowLoadModal(false);
+  };
+
+  const handleCloseLoadModal = () => {
+    setShowLoadModal(false);
+    setShowLoadConfirm(false);
+    setPendingLoad(null);
+    setLoadError(null);
+    setSourceDtidInput(null);
+    setSourceDocTypeId(selectedDocTypeId);
   };
 
   const getReportData = () => {
@@ -579,81 +590,111 @@ const LandingPage: FC = () => {
           </select>
         </div>
       </Row>
-      <Row
-        className="mb-3"
-        style={{
-          opacity: documentType ? 1 : 0.4,
-          pointerEvents: documentType ? 'auto' : 'none',
-        }}
-      >
-        <div className="ml-3" style={{ display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap' }}>
-          <b style={{ whiteSpace: 'nowrap' }}>Load from DTID:</b>
-          <input
-            type="number"
-            className="form-control"
-            style={{ width: '130px' }}
-            value={sourceDtidInput || ''}
-            disabled={!documentType || loadingSource}
-            onChange={handleSourceDtidChange}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') {
-                e.preventDefault();
-                handleLoadFromSourceDtid();
-              }
-            }}
-          />
-          <b style={{ whiteSpace: 'nowrap' }}>Source Document Type:</b>
-          <select
-            className="form-control"
-            style={{ width: 'auto', minWidth: '220px' }}
-            value={sourceDocTypeId || ''}
-            disabled={!documentType || loadingSource}
-            onChange={handleSourceDocTypeChange}
-          >
-            <option value="">Select a document type</option>
-            {documentTypes.map((docType) => (
-              <option key={docType.id} value={docType.id}>
-                {docType.name}
-              </option>
-            ))}
-          </select>
+      <Row className="mb-3">
+        <div className="ml-3">
           <Button
             variant="outline-secondary"
-            disabled={!documentType || !sourceDtidInput || !sourceDocTypeId || loadingSource}
-            onClick={handleLoadFromSourceDtid}
-            style={{ whiteSpace: 'nowrap' }}
+            disabled={!documentType}
+            style={!documentType ? { backgroundColor: '#d6d6d6', borderColor: '#bbb', color: '#888' } : {}}
+            onClick={() => {
+              setSourceDocTypeId(selectedDocTypeId);
+              setShowLoadModal(true);
+            }}
           >
-            {loadingSource ? 'Loading…' : 'Load'}
+            Load Provisions
           </Button>
         </div>
       </Row>
-      {loadError && (
-        <Row className="mb-2">
-          <div className="ml-3">
-            <Alert variant="danger" className="d-inline-block mb-0" style={{ width: 'auto', maxWidth: '100%' }}>
-              {loadError}
-            </Alert>
-          </div>
-        </Row>
-      )}
-      <Modal show={showLoadConfirm} onHide={() => setShowLoadConfirm(false)} centered>
+      <Modal show={showLoadModal} onHide={handleCloseLoadModal} centered dialogClassName="modal-600">
         <Modal.Header closeButton>
-          <Modal.Title>Confirm Load</Modal.Title>
+          <Modal.Title>Load Provisions</Modal.Title>
         </Modal.Header>
-        <Modal.Body>
-          This will replace your current provision selections with{' '}
-          <strong>{pendingLoad?.filteredProvisionIds.length ?? 0}</strong> provision
-          {pendingLoad?.filteredProvisionIds.length === 1 ? '' : 's'} from DTID <strong>{sourceDtidInput}</strong>. Any
-          unsaved changes will be lost.
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={() => setShowLoadConfirm(false)}>
-            Cancel
-          </Button>
-          <Button variant="primary" onClick={confirmLoad}>
-            Load
-          </Button>
-        </Modal.Footer>
+        {!showLoadConfirm ? (
+          <>
+            <Modal.Body>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                <div>
+                  <label className="form-label">
+                    <b>DTID</b>
+                  </label>
+                  <input
+                    type="number"
+                    className="form-control"
+                    style={{ width: '160px' }}
+                    value={sourceDtidInput || ''}
+                    disabled={loadingSource}
+                    onChange={handleSourceDtidChange}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        handleLoadFromSourceDtid();
+                      }
+                    }}
+                    autoFocus
+                  />
+                </div>
+                <div>
+                  <label className="form-label">
+                    <b>Document Type</b>
+                  </label>
+                  <select
+                    className="form-control"
+                    style={{ width: 'auto', minWidth: '220px' }}
+                    value={sourceDocTypeId || ''}
+                    disabled={loadingSource}
+                    onChange={handleSourceDocTypeChange}
+                  >
+                    <option value="">Select a document type</option>
+                    {documentTypes.map((docType) => (
+                      <option key={docType.id} value={docType.id}>
+                        {docType.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                {loadError && (
+                  <Alert variant="danger" className="mb-0">
+                    {loadError}
+                  </Alert>
+                )}
+              </div>
+            </Modal.Body>
+            <Modal.Footer>
+              <Button variant="secondary" onClick={handleCloseLoadModal}>
+                Cancel
+              </Button>
+              <Button
+                variant="primary"
+                disabled={!sourceDtidInput || !sourceDocTypeId || loadingSource}
+                onClick={handleLoadFromSourceDtid}
+              >
+                {loadingSource ? 'Loading…' : 'Load'}
+              </Button>
+            </Modal.Footer>
+          </>
+        ) : (
+          <>
+            <Modal.Body>
+              This will replace your current provision selections with{' '}
+              <strong>{pendingLoad?.filteredProvisionIds.length ?? 0}</strong> provision(s) from DTID{' '}
+              <strong>{sourceDtidInput}</strong>. Any unsaved changes will be lost.
+            </Modal.Body>
+            <Modal.Footer>
+              <Button variant="secondary" onClick={() => setShowLoadConfirm(false)}>
+                Back
+              </Button>
+              <Button
+                variant="primary"
+                onClick={() => {
+                  confirmLoad();
+                  setShowLoadModal(false);
+                }}
+              >
+                Confirm
+              </Button>
+            </Modal.Footer>
+          </>
+        )}
       </Modal>
       <Collapsible title="Disposition Transaction ID Details" isOpen={isOpen}>
         {data ? <DtidDetails data={data!} /> : <Skeleton />}

@@ -2,6 +2,11 @@
   float: left !important;
 }
 
+.modal-600 {
+  max-width: 600px;
+  width: 600px;
+}
+
 .option-viewed {
   background-color: lightgreen;
 }

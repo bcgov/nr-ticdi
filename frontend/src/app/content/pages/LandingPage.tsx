@@ -22,7 +22,7 @@ import Skeleton from 'react-loading-skeleton';
 import Provisions from '../display/Provisions';
 import { ProvisionJson, SaveProvisionData } from '../../components/table/reports/SelectedProvisionsTable';
 import VariablesTable, { SaveVariableData, VariableJson } from '../../components/table/reports/VariablesTable';
-import { Alert, Button, Row } from 'react-bootstrap';
+import { Alert, Button, Modal, Row } from 'react-bootstrap';
 import { getActiveDocTypes } from '../../common/manage-doc-types';
 import { getVariablesByDocType } from '../../common/manage-provisions';
 import { useDispatch, useSelector } from 'react-redux';
@@ -54,6 +54,17 @@ const LandingPage: FC = () => {
   const [filteredDocumentTypes, setFilteredDocumentTypes] = useState<DocType[]>([]);
 
   const [variableEdits, setVariableEdits] = useState<{ [variableId: number]: string }>({});
+  const [sourceDtidInput, setSourceDtidInput] = useState<number | null>(null);
+  const [sourceDocTypeId, setSourceDocTypeId] = useState<number | null>(null);
+  const [loadingSource, setLoadingSource] = useState<boolean>(false);
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const [showLoadModal, setShowLoadModal] = useState<boolean>(false);
+  const [showLoadConfirm, setShowLoadConfirm] = useState<boolean>(false);
+  const [pendingLoad, setPendingLoad] = useState<{
+    filteredProvisionIds: number[];
+    mergedVariables: Variable[];
+    selectedVariableIds: number[];
+  } | null>(null);
 
   const dispatch = useDispatch();
   const selectedProvisionIds: number[] = useSelector((state: RootState) => state.provision.selectedProvisionIds);
@@ -82,6 +93,7 @@ const LandingPage: FC = () => {
         if (dt.name.toLowerCase() === docTypeFromUrl.toLowerCase()) {
           setDocumentType(dt);
           setSelectedDocTypeId(dt.id);
+          setSourceDocTypeId(dt.id);
           setInitializeDocType(false);
         }
       }
@@ -90,6 +102,7 @@ const LandingPage: FC = () => {
       if (lurDocType) {
         setDocumentType(lurDocType);
         setSelectedDocTypeId(lurDocType.id);
+        setSourceDocTypeId(lurDocType.id);
       }
       setInitializeDocType(false);
     }
@@ -127,6 +140,7 @@ const LandingPage: FC = () => {
         setDtidInput(searchState.dtid);
         setDocumentType(searchState.document_type);
         setSelectedDocTypeId(searchState.document_type.id);
+        setSourceDocTypeId(searchState.document_type.id);
         const displayData: { dtr: DTRDisplayObject | null; error: string | null } = await getDisplayData(
           searchState.dtid
         );
@@ -247,10 +261,77 @@ const LandingPage: FC = () => {
   const handleDocTypeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedId = parseInt(event.target.value);
     setSelectedDocTypeId(selectedId || null);
+    setSourceDocTypeId(selectedId || null);
+    setSourceDtidInput(null);
+    setLoadError(null);
   };
 
   const handleDtidChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setDtidInput(!isNaN(parseInt(e.target.value)) ? parseInt(e.target.value) : null);
+  };
+
+  const handleSourceDtidChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSourceDtidInput(!isNaN(parseInt(e.target.value)) ? parseInt(e.target.value) : null);
+    setLoadError(null);
+  };
+
+  const handleSourceDocTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setSourceDocTypeId(parseInt(e.target.value) || null);
+    setLoadError(null);
+  };
+
+  const handleLoadFromSourceDtid = async () => {
+    if (!documentType || !sourceDtidInput || !sourceDocTypeId) return;
+    setLoadError(null);
+    try {
+      setLoadingSource(true);
+      // Fetch saved data for the source dtid + source doc type
+      const sourceData: DocumentDataDTO = await getDocumentData(sourceDocTypeId, sourceDtidInput);
+      // Check that the source DTID actually has saved document data
+      if (!sourceData.preselectedProvisionIds || sourceData.preselectedProvisionIds.length === 0) {
+        setLoadError(`No saved document data found for DTID ${sourceDtidInput} with the selected document type.`);
+        return;
+      }
+      // Only keep provision ids that exist in the current doc type (provisions already loaded in Redux)
+      const currentProvisionIds = new Set(provisions.map((p) => p.provision_id));
+      const filteredProvisionIds = sourceData.preselectedProvisionIds.filter((id) => currentProvisionIds.has(id));
+      // Check that there are shared provisions between the source and current doc type
+      if (filteredProvisionIds.length === 0) {
+        setLoadError(
+          'No provisions from the source document type are compatible with the current document type. Nothing to load.'
+        );
+        return;
+      }
+      // Build variables for the current doc type, overlaying saved values from the source
+      const defaultVariables: Variable[] = await getVariablesByDocType(documentType.id);
+      const mergedVariables: Variable[] = defaultVariables.map((defaultVar) => {
+        const savedVar = sourceData.savedVariableInfo?.find((info) => info.variable_id === defaultVar.id);
+        return {
+          ...defaultVar,
+          variable_value: savedVar?.saved_value || defaultVar.variable_value,
+        };
+      });
+      const selectedVarIds = mergedVariables
+        .filter((v) => filteredProvisionIds.includes(v.provision_id))
+        .map((v) => v.id);
+      setPendingLoad({ filteredProvisionIds, mergedVariables, selectedVariableIds: selectedVarIds });
+      setShowLoadConfirm(true);
+    } catch (err) {
+      console.log('Error loading document data from source DTID');
+      console.log(err);
+      setLoadError('An error occurred while fetching document data. Please try again.');
+    } finally {
+      setLoadingSource(false);
+    }
+  };
+
+  const confirmLoad = () => {
+    if (!pendingLoad) return;
+    dispatch(setSelectedProvisionIds(pendingLoad.filteredProvisionIds));
+    dispatch(setVariables(pendingLoad.mergedVariables));
+    dispatch(setSelectedVariableIds(pendingLoad.selectedVariableIds));
+    setPendingLoad(null);
+    setShowLoadConfirm(false);
   };
 
   /**
@@ -324,6 +405,21 @@ const LandingPage: FC = () => {
     setSelectedDocTypeId(null);
     setShowError(false);
     setShowGenerateError(false);
+    setSourceDtidInput(null);
+    setSourceDocTypeId(null);
+    setLoadError(null);
+    setPendingLoad(null);
+    setShowLoadConfirm(false);
+    setShowLoadModal(false);
+  };
+
+  const handleCloseLoadModal = () => {
+    setShowLoadModal(false);
+    setShowLoadConfirm(false);
+    setPendingLoad(null);
+    setLoadError(null);
+    setSourceDtidInput(null);
+    setSourceDocTypeId(selectedDocTypeId);
   };
 
   const getReportData = () => {
@@ -480,6 +576,7 @@ const LandingPage: FC = () => {
         <div className="ml-3">
           <select
             className="form-control"
+            style={{ width: 'auto', minWidth: '220px' }}
             value={selectedDocTypeId || ''}
             disabled={loading || !dtid || !data || showError}
             onChange={handleDocTypeChange}
@@ -493,6 +590,112 @@ const LandingPage: FC = () => {
           </select>
         </div>
       </Row>
+      <Row className="mb-3">
+        <div className="ml-3">
+          <Button
+            variant="outline-secondary"
+            disabled={!documentType}
+            style={!documentType ? { backgroundColor: '#d6d6d6', borderColor: '#bbb', color: '#888' } : {}}
+            onClick={() => {
+              setSourceDocTypeId(selectedDocTypeId);
+              setShowLoadModal(true);
+            }}
+          >
+            Load Provisions
+          </Button>
+        </div>
+      </Row>
+      <Modal show={showLoadModal} onHide={handleCloseLoadModal} centered dialogClassName="modal-600">
+        <Modal.Header closeButton>
+          <Modal.Title>Load Provisions</Modal.Title>
+        </Modal.Header>
+        {!showLoadConfirm ? (
+          <>
+            <Modal.Body>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                <div>
+                  <label className="form-label">
+                    <b>DTID</b>
+                  </label>
+                  <input
+                    type="number"
+                    className="form-control"
+                    style={{ width: '160px' }}
+                    value={sourceDtidInput || ''}
+                    disabled={loadingSource}
+                    onChange={handleSourceDtidChange}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        handleLoadFromSourceDtid();
+                      }
+                    }}
+                    autoFocus
+                  />
+                </div>
+                <div>
+                  <label className="form-label">
+                    <b>Document Type</b>
+                  </label>
+                  <select
+                    className="form-control"
+                    style={{ width: 'auto', minWidth: '220px' }}
+                    value={sourceDocTypeId || ''}
+                    disabled={loadingSource}
+                    onChange={handleSourceDocTypeChange}
+                  >
+                    <option value="">Select a document type</option>
+                    {documentTypes.map((docType) => (
+                      <option key={docType.id} value={docType.id}>
+                        {docType.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                {loadError && (
+                  <Alert variant="danger" className="mb-0">
+                    {loadError}
+                  </Alert>
+                )}
+              </div>
+            </Modal.Body>
+            <Modal.Footer>
+              <Button variant="secondary" onClick={handleCloseLoadModal}>
+                Cancel
+              </Button>
+              <Button
+                variant="primary"
+                disabled={!sourceDtidInput || !sourceDocTypeId || loadingSource}
+                onClick={handleLoadFromSourceDtid}
+              >
+                {loadingSource ? 'Loading…' : 'Load'}
+              </Button>
+            </Modal.Footer>
+          </>
+        ) : (
+          <>
+            <Modal.Body>
+              This will replace your current provision selections with{' '}
+              <strong>{pendingLoad?.filteredProvisionIds.length ?? 0}</strong> provision(s) from DTID{' '}
+              <strong>{sourceDtidInput}</strong>. Any unsaved changes will be lost.
+            </Modal.Body>
+            <Modal.Footer>
+              <Button variant="secondary" onClick={() => setShowLoadConfirm(false)}>
+                Back
+              </Button>
+              <Button
+                variant="primary"
+                onClick={() => {
+                  confirmLoad();
+                  setShowLoadModal(false);
+                }}
+              >
+                Confirm
+              </Button>
+            </Modal.Footer>
+          </>
+        )}
+      </Modal>
       <Collapsible title="Disposition Transaction ID Details" isOpen={isOpen}>
         {data ? <DtidDetails data={data!} /> : <Skeleton />}
       </Collapsible>

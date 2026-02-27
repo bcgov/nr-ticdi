@@ -16,6 +16,7 @@ import {
   saveDocument,
   getGroupMaxByDocTypeId,
   getDocumentData,
+  getDocTypesByDtid,
 } from '../../common/report';
 import InterestedParties from '../display/InterestedParties';
 import Skeleton from 'react-loading-skeleton';
@@ -57,6 +58,9 @@ const LandingPage: FC = () => {
   const [sourceDtidInput, setSourceDtidInput] = useState<number | null>(null);
   const [sourceDocTypeId, setSourceDocTypeId] = useState<number | null>(null);
   const [loadingSource, setLoadingSource] = useState<boolean>(false);
+  const [loadingSearch, setLoadingSearch] = useState<boolean>(false);
+  const [sourceDtidSearched, setSourceDtidSearched] = useState<boolean>(false);
+  const [sourceDocTypes, setSourceDocTypes] = useState<DocType[]>([]);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [showLoadModal, setShowLoadModal] = useState<boolean>(false);
   const [showLoadConfirm, setShowLoadConfirm] = useState<boolean>(false);
@@ -272,7 +276,41 @@ const LandingPage: FC = () => {
 
   const handleSourceDtidChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSourceDtidInput(!isNaN(parseInt(e.target.value)) ? parseInt(e.target.value) : null);
+    setSourceDtidSearched(false);
+    setSourceDocTypes([]);
+    setSourceDocTypeId(null);
     setLoadError(null);
+  };
+
+  const handleSourceDtidSearch = async () => {
+    if (!sourceDtidInput) return;
+    setLoadError(null);
+    setSourceDtidSearched(false);
+    setSourceDocTypes([]);
+    setSourceDocTypeId(null);
+    try {
+      setLoadingSearch(true);
+      // Validate the DTID exists in the TTLS API
+      const displayData = await getDisplayData(sourceDtidInput);
+      if (displayData.error) {
+        setLoadError(displayData.error);
+        return;
+      }
+      // Fetch doc types that have saved 'Complete' or 'In Progress' data for this DTID
+      const docTypes = await getDocTypesByDtid(sourceDtidInput);
+      if (!docTypes || docTypes.length === 0) {
+        setLoadError(`No saved document data found for DTID ${sourceDtidInput}.`);
+        return;
+      }
+      setSourceDocTypes(docTypes);
+      setSourceDtidSearched(true);
+    } catch (err) {
+      console.log('Error searching for DTID');
+      console.log(err);
+      setLoadError('An error occurred while searching. Please try again.');
+    } finally {
+      setLoadingSearch(false);
+    }
   };
 
   const handleSourceDocTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -411,6 +449,9 @@ const LandingPage: FC = () => {
     setPendingLoad(null);
     setShowLoadConfirm(false);
     setShowLoadModal(false);
+    setSourceDtidSearched(false);
+    setSourceDocTypes([]);
+    setLoadingSearch(false);
   };
 
   const handleCloseLoadModal = () => {
@@ -419,7 +460,10 @@ const LandingPage: FC = () => {
     setPendingLoad(null);
     setLoadError(null);
     setSourceDtidInput(null);
-    setSourceDocTypeId(selectedDocTypeId);
+    setSourceDocTypeId(null);
+    setSourceDtidSearched(false);
+    setSourceDocTypes([]);
+    setLoadingSearch(false);
   };
 
   const getReportData = () => {
@@ -601,13 +645,13 @@ const LandingPage: FC = () => {
               setShowLoadModal(true);
             }}
           >
-            Load Provisions
+            Load Previous Provisions
           </Button>
         </div>
       </Row>
       <Modal show={showLoadModal} onHide={handleCloseLoadModal} centered dialogClassName="modal-600">
         <Modal.Header closeButton>
-          <Modal.Title>Load Provisions</Modal.Title>
+          <Modal.Title>Load Previous Provisions</Modal.Title>
         </Modal.Header>
         {!showLoadConfirm ? (
           <>
@@ -617,41 +661,52 @@ const LandingPage: FC = () => {
                   <label className="form-label">
                     <b>DTID</b>
                   </label>
-                  <input
-                    type="number"
-                    className="form-control"
-                    style={{ width: '160px' }}
-                    value={sourceDtidInput || ''}
-                    disabled={loadingSource}
-                    onChange={handleSourceDtidChange}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter') {
-                        e.preventDefault();
-                        handleLoadFromSourceDtid();
-                      }
-                    }}
-                    autoFocus
-                  />
+                  <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                    <input
+                      type="number"
+                      className="form-control"
+                      style={{ width: '160px' }}
+                      value={sourceDtidInput || ''}
+                      disabled={loadingSource || loadingSearch}
+                      onChange={handleSourceDtidChange}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          e.preventDefault();
+                          handleSourceDtidSearch();
+                        }
+                      }}
+                      autoFocus
+                    />
+                    <Button
+                      variant="outline-primary"
+                      disabled={!sourceDtidInput || loadingSource || loadingSearch}
+                      onClick={handleSourceDtidSearch}
+                    >
+                      {loadingSearch ? 'Searching…' : 'Search'}
+                    </Button>
+                  </div>
                 </div>
-                <div>
-                  <label className="form-label">
-                    <b>Document Type</b>
-                  </label>
-                  <select
-                    className="form-control"
-                    style={{ width: 'auto', minWidth: '220px' }}
-                    value={sourceDocTypeId || ''}
-                    disabled={loadingSource}
-                    onChange={handleSourceDocTypeChange}
-                  >
-                    <option value="">Select a document type</option>
-                    {documentTypes.map((docType) => (
-                      <option key={docType.id} value={docType.id}>
-                        {docType.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+                {sourceDtidSearched && sourceDocTypes.length > 0 && (
+                  <div>
+                    <label className="form-label">
+                      <b>Document Type</b>
+                    </label>
+                    <select
+                      className="form-control"
+                      style={{ width: 'auto', minWidth: '220px' }}
+                      value={sourceDocTypeId || ''}
+                      disabled={loadingSource}
+                      onChange={handleSourceDocTypeChange}
+                    >
+                      <option value="">Select a document type</option>
+                      {sourceDocTypes.map((docType) => (
+                        <option key={docType.id} value={docType.id}>
+                          {docType.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                )}
                 {loadError && (
                   <Alert variant="danger" className="mb-0">
                     {loadError}
@@ -665,7 +720,7 @@ const LandingPage: FC = () => {
               </Button>
               <Button
                 variant="primary"
-                disabled={!sourceDtidInput || !sourceDocTypeId || loadingSource}
+                disabled={!sourceDtidInput || !sourceDocTypeId || loadingSource || !sourceDtidSearched}
                 onClick={handleLoadFromSourceDtid}
               >
                 {loadingSource ? 'Loading…' : 'Load'}

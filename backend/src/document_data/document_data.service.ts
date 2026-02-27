@@ -458,4 +458,24 @@ export class DocumentDataService {
       document_type: { id: document_type_id },
     });
   }
+
+  async getDocTypesByDtidWithStatus(dtid: number) {
+    try {
+      const documentDataRecords = await this.documentDataRepository.find({
+        where: { dtid: dtid },
+        relations: ['document_type'],
+      });
+      const filtered = documentDataRecords.filter(
+        (dd) => dd.document_type && (dd.status === 'Complete' || dd.status === 'In Progress')
+      );
+      const uniqueDocTypes = filtered
+        .map((dd) => dd.document_type)
+        .filter((dt, index, self) => dt && self.findIndex((d) => d.id === dt.id) === index);
+      return uniqueDocTypes;
+    } catch (err) {
+      console.log('Error in getDocTypesByDtidWithStatus');
+      console.log(err);
+      return [];
+    }
+  }
 }

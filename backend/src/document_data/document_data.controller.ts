@@ -49,6 +49,11 @@ export class DocumentDataController {
     return this.documentDataService.getEnabledProvisionsByDocTypeIdAndDtid(document_type_id, dtid);
   }
 
+  @Get('doc-types-by-dtid/:dtid')
+  getDocTypesByDtidWithStatus(@Param('dtid') dtid: number) {
+    return this.documentDataService.getDocTypesByDtidWithStatus(dtid);
+  }
+
   @Delete(':dtid')
   remove(@Param('dtid') dtid: string) {
     return this.documentDataService.remove(+dtid);

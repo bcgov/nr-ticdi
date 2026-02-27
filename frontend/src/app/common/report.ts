@@ -129,3 +129,10 @@ export const getAllProvisionGroups = async (): Promise<ProvisionGroup[]> => {
   const response = await api.get<ProvisionGroup[]>(getParameters);
   return response;
 };
+
+export const getDocTypesByDtid = async (dtid: number): Promise<DocType[]> => {
+  const url = `${config.API_BASE_URL}/document-data/doc-types-by-dtid/${dtid}`;
+  const getParameters = api.generateApiParameters(url);
+  const response = await api.get<DocType[]>(getParameters);
+  return response;
+};

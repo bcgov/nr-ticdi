@@ -317,13 +317,18 @@ const LandingPage: FC = () => {
           })
         )
       ).filter((dt): dt is DocType => dt !== null);
-      if (compatibleDocTypes.length === 0) {
+      // Exclude the currently active DTID + document type combination
+      const filteredDocTypes =
+        sourceDtidInput === dtid && documentType
+          ? compatibleDocTypes.filter((dt) => dt.id !== documentType.id)
+          : compatibleDocTypes;
+      if (filteredDocTypes.length === 0) {
         setLoadError(
           `No compatible provisions were found for DTID ${sourceDtidInput} with the current document type.`
         );
         return;
       }
-      setSourceDocTypes(compatibleDocTypes);
+      setSourceDocTypes(filteredDocTypes);
       setSourceDtidSearched(true);
     } catch (err) {
       console.log('Error searching for DTID');

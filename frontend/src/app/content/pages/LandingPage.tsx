@@ -302,7 +302,28 @@ const LandingPage: FC = () => {
         setLoadError(`No saved document data found for DTID ${sourceDtidInput}.`);
         return;
       }
-      setSourceDocTypes(docTypes);
+      // Filter to only doc types that have at least one provision compatible with the current doc type
+      const currentProvisionIds = new Set(provisions.map((p) => p.provision_id));
+      const compatibleDocTypes = (
+        await Promise.all(
+          docTypes.map(async (docType) => {
+            try {
+              const sourceData = await getDocumentData(docType.id, sourceDtidInput);
+              const hasCompatible = sourceData.preselectedProvisionIds?.some((id) => currentProvisionIds.has(id));
+              return hasCompatible ? docType : null;
+            } catch {
+              return null;
+            }
+          })
+        )
+      ).filter((dt): dt is DocType => dt !== null);
+      if (compatibleDocTypes.length === 0) {
+        setLoadError(
+          `No compatible provisions were found for DTID ${sourceDtidInput} with the current document type.`
+        );
+        return;
+      }
+      setSourceDocTypes(compatibleDocTypes);
       setSourceDtidSearched(true);
     } catch (err) {
       console.log('Error searching for DTID');

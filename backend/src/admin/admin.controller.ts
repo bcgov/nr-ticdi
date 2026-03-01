@@ -146,7 +146,7 @@ export class AdminController {
   }
 
   /**
-   * Used for an AJAX route to render all admins in a datatable
+   * Used for an AJAX route to render all admins in a datatable.
    * @returns altered admin object array
    */
   @Get('get-admins')

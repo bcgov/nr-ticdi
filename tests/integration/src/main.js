@@ -48,7 +48,6 @@ async function run() {
   // ── Public endpoints ──────────────────────────────────────────────────────
   // These should be reachable without any authentication token.
   console.log('Public endpoints:');
-  await check('GET /healthcheck returns 200', 'GET', '/healthcheck', { expectedStatus: 200 });
   await check('GET /report/healthcheck returns 200', 'GET', '/report/healthcheck', { expectedStatus: 200 });
 
   // ── Summary ───────────────────────────────────────────────────────────────

@@ -35,8 +35,10 @@
     "web-vitals": "^5.1.0"
   },
   "devDependencies": {
-    "@types/node": "^22.13.5",
+    "@playwright/test": "^1.58.2",
+    "@types/node": "^22.19.13",
     "@vitejs/plugin-react": "^4.3.4",
+    "dotenv": "^17.3.1",
     "sass": "^1.97.3",
     "vite": "^6.0.11"
   },
@@ -45,7 +47,9 @@
     "build": "tsc && vite build",
     "preview": "vite preview",
     "test": "echo 'Tests passed (mock)'",
-    "test:cov": "echo 'Coverage tests passed (mock)'"
+    "test:cov": "echo 'Coverage tests passed (mock)'",
+    "test:e2e": "playwright test",
+    "test:e2e:report": "playwright show-report"
   },
   "eslintConfig": {
     "extends": [

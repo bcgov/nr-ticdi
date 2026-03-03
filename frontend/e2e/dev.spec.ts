@@ -74,7 +74,7 @@ test.describe('Dev environment', () => {
     await expect(tfn).not.toBeEmpty({ timeout: 15000 });
 
     // Click Create and expect a file download
-    const downloadPromise = page.waitForEvent('download', { timeout: 30000 });
+    const downloadPromise = page.waitForEvent('download', { timeout: 10000 });
     await page.getByRole('button', { name: 'Create' }).click();
     const download = await downloadPromise;
 
@@ -189,5 +189,112 @@ test.describe('Dev environment', () => {
     await expect(removeDialog).toBeVisible();
     await removeDialog.getByRole('button', { name: 'Remove' }).click();
     await expect(editedRow).not.toBeVisible({ timeout: 10000 });
+  });
+
+  test('Manage Provisions: create, edit, add variable, verify, delete', async ({ page }) => {
+    const provisionName = `E2E Provision ${Date.now()}`;
+    const updatedProvisionName = `${provisionName} Updated`;
+    const freeText = 'E2E free text content';
+    const category = 'E2E Category';
+    const variableName = 'E2E_VAR';
+    const variableValue = 'e2e variable value';
+
+    await page.goto('/manage-provisions');
+    await loginAsIdir(page);
+    await expect(page.locator('h1', { hasText: 'Manage Provisions' })).toBeVisible();
+
+    // ------------------------------------------------------------------
+    // Step 1: Add a new provision
+    // ------------------------------------------------------------------
+    await page.getByRole('button', { name: 'Add a Provision' }).click();
+    const dialog = page.getByRole('dialog');
+    await expect(dialog.locator('.modal-title', { hasText: 'Add Provision' })).toBeVisible();
+
+    await dialog.locator('input[name="provision"]').fill(provisionName);
+    await dialog.locator('textarea[name="free_text"]').fill(freeText);
+    await dialog.locator('input[name="category"]').fill(category);
+    await dialog.getByRole('button', { name: 'Save' }).click();
+    await expect(dialog).not.toBeVisible({ timeout: 10000 });
+
+    // ------------------------------------------------------------------
+    // Step 2: Filter to the new provision and open Edit
+    // ------------------------------------------------------------------
+    await page.locator('input.form-control[placeholder="Search..."]').fill(provisionName);
+
+    const provisionRow = page
+      .locator('table tbody tr')
+      .filter({ has: page.locator(`input[value="${provisionName}"]`) });
+    await expect(provisionRow).toBeVisible({ timeout: 10000 });
+    await provisionRow.getByRole('button', { name: 'Edit' }).click();
+
+    // ------------------------------------------------------------------
+    // Step 3: Edit the provision name, add a variable, and save
+    // ------------------------------------------------------------------
+    const editDialog = page.getByRole('dialog');
+    await expect(editDialog.locator('.modal-title', { hasText: 'Edit Provision' })).toBeVisible();
+
+    // Add a variable
+    await editDialog.getByRole('button', { name: 'Add a Variable' }).click();
+    await expect(editDialog.locator('.modal-title', { hasText: 'Add Variable' })).toBeVisible();
+
+    // Variable Name / Variable Value / Help Text — no name attrs, target by order
+    await editDialog.locator('input[type="text"]').nth(0).fill(variableName);
+    await editDialog.locator('textarea').fill(variableValue);
+    await editDialog.getByRole('button', { name: 'Save' }).click();
+
+    // After saving variable, modal returns to Edit Provision view
+    await expect(editDialog.locator('.modal-title', { hasText: 'Edit Provision' })).toBeVisible({ timeout: 10000 });
+
+    // Change the provision name.
+    // The EditProvisionModalForm uses defaultValue (uncontrolled input) and re-mounts when
+    // navigating to Add Variable and back, so we triple-click to select all before filling
+    // to ensure the native input event fires and React's onChange updates state.
+    const nameInput = editDialog.locator('input[name="provision"]');
+    await nameInput.click({ clickCount: 3 });
+    await nameInput.fill(updatedProvisionName);
+    await nameInput.press('Tab'); // trigger onBlur / ensure onChange has fired
+
+    // Save the provision
+    await editDialog.getByRole('button', { name: 'Save' }).click();
+    await expect(editDialog).not.toBeVisible({ timeout: 10000 });
+
+    // ------------------------------------------------------------------
+    // Step 4: Open Edit again and verify the updated name and variable
+    // ------------------------------------------------------------------
+    // Re-apply the filter with the updated name so the row is visible
+    await page.locator('input.form-control[placeholder="Search..."]').fill(updatedProvisionName);
+
+    const updatedRow = page
+      .locator('table tbody tr')
+      .filter({ has: page.locator(`input[value="${updatedProvisionName}"]`) });
+    await expect(updatedRow).toBeVisible({ timeout: 10000 });
+    await updatedRow.getByRole('button', { name: 'Edit' }).click();
+
+    const verifyDialog = page.getByRole('dialog');
+    await expect(verifyDialog.locator('.modal-title', { hasText: 'Edit Provision' })).toBeVisible();
+
+    // Verify updated provision name
+    await expect(verifyDialog.locator('input[name="provision"]')).toHaveValue(updatedProvisionName);
+
+    // Verify the variable row exists in the variables table
+    // variableName is rendered inside an <input>, so match by value attribute rather than text content
+    await expect(
+      verifyDialog.locator('table tbody tr').filter({ has: page.locator(`input[value="${variableName}"]`) })
+    ).toBeVisible({
+      timeout: 10000,
+    });
+
+    await verifyDialog.getByRole('button', { name: 'Cancel' }).click();
+    await expect(verifyDialog).not.toBeVisible({ timeout: 10000 });
+
+    // ------------------------------------------------------------------
+    // Step 5: Delete the provision
+    // ------------------------------------------------------------------
+    await updatedRow.getByRole('button', { name: 'Remove' }).click();
+
+    const removeDialog = page.getByRole('dialog');
+    await expect(removeDialog).toBeVisible();
+    await removeDialog.getByRole('button', { name: 'Remove' }).click();
+    await expect(updatedRow).not.toBeVisible({ timeout: 10000 });
   });
 });

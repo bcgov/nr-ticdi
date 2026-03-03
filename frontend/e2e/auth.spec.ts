@@ -35,6 +35,7 @@ test.describe('Authenticated user', () => {
     await expect(page.locator('#createDocumentLink')).toBeVisible();
   });
 
+  // ttls data for 921528 exists on all environments
   test('retrieving DTID 921528 populates tenure file number without errors', async ({ page }) => {
     await page.goto('/');
     await loginAsIdir(page);
@@ -50,5 +51,50 @@ test.describe('Authenticated user', () => {
 
     // No error alert should be visible
     await expect(page.locator('[role="alert"].alert-danger')).not.toBeVisible();
+  });
+
+  // These tests verify that each admin pages & search page loads data into their tables.
+  test.describe('page table data loads', () => {
+    test.describe.configure({ retries: 2 });
+
+    test('search page loads data into table', async ({ page }) => {
+      await page.goto('/search');
+      await loginAsIdir(page);
+
+      await expect(page.locator('.h1', { hasText: 'Search' })).toBeVisible();
+      await expect(page.locator('table tbody tr').first()).toBeVisible({ timeout: 15000 });
+    });
+
+    test('manage-admins page loads data into table', async ({ page }) => {
+      await page.goto('/manage-admins');
+      await loginAsIdir(page);
+
+      await expect(page.locator('h1', { hasText: 'Manage Administrators' })).toBeVisible();
+      await expect(page.locator('table tbody tr').first()).toBeVisible({ timeout: 15000 });
+    });
+
+    test('manage-doc-types page loads data into table', async ({ page }) => {
+      await page.goto('/manage-doc-types');
+      await loginAsIdir(page);
+
+      await expect(page.locator('h1', { hasText: 'Manage Document Types' })).toBeVisible();
+      await expect(page.locator('table tbody tr').first()).toBeVisible({ timeout: 15000 });
+    });
+
+    test('manage-templates page loads data into table', async ({ page }) => {
+      await page.goto('/manage-templates');
+      await loginAsIdir(page);
+
+      await expect(page.locator('h1', { hasText: 'Manage Templates' })).toBeVisible();
+      await expect(page.locator('table tbody tr').first()).toBeVisible({ timeout: 15000 });
+    });
+
+    test('manage-provisions page loads data into table', async ({ page }) => {
+      await page.goto('/manage-provisions');
+      await loginAsIdir(page);
+
+      await expect(page.locator('h1', { hasText: 'Manage Provisions' })).toBeVisible();
+      await expect(page.locator('table tbody tr').first()).toBeVisible({ timeout: 15000 });
+    });
   });
 });

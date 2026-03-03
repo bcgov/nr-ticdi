@@ -50,6 +50,7 @@ jobs:
     uses: ./.github/workflows/.tests.yml
     with:
       target: ${{ github.event.number }}
+      target_env: dev
 
   results:
     name: PR Results

@@ -15,6 +15,12 @@ on:
         required: false
         type: string
 
+      target_env:
+        description: Logical environment name (dev, test, prod). Controls which test suites run (e.g. dev-only tests).
+        required: false
+        type: string
+        default: ''
+
 env:
   DOMAIN: apps.silver.devops.gov.bc.ca
   PREFIX: ${{ github.event.repository.name }}-${{ inputs.target }}
@@ -61,6 +67,7 @@ jobs:
       - name: Run Playwright tests
         env:
           BASE_URL: https://${{ github.event.repository.name }}-${{ inputs.target }}-frontend.${{ env.DOMAIN }}/
+          E2E_TARGET: ${{ inputs.target_env }}
         run: npx playwright test
         working-directory: ./frontend
 

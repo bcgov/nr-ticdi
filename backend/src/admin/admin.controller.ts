@@ -57,7 +57,7 @@ export class AdminController {
   }
 
   @Get('update-template/:id/:documentTypeId/:documentNo/:documentName')
-  async upddateTemplate(
+  async updateTemplate(
     @User() user: IdirObject,
     @Param('id') id: number,
     @Param('document_type_id') document_type_id: number,

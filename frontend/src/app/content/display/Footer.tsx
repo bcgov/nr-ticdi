@@ -57,7 +57,9 @@ const Footer: FC = () => {
               </a>
             </li>
           </ul>
-          <div className="version">Version 1.0.2</div>
+          <div style={{ color: 'white' }} className="version">
+            Version 2.1.0
+          </div>
         </div>
       </nav>
     </footer>

@@ -1,0 +1,12 @@
+{
+  "name": "integration-tests",
+  "version": "1.0.0",
+  "description": "Integration tests for the TICDI NestJS backend API",
+  "main": "src/main.js",
+  "scripts": {
+    "test": "node src/main.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

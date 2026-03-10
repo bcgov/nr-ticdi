@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Button, Col, Form, Modal, Spinner } from 'react-bootstrap';
-
+//
 interface AddVariableModalFormProps {
   loading: boolean;
   onHide: () => void;

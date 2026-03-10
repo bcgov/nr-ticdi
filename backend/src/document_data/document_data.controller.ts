@@ -1,7 +1,7 @@
 import { Controller, Delete, Get, Param, Post, UseGuards } from '@nestjs/common';
 import { DocumentDataService } from './document_data.service';
 import { JwtAuthGuard } from 'src/auth/jwtauth.guard';
-
+//
 @Controller('document-data')
 @UseGuards(JwtAuthGuard)
 export class DocumentDataController {

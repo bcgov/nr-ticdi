@@ -323,9 +323,7 @@ const LandingPage: FC = () => {
           ? compatibleDocTypes.filter((dt) => dt.id !== documentType.id)
           : compatibleDocTypes;
       if (filteredDocTypes.length === 0) {
-        setLoadError(
-          `No compatible provisions were found for DTID ${sourceDtidInput} with the current document type.`
-        );
+        setLoadError(`No compatible provisions were found for DTID ${sourceDtidInput} with the current document type.`);
         return;
       }
       setSourceDocTypes(filteredDocTypes);
@@ -616,6 +614,21 @@ const LandingPage: FC = () => {
         >
           Clear
         </Button>
+        <Button
+          variant="outline-secondary"
+          disabled={!documentType}
+          style={
+            !documentType
+              ? { backgroundColor: '#d6d6d6', borderColor: '#bbb', color: '#888', marginLeft: '10px' }
+              : { marginLeft: '10px' }
+          }
+          onClick={() => {
+            setSourceDocTypeId(selectedDocTypeId);
+            setShowLoadModal(true);
+          }}
+        >
+          Load Previous Provisions
+        </Button>
       </div>
       {showError && (
         <Alert variant="danger" className="mb-3 d-inline-block" style={{ width: 'auto', maxWidth: '100%' }}>
@@ -658,21 +671,6 @@ const LandingPage: FC = () => {
               </option>
             ))}
           </select>
-        </div>
-      </Row>
-      <Row className="mb-3">
-        <div className="ml-3">
-          <Button
-            variant="outline-secondary"
-            disabled={!documentType}
-            style={!documentType ? { backgroundColor: '#d6d6d6', borderColor: '#bbb', color: '#888' } : {}}
-            onClick={() => {
-              setSourceDocTypeId(selectedDocTypeId);
-              setShowLoadModal(true);
-            }}
-          >
-            Load Previous Provisions
-          </Button>
         </div>
       </Row>
       <Modal show={showLoadModal} onHide={handleCloseLoadModal} centered dialogClassName="modal-600">

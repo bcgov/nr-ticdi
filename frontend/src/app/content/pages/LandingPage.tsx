@@ -33,6 +33,20 @@ import { RootState } from '../../store/store';
 import { setSearchState } from '../../store/reducers/searchSlice';
 import { useParams } from 'react-router-dom';
 
+const RIGHT_OF_WAY_LICENCE_DOCUMENT_TYPES = new Set([
+  'BCHMA SCHEDULE B - UTILITY LICENCE',
+  'BCHMA SCHEDULE D  - ROADWAY LICENCE',
+  'BCHMA SCHEDULE H - STANDARD LICENCE',
+  'BCHMA SCHEDULE H2 - STANDARD LICENCE SPECIAL TERMS',
+]);
+
+const normalizeTypeValue = (value?: string | null): string => (value || '').trim().toUpperCase();
+
+const isRightOfWayValue = (value?: string | null): boolean => {
+  const normalized = normalizeTypeValue(value).replace(/-/g, ' ');
+  return normalized.includes('RIGHT OF WAY');
+};
+
 const LandingPage: FC = () => {
   const { dtidNumber, docTypeFromUrl } = useParams();
   const dtidFromUrl = dtidNumber ? parseInt(dtidNumber) : null;
@@ -206,7 +220,10 @@ const LandingPage: FC = () => {
 
   useEffect(() => {
     if (data && data.type) {
-      switch (data.type) {
+      const normalizedType = normalizeTypeValue(data.type);
+      const isRightOfWay = isRightOfWayValue(data.type) || isRightOfWayValue(data.subType);
+
+      switch (normalizedType) {
         case 'LEASE':
           // filter out document type that includes word LICENCE
           setFilteredDocumentTypes(documentTypes.filter((dt) => !dt.name.toLowerCase().includes('licence')));
@@ -216,6 +233,28 @@ const LandingPage: FC = () => {
           setFilteredDocumentTypes(documentTypes.filter((dt) => !dt.name.toLowerCase().includes('lease')));
           break;
         default:
+          if (isRightOfWay) {
+            // Right-of-way files should include these BCHMA licence schedules in addition to non-lease/non-licence types.
+            setFilteredDocumentTypes(
+              documentTypes.filter((dt) => {
+                const normalizedName = dt.name.trim().toUpperCase();
+                const hasLease = normalizedName.includes('LEASE');
+                const hasLicence = normalizedName.includes('LICENCE');
+
+                if (hasLease) {
+                  return false;
+                }
+
+                if (!hasLicence) {
+                  return true;
+                }
+
+                return RIGHT_OF_WAY_LICENCE_DOCUMENT_TYPES.has(normalizedName);
+              })
+            );
+            break;
+          }
+
           // if data.type is neither LEASE nor LICENCE, exclude document types with lease or licence in name
           setFilteredDocumentTypes(
             documentTypes.filter(

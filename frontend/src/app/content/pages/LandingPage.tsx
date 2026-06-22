@@ -33,14 +33,22 @@ import { RootState } from '../../store/store';
 import { setSearchState } from '../../store/reducers/searchSlice';
 import { useParams } from 'react-router-dom';
 
-const RIGHT_OF_WAY_LICENCE_DOCUMENT_TYPES = new Set([
-  'BCHMA SCHEDULE B - UTILITY LICENCE',
-  'BCHMA SCHEDULE D  - ROADWAY LICENCE',
-  'BCHMA SCHEDULE H - STANDARD LICENCE',
-  'BCHMA SCHEDULE H2 - STANDARD LICENCE SPECIAL TERMS',
-]);
-
 const normalizeTypeValue = (value?: string | null): string => (value || '').trim().toUpperCase();
+
+const normalizeDocumentTypeName = (value?: string | null): string =>
+  normalizeTypeValue(value)
+    .replace(/\s*-\s*/g, ' - ')
+    .replace(/\s+/g, ' ')
+    .trim();
+
+const RIGHT_OF_WAY_LICENCE_DOCUMENT_TYPES = new Set(
+  [
+    'BCHMA SCHEDULE B - UTILITY LICENCE',
+    'BCHMA SCHEDULE D  - ROADWAY LICENCE',
+    'BCHMA SCHEDULE H - STANDARD LICENCE',
+    'BCHMA SCHEDULE H2 - STANDARD LICENCE SPECIAL TERMS',
+  ].map(normalizeDocumentTypeName)
+);
 
 const isRightOfWayValue = (value?: string | null): boolean => {
   const normalized = normalizeTypeValue(value).replace(/-/g, ' ');
@@ -237,7 +245,7 @@ const LandingPage: FC = () => {
             // Right-of-way files should include these BCHMA licence schedules in addition to non-lease/non-licence types.
             setFilteredDocumentTypes(
               documentTypes.filter((dt) => {
-                const normalizedName = dt.name.trim().toUpperCase();
+                const normalizedName = normalizeDocumentTypeName(dt.name);
                 const hasLease = normalizedName.includes('LEASE');
                 const hasLicence = normalizedName.includes('LICENCE');
 

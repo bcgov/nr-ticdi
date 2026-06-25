@@ -50,6 +50,28 @@ const RIGHT_OF_WAY_LICENCE_DOCUMENT_TYPES = new Set(
   ].map(normalizeDocumentTypeName)
 );
 
+const isRightOfWayBchmaLicenceSchedule = (normalizedName: string): boolean => {
+  const isScheduleB =
+    /\bSCHEDULE B\b/.test(normalizedName) && /\bUTILITY\b/.test(normalizedName) && /\bLICENCE\b/.test(normalizedName);
+
+  const isScheduleD =
+    /\bSCHEDULE D\b/.test(normalizedName) && /\bROADWAY\b/.test(normalizedName) && /\bLICENCE\b/.test(normalizedName);
+
+  const isScheduleH =
+    /\bSCHEDULE H\b/.test(normalizedName) &&
+    !/\bSCHEDULE H2\b/.test(normalizedName) &&
+    /\bSTANDARD\b/.test(normalizedName) &&
+    /\bLICENCE\b/.test(normalizedName);
+
+  const isScheduleH2 =
+    /\bSCHEDULE H2\b/.test(normalizedName) &&
+    /\bSTANDARD\b/.test(normalizedName) &&
+    /\bLICENCE\b/.test(normalizedName) &&
+    /\bSPECIAL\b/.test(normalizedName);
+
+  return isScheduleB || isScheduleD || isScheduleH || isScheduleH2;
+};
+
 const isRightOfWayValue = (value?: string | null): boolean => {
   const normalized = normalizeTypeValue(value).replace(/-/g, ' ');
   return normalized.includes('RIGHT OF WAY');
@@ -257,7 +279,10 @@ const LandingPage: FC = () => {
                   return true;
                 }
 
-                return RIGHT_OF_WAY_LICENCE_DOCUMENT_TYPES.has(normalizedName);
+                return (
+                  RIGHT_OF_WAY_LICENCE_DOCUMENT_TYPES.has(normalizedName) ||
+                  isRightOfWayBchmaLicenceSchedule(normalizedName)
+                );
               })
             );
             break;
